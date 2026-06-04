@@ -29,8 +29,8 @@ graphengine-parsing = { path = "../graphengine-parsing" }
 async-trait = "0.1"
 anyhow = "1.0"
 tracing = "0.1"
-url = "2.4"
-rayon = "1.8"
+url = "2.5"
+rayon = "1.12"
 # MockLspResolver fans out the four `resolve_*` async calls under
 # `tokio::try_join!`. We only need the macro surface — no rt features
 # required because the resolver's caller drives the runtime.

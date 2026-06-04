@@ -38,7 +38,7 @@ license = "MIT OR Apache-2.0"
 [workspace.lints.rust]
 
 [workspace.dependencies]
-tokio = { version = "1.0", features = ["full"] }
+tokio = { version = "1.50", features = ["full"] }
 tokio-util = { version = "0.7", features = ["rt"] }
 # Pinned via workspace so every engine binary, the runner, and both
 # consumer surfaces (CLI + desktop) build against the same serde versions.

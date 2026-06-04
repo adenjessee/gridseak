@@ -72,15 +72,15 @@ tree-sitter-sfapex-vendored = { path = "vendor/tree-sitter-sfapex" }
 # trigger-meta.xml, cls-meta.xml). Avoids pulling a heavyweight DOM crate
 # for what are very small, flat files.
 quick-xml = "0.36"
-rayon = "1.8"
-tokio = { version = "1.0", features = ["full"] }
+rayon = "1.12"
+tokio = { version = "1.50", features = ["full"] }
 lsp-types = "0.95"
 lsp-server = "0.7"
-url = "2.4"
+url = "2.5"
 nix = "0.27"
 rusqlite = { version = "0.32", features = ["bundled"] }
-clap = { version = "4.0", features = ["derive"] }
-fastrand = "2.0"
+clap = { version = "4.5", features = ["derive"] }
+fastrand = "2.4"
 which = "4.4"
 syn = { version = "2.0", features = ["full"] }
 futures = "0.3.32"
@@ -92,9 +92,9 @@ futures = "0.3.32"
 graphengine-progress = { path = "../graphengine-progress" }
 
 [dev-dependencies]
-proptest = "1.0"
+proptest = "1.11"
 criterion = "0.5"
-tokio = { version = "1.0", features = ["full"] }
+tokio = { version = "1.50", features = ["full"] }
 tempfile = "3.8"
 libfuzzer-sys = "0.4"
 # Mock implementations of the parser's port traits live in a separate
