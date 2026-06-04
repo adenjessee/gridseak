@@ -13,8 +13,9 @@ user-facing docs live at the repo root:
 - [`BUILD.md`](../BUILD.md) — build from source, reproducible-build status
 - [`LIMITATIONS.md`](../LIMITATIONS.md) — what GridSeak does **not** do
 - [`CHANGELOG.md`](../CHANGELOG.md) — release notes
-- [`CONTRIBUTING.md`](../CONTRIBUTING.md) — how to send a PR
-- [`SECURITY.md`](../SECURITY.md) — how to report a vulnerability
+- [`CONTRIBUTING.md`](../CONTRIBUTING.md) — how to send a PR (solo-maintained)
+- [`LICENSE-COMMITMENT.md`](../LICENSE-COMMITMENT.md) — MIT OR Apache-2.0 stays permissive
+- [`SECURITY.md`](../SECURITY.md) — solo maintainer; GitHub advisories for serious issues only
 - [`THIRD-PARTY.md`](../THIRD-PARTY.md) — dependency attribution
 
 ---

@@ -212,5 +212,5 @@ Next steps
      two tool calls. If it doesn't:
        $BIN_DIR/gridseak setup --verify
 
-Full walkthrough: https://gridseak.com/cli
+Full walkthrough: https://github.com/adenjessee/gridseak/blob/main/docs/05-deployment/GRIDSEAK_CLI_MCP_SETUP.md
 EOF

@@ -1,8 +1,7 @@
 <!--
-Thank you for the PR. Please fill out the sections below. We close
-PRs without any description, even if the change is good, because
-without a description the review is more expensive than the change
-is worth.
+Thank you for the PR. Please fill out the sections below. PRs with no
+description are hard to review on a solo-maintained project and may sit
+open until there is enough context to merge safely.
 -->
 
 ## What this PR does

@@ -225,7 +225,7 @@ a local SQLite table — nothing leaves your machine unless you explicitly
 export it. Tell us what would unlock you and we'll see it the next
 time you choose to share.
 
-Full walkthrough: <https://gridseak.com/cli>
+Full walkthrough: <https://github.com/adenjessee/gridseak/blob/main/docs/05-deployment/GRIDSEAK_CLI_MCP_SETUP.md>
 EOF
 
   ARCHIVE_NAME="gridseak-${VERSION}-${TARGET}.tar.gz"

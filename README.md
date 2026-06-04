@@ -1,11 +1,15 @@
 # GridSeak
 
+**Maintainer:** one person, spare time, pre-1.0. Everything runs on your
+machine; there is no GridSeak cloud. **Use at your own risk** — same bargain
+as any indie OSS CLI you `curl | sh`.
+
 > **For your coding agent:** a deterministic call graph it can quote —
 > every edge tagged with its evidence tier, every answer grounded in a
 > path the agent did not hallucinate.
 >
 > **For you:** GridSeak gives your AI a structural-knowledge layer
-> beside the IDE. Fourteen MCP tools, all local, all 0 LLM tokens. The
+> beside the IDE. Twelve MCP tools, all local, all 0 LLM tokens. The
 > agent stops re-grepping your repo and starts quoting facts.
 
 GridSeak is built for the agent first and the human second. The MCP
@@ -50,7 +54,7 @@ Next: gridseak setup   (wires the MCP server into your IDE)
 ## What the agent calls (the MCP surface)
 
 GridSeak registers as an MCP server when you run `gridseak setup`.
-From that moment on, your agent has fourteen tools available. Each one
+From that moment on, your agent has twelve tools available. Each one
 is written so the agent knows *when* to call it, not just how. Every
 response carries an `evidence: "deterministic_local_analysis"` marker
 and a `tier_legend` — Cursor's planner reads those fields as "cheap
@@ -59,14 +63,12 @@ and trustworthy" and prefers us over re-grepping the repo.
 | Tool | When the agent calls it |
 | --- | --- |
 | `gridseak_context_for_llm` | **First call** on a new conversation. One-shot bundle: summary + metrics + priorities + caveats + artifact paths + `next_tool` hints. |
-| `gridseak_route` | "Which GridSeak tool fits this intent?" Meta-router — give it a natural-language goal, it returns the tool to call next and the args to use. For when the agent is unsure which structural query applies. |
 | `gridseak_status` | Cheap probe — health + scan metadata. |
 | `gridseak_scan` | Fresh parse + analysis. Only when `status` reports no recent scan. |
 | `gridseak_get_recommendations` | "What should we refactor first?" / "Where's risky?" Ranked deterministic priorities. |
 | `gridseak_explain_finding` | Drill into a priority by `finding_id`. Narrative + suggested action. |
 | `gridseak_get_findings` | Raw unranked list, filterable by severity. |
-| `gridseak_graph_blast_radius` | "If I change this **symbol**, what breaks?" Transitive **upstream** callers (reverse BFS), depth-bounded. |
-| `gridseak_graph_file_blast_radius` | "If I change this **file**, what breaks?" File-level reverse reachability — the whole-file companion to `graph_blast_radius`. |
+| `gridseak_graph_blast_radius` | "If I change X, what breaks?" Transitive **upstream** callers (reverse BFS), depth-bounded. |
 | `gridseak_graph_callers` / `_callees` | "Who calls X?" / "What does X call?" Direct only. |
 | `gridseak_graph_slice` | Full upstream+downstream neighborhood (heavier). |
 | `gridseak_graph_module_coupling` | Top tightly-coupled module pairs. |
@@ -107,35 +109,29 @@ configs into `~/.gridseak/bin`. SHA256-verified against the public manifest.
 ```sh
 # macOS (Apple Silicon + Intel) and Linux x86_64:
 curl -fsSL https://raw.githubusercontent.com/adenjessee/gridseak/main/scripts/install/install.sh | bash
-# Windows x86_64 (PowerShell):
-# iwr https://raw.githubusercontent.com/adenjessee/gridseak/main/scripts/install/install.ps1 -useb | iex
+# Windows:
+iwr https://raw.githubusercontent.com/adenjessee/gridseak/main/scripts/install/install.ps1 -useb | iex
 ```
 
-The installer reads the manifest attached to the latest GitHub release and
-SHA256-verifies each download — no website or CDN in the path. Once
-`gridseak.com` mirrors the release assets, the shorter
-`curl -fsSL https://gridseak.com/install.sh | sh` becomes an equivalent
-alias (override anytime with `GRIDSEAK_MANIFEST_URL`).
+Shorter `gridseak.com` URLs work when that host mirrors the release; GitHub
+is the canonical source today.
 
-**Supported at v0.1.0:** macOS (aarch64 + x86_64), Linux x86_64, and
-Windows (x86_64). On any other host the installer exits with an explicit
-"no artifact" message rather than installing the wrong binary.
+**Supported at v0.1.0:** macOS (aarch64 + x86_64) and Windows (x86_64).
+Linux tarballs are not shipped yet — `install.sh` will fail with an explicit
+"no artifact" message on Linux until we add them.
 
 **From source (full workspace build):**
 
 ```sh
-git clone https://github.com/adenjessee/gridseak
-cd gridseak
+git clone https://github.com/adenjessee/gridseak-graphengine
+cd gridseak-graphengine
 cargo build --release -p gridseak-cli
 # binaries land in target/release/ — see BUILD.md for PATH + sidecars
 ```
 
-`cargo install --path gridseak-cli --locked` installs the **CLI binary
-only** — not `graphengine-parsing`, `ge-analyze`, or `configs/`. The
-`--locked` flag is required (the committed `Cargo.lock` pins a single
-`tree-sitter`; an unlocked resolve breaks the build — see
-[`INSTALL.md`](docs/05-deployment/INSTALL.md)). Use `curl | sh` or a full
-workspace build for a working scan.
+`cargo install --path gridseak-cli` installs the **CLI binary only** — not
+`graphengine-parsing`, `ge-analyze`, or `configs/`. Use `curl | sh` or a
+full workspace build for a working scan.
 
 Then wire it into your IDE(s):
 
@@ -146,7 +142,7 @@ gridseak setup --verify       # post-install sanity check
 
 - **Cursor** + **Windsurf** — fully automated. `gridseak setup` writes
   `mcp.json` and (for Cursor) the rule file that teaches the agent
-  when to call each of the fourteen MCP tools.
+  when to call each of the twelve MCP tools.
 - **Claude Code** — prints the official `claude mcp add` command.
 - **Codex** — prints the TOML snippet to paste into `~/.codex/config.toml`.
 
@@ -162,8 +158,8 @@ its first two tool calls. If it doesn't, run `gridseak setup --verify`.
 - **Languages with Tier 0 (tree-sitter parsed) edges:** Rust,
   TypeScript, JavaScript, Apex. Python is parsed at skeleton level.
 - **Install platforms (v0.1.0):** macOS (Apple Silicon + Intel), Linux
-  x86_64, and Windows x86_64, installed from the GitHub release manifest
-  via `install.sh` / `install.ps1`. Linux arm64 is not shipped yet.
+  x86_64, and Windows x86_64 via the install scripts on GitHub Releases
+  (see [`docs/05-deployment/INSTALL.md`](docs/05-deployment/INSTALL.md)).
 - **Other languages:** Tier 1 (filtered grep) only.
 - **Telemetry:** **None.** Everything stays in `.gridseak/` on your
   machine. There is nothing to opt out of because nothing is being
@@ -197,8 +193,8 @@ public binary.
 ## Build from source
 
 ```sh
-git clone https://github.com/adenjessee/gridseak
-cd gridseak
+git clone https://github.com/adenjessee/gridseak-graphengine
+cd gridseak-graphengine
 cargo build --release         # the public surface
 cargo test --workspace        # ~370 tests, ~50s
 ```
@@ -229,7 +225,7 @@ Licensed under either of
 at your option. The dual-license is the Rust ecosystem standard;
 recipients pick the one that fits their downstream constraints.
 
-We publicly commit not to relicense this tree to more restrictive terms.
+The maintainer commits not to relicense this tree to more restrictive terms.
 See [`LICENSE-COMMITMENT.md`](LICENSE-COMMITMENT.md).
 
 ### Contribution
@@ -241,12 +237,11 @@ additional terms or conditions.
 
 ## Contributing
 
-See [`CONTRIBUTING.md`](CONTRIBUTING.md). The short version: open an
-issue first if your change is larger than a bug-fix or a small
-feature; PRs without a tracking issue get closed politely. We try
-hard to keep this honest, even when politeness costs us throughput.
+See [`CONTRIBUTING.md`](CONTRIBUTING.md). Solo-maintained — small, focused
+PRs with tests are the fastest path to merge.
 
 ## Security
 
-See [`SECURITY.md`](SECURITY.md) for how to report vulnerabilities
-privately.
+Pre-1.0, local-only, no security team. See [`SECURITY.md`](SECURITY.md) —
+use a GitHub Security Advisory only for serious exploit-class issues;
+everything else is a normal issue.

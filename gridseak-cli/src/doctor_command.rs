@@ -354,7 +354,7 @@ fn check_path() -> PathCheck {
             // user 15 minutes of debugging.
             detail: Some(
                 "the gridseak on PATH is not the binary you're currently running. \
-                 If you installed via `https://gridseak.com/install.sh`, ensure \
+                 If you installed via the GitHub release script, ensure \
                  `~/.gridseak/bin` precedes any older install on your PATH."
                     .to_string(),
             ),

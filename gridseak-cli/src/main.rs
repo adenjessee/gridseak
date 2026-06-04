@@ -105,7 +105,7 @@ Then drilldown:
   gridseak compare --previous  Delta vs your previous scan
   gridseak context --for-llm   Compact agent-ready context bundle
 
-Docs:      https://gridseak.com/cli
+Docs:      https://github.com/adenjessee/gridseak/blob/main/docs/05-deployment/GRIDSEAK_CLI_MCP_SETUP.md
 Feedback:  gridseak feedback \"<text>\"   (stored locally, never uploaded)
 ";
 

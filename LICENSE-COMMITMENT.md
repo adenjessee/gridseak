@@ -1,42 +1,36 @@
 # License commitment
 
-GridSeak (the CLI, MCP server, and all open-source crates in this
-repository) is and will remain licensed under **MIT OR Apache-2.0**.
-Recipients choose one license; both apply to the same source tree.
+GridSeak (the CLI, MCP server, and open-source crates in this repository) is
+and will remain licensed under **MIT OR Apache-2.0**. You pick one license;
+both apply to the same source tree.
 
-## What we promise
+## What I commit to
 
-1. **No relicensing.** We will not change the license of code already
-   published under MIT OR Apache-2.0 to a more restrictive license
-   (SSPL, BSL, PolyForm Noncommercial, proprietary, or similar).
-2. **No license gating in this repo.** Paid features (team sync, SSO,
-   audit retention, hosted services) live in separate products and
-   repositories. The on-machine open-source surface stays free and
-   permissively licensed.
-3. **Contributions stay permissive.** We use a Developer Certificate of
-   Origin (DCO), not a Contributor License Agreement that would grant us
-   rights to relicense your work under different terms.
+1. **No relicensing** of code already published under MIT OR Apache-2.0 to a
+   more restrictive license (SSPL, BSL, PolyForm Noncommercial, proprietary,
+   or similar).
+2. **No license gating in this repo.** Paid or hosted features, if they ever
+   exist, live in separate products — not in the on-machine open-source tree.
+3. **Contributions stay permissive.** DCO sign-off, not a CLA that would let me
+   relicense your work under different terms.
 
 ## What this does not mean
 
-- Permissive licenses **allow** commercial use, forks, and competing
-  products. That is intentional. Our moat is quality, tier honesty, and
-  trust — not legal lock-out of the local tool.
-- **Trademark** "GridSeak" and our logos are not covered by MIT or
-  Apache. Forks must not imply endorsement. See project branding
-  guidance in the README.
-- This file is a **public commitment**, not a separate legal contract.
-  The actual license terms are in `LICENSE-MIT` and `LICENSE-APACHE`.
+- MIT and Apache-2.0 **allow** commercial use, forks, and competing products.
+  That's intentional.
+- The **GridSeak** name and logos are not covered by those licenses. Forks
+  must not imply endorsement.
+- This file is a **public statement of intent**, not a separate contract.
+  The legal terms are in `LICENSE-MIT` and `LICENSE-APACHE`.
 
-## If you need a fork under different terms
+## Forks
 
-You may fork under MIT OR Apache-2.0 and maintain your own derivative.
-We will not relicense this upstream to block you.
+You may fork under MIT OR Apache-2.0. I will not relicense upstream to block
+you.
 
 ## Questions
 
-License or contribution questions: open a GitHub issue or email
-aden@gridseak.com.
+Open a [GitHub issue](https://github.com/adenjessee/gridseak/issues) or
+[Discussion](https://github.com/adenjessee/gridseak/discussions).
 
-*Effective: June 2026. Applies to all releases tagged from this
-repository.*
+*Effective: June 2026. Applies to releases tagged from this repository.*

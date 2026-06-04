@@ -9,9 +9,8 @@ assignees: ''
 ## The problem this solves
 
 <!-- Describe the situation in which you would use this feature, and
-     what is currently missing or awkward. We weigh feature requests
-     mostly by the size of the underlying problem, not the elegance
-     of the solution. -->
+     what is currently missing or awkward. Feature requests are weighed
+     by problem size, not solution elegance. -->
 
 ## Proposed solution
 
@@ -48,5 +47,5 @@ assignees: ''
 - [ ] Would significantly improve my workflow
 - [ ] Nice to have
 
-(Honest answers help us prioritize. "Blocking my use" is treated
-seriously; "nice to have" gets a calmer pace.)
+(Honest answers help prioritize. "Blocking" gets attention first;
+"nice to have" may wait.)

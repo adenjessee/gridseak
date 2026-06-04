@@ -254,14 +254,11 @@ form.
 
 ## How to challenge this document
 
-If you find a limitation we should add: open an issue with the label
-`docs: limitations`. We will add it. We would much rather be honest
-about a gap than have you discover it the hard way.
+If a limitation is missing: open an issue with label `docs: limitations`.
+I'd rather list the gap here than have you discover it the hard way.
 
-If you find a statement here that is too pessimistic — i.e., we said
-"we don't" and actually we do — open an issue with the label `docs:
-limitations` and we will tighten the language.
+If a statement is too pessimistic (we say "don't" but we do): same label,
+`docs: limitations`.
 
-If you find a statement here that is too optimistic — i.e., we said
-"we do" and actually we don't — open an issue with the label `bug` and
-we will treat it as a bug.
+If a statement is too optimistic (we say "do" but we don't): label `bug` —
+that's a trust bug, not just docs.
