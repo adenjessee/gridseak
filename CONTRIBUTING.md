@@ -124,10 +124,26 @@ Scope is optional but helpful: `feat(view): add hierarchy perspective`.
 - **Snapshot tests** use `insta`. After a deliberate output change:
   `cargo insta review` to accept new snapshots, then commit them.
 
-## Sign-off
+## Developer Certificate of Origin (DCO)
 
-We do not require DCO sign-off currently. If we ever do, we will
-announce it in this file and grandfather all prior commits.
+We use the [Developer Certificate of Origin](https://developercertificate.org/)
+(DCO 1.1), not a Contributor License Agreement. A CLA is often read as
+"the project plans to relicense later"; we committed to MIT OR
+Apache-2.0 forever in [`LICENSE-COMMITMENT.md`](LICENSE-COMMITMENT.md).
+
+Every commit must include a sign-off line:
+
+```
+Signed-off-by: Your Name <your.email@example.com>
+```
+
+Use your real name and an email you are comfortable being associated
+with the change. `git commit -s` adds the line automatically.
+
+By signing off, you certify the DCO terms (see the link above): you
+wrote the patch or have the right to submit it under our license, and
+you understand the contribution is licensed MIT OR Apache-2.0 like the
+rest of the project.
 
 ## Code of Conduct
 

@@ -229,6 +229,9 @@ Licensed under either of
 at your option. The dual-license is the Rust ecosystem standard;
 recipients pick the one that fits their downstream constraints.
 
+We publicly commit not to relicense this tree to more restrictive terms.
+See [`LICENSE-COMMITMENT.md`](LICENSE-COMMITMENT.md).
+
 ### Contribution
 
 Unless you explicitly state otherwise, any contribution intentionally
