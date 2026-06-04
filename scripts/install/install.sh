@@ -25,10 +25,16 @@ warn()  { printf '[%s] WARN: %s\n' "$PROG" "$*" >&2; }
 fail()  { printf '[%s] ERROR: %s\n' "$PROG" "$*" >&2; exit 1; }
 plan()  { printf '[%s] plan: %s\n' "$PROG" "$*"; }
 
-# Production default: the manifest served by gridseak-web's public/install/
-# (see GRIDSEAK_WEB_SHADOW_MODE_LAUNCH_PLAN.md). For local-proof flows, override
-# with `GRIDSEAK_MANIFEST_URL=http://localhost:8765/cli-manifest.json`.
-MANIFEST_URL="${GRIDSEAK_MANIFEST_URL:-https://gridseak.com/install/cli-manifest.json}"
+# Production default: the manifest attached to the latest GitHub CLI
+# release. GitHub serves release assets at a stable redirect
+# (`releases/latest/download/<asset>`), and the manifest's per-target
+# `url` fields are relative, so they resolve against this same
+# directory — making the whole install path GitHub-native with no
+# website or CDN dependency. The vanity host (gridseak.com) is an
+# optional override once the site mirrors these assets. For local-proof
+# flows, override with
+# `GRIDSEAK_MANIFEST_URL=http://localhost:8765/cli-manifest.json`.
+MANIFEST_URL="${GRIDSEAK_MANIFEST_URL:-https://github.com/adenjessee/gridseak/releases/latest/download/cli-manifest.json}"
 HOME_DIR="${GRIDSEAK_HOME:-$HOME/.gridseak}"
 BIN_DIR="$HOME_DIR/bin"
 SHARE_DIR="$HOME_DIR/share/$(date -u +%Y%m%dT%H%M%SZ)"

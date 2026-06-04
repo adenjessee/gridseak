@@ -20,9 +20,11 @@ function Log($msg)  { Write-Host "[gridseak-install] $msg" }
 function Warn($msg) { Write-Warning "[gridseak-install] $msg" }
 function Plan($msg) { Write-Host "[gridseak-install] plan: $msg" }
 
-# Production default — same URL the macOS / Linux install.sh reads from.
-# For local-proof flows, override via `$env:GRIDSEAK_MANIFEST_URL`.
-$ManifestUrl = if ($env:GRIDSEAK_MANIFEST_URL) { $env:GRIDSEAK_MANIFEST_URL } else { 'https://gridseak.com/install/cli-manifest.json' }
+# Production default — same GitHub-native release manifest install.sh
+# reads from (releases/latest/download resolves to the newest CLI
+# release; the manifest's relative urls resolve against it). No website
+# dependency. For local-proof flows, override via `$env:GRIDSEAK_MANIFEST_URL`.
+$ManifestUrl = if ($env:GRIDSEAK_MANIFEST_URL) { $env:GRIDSEAK_MANIFEST_URL } else { 'https://github.com/adenjessee/gridseak/releases/latest/download/cli-manifest.json' }
 $HomeRoot    = if ($env:GRIDSEAK_HOME)         { $env:GRIDSEAK_HOME }         else { Join-Path $env:USERPROFILE '.gridseak' }
 $BinDir      = Join-Path $HomeRoot 'bin'
 $ShareDir    = Join-Path $HomeRoot ("share\" + (Get-Date -Format 'yyyyMMddTHHmmssZ'))

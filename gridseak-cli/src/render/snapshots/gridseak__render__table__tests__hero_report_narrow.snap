@@ -47,7 +47,7 @@ Free in this build:
   - Local scans (CLI + MCP server)
   - Scan history on this machine
   - Table / Markdown / JSON / LLM output
-  - MCP server over stdio (twelve tools)
+  - MCP server over stdio (fourteen tools)
   - Graph slice queries (callers, callees, blast radius, cycles)
 Future hosted SaaS (not in this binary):
   - Multi-repo benchmarks across machines

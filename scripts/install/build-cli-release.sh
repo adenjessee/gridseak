@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# scripts/install/build-cli-release.sh — pack the standalone shadow-mode CLI.
+# scripts/install/build-cli-release.sh — pack the standalone GridSeak CLI.
 #
 # Pilot scope (Stage 10 "local proof"): produce target/cli-release/<version>/
 # with one tar.gz per supported host triple, each containing:
@@ -97,10 +97,20 @@ for TARGET in "${TARGETS[@]}"; do
         --bin graphengine-parsing --bin ge-analyze --bin gridseak
       ;;
     x86_64-pc-windows-msvc|aarch64-pc-windows-msvc)
-      # Reuses the cargo-xwin path the desktop release already vetted.
-      cargo xwin build --release --target "$TARGET" \
-        -p graphengine-parsing -p graphengine-analysis -p gridseak-cli \
-        --bin graphengine-parsing --bin ge-analyze --bin gridseak
+      # On a native Windows host (CI runs each target on a matching-OS
+      # runner) plain `cargo build` is correct and needs no extra tooling.
+      # `cargo xwin` is only for cross-building Windows from macOS/Linux
+      # (local-dev convenience; the desktop release vetted this path).
+      HOST="$(rustc -vV | awk '/^host:/ {print $2}')"
+      if [[ "$HOST" == *windows* ]]; then
+        cargo build --release --target "$TARGET" \
+          -p graphengine-parsing -p graphengine-analysis -p gridseak-cli \
+          --bin graphengine-parsing --bin ge-analyze --bin gridseak
+      else
+        cargo xwin build --release --target "$TARGET" \
+          -p graphengine-parsing -p graphengine-analysis -p gridseak-cli \
+          --bin graphengine-parsing --bin ge-analyze --bin gridseak
+      fi
       ;;
     *)
       echo "[build-cli-release] unsupported target: $TARGET" >&2
@@ -127,17 +137,9 @@ for TARGET in "${TARGETS[@]}"; do
   # the workspace dev path.
   cp -R "$CONFIGS_DIR" "$STAGE_DIR/configs"
 
-  # Bundle the Cursor agent skill so users who installed via `curl | sh`
-  # have a one-step path to wiring it into Cursor. The install scripts
-  # print the `cp -R` command users run to put it under
-  # `~/.cursor/skills/`. See GRIDSEAK_WEB_SHADOW_MODE_LAUNCH_PLAN.md §3.
-  SKILL_SRC="$WORKSPACE/.cursor/skills/shadow-mode-scan"
-  if [[ -d "$SKILL_SRC" ]]; then
-    mkdir -p "$STAGE_DIR/skills"
-    cp -R "$SKILL_SRC" "$STAGE_DIR/skills/shadow-mode-scan"
-  else
-    echo "[build-cli-release] WARN: agent skill not found at $SKILL_SRC; tarball will not include it" >&2
-  fi
+  # Cursor wiring ships via `gridseak setup` (writes mcp.json + the
+  # gridseak Cursor rule that teaches the agent when to call each tool),
+  # so the tarball does not bundle a separate agent skill.
 
   for f in LICENSE-MIT LICENSE-APACHE; do
     if [[ -f "$WORKSPACE/$f" ]]; then
@@ -154,15 +156,15 @@ for TARGET in "${TARGETS[@]}"; do
   cat > "$STAGE_DIR/README.md" <<EOF
 # GridSeak CLI ${VERSION} — ${TARGET}
 
-Shadow mode: local, deterministic structural-health analysis for any
-codebase. Source code never leaves your machine. No signup required.
+Local, deterministic structural-health analysis for any codebase.
+Source code never leaves your machine. No signup required.
 
 ## Quick start
 
 \`\`\`bash
 gridseak doctor              # verify the install
 gridseak scan .              # first scan of the current folder
-gridseak setup-cursor        # wire MCP into Cursor (optional)
+gridseak setup               # wire MCP + Cursor rule into your IDE(s)
 \`\`\`
 
 The first \`gridseak scan .\` prints a hero structural-health report
@@ -171,23 +173,16 @@ terminal. No upload, no account.
 
 ## Hook the scan into your AI agent (Cursor + MCP)
 
-The CLI ships a Cursor agent skill that teaches Cursor how to drive
-the scan and synthesise the result honestly (citing the deterministic
-numbers, flagging confidence caveats, recommending follow-up
-commands). Drop it under \`~/.cursor/skills/\`:
+\`gridseak setup\` writes \`~/.cursor/mcp.json\` (so the IDE launches the
+MCP server on demand) and installs the GridSeak Cursor rule that teaches
+the agent when to call each of the deterministic tools. Run it once, then
+open your IDE and ask:
 
-\`\`\`bash
-mkdir -p ~/.cursor/skills
-cp -R skills/shadow-mode-scan ~/.cursor/skills/
-\`\`\`
+> "What's risky to refactor in this repo?"
 
-Then \`gridseak setup-cursor\` writes \`~/.cursor/mcp.json\` so Cursor
-launches the MCP server on demand. Open Cursor and ask:
-
-> "Run a shadow-mode scan on this repo and tell me what's risky."
-
-The agent will invoke the MCP tools, get back the same hero numbers
-\`gridseak scan .\` shows, and synthesise an honest answer.
+The agent will invoke the MCP tools, get back the same numbers
+\`gridseak scan .\` shows, and synthesise an honest answer that cites the
+deterministic evidence and flags confidence caveats.
 
 ## Useful drilldowns
 
@@ -209,9 +204,9 @@ Run \`gridseak --help\` for the full surface.
 | --- | --- |
 | macOS: "developer cannot be verified" on first launch | \`xattr -dr com.apple.quarantine ~/.gridseak/bin ~/.gridseak/share\` (one-time) |
 | Windows: SmartScreen blocks first launch | Click "More info" -> "Run anyway" |
-| Scan fails fast with \`BinaryVersionMismatch\` | Sidecar is stale. Reinstall via \`https://gridseak.com/install.sh\`. |
+| Scan fails fast with \`BinaryVersionMismatch\` | Sidecar is stale. Reinstall via \`curl -fsSL https://raw.githubusercontent.com/adenjessee/gridseak/main/scripts/install/install.sh \| bash\`. |
 | \`gridseak\` not found in a new shell | Add \`~/.gridseak/bin\` to \`PATH\`; \`gridseak doctor\` reports if it's missing. |
-| MCP server not picked up by Cursor | \`gridseak setup-cursor\` then restart Cursor. \`gridseak doctor\` reports MCP status. |
+| MCP server not picked up by Cursor | \`gridseak setup\` then restart Cursor. \`gridseak doctor\` reports MCP status. |
 
 ## Contents
 
@@ -221,7 +216,6 @@ Run \`gridseak --help\` for the full surface.
 | \`graphengine-parsing${ext}\` | Parser engine sidecar. Executed by \`gridseak scan\`. |
 | \`ge-analyze${ext}\` | Analyzer engine sidecar. Computes the health report from the parsed graph. |
 | \`configs/\` | Tree-sitter language descriptors. Loaded by the parser; do not hand-edit. |
-| \`skills/shadow-mode-scan/SKILL.md\` | Cursor agent skill (see "Hook the scan into your AI agent"). |
 | \`LICENSE-MIT\`, \`LICENSE-APACHE\` | Dual MIT/Apache-2.0 licence. |
 
 ## Local-only feedback

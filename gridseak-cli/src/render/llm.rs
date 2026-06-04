@@ -329,7 +329,22 @@ mod tests {
                 .collect(),
             next_commands: vec!["gridseak explain f1".into()],
             schema_caveats: vec!["legacy_pre_orderfix".into()],
-            tier_signal: crate::render::tier_signaling::TierSignal::default_v0(),
+            // Fixed, small tier signal on purpose. The budget tests below
+            // assert exactly which sections survive a byte-budget cut, and
+            // tier_signal is the first thing trimmed. Using the production
+            // `default_v0()` copy here couples those token-math assertions
+            // to marketing wording, so an innocuous edit (e.g. "twelve" ->
+            // "fourteen" tools) silently flips a trim boundary. This stable
+            // fixture keeps the trim arithmetic independent of product copy.
+            tier_signal: crate::render::tier_signaling::TierSignal {
+                free: vec![
+                    "feature one".into(),
+                    "feature two".into(),
+                    "feature three".into(),
+                ],
+                future_hosted: vec!["future one".into(), "future two".into()],
+                feedback_prompt: "feedback prompt".into(),
+            },
         }
     }
 

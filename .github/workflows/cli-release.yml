@@ -1,10 +1,14 @@
-# CLI bundle release — tag `cli-v*` only (never bare `v*` for CLI).
+# CLI bundle release — tag `cli-v*` only (never bare `v*`; see RELEASE.md).
 #
-# Public release automation. Cuts the macOS + Windows install tarballs
-# that `curl -fsSL https://gridseak.com/install.sh | sh` consumes, and
-# uploads them to this repo's GitHub Releases. Uses only the
-# auto-provided GITHUB_TOKEN (no private secrets). Runs on the public
-# mirror, where macOS runner minutes are free.
+# Public release automation. Builds the install tarballs that
+# `curl -fsSL .../install.sh | sh` consumes and uploads them to this
+# repo's GitHub Releases. Uses only the auto-provided GITHUB_TOKEN (no
+# private secrets). Runs on the public mirror, where runner minutes are
+# free across macOS, Linux, and Windows.
+#
+# Strategy: build each target on a NATIVE runner (no cross-compilation,
+# no extra linkers/toolchains), then a single publish job assembles one
+# combined cli-manifest.json from every tarball and cuts the release.
 #
 # See docs/05-deployment/RELEASE.md.
 
@@ -23,13 +27,37 @@ env:
   CARGO_INCREMENTAL: "0"
 
 jobs:
-  release:
-    name: Build and publish CLI tarballs
-    runs-on: macos-latest
+  build:
+    name: Build ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # macOS Apple Silicon is the host; Intel is a trivial native
+          # apple cross (no extra linker), so one runner covers both.
+          - name: macOS (arm64 + x86_64)
+            os: macos-14
+            targets: "aarch64-apple-darwin x86_64-apple-darwin"
+          # Pinned to 22.04 for a conservative glibc floor so the binary
+          # runs on a wide range of distros, not just the newest.
+          - name: Linux x86_64
+            os: ubuntu-22.04
+            targets: "x86_64-unknown-linux-gnu"
+          - name: Windows x86_64
+            os: windows-latest
+            targets: "x86_64-pc-windows-msvc"
     steps:
       - uses: actions/checkout@v4
 
       - uses: dtolnay/rust-toolchain@stable
+
+      # rustup accepts a space-separated list; adding the host triple is a
+      # harmless no-op, so this also installs the Intel apple target on the
+      # arm64 macOS runner.
+      - name: Add targets
+        shell: bash
+        run: rustup target add ${{ matrix.targets }}
 
       - uses: actions/cache@v4
         with:
@@ -37,56 +65,87 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: macos-cli-release-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: macos-cli-release-
+          key: ${{ matrix.os }}-cli-release-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ matrix.os }}-cli-release-
 
-      - name: Build CLI release bundles
+      - name: Build CLI bundles
+        shell: bash
         run: |
-          bash scripts/install/build-cli-release.sh \
-            aarch64-apple-darwin \
-            x86_64-apple-darwin \
-            x86_64-pc-windows-msvc
+          bash scripts/install/build-cli-release.sh ${{ matrix.targets }}
+          mkdir -p cli-dist
+          cp target/cli-release/*/gridseak-*.tar.gz cli-dist/
 
-      - name: Resolve version directory
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cli-${{ matrix.os }}
+          path: cli-dist/*.tar.gz
+          if-no-files-found: error
+
+  publish:
+    name: Assemble manifest and publish release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve workspace version
         id: ver
+        shell: bash
         run: |
-          VERSION="$(python3 - <<'PY'
-          import json, pathlib
-          for p in sorted(pathlib.Path("target/cli-release").glob("*/cli-manifest.json")):
-              print(json.load(open(p)).get("version", ""))
-              break
-          PY
-          )"
-          echo "dir=target/cli-release/${VERSION}" >> "$GITHUB_OUTPUT"
-          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          VERSION="$(awk '
+            /^\[workspace\.package\]/ { in_block=1; next }
+            in_block && /^\[/         { exit }
+            in_block && /^version[[:space:]]*=/ {
+              match($0, /"[^"]+"/); print substr($0, RSTART+1, RLENGTH-2); exit
+            }' Cargo.toml)"
+          [ -n "$VERSION" ] || { echo "could not read workspace version" >&2; exit 1; }
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Verify manifest locally
+      - name: Download all platform tarballs
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          pattern: cli-*
+          merge-multiple: true
+
+      - name: Assemble combined manifest
+        shell: bash
+        run: bash scripts/install/assemble-manifest.sh dist "${{ steps.ver.outputs.version }}"
+
+      # Recompute and re-verify from the downloaded bytes so a corrupted
+      # upload can never produce a manifest that "verifies" against itself.
+      - name: Verify manifest integrity
+        shell: bash
         run: |
-          MANIFEST="${{ steps.ver.outputs.dir }}/cli-manifest.json"
-          python3 - <<'PY' "$MANIFEST" "${{ steps.ver.outputs.dir }}"
+          python3 - dist/cli-manifest.json dist <<'PY'
           import hashlib, json, sys
           from pathlib import Path
           manifest, base = Path(sys.argv[1]), Path(sys.argv[2])
           data = json.load(open(manifest))
+          assert data["artifacts"], "manifest has no artifacts"
           for a in data["artifacts"]:
-              f = base / a["url"]
-              body = f.read_bytes()
-              assert hashlib.sha256(body).hexdigest() == a["sha256"]
-              assert len(body) == a["size"]
-              print("ok", a["target"], len(body))
+              body = (base / a["url"]).read_bytes()
+              assert hashlib.sha256(body).hexdigest() == a["sha256"], a["target"]
+              assert len(body) == a["size"], a["target"]
+              print("ok", a["target"], len(body), "bytes")
           PY
 
-      - name: Upload GitHub Release assets
+      - name: Publish GitHub release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
         run: |
           TAG="${GITHUB_REF_NAME}"
-          DIR="${{ steps.ver.outputs.dir }}"
+          # workflow_dispatch has no tag ref; require a real cli-v* tag.
+          case "$TAG" in
+            cli-v*) ;;
+            *) echo "refusing to publish: ref '$TAG' is not a cli-v* tag (run from a tag push)" >&2; exit 1 ;;
+          esac
+          NOTES="GridSeak CLI ${{ steps.ver.outputs.version }} — local, deterministic structural analysis. macOS (arm64 + Intel), Linux x86_64, Windows x86_64. Install: \`curl -fsSL https://raw.githubusercontent.com/adenjessee/gridseak/main/scripts/install/install.sh | bash\`. See docs/05-deployment/RELEASE.md and LIMITATIONS.md."
           gh release create "$TAG" \
             --title "GridSeak CLI ${{ steps.ver.outputs.version }}" \
-            --notes "See docs/05-deployment/RELEASE.md" \
-            "$DIR"/gridseak-*.tar.gz \
-            "$DIR/cli-manifest.json" \
-            || gh release upload "$TAG" \
-              "$DIR"/gridseak-*.tar.gz \
-              "$DIR/cli-manifest.json"
+            --notes "$NOTES" \
+            --latest \
+            dist/gridseak-*.tar.gz dist/cli-manifest.json \
+          || gh release upload "$TAG" --clobber \
+            dist/gridseak-*.tar.gz dist/cli-manifest.json

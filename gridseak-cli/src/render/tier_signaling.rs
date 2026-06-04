@@ -35,7 +35,7 @@ impl TierSignal {
                 "Local scans (CLI + MCP server)".into(),
                 "Scan history on this machine".into(),
                 "Table / Markdown / JSON / LLM output".into(),
-                "MCP server over stdio (twelve tools)".into(),
+                "MCP server over stdio (fourteen tools)".into(),
                 "Graph slice queries (callers, callees, blast radius, cycles)".into(),
             ],
             future_hosted: vec![

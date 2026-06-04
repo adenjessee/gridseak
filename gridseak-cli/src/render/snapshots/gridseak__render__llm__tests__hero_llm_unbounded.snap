@@ -2,7 +2,7 @@
 source: gridseak-cli/src/render/llm.rs
 expression: rendered
 ---
-[gridseak scan_report tokens≈343]
+[gridseak scan_report tokens≈344]
 ## overview
 repo=my-service
 scan_id=scan_test
@@ -41,7 +41,7 @@ free:
   - Local scans (CLI + MCP server)
   - Scan history on this machine
   - Table / Markdown / JSON / LLM output
-  - MCP server over stdio (twelve tools)
+  - MCP server over stdio (fourteen tools)
   - Graph slice queries (callers, callees, blast radius, cycles)
 future_hosted:
   - Multi-repo benchmarks across machines

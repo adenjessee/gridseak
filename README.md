@@ -105,13 +105,21 @@ do — the single most important page for trust in a tool of this kind.
 configs into `~/.gridseak/bin`. SHA256-verified against the public manifest.
 
 ```sh
-curl -fsSL https://gridseak.com/install.sh | sh    # macOS (Apple Silicon + Intel)
-# Windows: iwr https://gridseak.com/install.ps1 -useb | iex
+# macOS (Apple Silicon + Intel) and Linux x86_64:
+curl -fsSL https://raw.githubusercontent.com/adenjessee/gridseak/main/scripts/install/install.sh | bash
+# Windows x86_64 (PowerShell):
+# iwr https://raw.githubusercontent.com/adenjessee/gridseak/main/scripts/install/install.ps1 -useb | iex
 ```
 
-**Supported at v0.1.0:** macOS (aarch64 + x86_64) and Windows (x86_64).
-Linux tarballs are not shipped yet — `install.sh` will fail with an explicit
-"no artifact" message on Linux until we add them.
+The installer reads the manifest attached to the latest GitHub release and
+SHA256-verifies each download — no website or CDN in the path. Once
+`gridseak.com` mirrors the release assets, the shorter
+`curl -fsSL https://gridseak.com/install.sh | sh` becomes an equivalent
+alias (override anytime with `GRIDSEAK_MANIFEST_URL`).
+
+**Supported at v0.1.0:** macOS (aarch64 + x86_64), Linux x86_64, and
+Windows (x86_64). On any other host the installer exits with an explicit
+"no artifact" message rather than installing the wrong binary.
 
 **From source (full workspace build):**
 
@@ -153,9 +161,9 @@ its first two tool calls. If it doesn't, run `gridseak setup --verify`.
 - **Languages with Tier 3 (LSP-verified) edges:** Rust.
 - **Languages with Tier 0 (tree-sitter parsed) edges:** Rust,
   TypeScript, JavaScript, Apex. Python is parsed at skeleton level.
-- **Install platforms (v0.1.0):** macOS (Apple Silicon + Intel) and
-  Windows x86_64 via `gridseak.com/install.sh` / `install.ps1`. Linux
-  tarballs are not shipped yet.
+- **Install platforms (v0.1.0):** macOS (Apple Silicon + Intel), Linux
+  x86_64, and Windows x86_64, installed from the GitHub release manifest
+  via `install.sh` / `install.ps1`. Linux arm64 is not shipped yet.
 - **Other languages:** Tier 1 (filtered grep) only.
 - **Telemetry:** **None.** Everything stays in `.gridseak/` on your
   machine. There is nothing to opt out of because nothing is being

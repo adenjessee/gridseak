@@ -1330,7 +1330,7 @@ struct RouteParams {
 // ---------------------------------------------------------------------------
 // MCP tool surface — agent-first, deterministic-local, 0 LLM tokens.
 //
-// Twelve tools. Slimmed from ~26 by dropping legacy aliases that confused
+// Fourteen tools. Slimmed from ~26 by dropping legacy aliases that confused
 // Cursor's planner (two names for the same thing → planner picks the wrong
 // one half the time). Each kept tool's description is symptom-led: it tells
 // the agent *when to call it* in the user's own words, not just what it
@@ -1661,7 +1661,7 @@ impl ServerHandler for GridSeakMcp {
         ServerInfo {
             instructions: Some(
                 "GridSeak — deterministic structural-knowledge layer for this repo. \
-                 Twelve tools, all local, all 0 LLM tokens. Start with \
+                 Fourteen tools, all local, all 0 LLM tokens. Start with \
                  `gridseak_context_for_llm` on any new conversation. Every response \
                  carries an `evidence: deterministic_local_analysis` marker and a \
                  `tier_legend` — quote the tier (0 tree-sitter, 1 grep, 3 LSP) when \
