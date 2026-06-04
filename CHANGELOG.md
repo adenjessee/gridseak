@@ -18,8 +18,9 @@ no network calls from the on-machine binaries.
 
 ### Added
 
-- Public install via `curl -fsSL https://gridseak.com/install.sh | sh`
-  with SHA256-pinned manifest on GitHub Releases (`cli-v*` tags).
+- Public install via GitHub-native `curl -fsSL
+  https://raw.githubusercontent.com/adenjessee/gridseak/main/scripts/install/install.sh
+  | bash` with SHA256-pinned manifest on GitHub Releases (`cli-v*` tags).
 - [`docs/05-deployment/RELEASE.md`](docs/05-deployment/RELEASE.md) —
   CLI vs legacy engine release channels.
 - Segmented incremental analysis (S2-γ): per-segment extraction with an
@@ -39,7 +40,8 @@ no network calls from the on-machine binaries.
   --locked` is CLI-only and **requires `--locked`** (an unbounded
   `tree-sitter` floor in the `tree-sitter-rust` grammar breaks unlocked
   resolution until a coordinated grammar bump).
-- Platform matrix: macOS + Windows at launch; Linux explicitly not yet.
+- Platform matrix: macOS (arm64 + Intel), Linux x86_64, and Windows
+  x86_64 at launch; Linux arm64 not yet.
 
 ### Fixed
 
