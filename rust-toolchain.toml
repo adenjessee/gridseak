@@ -1,0 +1,14 @@
+[toolchain]
+# Pinned to 1.91 by T6 (universal-fidelity sprint, Gate 1.1). The pin is
+# load-bearing: every `ra_ap_ide >= 0.0.308` release pulls in
+# `ra-ap-rustc_index` versions that use the unstable `new_zeroed_alloc`
+# library feature, which fails on any stable rustc. Our `ra_ap_ide`
+# dependency is pinned at `=0.0.307`, the newest stable-rust-compatible
+# version, which itself requires 1.91 via transitive `cargo-platform`.
+# See docs/workstreams/universal-fidelity/tasks/T6-rust-layer2.md §9.B2
+# for the measurement matrix and
+# docs/workstreams/universal-fidelity/FOLLOWUPS.md::UF-FU-008 for the
+# unblock path.
+channel = "1.91"
+components = ["rustfmt", "clippy"]
+targets = ["x86_64-pc-windows-msvc", "x86_64-unknown-linux-gnu", "x86_64-apple-darwin"]

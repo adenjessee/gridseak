@@ -1,0 +1,158 @@
+language: csharp
+file_extensions:
+  - ".cs"
+version: "1.0"
+
+# LSP configuration for C#
+lsp_command: "omnisharp"
+lsp_args:
+  - "--languageserver"
+  - "--stdio"
+lsp_request_timeout_ms: 5000
+lsp_max_concurrent_requests: 16
+
+queries:
+  functions: |
+    ; Method declarations
+    (method_declaration
+      name: (identifier) @name
+      parameters: (parameter_list) @params
+    ) @func
+
+    ; Constructor declarations
+    (constructor_declaration
+      name: (identifier) @name
+      parameters: (parameter_list) @params
+    ) @func
+
+    ; Local function statements (C# 7+)
+    (local_function_statement
+      name: (identifier) @name
+      parameters: (parameter_list) @params
+    ) @func
+
+  structs: |
+    ; Class declarations → Struct in domain model
+    (class_declaration
+      name: (identifier) @name
+      body: (declaration_list) @body
+    ) @struct
+
+    ; Struct declarations (value types)
+    (struct_declaration
+      name: (identifier) @name
+      body: (declaration_list) @body
+    ) @struct
+
+    ; Record declarations (C# 9+)
+    (record_declaration
+      name: (identifier) @name
+    ) @struct
+
+  traits: |
+    ; Interface declarations → Interface in domain model
+    (interface_declaration
+      name: (identifier) @name
+      body: (declaration_list) @body
+    ) @trait
+
+  modules: |
+    ; Namespace declarations serve as module markers
+    (namespace_declaration) @module
+
+    ; File-scoped namespace declarations (C# 10+)
+    (file_scoped_namespace_declaration) @module
+
+  enums: |
+    (enum_declaration
+      name: (identifier) @name
+      body: (enum_member_declaration_list) @body
+    ) @enum
+
+  constants: |
+    ; Field declarations (class fields, constants)
+    (field_declaration
+      (variable_declaration
+        (variable_declarator
+          (identifier) @name
+        )
+      )
+    ) @const
+
+    ; Property declarations
+    (property_declaration
+      name: (identifier) @name
+    ) @const
+
+  call_sites: |
+    ; Method invocations: obj.Method(args) or Method(args)
+    (invocation_expression
+      function: (member_access_expression
+        name: (identifier) @method
+      )
+      arguments: (argument_list) @args
+    ) @method_call
+
+    ; Direct invocations: Method(args)
+    (invocation_expression
+      function: (identifier) @method
+      arguments: (argument_list) @args
+    ) @method_call
+
+    ; Constructor calls: new Type(args)
+    (object_creation_expression
+      type: (_) @constructor
+      arguments: (argument_list) @args
+    ) @call
+
+  imports: |
+    ; Using directives
+    (using_directive) @import
+
+  type_refs: |
+    ; Type references in declarations, parameters, etc.
+    (identifier) @type
+
+  # Sprint E.1: C# inheritance. C# uses a single `base_list` for both
+  # `extends` and `implements` (the language doesn't syntactically
+  # distinguish — the first entry is usually the base class and the
+  # rest are interfaces, but that's a naming convention enforced by
+  # the compiler, not grammar). We conservatively tag all as `Extends`
+  # here, leaving an explicit gap for the semantic-layer disambiguation
+  # step (when jdtls-style symbol kinds become available on C# too).
+  inheritance: |
+    (class_declaration
+      name: (identifier) @class_name
+      bases: (base_list
+        (identifier) @extends_type
+      )
+    ) @class_with_base
+
+    (interface_declaration
+      name: (identifier) @interface_name
+      bases: (base_list
+        (identifier) @extends_type
+      )
+    ) @interface_with_base
+
+    (struct_declaration
+      name: (identifier) @struct_name
+      bases: (base_list
+        (identifier) @extends_type
+      )
+    ) @struct_with_base
+
+kind_mappings:
+  method_declaration: Function
+  constructor_declaration: Function
+  local_function_statement: Function
+  lambda_expression: Function
+  class_declaration: Struct
+  struct_declaration: Struct
+  record_declaration: Struct
+  interface_declaration: Interface
+  enum_declaration: Enum
+  using_directive: Import
+  field_declaration: Variable
+  property_declaration: Variable
+  local_declaration_statement: Variable

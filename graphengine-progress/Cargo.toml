@@ -1,0 +1,11 @@
+[package]
+name = "graphengine-progress"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Shared structured-progress event vocabulary emitted by graphengine-parsing and ge-analyze, consumed by gridseak-cli and the desktop shell. JSONL on the wire, typed enum in Rust."
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }

@@ -1,0 +1,207 @@
+language: python
+file_extensions:
+  - ".py"
+  - ".pyi"
+  - ".pyw"
+version: "1.0"
+
+# LSP configuration
+lsp_command: "pyright"
+lsp_args:
+  - "--stdio"
+lsp_request_timeout_ms: 1000
+lsp_max_concurrent_requests: 32
+
+queries:
+  functions: |
+    (function_definition 
+      name: (identifier) @name
+      parameters: (parameters) @params
+    ) @func
+  
+  classes: |
+    (class_definition 
+      name: (identifier) @name
+      body: (block) @body
+    ) @class
+  
+  structs: |
+    (class_definition 
+      name: (identifier) @name
+      body: (block) @body
+    ) @struct
+
+  # Sprint E.1: Python inheritance. Python has no `implements` keyword —
+  # every base class listed in `(class_definition superclasses: ...)` is
+  # modelled as `Extends`. ABC-based "protocol" relationships are not
+  # syntactically distinguishable from plain inheritance at parse time;
+  # classifying them as interfaces is a semantic-layer concern we leave
+  # to downstream analysis.
+  inheritance: |
+    (class_definition
+      name: (identifier) @class_name
+      superclasses: (argument_list
+        (identifier) @extends_type
+      )
+    ) @class_with_extends
+
+    (class_definition
+      name: (identifier) @class_name
+      superclasses: (argument_list
+        (attribute
+          attribute: (identifier) @extends_type
+        )
+      )
+    ) @class_with_extends_attr
+  
+  modules: |
+    (import_statement) @import
+    
+    (import_from_statement) @import
+    
+    (module) @module
+  
+  call_sites: |
+    (call 
+      function: (identifier) @func
+    ) @call
+    
+    (call 
+      function: (attribute 
+        object: (identifier) @obj
+        attribute: (identifier) @method
+      )
+    ) @call
+    
+    (call 
+      function: (attribute 
+        object: (attribute 
+          object: (identifier) @obj
+          attribute: (identifier) @attr
+        )
+        attribute: (identifier) @method
+      )
+    ) @call
+  
+  imports: |
+    ; `import os` / `import os.path`
+    (import_statement
+      name: (dotted_name) @module
+    ) @import
+
+    ; `import os as operating_system`
+    (import_statement
+      name: (aliased_import
+        name: (dotted_name) @module
+        alias: (identifier) @local_name
+      )
+    ) @import
+
+    ; `from os import path` / `from os.path import join`
+    (import_from_statement
+      module_name: (dotted_name) @module
+      name: (dotted_name) @imported_name
+    ) @import
+
+    ; `from os import path as p`
+    (import_from_statement
+      module_name: (dotted_name) @module
+      name: (aliased_import
+        name: (dotted_name) @imported_name
+        alias: (identifier) @local_name
+      )
+    ) @import
+
+    ; `from os import *`
+    (import_from_statement
+      module_name: (dotted_name) @module
+      (wildcard_import) @glob
+    ) @import
+
+    ; Relative imports: `from . import foo` / `from ..utils import bar`
+    (import_from_statement
+      module_name: (relative_import) @module
+      name: (dotted_name) @imported_name
+    ) @import
+
+    (import_from_statement
+      module_name: (relative_import) @module
+      name: (aliased_import
+        name: (dotted_name) @imported_name
+        alias: (identifier) @local_name
+      )
+    ) @import
+  
+  variables: |
+    (assignment 
+      left: (identifier) @name
+    ) @variable
+    
+    (augmented_assignment 
+      left: (identifier) @name
+    ) @variable
+    
+    (for_statement 
+      left: (identifier) @name
+    ) @variable
+    
+    (for_statement 
+      left: (pattern_list 
+        (identifier) @name
+      )
+    ) @variable
+  
+  attributes: |
+    (attribute 
+      object: (identifier) @obj
+      attribute: (identifier) @attr
+    ) @attribute
+  
+  decorators: |
+    (decorator 
+      decorator: (identifier) @decorator
+    ) @decorator
+    
+    (decorator 
+      decorator: (attribute 
+        object: (identifier) @obj
+        attribute: (identifier) @attr
+      )
+    ) @decorator
+  
+  exceptions: |
+    (except_clause 
+      type: (identifier) @exception
+    ) @exception
+    
+    (raise_statement 
+      value: (identifier) @exception
+    ) @exception
+  
+  comprehensions: |
+    (list_comprehension) @comprehension
+    
+    (dictionary_comprehension) @comprehension
+    
+    (set_comprehension) @comprehension
+    
+    (generator_expression) @comprehension
+
+kind_mappings:
+  function_definition: Function
+  class_definition: Struct
+  import_statement: Import
+  import_from_statement: Import
+  assignment: Variable
+  augmented_assignment: Variable
+  for_statement: Variable
+  attribute: Variable
+  decorator: Variable
+  except_clause: Variable
+  raise_statement: Variable
+  list_comprehension: Variable
+  dictionary_comprehension: Variable
+  set_comprehension: Variable
+  generator_expression: Variable
+  type_identifier: Type
+  generic_type: Type

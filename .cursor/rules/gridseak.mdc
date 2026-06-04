@@ -1,0 +1,183 @@
+---
+description: |
+  GridSeak is the deterministic structural-knowledge layer for this repo.
+  Fourteen MCP tools, all local, all 0 LLM tokens. Call them eagerly when
+  the user asks about code structure, risk, dependencies, or refactor
+  impact — they save real LLM budget and reduce hallucination.
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# GridSeak — structural ground truth for this repo
+
+## The contract
+
+GridSeak gives you **deterministic** answers to structural questions —
+"who calls X", "what does X reach", "is there a cycle", "what's risky
+to refactor". The data comes from a parsed call/import graph backed by
+tree-sitter (Tier 0), filtered grep (Tier 1), and the language server
+(Tier 3). It does NOT replace your reading of the code. The point is
+to give you trustworthy structural ground truth so you spend the LLM
+budget on synthesis, not on rediscovering the graph by re-grepping.
+
+Every MCP response carries:
+
+- `evidence: "deterministic_local_analysis"` — this tool's output is
+  cheap and trustworthy. Prefer it over re-grepping the repo yourself.
+- `tier_legend` — describes what each Tier 0 / 1 / 3 edge means.
+- `next_tool` — what to call next without burning a planning round.
+
+When you state a structural fact derived from GridSeak, **name the
+tier you're quoting**. Don't flatten tiers into "GridSeak says…". A
+grep-heuristic edge is not the same as an LSP-verified edge, and the
+user can tell when you flatten them.
+
+## Scan-provenance preamble (mandatory)
+
+**Lead any structural answer with one short line** that names:
+
+- the scan you're querying — its `scan_id` (short prefix is fine) and
+  how recent (`scan_age_seconds` from the response envelope; render
+  in minutes or hours, not raw seconds);
+- whether you just triggered a fresh scan or are reading cached data
+  (call `gridseak_scan` only if `scan_age_seconds` exceeds the
+  conversation's freshness expectation OR `gridseak_status` says no
+  recent scan exists);
+- which GridSeak tool produced the headline number you're about to
+  quote.
+
+Example opening line:
+
+> "Per the `4a3f1c…` scan (12 min old, cached), `gridseak_get_recommendations`
+> reports 3 critical priorities…"
+
+This is non-negotiable: when you skip it, the user has to ask "is it
+even scanning? how does it know that?" — which is exactly the trust
+break this section exists to prevent. The agent transcript will show
+the tool calls; the preamble shows the user you know what they're
+looking at.
+
+## When to call each tool
+
+### `gridseak_context_for_llm` — your first call
+
+Call this on any new conversation about this codebase. One-shot
+bundle: summary + metrics + top priorities + caveats + artifact paths
++ `next_tool` hints. Replaces 4–5 separate tool calls. Use as your
+default cold-start.
+
+### `gridseak_status` — quick health probe
+
+Cheap. Returns latest scan metadata + project health. Use when you
+only need to confirm there's a recent scan and the codebase shape.
+
+### `gridseak_scan` — fresh parse + analysis
+
+Call ONLY when `gridseak_status` reports no recent scan. Otherwise
+re-use the existing scan; re-scanning is slow and wasteful.
+
+### `gridseak_get_recommendations` — what to fix first
+
+Trigger phrases:
+
+- "what should we refactor first"
+- "what's risky here"
+- "what's tightly coupled"
+- "where should I focus"
+- "what's the technical debt"
+
+Returns ranked deterministic priorities. Each row has a `finding_id`
+you pass to `gridseak_explain_finding`. **Quote the `confidence_caveat`
+verbatim** — paraphrasing it is how agents get caught lying about
+"this is dead code" when the caveat says low confidence.
+
+### `gridseak_explain_finding`
+
+Call after `gridseak_get_recommendations`. Pass the `finding_id`.
+Returns narrative + suggested action + the affected symbols.
+
+### `gridseak_graph_blast_radius` — "if I change X, what breaks?"
+
+Trigger phrases:
+
+- "if I change X what breaks"
+- "is X safe to remove"
+- "what's the impact of refactoring X"
+- "what depends on X (transitively)"
+
+Returns the transitive **upstream** callers of a function symbol —
+reverse BFS through Call edges with depth cap (default 3). Each
+reachable symbol carries its evidence tier — call Tier 1 (grep) hits
+"possibly affected", Tier 0 / 3 hits "definitely affected".
+
+The symbol parameter must be a function/method FQN. File paths and
+module-level seeds are rejected with a clear error; if the user
+asks about an entire file, enumerate its public symbols first (your
+editor knows them) and call this tool per symbol, or call
+`gridseak_get_recommendations` for file-level risk.
+
+For the opposite direction ("what does X transitively reach when it
+runs"), use `gridseak_graph_slice` or `gridseak_graph_callees`.
+
+### `gridseak_graph_callers` / `gridseak_graph_callees`
+
+"Who calls X" → `callers` (one hop upstream). "What does X call" →
+`callees` (one hop downstream). For *transitive* upstream callers,
+use `gridseak_graph_blast_radius`. For *transitive* downstream reach,
+use `gridseak_graph_slice` and filter on `direction = downstream`.
+
+### `gridseak_graph_slice` — full neighborhood
+
+Heavier than callers/callees alone. Use when the user wants both
+upstream AND downstream around a symbol ("show me everything
+connected to X", "how does X fit into the codebase").
+
+### `gridseak_graph_module_coupling`
+
+"What modules are tightly coupled" / "where's the cross-module mess".
+Top coupled module pairs by call-edge count.
+
+### `gridseak_graph_cycles`
+
+"Are there cycles" / "is this codebase well-layered". A non-empty
+result is a layering smell — surface it to the user immediately.
+
+### `gridseak_get_findings`
+
+Raw unranked findings, filterable by severity. Lower-level than
+`gridseak_get_recommendations`. Prefer recommendations unless the
+user explicitly wants every finding (e.g. for a full review).
+
+## When NOT to call any GridSeak tool
+
+- Trivial edits ("add a comment to this function").
+- Pure-string refactors ("rename X to Y everywhere" — that's
+  grep / sed, not structural).
+- Questions about the agent's own behaviour, not the code.
+- The user has the answer already and just wants you to write code.
+
+## Anti-patterns
+
+- Do NOT generate metric numbers from your own reading; call a tool.
+- Do NOT claim "this is dead code" without `gridseak_explain_finding`
+  agreeing AND the confidence caveat for dead code being `high`.
+- Do NOT paste the full raw report into chat. The whole point is
+  compact, structured output.
+- Do NOT skip the tier annotation when stating a structural fact.
+  "Per Tier 0 (tree-sitter), X depends on Y" is correct.
+  "GridSeak says X depends on Y" flattens the tier and is wrong.
+
+## Closing the loop
+
+When you finish a synthesis, end with a short block that names:
+
+- what GridSeak **proved deterministically** (cycle counts, blast
+  radius, top hotspots — with tiers),
+- what was **inferred** (architectural advice you derived from those
+  facts plus your own reasoning),
+- what GridSeak **could not answer** (anything where the tier-honest
+  caveat said low confidence, or the codebase region wasn't covered).
+
+This protects users from over-trusting either pure-LLM or pure-tool
+output. It is the trust contract between the user, the agent, and
+GridSeak.

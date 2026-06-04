@@ -1,0 +1,32 @@
+---
+source: gridseak-cli/src/render/llm.rs
+expression: rendered
+---
+[gridseak scan_report tokens≈179 budget=180]
+## overview
+repo=my-service
+scan_id=scan_test
+scanned_at=2026-05-17 11:12
+branch=main
+commit=9f3c2a1
+languages=typescript,javascript
+score=62/100 band=moderate_risk
+
+## confidence
+high: coupling, depth, blast radius
+medium: dead code
+
+## priorities
+#1 [Critical] Blast radius hotspot :: auth/createSession :: 41 downstream nodes (confidence=high) id=finding_001
+#2 [High] Low cohesion :: src/services :: 9 disconnected clusters (confidence=medium) id=finding_002
+
+## metrics
+Health score = 62/100 (Moderate risk)
+Cycles = 3 (Risk)
+Tangle index = 4.2% (Risk)
+
+## next
+gridseak explain finding_001
+gridseak graph callers auth/createSession
+gridseak graph blast-radius auth/createSession
+gridseak compare --previous

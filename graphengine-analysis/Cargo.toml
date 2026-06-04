@@ -1,0 +1,59 @@
+[package]
+name = "graphengine-analysis"
+version.workspace = true
+edition = "2021"
+authors = ["GraphEngine Team"]
+license.workspace = true
+description = "Graph analysis and postprocessing for GraphEngine"
+
+[[bin]]
+name = "ge-analyze"
+path = "src/bin/ge_analyze.rs"
+
+[dependencies]
+anyhow = "1.0"
+clap = { version = "4", features = ["derive"] }
+regex = "1"
+rusqlite = { version = "0.32", features = ["bundled"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
+toml = "0.8"
+tokio = { version = "1.0", features = ["full"] }
+chrono = { version = "0.4", features = ["serde"] }
+rayon = "1.8"
+
+# Stage 1 (shadow-mode): structured stage-boundary progress emission.
+# `ge-analyze` flips a process-global toggle on `--progress-json`; the
+# detector pipeline calls `health::progress::emit_stage_started/finished`
+# at each major boundary; consumers (`gridseak-engine-runner` → CLI/desktop)
+# parse the JSONL off stderr and render real percentages. Without the
+# flag, emission is a no-op so every existing caller (tests, scripts that
+# parse the eprintln stage prose, the desktop's pre-Stage-1 fallback)
+# keeps behaving identically.
+graphengine-progress = { workspace = true }
+
+# T7 Layer 0 evidence stream. The git-signals crate exposes the
+# report struct embedded into `HealthReport.git_signals` and the
+# consumer trait the dead-code classifier uses to downgrade
+# `no_callers` verdicts on recently-touched files. Kept as a
+# required dependency (no cargo feature gate) because every
+# universal-fidelity consumer that reads a report needs to know
+# whether the git_signals block is absent, empty, or populated —
+# gating behind a feature would silently drop the whole block on
+# builds that forgot to enable it, which is the opposite of the
+# measured-fallback discipline.
+graphengine-git-signals = { path = "../graphengine-git-signals" }
+
+# T8 extraction-coverage payload. `FileExtractionCoverage` /
+# `CoverageGap` are produced by the parser (co-located with
+# `SyntaxResults` in `graphengine-parsing::application::ports`) and
+# consumed by the dead-code classifier here; embedding the parse crate
+# as a direct dep is the natural two-jobs boundary — parsing
+# produces coverage data, analysis consumes it — and avoids a
+# third shim crate whose only job would be to re-export a type
+# already owned by parsing. See
+# `docs/workstreams/universal-fidelity/tasks/T8-coverage-awareness.md`.
+graphengine-parsing = { path = "../graphengine-parsing", default-features = false }
+
+[dev-dependencies]
+tempfile = "3.0"

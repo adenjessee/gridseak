@@ -1,0 +1,127 @@
+---
+source: gridseak-cli/src/render/json.rs
+expression: rendered
+---
+{
+  "schema": "gridseak.scan_report.v1",
+  "view": {
+    "repo_name": "my-service",
+    "root_path": "/repos/my-service",
+    "scan_id": "scan_test",
+    "scanned_at_display": "2026-05-17 11:12",
+    "branch": "main",
+    "commit_short": "9f3c2a1",
+    "dirty": false,
+    "languages": [
+      "typescript",
+      "javascript"
+    ],
+    "score": 62,
+    "score_band": "moderate",
+    "confidence_notes": [
+      {
+        "level": "high",
+        "metrics": [
+          "coupling",
+          "depth",
+          "blast radius"
+        ]
+      },
+      {
+        "level": "medium",
+        "metrics": [
+          "dead code"
+        ]
+      }
+    ],
+    "priorities": [
+      {
+        "rank": 1,
+        "severity": "Critical",
+        "finding_id": "finding_001",
+        "finding": "Blast radius hotspot",
+        "target": "auth/createSession",
+        "evidence": "41 downstream nodes",
+        "confidence": "high"
+      },
+      {
+        "rank": 2,
+        "severity": "High",
+        "finding_id": "finding_002",
+        "finding": "Low cohesion",
+        "target": "src/services",
+        "evidence": "9 disconnected clusters",
+        "confidence": "medium"
+      },
+      {
+        "rank": 3,
+        "severity": "High",
+        "finding_id": "finding_003",
+        "finding": "Dead code",
+        "target": "billing/legacyApplyDiscount",
+        "evidence": "no production callers",
+        "confidence": "medium"
+      }
+    ],
+    "metrics": [
+      {
+        "name": "Health score",
+        "value": "62/100",
+        "status": "Moderate risk"
+      },
+      {
+        "name": "Cycles",
+        "value": "3",
+        "status": "Risk"
+      },
+      {
+        "name": "Tangle index",
+        "value": "4.2%",
+        "status": "Risk"
+      },
+      {
+        "name": "Hotspots",
+        "value": "7",
+        "status": "Risk"
+      },
+      {
+        "name": "Dead functions",
+        "value": "18",
+        "status": "Review"
+      },
+      {
+        "name": "Avg coupling",
+        "value": "0.42",
+        "status": "Moderate"
+      },
+      {
+        "name": "Max call depth",
+        "value": "14",
+        "status": "Deep"
+      }
+    ],
+    "next_commands": [
+      "gridseak explain finding_001",
+      "gridseak graph callers auth/createSession",
+      "gridseak graph blast-radius auth/createSession",
+      "gridseak compare --previous"
+    ],
+    "schema_caveats": [],
+    "tier_signal": {
+      "free": [
+        "Local scans (CLI + MCP server)",
+        "Scan history on this machine",
+        "Table / Markdown / JSON / LLM output",
+        "MCP server over stdio (twelve tools)",
+        "Graph slice queries (callers, callees, blast radius, cycles)"
+      ],
+      "future_hosted": [
+        "Multi-repo benchmarks across machines",
+        "Team-tier judgment sync",
+        "Audit log retention + RBAC",
+        "Organisation dashboards"
+      ],
+      "feedback_prompt": "Tell us what would unlock you: `gridseak feedback \"<text>\"`"
+    }
+  }
+}

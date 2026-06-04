@@ -1,0 +1,15 @@
+---
+source: gridseak-cli/src/render/compare.rs
+expression: "String::from_utf8(buf).unwrap()"
+---
+# Scan Compare — demo
+
+| Metric | 2026-05-10 | 2026-05-17 | Delta |
+|--------|----:|----:|------:|
+| score | 58 | 62 | +4 |
+| critical | 3 | 2 | -1 |
+| high | 7 | 7 | 0 |
+| cycles | 4 | 3 | -1 |
+| hotspots | 7 | 7 | 0 |
+| dead | 18 | 18 | 0 |
+| coupling | 0.42 | 0.42 | 0.00 |

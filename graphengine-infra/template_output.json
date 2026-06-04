@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "provenance": {
+    "schema_rev": 1,
+    "engine_version": "rcgl-delta-1.0",
+    "repo": "test",
+    "commit": "test",
+    "template": "test",
+    "profile_id": "default",
+    "generated_at": "2025-10-03T02:40:28.460406Z",
+    "seed": 0
+  },
+  "nodes": [],
+  "edges": [],
+  "metrics": {}
+}

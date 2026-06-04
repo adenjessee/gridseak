@@ -1,0 +1,38 @@
+---
+source: gridseak-cli/src/render/metrics.rs
+expression: "String::from_utf8(buf).unwrap()"
+---
+# Metrics — demo
+
+## Graph
+
+| Metric | Value | Status |
+|--------|-------|--------|
+| Cycles | 3 | Risk |
+| Tangle index | 4.2% | Moderate |
+| Max call depth | 14 | Deep |
+
+## Function
+
+| Metric | Value | Status |
+|--------|-------|--------|
+| Hotspots | 7 | Risk |
+| Dead functions | 18 | Review |
+| Avg fan-in | 2.10 | — |
+| Avg fan-out | 2.40 | — |
+
+## Module
+
+| Metric | Value | Status |
+|--------|-------|--------|
+| Avg coupling | 0.42 | Moderate |
+| High-coupling modules | 0 | OK |
+
+## Composite
+
+| Metric | Value | Status |
+|--------|-------|--------|
+| Health score | 62/100 | Moderate risk |
+| Findings (total) | 0 | — |
+| Findings (critical) | 0 | OK |
+| Findings (high) | 0 | OK |

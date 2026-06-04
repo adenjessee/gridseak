@@ -1,0 +1,2249 @@
+{
+  "repos": {
+    "colinhacks/zod": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 10331,
+      "func_count": 1314,
+      "health_score": 80,
+      "parse_time_s": 26.40825581550598,
+      "analyze_time_s": 0.34600019454956055
+    },
+    "honojs/hono": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 11435,
+      "func_count": 1226,
+      "health_score": 83,
+      "parse_time_s": 30.470993041992188,
+      "analyze_time_s": 0.15894103050231934
+    },
+    "trpc/trpc": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 11533,
+      "func_count": 1592,
+      "health_score": 77,
+      "parse_time_s": 57.914610862731934,
+      "analyze_time_s": 0.41137123107910156
+    },
+    "vercel/next.js": {
+      "status": "failed",
+      "language": "typescript",
+      "error": "parse_failed: TIMEOUT after 300s"
+    },
+    "prisma/prisma": {
+      "status": "failed",
+      "language": "typescript",
+      "error": "parse_failed: TIMEOUT after 300s"
+    },
+    "drizzle-team/drizzle-orm": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 28930,
+      "func_count": 3947,
+      "health_score": 82,
+      "parse_time_s": 159.58814120292664,
+      "analyze_time_s": 3.5514070987701416
+    },
+    "tldraw/tldraw": {
+      "status": "failed",
+      "language": "typescript",
+      "error": "parse_failed: TIMEOUT after 300s"
+    },
+    "calcom/cal.com": {
+      "status": "failed",
+      "language": "typescript",
+      "error": "parse_failed: TIMEOUT after 300s"
+    },
+    "Effect-TS/effect": {
+      "status": "failed",
+      "language": "typescript",
+      "error": "parse_failed: TIMEOUT after 300s"
+    },
+    "aidenybai/million": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 2541,
+      "func_count": 434,
+      "health_score": 85,
+      "parse_time_s": 6.0675671100616455,
+      "analyze_time_s": 0.03885912895202637
+    },
+    "expressjs/express": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 759,
+      "func_count": 122,
+      "health_score": 75,
+      "parse_time_s": 3.323201894760132,
+      "analyze_time_s": 0.010465145111083984
+    },
+    "lodash/lodash": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 855,
+      "func_count": 732,
+      "health_score": 78,
+      "parse_time_s": 4.590382099151611,
+      "analyze_time_s": 0.05200982093811035
+    },
+    "chartjs/Chart.js": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 2859,
+      "func_count": 991,
+      "health_score": 83,
+      "parse_time_s": 5.4759111404418945,
+      "analyze_time_s": 0.03110027313232422
+    },
+    "mrdoob/three.js": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 21594,
+      "func_count": 15695,
+      "health_score": 65,
+      "parse_time_s": 108.82199501991272,
+      "analyze_time_s": 1.8666729927062988
+    },
+    "webpack/webpack": {
+      "status": "failed",
+      "language": "javascript",
+      "error": "parse_failed: TIMEOUT after 300s"
+    },
+    "tiangolo/fastapi": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 7466,
+      "func_count": 4433,
+      "health_score": 55,
+      "parse_time_s": 2.0789592266082764,
+      "analyze_time_s": 0.1312410831451416
+    },
+    "pallets/flask": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 1821,
+      "func_count": 1467,
+      "health_score": 66,
+      "parse_time_s": 0.29491400718688965,
+      "analyze_time_s": 0.02366781234741211
+    },
+    "django/django": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 48419,
+      "func_count": 31486,
+      "health_score": 55,
+      "parse_time_s": 91.5810809135437,
+      "analyze_time_s": 4.670396089553833
+    },
+    "pydantic/pydantic": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 14428,
+      "func_count": 8438,
+      "health_score": 57,
+      "parse_time_s": 6.679189920425415,
+      "analyze_time_s": 0.660696268081665
+    },
+    "encode/httpx": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 1367,
+      "func_count": 1134,
+      "health_score": 72,
+      "parse_time_s": 0.1688237190246582,
+      "analyze_time_s": 0.018149137496948242
+    },
+    "psf/requests": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 833,
+      "func_count": 670,
+      "health_score": 75,
+      "parse_time_s": 0.10727310180664062,
+      "analyze_time_s": 0.01573920249938965
+    },
+    "sqlalchemy/sqlalchemy": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 40384,
+      "func_count": 30546,
+      "health_score": 54,
+      "parse_time_s": 77.57368993759155,
+      "analyze_time_s": 3.3498849868774414
+    },
+    "python-poetry/poetry": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 3907,
+      "func_count": 2770,
+      "health_score": 71,
+      "parse_time_s": 1.1939671039581299,
+      "analyze_time_s": 0.10959386825561523
+    },
+    "tokio-rs/tokio": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 9944,
+      "func_count": 6383,
+      "health_score": 46,
+      "parse_time_s": 117.82291626930237,
+      "analyze_time_s": 6.253955125808716
+    },
+    "serde-rs/serde": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 3086,
+      "func_count": 1692,
+      "health_score": 82,
+      "parse_time_s": 7.238649845123291,
+      "analyze_time_s": 0.052947998046875
+    },
+    "BurntSushi/ripgrep": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 3291,
+      "func_count": 2628,
+      "health_score": 60,
+      "parse_time_s": 14.614603996276855,
+      "analyze_time_s": 0.38127994537353516
+    },
+    "sharkdp/fd": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 433,
+      "func_count": 307,
+      "health_score": 76,
+      "parse_time_s": 0.545767068862915,
+      "analyze_time_s": 0.009567022323608398
+    },
+    "denoland/deno": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 18189,
+      "func_count": 12110,
+      "health_score": 35,
+      "parse_time_s": 261.38679099082947,
+      "analyze_time_s": 33.89038395881653
+    },
+    "astral-sh/ruff": {
+      "status": "failed",
+      "language": "rust",
+      "error": "parse_failed: TIMEOUT after 300s"
+    },
+    "go-chi/chi": {
+      "status": "analyzed",
+      "language": "go",
+      "node_count": 640,
+      "func_count": 352,
+      "health_score": 63,
+      "parse_time_s": 0.11385083198547363,
+      "analyze_time_s": 0.013393163681030273
+    },
+    "gin-gonic/gin": {
+      "status": "analyzed",
+      "language": "go",
+      "node_count": 1749,
+      "func_count": 1287,
+      "health_score": 67,
+      "parse_time_s": 0.34738707542419434,
+      "analyze_time_s": 0.039895057678222656
+    },
+    "gofiber/fiber": {
+      "status": "analyzed",
+      "language": "go",
+      "node_count": 4502,
+      "func_count": 3365,
+      "health_score": 50,
+      "parse_time_s": 1.9708569049835205,
+      "analyze_time_s": 0.2680027484893799
+    },
+    "containerd/containerd": {
+      "status": "analyzed",
+      "language": "go",
+      "node_count": 15251,
+      "func_count": 9615,
+      "health_score": 60,
+      "parse_time_s": 6.987156867980957,
+      "analyze_time_s": 1.0923411846160889
+    },
+    "hashicorp/terraform": {
+      "status": "analyzed",
+      "language": "go",
+      "node_count": 24643,
+      "func_count": 16581,
+      "health_score": 50,
+      "parse_time_s": 29.247079849243164,
+      "analyze_time_s": 2.6220459938049316
+    },
+    "cli/cli": {
+      "status": "analyzed",
+      "language": "go",
+      "node_count": 8418,
+      "func_count": 4528,
+      "health_score": 54,
+      "parse_time_s": 3.8828630447387695,
+      "analyze_time_s": 0.2280879020690918
+    },
+    "yangshun/tech-interview-handbook": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 3407,
+      "func_count": 551,
+      "health_score": 94,
+      "parse_time_s": 8.87271499633789,
+      "analyze_time_s": 0.03381514549255371
+    },
+    "excalidraw/excalidraw": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 16867,
+      "func_count": 2500,
+      "health_score": 67,
+      "parse_time_s": 77.85679578781128,
+      "analyze_time_s": 0.9173309803009033
+    },
+    "shadcn-ui/ui": {
+      "status": "failed",
+      "language": "typescript",
+      "error": "parse_failed: TIMEOUT after 300s"
+    },
+    "clash-verge-rev/clash-verge-rev": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 4776,
+      "func_count": 712,
+      "health_score": 87,
+      "parse_time_s": 9.72099494934082,
+      "analyze_time_s": 0.057714223861694336
+    },
+    "google-gemini/gemini-cli": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 49735,
+      "func_count": 5057,
+      "health_score": 69,
+      "parse_time_s": 243.52499723434448,
+      "analyze_time_s": 3.310542106628418
+    },
+    "ChatGPTNextWeb/NextChat": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 3903,
+      "func_count": 770,
+      "health_score": 76,
+      "parse_time_s": 7.632749080657959,
+      "analyze_time_s": 0.0585479736328125
+    },
+    "firecrawl/firecrawl": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 11081,
+      "func_count": 1450,
+      "health_score": 86,
+      "parse_time_s": 40.05319619178772,
+      "analyze_time_s": 0.149000883102417
+    },
+    "realworld-apps/realworld": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 740,
+      "func_count": 48,
+      "health_score": 99,
+      "parse_time_s": 2.9069459438323975,
+      "analyze_time_s": 0.010990142822265625
+    },
+    "modelcontextprotocol/servers": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 1515,
+      "func_count": 107,
+      "health_score": 99,
+      "parse_time_s": 3.740262031555176,
+      "analyze_time_s": 0.014883995056152344
+    },
+    "vitejs/vite": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 11247,
+      "func_count": 2088,
+      "health_score": 76,
+      "parse_time_s": 46.66072392463684,
+      "analyze_time_s": 0.8835558891296387
+    },
+    "hoppscotch/hoppscotch": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 19965,
+      "func_count": 3249,
+      "health_score": 78,
+      "parse_time_s": 106.36739993095398,
+      "analyze_time_s": 0.3102400302886963
+    },
+    "coder/code-server": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 1701,
+      "func_count": 221,
+      "health_score": 84,
+      "parse_time_s": 4.162951231002808,
+      "analyze_time_s": 0.02295398712158203
+    },
+    "abi/screenshot-to-code": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 1415,
+      "func_count": 224,
+      "health_score": 97,
+      "parse_time_s": 2.7329039573669434,
+      "analyze_time_s": 0.01828312873840332
+    },
+    "Eugeny/tabby": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 4184,
+      "func_count": 1591,
+      "health_score": 72,
+      "parse_time_s": 16.51456618309021,
+      "analyze_time_s": 0.1922621726989746
+    },
+    "socketio/socket.io": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 4049,
+      "func_count": 832,
+      "health_score": 79,
+      "parse_time_s": 15.927812814712524,
+      "analyze_time_s": 0.12121915817260742
+    },
+    "reduxjs/redux": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 903,
+      "func_count": 150,
+      "health_score": 88,
+      "parse_time_s": 2.9709770679473877,
+      "analyze_time_s": 0.013083934783935547
+    },
+    "pmndrs/zustand": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 1323,
+      "func_count": 181,
+      "health_score": 82,
+      "parse_time_s": 3.2881181240081787,
+      "analyze_time_s": 0.015614032745361328
+    },
+    "remix-run/react-router": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 17286,
+      "func_count": 3013,
+      "health_score": 69,
+      "parse_time_s": 83.53974509239197,
+      "analyze_time_s": 0.41111302375793457
+    },
+    "vuejs/core": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 17305,
+      "func_count": 3753,
+      "health_score": 72,
+      "parse_time_s": 51.60858106613159,
+      "analyze_time_s": 1.3145198822021484
+    },
+    "FlowiseAI/Flowise": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 26221,
+      "func_count": 3917,
+      "health_score": 79,
+      "parse_time_s": 143.3293330669403,
+      "analyze_time_s": 0.8084149360656738
+    },
+    "lyswhut/lx-music-desktop": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 6562,
+      "func_count": 1581,
+      "health_score": 82,
+      "parse_time_s": 13.422003984451294,
+      "analyze_time_s": 0.08380699157714844
+    },
+    "TanStack/query": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 16258,
+      "func_count": 2671,
+      "health_score": 78,
+      "parse_time_s": 75.65608310699463,
+      "analyze_time_s": 0.3292059898376465
+    },
+    "type-challenges/type-challenges": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 2647,
+      "func_count": 91,
+      "health_score": 96,
+      "parse_time_s": 4.132169961929321,
+      "analyze_time_s": 0.0322718620300293
+    },
+    "upstash/context7": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 1153,
+      "func_count": 142,
+      "health_score": 98,
+      "parse_time_s": 3.2820332050323486,
+      "analyze_time_s": 0.014014244079589844
+    },
+    "OpenCut-app/OpenCut": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 6745,
+      "func_count": 1194,
+      "health_score": 84,
+      "parse_time_s": 12.090250968933105,
+      "analyze_time_s": 0.07705879211425781
+    },
+    "react-hook-form/react-hook-form": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 5314,
+      "func_count": 1126,
+      "health_score": 69,
+      "parse_time_s": 20.21549701690674,
+      "analyze_time_s": 0.0739431381225586
+    },
+    "slidevjs/slidev": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 3401,
+      "func_count": 537,
+      "health_score": 89,
+      "parse_time_s": 11.340878009796143,
+      "analyze_time_s": 0.04386401176452637
+    },
+    "streamich/react-use": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 3174,
+      "func_count": 514,
+      "health_score": 76,
+      "parse_time_s": 12.93415904045105,
+      "analyze_time_s": 0.033164024353027344
+    },
+    "AykutSarac/jsoncrack.com": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 1510,
+      "func_count": 197,
+      "health_score": 96,
+      "parse_time_s": 5.2760679721832275,
+      "analyze_time_s": 0.01752305030822754
+    },
+    "fastapi/full-stack-fastapi-template": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 1204,
+      "func_count": 280,
+      "health_score": 90,
+      "parse_time_s": 3.0576670169830322,
+      "analyze_time_s": 0.015254020690917969
+    },
+    "hexojs/hexo": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 5116,
+      "func_count": 427,
+      "health_score": 80,
+      "parse_time_s": 14.48376202583313,
+      "analyze_time_s": 0.056858062744140625
+    },
+    "styled-components/styled-components": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 2525,
+      "func_count": 270,
+      "health_score": 92,
+      "parse_time_s": 7.308106899261475,
+      "analyze_time_s": 0.026042938232421875
+    },
+    "vuetifyjs/vuetify": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 13498,
+      "func_count": 1908,
+      "health_score": 72,
+      "parse_time_s": 90.63365292549133,
+      "analyze_time_s": 0.1921672821044922
+    },
+    "chatboxai/chatbox": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 10127,
+      "func_count": 1789,
+      "health_score": 84,
+      "parse_time_s": 30.643967866897583,
+      "analyze_time_s": 0.22086286544799805
+    },
+    "mifi/lossless-cut": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 3807,
+      "func_count": 674,
+      "health_score": 87,
+      "parse_time_s": 8.985068082809448,
+      "analyze_time_s": 0.040490150451660156
+    },
+    "ant-design/ant-design-pro": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 557,
+      "func_count": 66,
+      "health_score": 92,
+      "parse_time_s": 1.6749639511108398,
+      "analyze_time_s": 0.010436058044433594
+    },
+    "RSSNext/Folo": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 29518,
+      "func_count": 4612,
+      "health_score": 79,
+      "parse_time_s": 275.0412139892578,
+      "analyze_time_s": 0.9612481594085693
+    },
+    "portainer/portainer": {
+      "status": "failed",
+      "language": "typescript",
+      "error": "parse_failed: TIMEOUT after 300s"
+    },
+    "markedjs/marked": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 623,
+      "func_count": 117,
+      "health_score": 93,
+      "parse_time_s": 1.5903470516204834,
+      "analyze_time_s": 0.01946282386779785
+    },
+    "date-fns/date-fns": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 17344,
+      "func_count": 944,
+      "health_score": 73,
+      "parse_time_s": 125.42867803573608,
+      "analyze_time_s": 0.5895822048187256
+    },
+    "typeorm/typeorm": {
+      "status": "failed",
+      "language": "typescript",
+      "error": "parse_failed: TIMEOUT after 300s"
+    },
+    "lerna/lerna": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 8049,
+      "func_count": 1101,
+      "health_score": 82,
+      "parse_time_s": 37.22292113304138,
+      "analyze_time_s": 0.14068984985351562
+    },
+    "umami-software/umami": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 6022,
+      "func_count": 1192,
+      "health_score": 80,
+      "parse_time_s": 24.79827117919922,
+      "analyze_time_s": 0.07871890068054199
+    },
+    "xyflow/xyflow": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 5660,
+      "func_count": 837,
+      "health_score": 90,
+      "parse_time_s": 17.255443811416626,
+      "analyze_time_s": 0.05782008171081543
+    },
+    "ueberdosis/tiptap": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 9298,
+      "func_count": 1519,
+      "health_score": 80,
+      "parse_time_s": 23.892672061920166,
+      "analyze_time_s": 0.19688200950622559
+    },
+    "solidjs/solid": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 2480,
+      "func_count": 423,
+      "health_score": 81,
+      "parse_time_s": 17.362603902816772,
+      "analyze_time_s": 0.025782108306884766
+    },
+    "vadimdemedes/ink": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 3440,
+      "func_count": 515,
+      "health_score": 78,
+      "parse_time_s": 6.448798894882202,
+      "analyze_time_s": 0.045754194259643555
+    },
+    "alan2207/bulletproof-react": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 2883,
+      "func_count": 320,
+      "health_score": 93,
+      "parse_time_s": 14.78220510482788,
+      "analyze_time_s": 0.029131650924682617
+    },
+    "jaredpalmer/formik": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 1252,
+      "func_count": 162,
+      "health_score": 90,
+      "parse_time_s": 4.520508050918579,
+      "analyze_time_s": 0.015841960906982422
+    },
+    "code-yeongyu/oh-my-opencode": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 24081,
+      "func_count": 2340,
+      "health_score": 83,
+      "parse_time_s": 99.39478611946106,
+      "analyze_time_s": 0.27567100524902344
+    },
+    "floating-ui/floating-ui": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 4165,
+      "func_count": 786,
+      "health_score": 88,
+      "parse_time_s": 13.297827959060669,
+      "analyze_time_s": 0.0516200065612793
+    },
+    "remix-run/remix": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 14343,
+      "func_count": 2286,
+      "health_score": 75,
+      "parse_time_s": 42.84706687927246,
+      "analyze_time_s": 0.8239960670471191
+    },
+    "vercel/swr": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 3174,
+      "func_count": 813,
+      "health_score": 79,
+      "parse_time_s": 9.15978193283081,
+      "analyze_time_s": 0.033571720123291016
+    },
+    "Lissy93/web-check": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 1087,
+      "func_count": 172,
+      "health_score": 96,
+      "parse_time_s": 2.038562059402466,
+      "analyze_time_s": 0.013731002807617188
+    },
+    "NginxProxyManager/nginx-proxy-manager": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 1955,
+      "func_count": 350,
+      "health_score": 97,
+      "parse_time_s": 4.968707084655762,
+      "analyze_time_s": 0.022617101669311523
+    },
+    "shardeum/shardeum": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 9881,
+      "func_count": 1041,
+      "health_score": 80,
+      "parse_time_s": 25.698065996170044,
+      "analyze_time_s": 0.17683196067810059
+    },
+    "codex-team/editor.js": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 3469,
+      "func_count": 955,
+      "health_score": 71,
+      "parse_time_s": 9.196033954620361,
+      "analyze_time_s": 0.09321904182434082
+    },
+    "ianstormtaylor/slate": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 12208,
+      "func_count": 955,
+      "health_score": 81,
+      "parse_time_s": 33.17735290527344,
+      "analyze_time_s": 0.14850497245788574
+    },
+    "pear-devs/pear-desktop": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 4233,
+      "func_count": 791,
+      "health_score": 76,
+      "parse_time_s": 7.41955304145813,
+      "analyze_time_s": 0.054322004318237305
+    },
+    "Dokploy/dokploy": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 12905,
+      "func_count": 1585,
+      "health_score": 89,
+      "parse_time_s": 68.30587697029114,
+      "analyze_time_s": 0.14057326316833496
+    },
+    "refined-github/refined-github": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 3687,
+      "func_count": 954,
+      "health_score": 71,
+      "parse_time_s": 9.385094165802002,
+      "analyze_time_s": 0.08292102813720703
+    },
+    "sequelize/sequelize": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 9092,
+      "func_count": 1703,
+      "health_score": 77,
+      "parse_time_s": 30.579994916915894,
+      "analyze_time_s": 0.3440730571746826
+    },
+    "pmndrs/react-three-fiber": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 1884,
+      "func_count": 394,
+      "health_score": 91,
+      "parse_time_s": 4.371420860290527,
+      "analyze_time_s": 0.022588014602661133
+    },
+    "cheeriojs/cheerio": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 1623,
+      "func_count": 150,
+      "health_score": 86,
+      "parse_time_s": 4.417549133300781,
+      "analyze_time_s": 0.0189666748046875
+    },
+    "bigint/hey": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 8964,
+      "func_count": 1024,
+      "health_score": 78,
+      "parse_time_s": 18.52361297607422,
+      "analyze_time_s": 0.08266901969909668
+    },
+    "postcss/postcss": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 1481,
+      "func_count": 127,
+      "health_score": 86,
+      "parse_time_s": 2.8012218475341797,
+      "analyze_time_s": 0.013910770416259766
+    },
+    "t3-oss/create-t3-app": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 1603,
+      "func_count": 164,
+      "health_score": 94,
+      "parse_time_s": 8.208114862442017,
+      "analyze_time_s": 0.01771092414855957
+    },
+    "tailwindlabs/headlessui": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 7370,
+      "func_count": 1674,
+      "health_score": 87,
+      "parse_time_s": 27.505006074905396,
+      "analyze_time_s": 0.08379793167114258
+    },
+    "musistudio/claude-code-router": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 3671,
+      "func_count": 662,
+      "health_score": 90,
+      "parse_time_s": 8.983112812042236,
+      "analyze_time_s": 0.03808784484863281
+    },
+    "voideditor/void": {
+      "status": "failed",
+      "language": "typescript",
+      "error": "parse_failed: TIMEOUT after 300s"
+    },
+    "heroui-inc/heroui": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 11247,
+      "func_count": 1658,
+      "health_score": 85,
+      "parse_time_s": 44.27408194541931,
+      "analyze_time_s": 0.11711812019348145
+    },
+    "mobxjs/mobx": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 3978,
+      "func_count": 1248,
+      "health_score": 86,
+      "parse_time_s": 9.489206075668335,
+      "analyze_time_s": 0.06966710090637207
+    },
+    "nextauthjs/next-auth": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 6285,
+      "func_count": 1226,
+      "health_score": 87,
+      "parse_time_s": 29.539557933807373,
+      "analyze_time_s": 0.11940217018127441
+    },
+    "TanStack/table": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 3583,
+      "func_count": 573,
+      "health_score": 84,
+      "parse_time_s": 33.89509987831116,
+      "analyze_time_s": 0.04728198051452637
+    },
+    "microsoft/playwright-mcp": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 367,
+      "func_count": 65,
+      "health_score": 97,
+      "parse_time_s": 1.9588310718536377,
+      "analyze_time_s": 0.00824594497680664
+    },
+    "gitroomhq/postiz-app": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 9258,
+      "func_count": 1909,
+      "health_score": 80,
+      "parse_time_s": 36.781291007995605,
+      "analyze_time_s": 0.14708828926086426
+    },
+    "ChromeDevTools/chrome-devtools-mcp": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 2469,
+      "func_count": 325,
+      "health_score": 89,
+      "parse_time_s": 5.169039249420166,
+      "analyze_time_s": 0.030839920043945312
+    },
+    "fingerprintjs/fingerprintjs": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 1432,
+      "func_count": 268,
+      "health_score": 92,
+      "parse_time_s": 4.460527658462524,
+      "analyze_time_s": 0.017369985580444336
+    },
+    "discordjs/discord.js": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 11372,
+      "func_count": 2699,
+      "health_score": 79,
+      "parse_time_s": 43.24772000312805,
+      "analyze_time_s": 0.2389838695526123
+    },
+    "better-auth/better-auth": {
+      "status": "analyzed",
+      "language": "typescript",
+      "node_count": 27613,
+      "func_count": 3573,
+      "health_score": 70,
+      "parse_time_s": 154.55892610549927,
+      "analyze_time_s": 2.087829113006592
+    },
+    "trekhleb/javascript-algorithms": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 2458,
+      "func_count": 599,
+      "health_score": 88,
+      "parse_time_s": 3.665529251098633,
+      "analyze_time_s": 0.024446964263916016
+    },
+    "airbnb/javascript": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 103,
+      "func_count": 10,
+      "health_score": 100,
+      "parse_time_s": 0.6735329627990723,
+      "analyze_time_s": 0.007425069808959961
+    },
+    "axios/axios": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 1059,
+      "func_count": 349,
+      "health_score": 77,
+      "parse_time_s": 4.753865957260132,
+      "analyze_time_s": 0.016813039779663086
+    },
+    "jaywcjlove/awesome-mac": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 0,
+      "func_count": 0,
+      "health_score": 100,
+      "parse_time_s": 0.007928848266601562,
+      "analyze_time_s": 0.005230903625488281
+    },
+    "louislam/uptime-kuma": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 2149,
+      "func_count": 791,
+      "health_score": 75,
+      "parse_time_s": 20.355278968811035,
+      "analyze_time_s": 0.029963016510009766
+    },
+    "anuraghazra/github-readme-stats": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 490,
+      "func_count": 160,
+      "health_score": 86,
+      "parse_time_s": 2.0774080753326416,
+      "analyze_time_s": 0.011075019836425781
+    },
+    "typicode/json-server": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 0,
+      "func_count": 0,
+      "health_score": 100,
+      "parse_time_s": 0.009315013885498047,
+      "analyze_time_s": 0.005861043930053711
+    },
+    "hakimel/reveal.js": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 1291,
+      "func_count": 1061,
+      "health_score": 78,
+      "parse_time_s": 4.2886011600494385,
+      "analyze_time_s": 0.018902063369750977
+    },
+    "leonardomso/33-js-concepts": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 1936,
+      "func_count": 1520,
+      "health_score": 92,
+      "parse_time_s": 6.355490207672119,
+      "analyze_time_s": 0.023375988006591797
+    },
+    "adam-p/markdown-here": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 770,
+      "func_count": 650,
+      "health_score": 85,
+      "parse_time_s": 3.0142369270324707,
+      "analyze_time_s": 0.01568317413330078
+    },
+    "jquery/jquery": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 1264,
+      "func_count": 424,
+      "health_score": 74,
+      "parse_time_s": 7.286200284957886,
+      "analyze_time_s": 0.022753000259399414
+    },
+    "jgraph/drawio-desktop": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 79,
+      "func_count": 57,
+      "health_score": 94,
+      "parse_time_s": 0.7391459941864014,
+      "analyze_time_s": 0.008262872695922852
+    },
+    "h5bp/html5-boilerplate": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 40,
+      "func_count": 4,
+      "health_score": 100,
+      "parse_time_s": 0.5518190860748291,
+      "analyze_time_s": 0.007325887680053711
+    },
+    "Mintplex-Labs/anything-llm": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 7995,
+      "func_count": 3776,
+      "health_score": 75,
+      "parse_time_s": 22.47969102859497,
+      "analyze_time_s": 0.1417999267578125
+    },
+    "marktext/marktext": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 2680,
+      "func_count": 1300,
+      "health_score": 80,
+      "parse_time_s": 6.922360897064209,
+      "analyze_time_s": 0.03194999694824219
+    },
+    "affaan-m/everything-claude-code": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 342,
+      "func_count": 178,
+      "health_score": 88,
+      "parse_time_s": 3.4048638343811035,
+      "analyze_time_s": 0.0183560848236084
+    },
+    "poteto/hiring-without-whiteboards": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 3,
+      "func_count": 0,
+      "health_score": 100,
+      "parse_time_s": 0.1813979148864746,
+      "analyze_time_s": 0.0056760311126708984
+    },
+    "iamkun/dayjs": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 1350,
+      "func_count": 154,
+      "health_score": 67,
+      "parse_time_s": 3.3857040405273438,
+      "analyze_time_s": 0.01726388931274414
+    },
+    "typescript-cheatsheets/react": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 42,
+      "func_count": 12,
+      "health_score": 100,
+      "parse_time_s": 0.5697231292724609,
+      "analyze_time_s": 0.0071468353271484375
+    },
+    "LeCoupa/awesome-cheatsheets": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 119,
+      "func_count": 53,
+      "health_score": 72,
+      "parse_time_s": 0.842634916305542,
+      "analyze_time_s": 0.007871389389038086
+    },
+    "google/zx": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 221,
+      "func_count": 35,
+      "health_score": 86,
+      "parse_time_s": 2.434363842010498,
+      "analyze_time_s": 0.008410930633544922
+    },
+    "Leaflet/Leaflet": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 1548,
+      "func_count": 936,
+      "health_score": 76,
+      "parse_time_s": 5.1950459480285645,
+      "analyze_time_s": 0.021842002868652344
+    },
+    "sudheerj/reactjs-interview-questions": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 134,
+      "func_count": 37,
+      "health_score": 98,
+      "parse_time_s": 0.8809249401092529,
+      "analyze_time_s": 0.007915019989013672
+    },
+    "parcel-bundler/parcel": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 19256,
+      "func_count": 8942,
+      "health_score": 69,
+      "parse_time_s": 130.28517985343933,
+      "analyze_time_s": 1.2137360572814941
+    },
+    "Unitech/pm2": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 1930,
+      "func_count": 333,
+      "health_score": 71,
+      "parse_time_s": 4.795298099517822,
+      "analyze_time_s": 0.03145909309387207
+    },
+    "nolimits4web/swiper": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 1130,
+      "func_count": 466,
+      "health_score": 82,
+      "parse_time_s": 2.0051419734954834,
+      "analyze_time_s": 0.018292903900146484
+    },
+    "usebruno/bruno": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 9504,
+      "func_count": 3696,
+      "health_score": 81,
+      "parse_time_s": 31.245675802230835,
+      "analyze_time_s": 0.13384413719177246
+    },
+    "HeyPuter/puter": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 9516,
+      "func_count": 5509,
+      "health_score": 71,
+      "parse_time_s": 39.48963189125061,
+      "analyze_time_s": 0.49324917793273926
+    },
+    "impress/impress.js": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 501,
+      "func_count": 296,
+      "health_score": 97,
+      "parse_time_s": 1.622178077697754,
+      "analyze_time_s": 0.011852025985717773
+    },
+    "preactjs/preact": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 2826,
+      "func_count": 2015,
+      "health_score": 70,
+      "parse_time_s": 7.920202970504761,
+      "analyze_time_s": 0.03482484817504883
+    },
+    "bmad-code-org/BMAD-METHOD": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 979,
+      "func_count": 677,
+      "health_score": 77,
+      "parse_time_s": 3.0730340480804443,
+      "analyze_time_s": 0.017040014266967773
+    },
+    "drawdb-io/drawdb": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 1143,
+      "func_count": 384,
+      "health_score": 88,
+      "parse_time_s": 3.889198064804077,
+      "analyze_time_s": 0.016924142837524414
+    },
+    "DavidHDev/react-bits": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 4954,
+      "func_count": 2230,
+      "health_score": 88,
+      "parse_time_s": 9.280298948287964,
+      "analyze_time_s": 0.051055192947387695
+    },
+    "carbon-app/carbon": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 670,
+      "func_count": 280,
+      "health_score": 87,
+      "parse_time_s": 1.3221769332885742,
+      "analyze_time_s": 0.01199793815612793
+    },
+    "koajs/koa": {
+      "status": "analyzed",
+      "language": "javascript",
+      "node_count": 456,
+      "func_count": 112,
+      "health_score": 82,
+      "parse_time_s": 1.6888020038604736,
+      "analyze_time_s": 0.01073002815246582
+    },
+    "public-apis/public-apis": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 75,
+      "func_count": 55,
+      "health_score": 91,
+      "parse_time_s": 0.02744317054748535,
+      "analyze_time_s": 0.0070950984954833984
+    },
+    "EbookFoundation/free-programming-books": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 12,
+      "func_count": 6,
+      "health_score": 100,
+      "parse_time_s": 0.02024698257446289,
+      "analyze_time_s": 0.006376981735229492
+    },
+    "donnemartin/system-design-primer": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 273,
+      "func_count": 148,
+      "health_score": 77,
+      "parse_time_s": 0.04129314422607422,
+      "analyze_time_s": 0.00785684585571289
+    },
+    "vinta/awesome-python": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 6,
+      "func_count": 2,
+      "health_score": 100,
+      "parse_time_s": 0.01756882667541504,
+      "analyze_time_s": 0.005992889404296875
+    },
+    "TheAlgorithms/Python": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 7113,
+      "func_count": 3852,
+      "health_score": 60,
+      "parse_time_s": 2.722291946411133,
+      "analyze_time_s": 0.24847102165222168
+    },
+    "AUTOMATIC1111/stable-diffusion-webui": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 3081,
+      "func_count": 2236,
+      "health_score": 63,
+      "parse_time_s": 0.8169033527374268,
+      "analyze_time_s": 0.09195685386657715
+    },
+    "yt-dlp/yt-dlp": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 12185,
+      "func_count": 6990,
+      "health_score": 59,
+      "parse_time_s": 7.1181440353393555,
+      "analyze_time_s": 0.6689069271087646
+    },
+    "521xueweihan/HelloGitHub": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 27,
+      "func_count": 15,
+      "health_score": 98,
+      "parse_time_s": 0.01910400390625,
+      "analyze_time_s": 0.006135702133178711
+    },
+    "ytdl-org/youtube-dl": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 7590,
+      "func_count": 4106,
+      "health_score": 57,
+      "parse_time_s": 3.6810250282287598,
+      "analyze_time_s": 0.42099595069885254
+    },
+    "Comfy-Org/ComfyUI": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 12043,
+      "func_count": 7442,
+      "health_score": 48,
+      "parse_time_s": 4.7769529819488525,
+      "analyze_time_s": 0.24752426147460938
+    },
+    "deepseek-ai/DeepSeek-V3": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 69,
+      "func_count": 42,
+      "health_score": 96,
+      "parse_time_s": 0.02587294578552246,
+      "analyze_time_s": 0.006983041763305664
+    },
+    "fastapi/fastapi": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 7466,
+      "func_count": 4433,
+      "health_score": 55,
+      "parse_time_s": 2.1081149578094482,
+      "analyze_time_s": 0.12385821342468262
+    },
+    "openai/whisper": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 249,
+      "func_count": 168,
+      "health_score": 89,
+      "parse_time_s": 0.042825937271118164,
+      "analyze_time_s": 0.008493661880493164
+    },
+    "microsoft/markitdown": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 408,
+      "func_count": 240,
+      "health_score": 81,
+      "parse_time_s": 0.07617807388305664,
+      "analyze_time_s": 0.01004791259765625
+    },
+    "3b1b/manim": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 2266,
+      "func_count": 1791,
+      "health_score": 73,
+      "parse_time_s": 0.38761401176452637,
+      "analyze_time_s": 0.0358579158782959
+    },
+    "bregman-arie/devops-exercises": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 114,
+      "func_count": 50,
+      "health_score": 88,
+      "parse_time_s": 0.0339818000793457,
+      "analyze_time_s": 0.007337093353271484
+    },
+    "browser-use/browser-use": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 4412,
+      "func_count": 3050,
+      "health_score": 60,
+      "parse_time_s": 1.4290850162506104,
+      "analyze_time_s": 0.2281479835510254
+    },
+    "swisskyrepo/PayloadsAllTheThings": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 150,
+      "func_count": 84,
+      "health_score": 84,
+      "parse_time_s": 0.05621790885925293,
+      "analyze_time_s": 0.008105993270874023
+    },
+    "anthropics/skills": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 605,
+      "func_count": 405,
+      "health_score": 79,
+      "parse_time_s": 0.12456989288330078,
+      "analyze_time_s": 0.013114213943481445
+    },
+    "sherlock-project/sherlock": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 112,
+      "func_count": 63,
+      "health_score": 83,
+      "parse_time_s": 0.03980875015258789,
+      "analyze_time_s": 0.010591983795166016
+    },
+    "github/spec-kit": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 248,
+      "func_count": 206,
+      "health_score": 84,
+      "parse_time_s": 0.04684591293334961,
+      "analyze_time_s": 0.00844573974609375
+    },
+    "josephmisiti/awesome-machine-learning": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 3,
+      "func_count": 0,
+      "health_score": 100,
+      "parse_time_s": 0.017045974731445312,
+      "analyze_time_s": 0.006720066070556641
+    },
+    "binary-husky/gpt_academic": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 2782,
+      "func_count": 1925,
+      "health_score": 66,
+      "parse_time_s": 0.818554162979126,
+      "analyze_time_s": 0.08499383926391602
+    },
+    "hiyouga/LlamaFactory": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 1988,
+      "func_count": 1163,
+      "health_score": 60,
+      "parse_time_s": 0.5700550079345703,
+      "analyze_time_s": 0.06470012664794922
+    },
+    "localstack/localstack": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 38603,
+      "func_count": 20338,
+      "health_score": 63,
+      "parse_time_s": 33.23543405532837,
+      "analyze_time_s": 1.3309860229492188
+    },
+    "keras-team/keras": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 17369,
+      "func_count": 13701,
+      "health_score": 62,
+      "parse_time_s": 13.674071073532104,
+      "analyze_time_s": 1.7792232036590576
+    },
+    "openinterpreter/open-interpreter": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 898,
+      "func_count": 514,
+      "health_score": 68,
+      "parse_time_s": 0.2454378604888916,
+      "analyze_time_s": 0.018410921096801758
+    },
+    "scrapy/scrapy": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 7469,
+      "func_count": 5180,
+      "health_score": 62,
+      "parse_time_s": 2.469831943511963,
+      "analyze_time_s": 0.24284100532531738
+    },
+    "Asabeneh/30-Days-Of-Python": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 69,
+      "func_count": 22,
+      "health_score": 90,
+      "parse_time_s": 0.04341697692871094,
+      "analyze_time_s": 0.007738828659057617
+    },
+    "ultralytics/yolov5": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 833,
+      "func_count": 615,
+      "health_score": 61,
+      "parse_time_s": 0.14193010330200195,
+      "analyze_time_s": 0.01914215087890625
+    },
+    "Textualize/rich": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 2468,
+      "func_count": 1812,
+      "health_score": 62,
+      "parse_time_s": 0.5598258972167969,
+      "analyze_time_s": 0.07339215278625488
+    },
+    "RVC-Boss/GPT-SoVITS": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 2301,
+      "func_count": 1562,
+      "health_score": 62,
+      "parse_time_s": 0.5719568729400635,
+      "analyze_time_s": 0.05258893966674805
+    },
+    "Z4nzu/hackingtool": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 411,
+      "func_count": 180,
+      "health_score": 76,
+      "parse_time_s": 0.059860944747924805,
+      "analyze_time_s": 0.009904146194458008
+    },
+    "FoundationAgents/OpenManus": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 720,
+      "func_count": 421,
+      "health_score": 79,
+      "parse_time_s": 0.13392877578735352,
+      "analyze_time_s": 0.014988899230957031
+    },
+    "ultralytics/ultralytics": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 3336,
+      "func_count": 2474,
+      "health_score": 62,
+      "parse_time_s": 0.8973901271820068,
+      "analyze_time_s": 0.11201786994934082
+    },
+    "unslothai/unsloth": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 1418,
+      "func_count": 1026,
+      "health_score": 71,
+      "parse_time_s": 0.4614851474761963,
+      "analyze_time_s": 0.036897897720336914
+    },
+    "Zie619/n8n-workflows": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 247,
+      "func_count": 185,
+      "health_score": 91,
+      "parse_time_s": 0.043749094009399414,
+      "analyze_time_s": 0.00970768928527832
+    },
+    "charlax/professional-programming": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 23,
+      "func_count": 7,
+      "health_score": 94,
+      "parse_time_s": 0.0199129581451416,
+      "analyze_time_s": 0.007503986358642578
+    },
+    "mem0ai/mem0": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 4561,
+      "func_count": 2861,
+      "health_score": 68,
+      "parse_time_s": 1.2657079696655273,
+      "analyze_time_s": 0.07245993614196777
+    },
+    "lllyasviel/Fooocus": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 3380,
+      "func_count": 2317,
+      "health_score": 61,
+      "parse_time_s": 0.8454508781433105,
+      "analyze_time_s": 0.051226139068603516
+    },
+    "sansan0/TrendRadar": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 790,
+      "func_count": 602,
+      "health_score": 73,
+      "parse_time_s": 0.15769696235656738,
+      "analyze_time_s": 0.018852949142456055
+    },
+    "oobabooga/text-generation-webui": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 1381,
+      "func_count": 1062,
+      "health_score": 67,
+      "parse_time_s": 0.2944188117980957,
+      "analyze_time_s": 0.030271053314208984
+    },
+    "virattt/ai-hedge-fund": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 806,
+      "func_count": 468,
+      "health_score": 79,
+      "parse_time_s": 0.15477919578552246,
+      "analyze_time_s": 0.015639066696166992
+    },
+    "NanmiCoder/MediaCrawler": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 1421,
+      "func_count": 892,
+      "health_score": 67,
+      "parse_time_s": 0.28597092628479004,
+      "analyze_time_s": 0.02784585952758789
+    },
+    "karpathy/nanochat": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 439,
+      "func_count": 312,
+      "health_score": 67,
+      "parse_time_s": 0.07851791381835938,
+      "analyze_time_s": 0.012958049774169922
+    },
+    "faif/python-patterns": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 789,
+      "func_count": 474,
+      "health_score": 71,
+      "parse_time_s": 0.09000015258789062,
+      "analyze_time_s": 0.012707948684692383
+    },
+    "9001/copyparty": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 2321,
+      "func_count": 1808,
+      "health_score": 55,
+      "parse_time_s": 0.7429771423339844,
+      "analyze_time_s": 0.1604781150817871
+    },
+    "mitmproxy/mitmproxy": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 7187,
+      "func_count": 4975,
+      "health_score": 63,
+      "parse_time_s": 2.4182639122009277,
+      "analyze_time_s": 0.2381889820098877
+    },
+    "mingrammer/diagrams": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 3429,
+      "func_count": 153,
+      "health_score": 84,
+      "parse_time_s": 0.35254597663879395,
+      "analyze_time_s": 0.025352954864501953
+    },
+    "exo-explore/exo": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 4633,
+      "func_count": 2742,
+      "health_score": 66,
+      "parse_time_s": 0.9506769180297852,
+      "analyze_time_s": 0.07125592231750488
+    },
+    "zhayujie/chatgpt-on-wechat": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 2180,
+      "func_count": 1403,
+      "health_score": 64,
+      "parse_time_s": 0.7046270370483398,
+      "analyze_time_s": 0.049549102783203125
+    },
+    "psf/black": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 3034,
+      "func_count": 2097,
+      "health_score": 69,
+      "parse_time_s": 1.2212059497833252,
+      "analyze_time_s": 0.06326818466186523
+    },
+    "hpcaitech/ColossalAI": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 16684,
+      "func_count": 11085,
+      "health_score": 56,
+      "parse_time_s": 12.354339122772217,
+      "analyze_time_s": 1.3427667617797852
+    },
+    "chubin/cheat.sh": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 455,
+      "func_count": 278,
+      "health_score": 79,
+      "parse_time_s": 0.07609701156616211,
+      "analyze_time_s": 0.01290130615234375
+    },
+    "jingyaogong/minimind": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 178,
+      "func_count": 110,
+      "health_score": 78,
+      "parse_time_s": 0.050585031509399414,
+      "analyze_time_s": 0.009192943572998047
+    },
+    "2noise/ChatTTS": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 686,
+      "func_count": 437,
+      "health_score": 70,
+      "parse_time_s": 0.11622095108032227,
+      "analyze_time_s": 0.01485896110534668
+    },
+    "gto76/python-cheatsheet": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 37,
+      "func_count": 22,
+      "health_score": 98,
+      "parse_time_s": 40.93972873687744,
+      "analyze_time_s": 0.00854802131652832
+    },
+    "microsoft/qlib": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 4933,
+      "func_count": 3429,
+      "health_score": 64,
+      "parse_time_s": 1.3774299621582031,
+      "analyze_time_s": 0.09951615333557129
+    },
+    "ComposioHQ/awesome-claude-skills": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 555,
+      "func_count": 373,
+      "health_score": 82,
+      "parse_time_s": 0.12060308456420898,
+      "analyze_time_s": 0.012908935546875
+    },
+    "0voice/interview_internal_reference": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 0,
+      "func_count": 0,
+      "health_score": 100,
+      "parse_time_s": 0.010818243026733398,
+      "analyze_time_s": 0.00811004638671875
+    },
+    "ManimCommunity/manim": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 5091,
+      "func_count": 3919,
+      "health_score": 64,
+      "parse_time_s": 1.3798060417175293,
+      "analyze_time_s": 0.19617080688476562
+    },
+    "satwikkansal/wtfpython": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 29,
+      "func_count": 11,
+      "health_score": 97,
+      "parse_time_s": 0.02738809585571289,
+      "analyze_time_s": 0.008763790130615234
+    },
+    "sqlmapproject/sqlmap": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 4595,
+      "func_count": 2968,
+      "health_score": 58,
+      "parse_time_s": 1.5048801898956299,
+      "analyze_time_s": 0.1282036304473877
+    },
+    "huggingface/pytorch-image-models": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 6902,
+      "func_count": 5425,
+      "health_score": 59,
+      "parse_time_s": 2.5853748321533203,
+      "analyze_time_s": 0.16411495208740234
+    },
+    "chatanywhere/GPT_API_free": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 6,
+      "func_count": 2,
+      "health_score": 85,
+      "parse_time_s": 0.0182039737701416,
+      "analyze_time_s": 0.007755756378173828
+    },
+    "hankcs/HanLP": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 4270,
+      "func_count": 2938,
+      "health_score": 62,
+      "parse_time_s": 1.1882178783416748,
+      "analyze_time_s": 0.10458803176879883
+    },
+    "geekcomputers/Python": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 4306,
+      "func_count": 2420,
+      "health_score": 62,
+      "parse_time_s": 1.52571702003479,
+      "analyze_time_s": 0.13881278038024902
+    },
+    "mouredev/Hello-Python": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 140,
+      "func_count": 60,
+      "health_score": 80,
+      "parse_time_s": 0.07138276100158691,
+      "analyze_time_s": 0.009719133377075195
+    },
+    "nextlevelbuilder/ui-ux-pro-max-skill": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 79,
+      "func_count": 54,
+      "health_score": 89,
+      "parse_time_s": 0.03486776351928711,
+      "analyze_time_s": 0.008955717086791992
+    },
+    "facebookresearch/detectron2": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 4500,
+      "func_count": 2896,
+      "health_score": 63,
+      "parse_time_s": 1.7784678936004639,
+      "analyze_time_s": 0.13513422012329102
+    },
+    "Pythagora-io/gpt-pilot": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 1458,
+      "func_count": 947,
+      "health_score": 69,
+      "parse_time_s": 0.35622286796569824,
+      "analyze_time_s": 0.02924489974975586
+    },
+    "google/langextract": {
+      "status": "analyzed",
+      "language": "python",
+      "node_count": 1088,
+      "func_count": 729,
+      "health_score": 76,
+      "parse_time_s": 0.1780717372894287,
+      "analyze_time_s": 0.018701791763305664
+    },
+    "rustdesk/rustdesk": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 6349,
+      "func_count": 3890,
+      "health_score": 54,
+      "parse_time_s": 18.030130863189697,
+      "analyze_time_s": 0.7966971397399902
+    },
+    "tauri-apps/tauri": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 5477,
+      "func_count": 3396,
+      "health_score": 46,
+      "parse_time_s": 86.5137710571289,
+      "analyze_time_s": 0.7776451110839844
+    },
+    "alacritty/alacritty": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 2067,
+      "func_count": 1338,
+      "health_score": 67,
+      "parse_time_s": 20.02297019958496,
+      "analyze_time_s": 0.09366393089294434
+    },
+    "rust-lang/rustlings": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 1669,
+      "func_count": 817,
+      "health_score": 80,
+      "parse_time_s": 1.0635881423950195,
+      "analyze_time_s": 0.021131038665771484
+    },
+    "topjohnwu/Magisk": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 1286,
+      "func_count": 749,
+      "health_score": 72,
+      "parse_time_s": 2.04268479347229,
+      "analyze_time_s": 0.02684187889099121
+    },
+    "sharkdp/bat": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 992,
+      "func_count": 704,
+      "health_score": 52,
+      "parse_time_s": 1.7445368766784668,
+      "analyze_time_s": 0.03449201583862305
+    },
+    "meilisearch/meilisearch": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 10830,
+      "func_count": 6082,
+      "health_score": 39,
+      "parse_time_s": 107.13597512245178,
+      "analyze_time_s": 8.448276996612549
+    },
+    "rust-unofficial/awesome-rust": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 46,
+      "func_count": 16,
+      "health_score": 100,
+      "parse_time_s": 0.12892484664916992,
+      "analyze_time_s": 0.005969047546386719
+    },
+    "dani-garcia/vaultwarden": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 1772,
+      "func_count": 1194,
+      "health_score": 58,
+      "parse_time_s": 3.1736860275268555,
+      "analyze_time_s": 0.04651904106140137
+    },
+    "starship/starship": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 3190,
+      "func_count": 2001,
+      "health_score": 55,
+      "parse_time_s": 7.6891021728515625,
+      "analyze_time_s": 0.0968160629272461
+    },
+    "tw93/Pake": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 70,
+      "func_count": 31,
+      "health_score": 95,
+      "parse_time_s": 0.15308809280395508,
+      "analyze_time_s": 0.005608797073364258
+    },
+    "FuelLabs/fuels-rs": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 2692,
+      "func_count": 1737,
+      "health_score": 60,
+      "parse_time_s": 5.9622368812561035,
+      "analyze_time_s": 0.1229250431060791
+    },
+    "helix-editor/helix": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 5778,
+      "func_count": 3251,
+      "health_score": 42,
+      "parse_time_s": 19.18066096305847,
+      "analyze_time_s": 1.3956537246704102
+    },
+    "nushell/nushell": {
+      "status": "failed",
+      "language": "rust",
+      "error": "parse_failed: TIMEOUT after 300s"
+    },
+    "lapce/lapce": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 2833,
+      "func_count": 1686,
+      "health_score": 51,
+      "parse_time_s": 12.993641138076782,
+      "analyze_time_s": 0.527238130569458
+    },
+    "DioxusLabs/dioxus": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 9664,
+      "func_count": 5955,
+      "health_score": 39,
+      "parse_time_s": 233.4389910697937,
+      "analyze_time_s": 4.004984140396118
+    },
+    "ajeetdsouza/zoxide": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 203,
+      "func_count": 109,
+      "health_score": 83,
+      "parse_time_s": 0.2537269592285156,
+      "analyze_time_s": 0.007150888442993164
+    },
+    "sxyazi/yazi": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 6590,
+      "func_count": 3317,
+      "health_score": 50,
+      "parse_time_s": 102.71498608589172,
+      "analyze_time_s": 1.5227551460266113
+    },
+    "google/comprehensive-rust": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 745,
+      "func_count": 299,
+      "health_score": 83,
+      "parse_time_s": 0.4734008312225342,
+      "analyze_time_s": 0.010931253433227539
+    },
+    "firecracker-microvm/firecracker": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 9029,
+      "func_count": 3899,
+      "health_score": 57,
+      "parse_time_s": 26.125969171524048,
+      "analyze_time_s": 0.6400997638702393
+    },
+    "yewstack/yew": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 4668,
+      "func_count": 2274,
+      "health_score": 50,
+      "parse_time_s": 18.463326930999756,
+      "analyze_time_s": 0.3417809009552002
+    },
+    "casey/just": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 2522,
+      "func_count": 1810,
+      "health_score": 49,
+      "parse_time_s": 19.058131217956543,
+      "analyze_time_s": 0.20179986953735352
+    },
+    "surrealdb/surrealdb": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 18497,
+      "func_count": 10903,
+      "health_score": 38,
+      "parse_time_s": 246.9024531841278,
+      "analyze_time_s": 33.92562294006348
+    },
+    "sunface/rust-course": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 649,
+      "func_count": 297,
+      "health_score": 86,
+      "parse_time_s": 0.6891589164733887,
+      "analyze_time_s": 0.009666919708251953
+    },
+    "iced-rs/iced": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 6249,
+      "func_count": 3868,
+      "health_score": 45,
+      "parse_time_s": 50.94376087188721,
+      "analyze_time_s": 1.8318169116973877
+    },
+    "qarmin/czkawka": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 2973,
+      "func_count": 1735,
+      "health_score": 71,
+      "parse_time_s": 57.907063722610474,
+      "analyze_time_s": 0.10637497901916504
+    },
+    "dandavison/delta": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 1572,
+      "func_count": 1001,
+      "health_score": 63,
+      "parse_time_s": 2.0590062141418457,
+      "analyze_time_s": 0.03275895118713379
+    },
+    "qdrant/qdrant": {
+      "status": "failed",
+      "language": "rust",
+      "error": "parse_failed: TIMEOUT after 300s"
+    },
+    "atuinsh/atuin": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 2236,
+      "func_count": 1341,
+      "health_score": 49,
+      "parse_time_s": 5.65735387802124,
+      "analyze_time_s": 0.2018270492553711
+    },
+    "emilk/egui": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 6598,
+      "func_count": 4539,
+      "health_score": 45,
+      "parse_time_s": 29.57404088973999,
+      "analyze_time_s": 3.497490167617798
+    },
+    "sharkdp/hyperfine": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 419,
+      "func_count": 228,
+      "health_score": 82,
+      "parse_time_s": 0.6636862754821777,
+      "analyze_time_s": 0.010018110275268555
+    },
+    "ankitects/anki": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 5403,
+      "func_count": 3472,
+      "health_score": 46,
+      "parse_time_s": 16.005708932876587,
+      "analyze_time_s": 0.8558390140533447
+    },
+    "cloudflare/pingora": {
+      "status": "analyzed",
+      "language": "rust",
+      "node_count": 4835,
+      "func_count": 3302,
+      "health_score": 43,
+      "parse_time_s": 55.867429971694946,
+      "analyze_time_s": 0.9158852100372314
+    }
+  },
+  "last_fetch": "2026-02-25T06:41:23.672857",
+  "version": "1.0"
+}

@@ -1,0 +1,40 @@
+[package]
+name = "graphengine-parsing-test-support"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = """
+Test-only fixtures and mock implementations for the graphengine-parsing
+port traits. Lives outside graphengine-parsing/src so production binaries
+never link the mocks and the structural call graph (per `gridseak scan`)
+does not include resolver edges into Mock* targets. Consume only as a
+[dev-dependencies] entry; the crate is not published to crates.io.
+"""
+
+[lib]
+# Library only — no binary surface, no benches owned here. Tests stay in
+# the consumer crates so they exercise the full pipeline against real
+# trait bounds.
+path = "src/lib.rs"
+
+[dependencies]
+graphengine-parsing = { path = "../graphengine-parsing" }
+# The mocks satisfy real port traits, so they pull in the same minimal
+# dependency set the production traits require: async_trait for the
+# trait method signatures, anyhow for error returns, tracing for the
+# debug! / info! lines preserved from the original mock implementations,
+# url for LSP workspace_root args, rayon for the file-parallel mock
+# extractor that mimics the real Tree-sitter pipeline shape.
+async-trait = "0.1"
+anyhow = "1.0"
+tracing = "0.1"
+url = "2.4"
+rayon = "1.8"
+# MockLspResolver fans out the four `resolve_*` async calls under
+# `tokio::try_join!`. We only need the macro surface — no rt features
+# required because the resolver's caller drives the runtime.
+tokio = { workspace = true }
+
+[lints]
+workspace = true

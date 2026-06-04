@@ -1,0 +1,147 @@
+[package]
+name = "graphengine-parsing"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+# Disable bench auto-discovery so any future bench file under benches/
+# must be added explicitly via [[bench]]. Avoids silent rot like the
+# parsing_benchmarks.rs / lsp_bench.rs / storage_bench.rs cases that
+# became uncompilable when the underlying APIs changed.
+autobenches = false
+description = "A production-ready, language-agnostic code parsing system that extracts semantic graphs from source code repositories"
+repository = "https://github.com/adenjessee/gridseak"
+homepage = "https://gridseak.com"
+documentation = "https://docs.rs/graphengine-parsing"
+keywords = ["parsing", "semantic", "graph", "code-analysis", "lsp", "tree-sitter"]
+categories = ["development-tools", "parsing"]
+readme = "README.md"
+
+[dependencies]
+thiserror = "1.0"
+sha2 = "0.10"
+# blake3 is used by the S1 incremental-scanning cache to hash file
+# contents at discovery time. Faster than sha2 on modern CPUs and the
+# unambiguous industry default for content-addressable caching. The
+# cache hashes raw bytes (not normalised text) so comment/whitespace
+# edits invalidate cleanly. See
+# `docs/02-strategy/S1_INCREMENTAL_SCANNING_DESIGN.md` §4.1.
+blake3 = "1"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+async-trait = "0.1"
+anyhow = "1.0"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+walkdir = "2.4"
+toml = "0.8"
+serde_yaml = "0.9"
+tree-sitter = "0.20"
+# IMPORTANT — read before touching any tree-sitter pin, and before
+# telling anyone `cargo install gridseak-cli` works without `--locked`:
+#
+# `tree-sitter-rust 0.20.2` declares `tree-sitter = ">= 0.20"` — an
+# UNBOUNDED lower bound. On a FRESH resolve (i.e. `cargo install`
+# without `--locked`, which ignores Cargo.lock) cargo satisfies that
+# edge with the newest `tree-sitter` on crates.io (currently 0.26.x),
+# while our own direct `tree-sitter = "0.20"` above stays on 0.20.10.
+# Two copies of `tree_sitter::Language` then exist and the build fails
+# at the `tree_sitter_rust::language()` call site with E0308. The only
+# thing that keeps the workspace on a single 0.20.10 today is the
+# committed Cargo.lock — so locked builds (`cargo build`, the release
+# tarball, `cargo install --locked`) work, and unlocked `cargo install`
+# does NOT. See docs/05-deployment/INSTALL.md.
+#
+# `=0.20.2` is the pre-`0.26` revision that resolves cleanly against the
+# current transitive `cc` graph (`libfuzzer-sys` / `ring` / `rusqlite`);
+# `0.20.4` also works on `tree-sitter 0.20` but demands an older
+# `cc = ~1.0.90` floor the lock cannot satisfy. The real unlocked-install
+# fix is a COORDINATED bump of every `tree-sitter-*` grammar to its
+# `0.26`-compatible release line (tracked in S2_POST_GAMMA_BACKLOG.md);
+# until then `--locked` is the supported cargo-install path.
+tree-sitter-rust = "=0.20.2"
+tree-sitter-javascript = "0.20"
+tree-sitter-typescript = "0.20"
+tree-sitter-python = "0.20"
+tree-sitter-go = "0.20"
+tree-sitter-java = "0.20"
+tree-sitter-c-sharp = "0.20"
+# Vendored Salesforce Apex / SOQL / SOSL grammars (upstream crate requires tree-sitter >=0.22).
+tree-sitter-sfapex-vendored = { path = "vendor/tree-sitter-sfapex" }
+# Streaming XML parser for Salesforce metadata files (object-meta.xml,
+# trigger-meta.xml, cls-meta.xml). Avoids pulling a heavyweight DOM crate
+# for what are very small, flat files.
+quick-xml = "0.36"
+rayon = "1.8"
+tokio = { version = "1.0", features = ["full"] }
+lsp-types = "0.95"
+lsp-server = "0.7"
+url = "2.4"
+nix = "0.27"
+rusqlite = { version = "0.32", features = ["bundled"] }
+clap = { version = "4.0", features = ["derive"] }
+fastrand = "2.0"
+which = "4.4"
+syn = { version = "2.0", features = ["full"] }
+futures = "0.3.32"
+# Shared structured-progress wire format. Parser used to own its own
+# emitter trait + impls in `src/domain/progress.rs`; R3 consolidated
+# those into `graphengine-progress` so parser, analyzer, runner, and
+# CLI all reference one type system. See
+# `docs/02-strategy/V0_1_0_RC1_FOLLOWUP_ISSUES.md` for the migration plan.
+graphengine-progress = { path = "../graphengine-progress" }
+
+[dev-dependencies]
+proptest = "1.0"
+criterion = "0.5"
+tokio = { version = "1.0", features = ["full"] }
+tempfile = "3.8"
+libfuzzer-sys = "0.4"
+# Mock implementations of the parser's port traits live in a separate
+# crate so production builds don't link them and the GridSeak scan
+# doesn't see them as production source (R2, v0.1.0-rc1 follow-up).
+# Tests and benches consume the mocks from here.
+graphengine-parsing-test-support = { path = "../graphengine-parsing-test-support" }
+
+[[bench]]
+name = "graph_bench"
+path = "tests/domain/benches/graph_bench.rs"
+harness = false
+
+[[bench]]
+name = "infrastructure_bench"
+path = "tests/infrastructure/benches/infrastructure_bench.rs"
+harness = false
+
+# Removed `lsp_bench` and `storage_bench` declarations: their source
+# files referenced ~50 methods that no longer exist on `LspResolver`,
+# `SqliteRepository`, and `PositionConverter` after the infrastructure
+# refactor. They had no CI coverage so the rot went unnoticed. Source
+# files were deleted; restore from git history if a future bench effort
+# needs them as a starting point.
+
+[features]
+# Default set includes `rust-layer2` post-Gate 1.2 so a plain
+# `cargo build -p graphengine-parsing` produces the `ra_ap_ide`-backed
+# Rust semantic resolver. A `--no-default-features` build still
+# compiles against the subprocess-LSP path that pre-dates T6, which
+# keeps the rollback criterion cheap (just drop the feature flag;
+# no code path is deleted).
+default = ["rust-layer2"]
+lsp-tests = []
+e2e-tests = []
+# T6 (universal-fidelity sprint) — Layer 2 semantic resolution for
+# Rust via `graphengine-ra-ide-adapter`. Gate 1.1 shipped the crate,
+# the dependency-pin, the MSRV bump, and the feature-flag plumbing
+# default-off. Gate 1.2 (this flip) wires the adapter into the
+# semantic-resolver selection in `factory.rs` and flips the feature
+# default-on, subject to the tiered-dogfood decision recorded in
+# `docs/workstreams/universal-fidelity/tasks/T6-rust-layer2.md` §9.G2.
+rust-layer2 = ["dep:graphengine-ra-ide-adapter"]
+
+[dependencies.graphengine-ra-ide-adapter]
+path = "../graphengine-ra-ide-adapter"
+optional = true
+
+[lints]
+workspace = true

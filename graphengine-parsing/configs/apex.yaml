@@ -1,0 +1,301 @@
+language: apex
+file_extensions:
+  - ".cls"
+  - ".trigger"
+  - ".apxc"
+version: "1.0"
+
+# ---------------------------------------------------------------------------
+# LSP integration — Salesforce apex-jorje Language Server
+# ---------------------------------------------------------------------------
+# The `lsp_command` and `lsp_args` values below are a declarative placeholder:
+# Apex is a special case because the LSP is a JAR, not a native binary.
+# `command_locator.rs` has an Apex-aware branch that rewrites these into a
+# real `java -cp <jar> <launcher-class>` invocation, honoring:
+#   - GRAPHENGINE_LSP_APEX            (full command override, highest precedence)
+#   - GRAPHENGINE_APEX_JORJE_JAR      (custom JAR path)
+#   - GRAPHENGINE_JAVA_HOME           (custom Java runtime)
+#   - Bundled JRE at <install>/runtime/jre (desktop default)
+#   - Bundled JAR at <install>/lsp/apex-jorje-lsp.jar (desktop default)
+#
+# YAML stays inert (no ${...} expansion) — per Locked Decision #2 of the plan.
+lsp_command: "java"
+lsp_args:
+  - "-cp"
+  - "APEX_JORJE_JAR_PLACEHOLDER"
+  - "-Ddebug.internal.errors=true"
+  - "-Ddebug.semantic.errors=true"
+  - "apex.jorje.lsp.ApexLanguageServerLauncher"
+lsp_request_timeout_ms: 15000
+lsp_max_concurrent_requests: 8
+
+# apex-jorje expects non-empty initialization options (empty object is accepted).
+# Semantic error reporting is enabled so the LSP loads its full type-resolution
+# pipeline rather than a pure-syntax fast path.
+lsp_initialization_options:
+  enableSemanticErrors: true
+
+# ---------------------------------------------------------------------------
+# Tree-sitter queries
+# ---------------------------------------------------------------------------
+# Node names match tree-sitter-sfapex v2.4.0 grammar (see
+# graphengine-parsing/vendor/tree-sitter-sfapex/apex/src/node-types.json).
+# The grammar is modeled closely after tree-sitter-java, so the query shapes
+# track configs/java.yaml with Apex-specific additions for triggers.
+queries:
+  functions: |
+    (method_declaration
+      name: (identifier) @name
+      parameters: (formal_parameters) @params
+    ) @func
+
+    (constructor_declaration
+      name: (identifier) @name
+      parameters: (formal_parameters) @params
+    ) @func
+
+  structs: |
+    (class_declaration
+      name: (identifier) @name
+      body: (class_body) @body
+    ) @struct
+
+    ; Triggers are modeled as Struct (subtype=trigger) per the plan's
+    ; "no new NodeKind" decision. The `object` field is the SObject the
+    ; trigger binds to — captured for trigger→SObject edge construction.
+    (trigger_declaration
+      name: (identifier) @name
+      object: (identifier) @sobject
+      body: (trigger_body) @body
+    ) @trigger
+
+  traits: |
+    (interface_declaration
+      name: (identifier) @name
+      body: (interface_body) @body
+    ) @trait
+
+  enums: |
+    (enum_declaration
+      name: (identifier) @name
+      body: (enum_body) @body
+    ) @enum
+
+  modules: |
+    ; Apex has no package declarations — the compilation unit IS the module.
+    ; We capture the root parser_output as a module marker so downstream
+    ; extractors treat each file as its own module boundary (1 module per .cls).
+    (parser_output) @module
+
+  call_sites: |
+    ; Bare method calls: `method(args)` — NO receiver / `object` field.
+    ; The `!object` negated-field predicate forces tree-sitter to only
+    ; match `method_invocation` nodes that carry NO `object:` child, so
+    ; the two patterns below are mutually exclusive and every
+    ; `method_invocation` produces exactly one call_sites match.
+    ;
+    ; Without `!object`, member calls (`obj.method(args)`) would match
+    ; BOTH patterns and emit two identical call sites per call,
+    ; doubling every member-call edge downstream. TR-A.3 uncovered
+    ; this when its receiver-text-aware dispatch produced two edges
+    ; per `obj.m(args)` fixture; fixed here at the YAML root rather
+    ; than dedupe in the extractor so duplicate suppression is a
+    ; query-shape invariant, not a defensive filter.
+    (method_invocation
+      !object
+      name: (identifier) @method
+      arguments: (argument_list) @args
+    ) @method_call
+
+    ; Member calls: `obj.method(args)` — `object:` field required.
+    (method_invocation
+      object: (_) @receiver
+      name: (identifier) @method
+      arguments: (argument_list) @args
+    ) @method_call
+
+    ; Constructor calls: `new Type(args)` / `new Type<...>(args)`
+    (object_creation_expression
+      type: (_) @constructor
+      arguments: (argument_list) @args
+    ) @call
+
+    ; `super(args)` and `this(args)` chained constructor invocations.
+    ; The `this` / `super` keyword child is captured as `@chained_ctor_keyword`
+    ; so the shared call_site_extractor can emit a sentinel function name
+    ; (`__self::new` or `__super::new`) for the Apex heuristic resolver to
+    ; expand against the enclosing class / its parent. TR-A.1 §8.3.
+    (explicit_constructor_invocation
+      constructor: [(this) (super)] @chained_ctor_keyword
+      arguments: (argument_list) @args
+    ) @call
+
+  imports: |
+    ; Apex has no user-writable `import` statement — implicit global namespace.
+    ; We expose a no-op capture so the existing import-extractor pipeline
+    ; handles Apex without a special case. Managed-package references
+    ; (e.g. `npsp__Something`) are surfaced via the namespace detector, not
+    ; imports.
+    (parser_output) @import
+
+  type_refs: |
+    ; Type usage sites — feed Class → Struct "Uses" edges.
+    (type_identifier) @type
+
+  # Sprint E.1: Apex inheritance queries. Grammar shape (per
+  # vendor/tree-sitter-sfapex/apex/src/node-types.json):
+  #   class_declaration.superclass  -> (superclass (_type))
+  #   class_declaration.interfaces  -> (interfaces (type_list (_type)*))
+  #   interface_declaration (child) -> (extends_interfaces (type_list (_type)*))
+  # `_type` can be one of: `type_identifier` (plain `Foo`),
+  # `scoped_type_identifier` (`pkg.Foo`), or `generic_type` (which itself
+  # wraps `type_identifier` or `scoped_type_identifier` plus type_arguments).
+  # We cover all three shapes so `Database.Batchable<SObject>` — very
+  # common in Apex — yields the same `implements_type` capture as plain
+  # `Schedulable`. `extract_inheritance` in type_ref_extractor.rs picks
+  # `extends_type` / `implements_type` captures; those flow into
+  # `TypeUsageKind::Extends` / `Implements` and then into
+  # `EdgeKind::Extends` / `Implements`.
+  inheritance: |
+    ; --- class extends --------------------------------------------------
+    (class_declaration
+      (superclass
+        (type_identifier) @extends_type
+      )
+    ) @class_with_extends
+
+    (class_declaration
+      (superclass
+        (scoped_type_identifier) @extends_type
+      )
+    ) @class_with_extends_scoped
+
+    (class_declaration
+      (superclass
+        (generic_type
+          (type_identifier) @extends_type
+        )
+      )
+    ) @class_with_extends_generic
+
+    (class_declaration
+      (superclass
+        (generic_type
+          (scoped_type_identifier) @extends_type
+        )
+      )
+    ) @class_with_extends_generic_scoped
+
+    ; --- class implements ----------------------------------------------
+    (class_declaration
+      interfaces: (interfaces
+        (type_list
+          (type_identifier) @implements_type
+        )
+      )
+    ) @class_with_implements
+
+    (class_declaration
+      interfaces: (interfaces
+        (type_list
+          (scoped_type_identifier) @implements_type
+        )
+      )
+    ) @class_with_implements_scoped
+
+    (class_declaration
+      interfaces: (interfaces
+        (type_list
+          (generic_type
+            (type_identifier) @implements_type
+          )
+        )
+      )
+    ) @class_with_implements_generic
+
+    (class_declaration
+      interfaces: (interfaces
+        (type_list
+          (generic_type
+            (scoped_type_identifier) @implements_type
+          )
+        )
+      )
+    ) @class_with_implements_generic_scoped
+
+    ; --- interface extends ---------------------------------------------
+    (interface_declaration
+      (extends_interfaces
+        (type_list
+          (type_identifier) @extends_type
+        )
+      )
+    ) @interface_with_extends
+
+    (interface_declaration
+      (extends_interfaces
+        (type_list
+          (scoped_type_identifier) @extends_type
+        )
+      )
+    ) @interface_with_extends_scoped
+
+    (interface_declaration
+      (extends_interfaces
+        (type_list
+          (generic_type
+            (type_identifier) @extends_type
+          )
+        )
+      )
+    ) @interface_with_extends_generic
+
+    (interface_declaration
+      (extends_interfaces
+        (type_list
+          (generic_type
+            (scoped_type_identifier) @extends_type
+          )
+        )
+      )
+    ) @interface_with_extends_generic_scoped
+
+  # Apex-specific: trigger event list. Each `trigger_event` is one of
+  # `before insert`, `after update`, etc. The Apex metric pipeline uses these
+  # to classify trigger workload and detect fan-out.
+  trigger_events: |
+    (trigger_event) @event
+
+  # Annotation captures drive entry-point detection. The annotation's `name`
+  # sub-node is an identifier like `AuraEnabled`, `IsTest`, `HttpGet`, etc.
+  annotations: |
+    (annotation
+      name: (identifier) @annotation_name
+    ) @annotation
+
+    (annotation
+      name: (scoped_identifier) @annotation_name
+    ) @annotation
+
+# ---------------------------------------------------------------------------
+# Tree-sitter node → domain NodeKind mapping
+# ---------------------------------------------------------------------------
+kind_mappings:
+  method_declaration: Function
+  constructor_declaration: Function
+  class_declaration: Struct
+  trigger_declaration: Struct
+  interface_declaration: Interface
+  enum_declaration: Enum
+  field_declaration: Variable
+  local_variable_declaration: Variable
+  constant_declaration: Variable
+
+# ---------------------------------------------------------------------------
+# Receiver type detection (for distinguishing interface vs concrete dispatch)
+# ---------------------------------------------------------------------------
+# Apex is case-insensitive and fully typed; receiver detection mostly happens
+# at the LSP layer. The tree-sitter layer records the receiver's raw text and
+# defers type resolution to the tiered resolver.
+receiver_type_detection:
+  enabled: true

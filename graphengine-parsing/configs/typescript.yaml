@@ -1,0 +1,349 @@
+language: typescript
+file_extensions:
+  - ".ts"
+  - ".tsx"
+  - ".mts"
+  - ".cts"
+version: "1.0"
+
+# LSP configuration for TypeScript
+lsp_command: "typescript-language-server"
+lsp_args:
+  - "--stdio"
+lsp_request_timeout_ms: 2000
+lsp_max_concurrent_requests: 32
+
+# Tree-sitter queries for TypeScript syntax extraction
+# Uses tree-sitter-typescript grammar which supports full TypeScript syntax
+queries:
+  # Required query - TypeScript doesn't have structs like Rust, but we include classes
+  structs: |
+    ; TypeScript classes map to structs in domain model
+    (class_declaration 
+      name: (type_identifier) @name
+      body: (class_body) @body
+    ) @struct
+    
+    (abstract_class_declaration
+      name: (type_identifier) @name
+      body: (class_body) @body
+    ) @struct
+
+  # Required query - TypeScript modules via import/export
+  modules: |
+    ; TypeScript namespace declarations (rare but supported)
+    (module
+      name: (identifier) @name
+      body: (statement_block) @body
+    ) @module
+
+  functions: |
+    ; Named function declarations
+    (function_declaration 
+      name: (identifier) @name
+      parameters: (formal_parameters) @params
+    ) @func
+    
+    ; Method definitions in classes
+    (method_definition 
+      name: (property_identifier) @name
+      parameters: (formal_parameters) @params
+    ) @func
+    
+    ; Arrow functions assigned to variables
+    (lexical_declaration
+      (variable_declarator
+        name: (identifier) @name
+        value: (arrow_function
+          parameters: (formal_parameters) @params
+        )
+      )
+    ) @func
+    
+    ; Function expressions assigned to variables
+    (lexical_declaration
+      (variable_declarator
+        name: (identifier) @name
+        value: (function_expression
+          parameters: (formal_parameters) @params
+        )
+      )
+    ) @func
+
+  constants: |
+    ; Const/let declarations
+    (lexical_declaration
+      (variable_declarator
+        name: (identifier) @name
+      ) @const
+    )
+
+    ; Var declarations
+    (variable_declaration
+      (variable_declarator
+        name: (identifier) @name
+      ) @const
+    )
+
+  classes: |
+    ; Class declarations with optional extends/implements
+    (class_declaration 
+      name: (type_identifier) @name
+      body: (class_body) @body
+    ) @class
+    
+    ; Abstract class declarations
+    (abstract_class_declaration
+      name: (type_identifier) @name
+      body: (class_body) @body
+    ) @class
+
+  traits: |
+    ; Interface declarations (mapped to traits for interface extraction)
+    (interface_declaration
+      name: (type_identifier) @name
+      body: (interface_body) @body
+    ) @trait
+
+  # TypeScript-specific alias for interfaces (same as traits query)
+  interfaces: |
+    (interface_declaration
+      name: (type_identifier) @name
+      body: (interface_body) @body
+    ) @interface
+
+  type_aliases: |
+    ; Type alias declarations
+    (type_alias_declaration
+      name: (type_identifier) @name
+      value: (_) @value
+    ) @type_alias
+
+  enums: |
+    ; Enum declarations
+    (enum_declaration
+      name: (identifier) @name
+      body: (enum_body) @body
+    ) @enum
+
+  call_sites: |
+    ; Direct function calls
+    (call_expression 
+      function: (identifier) @func
+      arguments: (arguments) @args
+    ) @call
+    
+    ; Method calls on objects
+    (call_expression 
+      function: (member_expression 
+        object: (_) @receiver
+        property: (property_identifier) @method
+      )
+      arguments: (arguments) @args
+    ) @method_call
+    
+    ; Constructor calls (new expressions)
+    (new_expression 
+      constructor: (identifier) @constructor
+      arguments: (arguments)? @args
+    ) @call
+    
+    ; Constructor calls with member expression (e.g., new module.Class())
+    (new_expression
+      constructor: (member_expression
+        object: (_) @module
+        property: (property_identifier) @constructor
+      )
+      arguments: (arguments)? @args
+    ) @call
+
+  identifier_uses: |
+    ; Identifier references (non-declarations filtered in extractor)
+    (identifier) @identifier
+
+    ; Property identifiers in member expressions (e.g., Constants.VALUE)
+    (member_expression
+      property: (property_identifier) @identifier
+    ) @member
+
+  imports: |
+    ; ES module imports
+    (import_statement
+      source: (string) @source
+    ) @import
+    
+    ; Named imports
+    (import_statement
+      (import_clause
+        (named_imports
+          (import_specifier
+            name: (identifier) @imported_name
+            alias: (identifier)? @local_name
+          )
+        )
+      )
+      source: (string) @source
+    ) @import
+    
+    ; Default imports
+    (import_statement
+      (import_clause
+        (identifier) @default_import
+      )
+      source: (string) @source
+    ) @import
+    
+    ; Namespace imports
+    (import_statement
+      (import_clause
+        (namespace_import
+          (identifier) @namespace
+        )
+      )
+      source: (string) @source
+    ) @import
+
+  exports: |
+    ; Named exports
+    (export_statement
+      declaration: (_)? @declaration
+    ) @export
+    
+    ; Export from re-exports
+    (export_statement
+      source: (string) @source
+    ) @export
+    
+    ; Default exports
+    (export_statement
+      value: (_) @value
+    ) @export
+
+  type_refs: |
+    ; Type annotations contain type references (parameters, return types, etc.)
+    (type_annotation
+      (type_identifier) @type_ref
+    ) @type_annotation
+    
+    ; Generic type arguments: Array<MyType>
+    (type_arguments
+      (type_identifier) @type_ref
+    ) @generic_type
+
+  # Extended type queries for structured extraction
+  inheritance: |
+    ; Class extends another class
+    (class_declaration
+      name: (type_identifier) @class_name
+      (class_heritage
+        (extends_clause
+          value: (identifier) @extends_type
+        )
+      )?
+    ) @class_with_extends
+    
+    ; Class implements interfaces
+    (class_declaration
+      name: (type_identifier) @class_name
+      (class_heritage
+        (implements_clause
+          (type_identifier) @implements_type
+        )
+      )?
+    ) @class_with_implements
+    
+    ; Interface extends other interfaces
+    (interface_declaration
+      name: (type_identifier) @interface_name
+      (extends_type_clause
+        (type_identifier) @extends_type
+      )?
+    ) @interface_with_extends
+
+  parameter_types: |
+    ; Function parameter with type annotation
+    (required_parameter
+      pattern: (identifier) @param_name
+      (type_annotation
+        (type_identifier) @param_type
+      )
+    ) @typed_param
+    
+    ; Optional parameter with type
+    (optional_parameter
+      pattern: (identifier) @param_name
+      (type_annotation
+        (type_identifier) @param_type
+      )
+    ) @typed_optional_param
+
+  return_types: |
+    ; Function with return type annotation
+    (function_declaration
+      name: (identifier) @func_name
+      (type_annotation
+        (type_identifier) @return_type
+      )
+    ) @func_with_return
+    
+    ; Method with return type
+    (method_definition
+      name: (property_identifier) @method_name
+      (type_annotation
+        (type_identifier) @return_type
+      )
+    ) @method_with_return
+    
+    ; Arrow function with return type
+    (arrow_function
+      (type_annotation
+        (type_identifier) @return_type
+      )
+    ) @arrow_with_return
+
+  variables: |
+    ; Variable declarations
+    (variable_declaration 
+      (variable_declarator 
+        name: (identifier) @name
+        type: (type_annotation)? @type
+        value: (_)? @value
+      )
+    ) @variable
+    
+    ; Lexical declarations (const, let)
+    (lexical_declaration 
+      (variable_declarator 
+        name: (identifier) @name
+        type: (type_annotation)? @type
+        value: (_)? @value
+      )
+    ) @variable
+
+  properties: |
+    ; Class property definitions
+    (public_field_definition
+      name: (property_identifier) @name
+      type: (type_annotation)? @type
+    ) @property
+    
+    ; Object properties
+    (property_identifier) @property
+
+# Mapping from tree-sitter node types to domain NodeKind
+kind_mappings:
+  function_declaration: Function
+  method_definition: Function
+  arrow_function: Function
+  function_expression: Function
+  class_declaration: Struct
+  abstract_class_declaration: Struct
+  interface_declaration: Interface
+  type_alias_declaration: Type
+  enum_declaration: Enum
+  import_statement: Import
+  export_statement: Import
+  variable_declaration: Variable
+  lexical_declaration: Variable
+  public_field_definition: Variable
+  property_identifier: Variable

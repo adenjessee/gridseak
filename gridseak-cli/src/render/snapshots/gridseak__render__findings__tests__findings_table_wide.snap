@@ -1,0 +1,8 @@
+---
+source: gridseak-cli/src/render/findings.rs
+expression: "String::from_utf8(buf).unwrap()"
+---
+Findings — demo (showing 2 of 2)
+ID  Severity  Type                  Target        Evidence               
+f1  Critical  Blast radius hotspot  auth/login    41 downstream nodes    
+f2  High      Low cohesion          src/services  1 disconnected clusters

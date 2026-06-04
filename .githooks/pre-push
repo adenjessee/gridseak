@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Pre-push gate. This hook is the per-push correctness gate in a
+# local-first build/test architecture: the laptop is the build server
+# and `scripts/release/` owns release packaging. On the PRIVATE repo
+# there is no per-push CI to fall back on, by design — GitHub Actions
+# minutes are metered, so the retained private workflows are all
+# manual-dispatch / tag-triggered only (apex-lsp + benchmark on demand;
+# release.yml + staging.yml on tags via flyctl). The PUBLIC mirror
+# (github.com/adenjessee/gridseak) carries a free fmt+clippy+test PR gate
+# for outside contributors — see scripts/release/public-overlay/.
+#
+# Gates run here:
+#   [1/2] cargo fmt --all -- --check       (Rust formatting)
+#   [2/2] cargo test --workspace           (Rust correctness, all
+#                                           workspace crates)
+#
+# Gates owned elsewhere in the local pipeline (NOT run on every push):
+#   - `cargo build --release` — run by `scripts/release/*` and at
+#     release-tag time. Adding it here would turn every push into a
+#     15+ min cold-compile job.
+#
+# Run the broader gate manually before any release-shaped push:
+#   cargo build --release
+#
+# Clippy is NOT run by this hook. It is a style linter, not a correctness
+# gate, and its cold-compile cost (~15 min) is dev-time we would rather
+# spend shipping. Run it explicitly for a style pass:
+#   cargo clippy --workspace --lib --bins --tests
+#
+# Dev-loop knobs (skip flags):
+#   SKIP_PRE_PUSH=1       — skip ALL checks (equivalent to --no-verify).
+#                           No upstream gate will catch it; YOU are the
+#                           gate when this is set.
+
+if [[ "${SKIP_PRE_PUSH:-0}" == "1" ]]; then
+  echo "SKIP_PRE_PUSH=1 set — skipping all pre-push checks."
+  echo "WARNING: There is no per-push CI in this repo. Nothing else will"
+  echo "         check this push before it lands on origin/main."
+  exit 0
+fi
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
+
+echo "Running pre-push checks..."
+echo ""
+
+echo "=== [1/2] cargo fmt --check ==="
+cargo fmt --all -- --check || {
+  echo ""
+  echo "ERROR: Formatting check failed. Run 'cargo fmt --all' to fix."
+  exit 1
+}
+
+echo ""
+echo "=== [2/2] cargo test --workspace ==="
+cargo test --workspace 2>&1 || {
+  echo ""
+  echo "ERROR: Tests failed. Fix them before pushing."
+  exit 1
+}
+
+echo ""
+echo "All pre-push checks passed. Pushing..."

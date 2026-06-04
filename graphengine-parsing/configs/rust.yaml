@@ -1,0 +1,129 @@
+language: rust
+file_extensions:
+  - ".rs"
+version: "1.0"
+
+# LSP configuration
+lsp_command: "rust-analyzer"
+lsp_request_timeout_ms: 5000
+lsp_max_concurrent_requests: 32
+
+# Call pattern configuration for language-agnostic call detection
+call_patterns:
+  # Simple function calls: function_name()
+  simple_function:
+    pattern: "function_call"
+    priority: 1
+    
+  # Method calls: object.method()
+  method_call:
+    pattern: "method_call"
+    priority: 2
+    
+  # Constructor calls: Type::new()
+  constructor_call:
+    pattern: "constructor_call"
+    priority: 3
+    
+  # Chained calls: .method()
+  chained_call:
+    pattern: "chained_call"
+    priority: 4
+
+queries:
+  functions: |
+    (function_item 
+      name: (identifier) @name
+      parameters: (parameters) @params
+    ) @func
+  
+  structs: |
+    (struct_item 
+      name: (type_identifier) @name
+      body: (field_declaration_list) @fields
+    ) @struct
+  
+  modules: |
+    (mod_item 
+      name: (identifier) @name
+    ) @module
+  
+  call_sites: |
+    (call_expression
+      function: [(identifier) (scoped_identifier)] @func
+    ) @call
+
+    (call_expression 
+      function: (field_expression 
+        (_) @receiver
+        field: (field_identifier) @method
+      )
+    ) @method_call
+  
+  imports: |
+    (use_declaration) @import
+  
+  type_refs: |
+    (type_identifier) @type
+  
+  traits: |
+    (trait_item 
+      name: (type_identifier) @name
+    ) @trait
+  
+  enums: |
+    (enum_item 
+      name: (type_identifier) @name
+    ) @enum
+  
+  constants: |
+    (const_item 
+      name: (identifier) @name
+    ) @const
+  
+  statics: |
+    (static_item 
+      name: (identifier) @name
+    ) @static
+  
+  type_aliases: |
+    (type_item 
+      name: (type_identifier) @name
+    ) @type_alias
+
+kind_mappings:
+  function_item: Function
+  struct_item: Struct
+  mod_item: Module
+  trait_item: Interface
+  enum_item: Enum
+  const_item: Variable
+  static_item: Variable
+  type_item: Type
+  use_declaration: Import
+
+# Receiver type detection configuration
+# This enables the system to distinguish trait object calls from concrete type calls
+receiver_type_detection:
+  # Patterns that indicate trait objects (e.g., &dyn Trait, Box<dyn Trait)
+  trait_object_patterns:
+    - "&dyn"
+    - "Box<dyn"
+    - "Arc<dyn"
+    - "Rc<dyn"
+    - "dyn "
+  
+  # Patterns that indicate concrete types (optional, for validation)
+  concrete_patterns:
+    - "&"
+    - "Box<"
+    - "Arc<"
+  
+  # How to extract type from LSP hover response
+  hover_extraction:
+    # Try markdown code blocks first (```rust\ntype\n```)
+    markdown_code_block: true
+    # Then try function signature patterns
+    function_signature: true
+    # Fallback to first line
+    first_line_fallback: true

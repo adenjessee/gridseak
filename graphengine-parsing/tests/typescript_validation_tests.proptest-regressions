@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 84e2aa7deac969e3621836c743061ee62911290602663bade6611f0d0879eeaa # shrinks to name = "A", path1 = "src/s.ts", path2 = "src/s.tsx"

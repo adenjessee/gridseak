@@ -1,0 +1,8 @@
+<apex:page standardController="Account" extensions="ExtA, ExtB">
+    <apex:form>
+        <!-- method lives on ExtB only; the VF resolver must fall through
+             past ExtA and bind to ExtB::computeFoo() per declared-order
+             first-match-wins semantics. -->
+        <apex:commandButton value="Go" action="{!computeFoo}"/>
+    </apex:form>
+</apex:page>

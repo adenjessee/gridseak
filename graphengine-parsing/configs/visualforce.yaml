@@ -1,0 +1,37 @@
+# Visualforce — discovery-only config (TR-A.5).
+#
+# SCOPE
+# -----
+# Visualforce is NOT a tree-sitter language in this engine. `.page` files
+# are read by `syntax::language::apex::vf_page_reader` via `quick-xml`,
+# not by a tree-sitter grammar. Consequently this file intentionally
+# deviates from the `graphengine-parsing/src/infrastructure/config.rs`
+# `LanguageConfig` schema: it carries NO `queries`, NO `kind_mappings`,
+# NO LSP bindings, and is NOT consumable by the generic
+# `load_language_config("visualforce")` path (which would reject an
+# empty `queries` map).
+#
+# It exists so that:
+#   * the set of file extensions the VF discovery layer picks up is
+#     visible in a config file instead of a magic literal in Rust
+#     source (single source of truth for which suffixes are "VF"),
+#   * when Phase C TR-C.3 extends VF to cover text-node expressions,
+#     `rerender` targets, and `<apex:actionFunction>` nested elements,
+#     there is an existing home to bolt those discovery concerns into
+#     without re-threading a YAML from scratch,
+#   * readers grepping `configs/*.yaml` for "what does this engine
+#     parse?" see visualforce listed alongside the tree-sitter
+#     languages.
+#
+# The loader is `syntax::language::apex::vf_page_reader::load_vf_config`
+# (not `infrastructure::config::load_config`), which deserializes this
+# file into a tiny `VfConfig { file_extensions }` struct.
+language: visualforce
+version: "1.0"
+# Flagged so the engine's discovery layer lists Visualforce (useful for the
+# UI's "detected languages" readout) but `parse --lang visualforce` is
+# rejected / skipped. See `LanguageDescriptor::discovery_only` for the full
+# rationale.
+discovery_only: true
+file_extensions:
+  - ".page"

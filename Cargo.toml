@@ -1,0 +1,63 @@
+[workspace]
+resolver = "2"
+members = [
+    "graphengine-analysis",
+    "graphengine-diagnostic",
+    "graphengine-git-signals",
+    "graphengine-infra",
+    "graphengine-mcp",
+    "graphengine-parsing",
+    "graphengine-parsing-test-support",
+    "graphengine-progress",
+    "graphengine-ra-ide-adapter",
+    "gridseak-cli",
+    "gridseak-engine-runner",
+    "gridseak-local-store",
+]
+default-members = [
+    "graphengine-analysis",
+    "graphengine-diagnostic",
+    "graphengine-git-signals",
+    "graphengine-infra",
+    "graphengine-mcp",
+    "graphengine-parsing",
+    "graphengine-parsing-test-support",
+    "graphengine-progress",
+    "graphengine-ra-ide-adapter",
+    "gridseak-cli",
+    "gridseak-engine-runner",
+    "gridseak-local-store",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["The GridSeak Authors"]
+license = "MIT OR Apache-2.0"
+
+[workspace.lints.rust]
+
+[workspace.dependencies]
+tokio = { version = "1.0", features = ["full"] }
+tokio-util = { version = "0.7", features = ["rt"] }
+# Pinned via workspace so every engine binary, the runner, and both
+# consumer surfaces (CLI + desktop) build against the same serde versions.
+# Drifting these locally has caused subtle Cargo.lock churn in past
+# refactors — this is the single point of update.
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "1.0"
+# Shared progress-event vocabulary. Re-exported via workspace = true so a
+# version bump propagates to every consumer in one place.
+graphengine-progress = { path = "graphengine-progress" }
+
+# The test profile's default `debug = 2` produces debuginfo that can push
+# the link step past the OOM threshold on GitHub's ubuntu-latest runner
+# (16 GB RAM, many fat test binaries linked in parallel), producing
+# `collect2: ld terminated with signal 7 [Bus error]`. `line-tables-only`
+# keeps filenames + line numbers in panic backtraces (the reason you
+# want debug info in tests at all) while dropping the heavy type +
+# scope info. Local `cargo test` backtraces stay useful; CI stops
+# crashing the linker.
+[profile.test]
+debug = "line-tables-only"

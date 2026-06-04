@@ -1,0 +1,49 @@
+---
+description: GridSeak MCP routing — when to call which tool in plain language
+alwaysApply: true
+---
+
+# GridSeak routing (deterministic tool selection)
+
+Call **`gridseak_context_for_llm`** on every new chat AND after any multi-file edit batch before structural claims.
+
+If a tool returns **`STALE_SNAPSHOT`**, run **`gridseak_scan`** — do not grep the repo as a substitute.
+
+When unsure which tool to use, call **`gridseak_route`** with the user's question (deterministic, no LLM).
+
+## Symptom → tool
+
+| User says (examples) | Call |
+|----------------------|------|
+| "what breaks if I change **this file**" / names a `.rs` path | `gridseak_graph_file_blast_radius` |
+| "what breaks if I change **this function**" / symbol FQN | `gridseak_graph_blast_radius` |
+| "who calls X" / "who uses X" | `gridseak_graph_callers` |
+| "what does X call" | `gridseak_graph_callees` |
+| "what should we fix first" / "what's risky" / technical debt | `gridseak_get_recommendations` (requires `analysis_complete`) |
+| "is there dead code" / list all findings | `gridseak_get_findings` |
+| "are there cycles" | `gridseak_graph_cycles` |
+| "tightly coupled modules" | `gridseak_graph_module_coupling` |
+| "everything connected to X" | `gridseak_graph_slice` |
+| new chat / cold start | `gridseak_context_for_llm` |
+
+## Example MCP calls
+
+```json
+{ "project": null }
+```
+→ `gridseak_context_for_llm` (first call)
+
+```json
+{ "project": null, "file": "gridseak-cli/src/graph_command.rs", "depth": 3 }
+```
+→ `gridseak_graph_file_blast_radius` when user asks what breaks if they change that file
+
+```json
+{ "project": null, "symbol": "gridseak_cli::run_graph", "depth": 3 }
+```
+→ `gridseak_graph_blast_radius` for symbol-level impact
+
+## Build mode
+
+- If `workspace_delta.dirty_paths` intersects your query target → **`gridseak_scan`** first.
+- If `analysis_readiness.analysis_complete` is false → do not quote ranked recommendations or headline metrics.

@@ -1,0 +1,8 @@
+<apex:page controller="UTIL_JobProgress_CTRL" action="{!refreshJobs}">
+    <apex:pageBlock title="Async jobs">
+        <apex:commandButton value="Refresh" action="{!refreshJobs}" rerender="blk"/>
+        <apex:outputPanel id="blk" rendered="{!hasActiveJobs}">
+            <apex:outputText value="{!jobSummary}"/>
+        </apex:outputPanel>
+    </apex:pageBlock>
+</apex:page>

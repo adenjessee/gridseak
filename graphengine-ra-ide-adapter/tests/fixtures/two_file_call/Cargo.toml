@@ -1,0 +1,15 @@
+[package]
+name = "two_file_call_fixture"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[lib]
+name = "fixture_lib"
+path = "src/lib.rs"
+
+[[bin]]
+name = "fixture_main"
+path = "src/main.rs"
+
+[workspace]

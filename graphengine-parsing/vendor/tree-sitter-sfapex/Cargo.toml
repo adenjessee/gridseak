@@ -1,0 +1,24 @@
+[package]
+name = "tree-sitter-sfapex-vendored"
+description = "Vendored Salesforce Apex, SOQL, and SOSL tree-sitter grammars (from aheber/tree-sitter-sfapex v2.4.0) compiled against tree-sitter 0.20 for the GridSeak GraphEngine."
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+publish = false
+build = "bindings/rust/build.rs"
+
+# We intentionally do NOT use the upstream published crate because it requires
+# tree-sitter 0.22+ (via tree-sitter-language). Vendoring lets us keep the
+# workspace on tree-sitter 0.20 for consistency with the other seven grammars,
+# while isolating the Apex toolchain as a self-contained implementation detail.
+# The parser.c files are generated output (ABI 14) and require no external
+# scanners — so compilation is a straightforward `cc` invocation.
+
+[lib]
+path = "bindings/rust/lib.rs"
+
+[dependencies]
+tree-sitter = "0.20"
+
+[build-dependencies]
+cc = "1.0"

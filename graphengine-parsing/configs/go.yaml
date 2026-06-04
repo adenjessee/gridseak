@@ -1,0 +1,113 @@
+language: go
+file_extensions:
+  - ".go"
+version: "1.0"
+
+lsp_command: "gopls"
+lsp_args:
+  - "-mode=stdio"
+lsp_request_timeout_ms: 1000
+lsp_max_concurrent_requests: 32
+
+queries:
+  functions: |
+    (function_declaration
+      name: (identifier) @name
+      parameters: (parameter_list) @params
+    ) @func
+
+    (method_declaration
+      receiver: (parameter_list) @receiver
+      name: (field_identifier) @name
+      parameters: (parameter_list) @params
+    ) @func
+
+  structs: |
+    (type_declaration
+      (type_spec
+        name: (type_identifier) @name
+        type: (struct_type) @body
+      )
+    ) @struct
+
+  modules: |
+    (package_clause
+      (package_identifier) @name
+    ) @module
+
+  call_sites: |
+    (call_expression
+      function: (identifier) @func
+    ) @call
+
+    (call_expression
+      function: (selector_expression
+        operand: (identifier) @obj
+        field: (field_identifier) @method
+      )
+    ) @call
+
+  imports: |
+    ; Single import: `import "fmt"`
+    (import_spec
+      path: (interpreted_string_literal) @path
+    ) @import
+
+    ; Aliased import: `import myfmt "fmt"`
+    (import_spec
+      name: (package_identifier) @local_name
+      path: (interpreted_string_literal) @path
+    ) @import
+
+    ; Dot import: `import . "fmt"`
+    (import_spec
+      name: (dot) @glob
+      path: (interpreted_string_literal) @path
+    ) @import
+
+    ; Blank import: `import _ "net/http/pprof"`
+    (import_spec
+      name: (blank_identifier) @local_name
+      path: (interpreted_string_literal) @path
+    ) @import
+
+  variables: |
+    (var_declaration
+      (var_spec
+        name: (identifier) @name
+      )
+    ) @variable
+
+    (short_var_declaration
+      left: (expression_list
+        (identifier) @name
+      )
+    ) @variable
+
+    (const_declaration
+      (const_spec
+        name: (identifier) @name
+      )
+    ) @variable
+
+  interfaces: |
+    (type_declaration
+      (type_spec
+        name: (type_identifier) @name
+        type: (interface_type) @body
+      )
+    ) @interface
+
+kind_mappings:
+  function_declaration: Function
+  method_declaration: Function
+  type_spec: Struct
+  package_clause: Module
+  import_declaration: Import
+  import_spec: Import
+  var_declaration: Variable
+  var_spec: Variable
+  short_var_declaration: Variable
+  const_declaration: Variable
+  const_spec: Variable
+  type_identifier: Type

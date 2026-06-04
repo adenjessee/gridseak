@@ -1,0 +1,14 @@
+---
+source: gridseak-cli/src/render/recommendations.rs
+expression: "String::from_utf8(buf).unwrap()"
+---
+# Top Recommendations — demo
+
+## #1 [Critical] Blast radius hotspot
+
+- **Target:** `auth/login`
+- **Evidence:** 10 downstream nodes
+- **Risk:** auth/login is called by 0 other functions and affects 10 downstream nodes. A bug or breaking change here has outsized impact across the codebase.
+- **Action:** Add comprehensive tests around auth/login. Consider extracting an interface to limit coupling surface. Avoid changing this function without targeted regression tests.
+- **Finding id:** `finding_a`
+- **Score:** 17.84

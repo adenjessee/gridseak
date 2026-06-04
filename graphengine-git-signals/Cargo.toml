@@ -1,0 +1,43 @@
+[package]
+name = "graphengine-git-signals"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Layer 0 evidence stream for the universal-fidelity engine: change frequency, authorship, recency, co-change clustering, and hotspot scoring derived from a git working tree via gix. Introduced by universal-fidelity sprint task T7."
+repository = "https://github.com/adenjessee/gridseak"
+keywords = ["git", "layer0", "hotspot", "churn", "signals"]
+categories = ["development-tools"]
+publish = false
+
+# `gix` is pinned to the 0.81.x line measured at T7 authoring time
+# (2026-04). Unlike the `ra_ap_*` family (T6 / UF-FU-008), `gix` does
+# not ship nightly-feature regressions per release — we pin to the
+# minor line for reproducibility but allow patch bumps via `cargo
+# update`. If a future gix release breaks the repository-open /
+# commit-walk API used here, widen this pin with a one-line rustdoc
+# justification in `src/lib.rs`.
+[dependencies]
+# Default features are intentionally enabled. `gix-hash`'s `Kind`
+# enum is empty unless at least one hash-backend feature
+# (`sha1`, `sha1-shattered`) is compiled in; disabling defaults
+# (`default-features = false`) without re-enabling a hash backend
+# fails to compile on `rustc 1.91` because `match self` over an
+# empty enum becomes a hard error rather than an exhaustive trivial
+# match. Leaving defaults enabled keeps the `sha1` backend on and
+# pulls in `index`, `worktree-mutation`, and `basic` — all of which
+# are load-bearing for the tree-diff / revwalk path we use here.
+gix = "0.81"
+serde = { version = "1.0", features = ["derive"] }
+thiserror = "1.0"
+tracing = "0.1"
+
+[dev-dependencies]
+tempfile = "3.8"
+# `serde_json` is dev-only: used by the `dump_report` example that
+# records the T7 §9 correlation data against a real repository, and
+# would be overreach to require of consumers of the library proper.
+serde_json = "1.0"
+
+[lints]
+workspace = true

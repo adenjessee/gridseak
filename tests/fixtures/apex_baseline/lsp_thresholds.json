@@ -1,0 +1,14 @@
+{
+  "_comment": "Sprint H.4 — pinned LSP recall thresholds for the nightly apex-lsp workflow. See docs/workstreams/apex/LSP_CI_RUNBOOK.md for the first-run and threshold-update procedure.",
+  "_first_run": "All thresholds are 0 / 0.0 on initial landing so the workflow establishes a baseline without failing. After the first green nightly run on main, open a PR that updates these to actual_value * 0.9 so subsequent drift fails CI.",
+  "default": {
+    "min_lsp_edges": 0,
+    "min_lsp_fraction": 0.0
+  },
+  "corpora": {
+    "dreamhouse-lwc": {
+      "min_lsp_edges": 0,
+      "min_lsp_fraction": 0.0
+    }
+  }
+}

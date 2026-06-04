@@ -1,0 +1,5 @@
+<apex:page controller="minimal_action">
+    <apex:form>
+        <apex:commandButton value="Save" action="{!save}"/>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,256 @@
+language: javascript
+file_extensions:
+  - ".js"
+  - ".jsx"
+  - ".mjs"
+  - ".cjs"
+  # NOTE: .ts and .tsx are handled by typescript.yaml - do NOT add them here
+version: "1.0"
+
+# LSP configuration
+lsp_command: "typescript-language-server"
+lsp_args:
+  - "--stdio"
+lsp_request_timeout_ms: 2000
+lsp_max_concurrent_requests: 32
+
+queries:
+  functions: |
+    ; Named function declarations
+    (function_declaration 
+      name: (identifier) @name
+      parameters: (formal_parameters) @params
+    ) @func
+    
+    ; Method definitions in classes
+    (method_definition 
+      name: (property_identifier) @name
+      parameters: (formal_parameters) @params
+    ) @func
+    
+    ; Arrow functions assigned to variables (const/let)
+    ; NOTE: We only extract arrow functions when assigned to a named variable
+    ; This prevents extracting anonymous callbacks in if/map/filter etc.
+    (lexical_declaration
+      (variable_declarator
+        name: (identifier) @name
+        value: (arrow_function
+          parameters: (formal_parameters) @params
+        )
+      )
+    ) @func
+    
+    ; Arrow functions assigned to var declarations
+    (variable_declaration
+      (variable_declarator
+        name: (identifier) @name
+        value: (arrow_function
+          parameters: (formal_parameters) @params
+        )
+      )
+    ) @func
+    
+    ; Named function expressions assigned to variables
+    (lexical_declaration
+      (variable_declarator
+        name: (identifier) @name
+        value: (function_expression
+          parameters: (formal_parameters) @params
+        )
+      )
+    ) @func
+    
+    ; Function expressions assigned to var declarations
+    (variable_declaration
+      (variable_declarator
+        name: (identifier) @name
+        value: (function_expression
+          parameters: (formal_parameters) @params
+        )
+      )
+    ) @func
+
+  structs: |
+    ; No structs in JavaScript, but query required for validation
+
+  classes: |
+    (class_declaration 
+      name: (type_identifier) @name
+      body: (class_body) @body
+    ) @class
+
+  modules: |
+    ; JavaScript modules are handled by imports/exports queries
+  
+  call_sites: |
+    (call_expression 
+      function: (identifier) @func
+    ) @call
+    
+    (call_expression 
+      function: (member_expression 
+        object: (identifier) @obj
+        property: (property_identifier) @method
+      )
+    ) @call
+    
+    (new_expression 
+      constructor: (identifier) @constructor
+    ) @call
+  
+  imports: |
+    ; ES module imports (side-effect only: `import "./foo"`)
+    (import_statement
+      source: (string) @source
+    ) @import
+
+    ; Named imports: `import { foo, bar as baz } from "./mod"`
+    (import_statement
+      (import_clause
+        (named_imports
+          (import_specifier
+            name: (identifier) @imported_name
+            alias: (identifier)? @local_name
+          )
+        )
+      )
+      source: (string) @source
+    ) @import
+
+    ; Default imports: `import React from "react"`
+    (import_statement
+      (import_clause
+        (identifier) @default_import
+      )
+      source: (string) @source
+    ) @import
+
+    ; Namespace imports: `import * as utils from "./utils"`
+    (import_statement
+      (import_clause
+        (namespace_import
+          (identifier) @namespace
+        )
+      )
+      source: (string) @source
+    ) @import
+
+    ; CommonJS require(): `const express = require("express")`
+    (lexical_declaration
+      (variable_declarator
+        name: (identifier) @default_import
+        value: (call_expression
+          function: (identifier) @_require_fn
+          arguments: (arguments
+            (string) @source
+          )
+        )
+      )
+      (#eq? @_require_fn "require")
+    ) @import
+
+    ; CommonJS destructured require(): `const { Router } = require("express")`
+    (lexical_declaration
+      (variable_declarator
+        name: (object_pattern
+          (shorthand_property_identifier_pattern) @imported_name
+        )
+        value: (call_expression
+          function: (identifier) @_require_fn
+          arguments: (arguments
+            (string) @source
+          )
+        )
+      )
+      (#eq? @_require_fn "require")
+    ) @import
+
+    ; var require(): `var express = require("express")`
+    (variable_declaration
+      (variable_declarator
+        name: (identifier) @default_import
+        value: (call_expression
+          function: (identifier) @_require_fn
+          arguments: (arguments
+            (string) @source
+          )
+        )
+      )
+      (#eq? @_require_fn "require")
+    ) @import
+
+    ; var destructured require(): `var { Router } = require("express")`
+    (variable_declaration
+      (variable_declarator
+        name: (object_pattern
+          (shorthand_property_identifier_pattern) @imported_name
+        )
+        value: (call_expression
+          function: (identifier) @_require_fn
+          arguments: (arguments
+            (string) @source
+          )
+        )
+      )
+      (#eq? @_require_fn "require")
+    ) @import
+  
+  type_refs: |
+    ; TypeScript features not available in JavaScript grammar
+
+  # Sprint E.1: JavaScript ES6 classes support `extends` (no `implements`).
+  # Capture `class Foo extends Bar` as an Extends relationship.
+  inheritance: |
+    (class_declaration
+      name: (identifier) @class_name
+      (class_heritage
+        (identifier) @extends_type
+      )
+    ) @class_with_extends
+  
+  variables: |
+    (variable_declaration 
+      declarator: (variable_declarator 
+        name: (identifier) @name
+      )
+    ) @variable
+    
+    (const_declaration 
+      declarator: (variable_declarator 
+        name: (identifier) @name
+      )
+    ) @variable
+    
+    (let_declaration 
+      declarator: (variable_declarator 
+        name: (identifier) @name
+      )
+    ) @variable
+  
+  properties: |
+    (property_identifier) @property
+    
+    (shorthand_property_identifier) @property
+  
+  objects: |
+    (object_expression) @object
+    
+    (object_pattern) @object
+
+kind_mappings:
+  function_declaration: Function
+  method_definition: Function
+  arrow_function: Function
+  function_expression: Function
+  import_statement: Import
+  export_statement: Import
+  variable_declaration: Variable
+  const_declaration: Variable
+  let_declaration: Variable
+  class_declaration: Struct
+  interface_declaration: Interface
+  type_alias_declaration: Type
+  property_identifier: Variable
+  shorthand_property_identifier: Variable
+  object_expression: Variable
+  object_pattern: Variable

@@ -1,0 +1,162 @@
+language: java
+file_extensions:
+  - ".java"
+version: "1.0"
+
+# LSP configuration for Java
+lsp_command: "jdtls"
+lsp_args:
+  - "--stdio"
+lsp_request_timeout_ms: 5000
+lsp_max_concurrent_requests: 16
+
+queries:
+  functions: |
+    ; Method declarations
+    (method_declaration
+      name: (identifier) @name
+      parameters: (formal_parameters) @params
+    ) @func
+
+    ; Constructor declarations
+    (constructor_declaration
+      name: (identifier) @name
+      parameters: (formal_parameters) @params
+    ) @func
+
+  structs: |
+    ; Class declarations → Struct in domain model
+    (class_declaration
+      name: (identifier) @name
+      body: (class_body) @body
+    ) @struct
+
+    ; Record declarations (Java 16+)
+    (record_declaration
+      name: (identifier) @name
+      body: (class_body) @body
+    ) @struct
+
+  traits: |
+    ; Interface declarations → Interface in domain model
+    (interface_declaration
+      name: (identifier) @name
+      body: (interface_body) @body
+    ) @trait
+
+  modules: |
+    ; Package declarations serve as module markers
+    (package_declaration) @module
+
+  enums: |
+    (enum_declaration
+      name: (identifier) @name
+      body: (enum_body) @body
+    ) @enum
+
+  constants: |
+    ; Field declarations (class fields, constants)
+    (field_declaration
+      declarator: (variable_declarator
+        name: (identifier) @name
+      )
+    ) @const
+
+    ; Constant declarations in interfaces
+    (constant_declaration
+      declarator: (variable_declarator
+        name: (identifier) @name
+      )
+    ) @const
+
+  call_sites: |
+    ; Bare method invocations: `method(args)` — NO `object:` field.
+    ; The `!object` negated-field predicate forces tree-sitter to match
+    ; only receiver-less `method_invocation` nodes so the two patterns
+    ; below are mutually exclusive and every `method_invocation` emits
+    ; exactly one call_sites match.
+    ;
+    ; Without `!object`, member invocations (`obj.method(args)`) match
+    ; BOTH patterns (the first pattern does not require `object:` to be
+    ; absent) and every Java member call gets double-emitted. The bug
+    ; ran silently on every Java parse prior to the TR-A.3 (PR 3) sweep;
+    ; see FOLLOWUP_RISKS.md R36. Apex carried the identical shape and
+    ; was fixed in the same PR.
+    (method_invocation
+      !object
+      name: (identifier) @method
+      arguments: (argument_list) @args
+    ) @method_call
+
+    ; Member invocations: `obj.method(args)` — `object:` field required.
+    (method_invocation
+      object: (_) @receiver
+      name: (identifier) @method
+      arguments: (argument_list) @args
+    ) @method_call
+
+    ; Constructor calls: new Type(args)
+    (object_creation_expression
+      type: (_) @constructor
+      arguments: (argument_list) @args
+    ) @call
+
+  imports: |
+    ; Import declarations
+    (import_declaration) @import
+
+  type_refs: |
+    ; Type references in declarations, parameters, etc.
+    (type_identifier) @type
+
+  # Sprint E.1: Java inheritance. Same grammar shape as Apex/sfapex
+  # (tree-sitter-sfapex is modelled on tree-sitter-java).
+  inheritance: |
+    (class_declaration
+      (superclass
+        (type_identifier) @extends_type
+      )
+    ) @class_with_extends
+
+    (class_declaration
+      (superclass
+        (scoped_type_identifier) @extends_type
+      )
+    ) @class_with_extends_scoped
+
+    (class_declaration
+      interfaces: (super_interfaces
+        (type_list
+          (type_identifier) @implements_type
+        )
+      )
+    ) @class_with_implements
+
+    (class_declaration
+      interfaces: (super_interfaces
+        (type_list
+          (scoped_type_identifier) @implements_type
+        )
+      )
+    ) @class_with_implements_scoped
+
+    (interface_declaration
+      (extends_interfaces
+        (type_list
+          (type_identifier) @extends_type
+        )
+      )
+    ) @interface_with_extends
+
+kind_mappings:
+  method_declaration: Function
+  constructor_declaration: Function
+  lambda_expression: Function
+  class_declaration: Struct
+  record_declaration: Struct
+  interface_declaration: Interface
+  enum_declaration: Enum
+  import_declaration: Import
+  field_declaration: Variable
+  constant_declaration: Variable
+  local_variable_declaration: Variable

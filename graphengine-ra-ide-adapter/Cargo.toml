@@ -1,0 +1,36 @@
+[package]
+name = "graphengine-ra-ide-adapter"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Layer 2 semantic-resolution adapter for Rust code, driven by ra_ap_ide. Links the rust-analyzer IDE library directly; no subprocess LSP wire. Introduced by universal-fidelity sprint task T6."
+repository = "https://github.com/adenjessee/gridseak"
+keywords = ["rust-analyzer", "semantic", "resolver", "ide", "layer2"]
+categories = ["development-tools"]
+publish = false
+
+# Exact version pins are load-bearing. The ra_ap_* crate family ships
+# breaking changes per weekly release, and versions >= 0.0.308 pull in
+# transitive dependencies that use the unstable `new_zeroed_alloc`
+# library feature (rust-lang/rust#129396 / PR #144091 still unmerged
+# 2026-04-19). `=0.0.307` is the newest stable-rust-compatible version
+# as measured in docs/workstreams/universal-fidelity/tasks/T6-rust-layer2.md
+# §9.B2.1. Do not relax these pins via `cargo update`; require an
+# explicit review + re-run of the §9.B2 dep-chain matrix.
+[dependencies]
+ra_ap_ide = "=0.0.307"
+ra_ap_ide_db = "=0.0.307"
+ra_ap_load-cargo = "=0.0.307"
+ra_ap_project_model = "=0.0.307"
+ra_ap_vfs = "=0.0.307"
+ra_ap_paths = "=0.0.307"
+anyhow = "1.0"
+thiserror = "1.0"
+tracing = "0.1"
+
+[dev-dependencies]
+tempfile = "3.8"
+
+[lints]
+workspace = true

@@ -1,0 +1,58 @@
+---
+source: gridseak-cli/src/render/table.rs
+expression: rendered
+---
+GridSeak Structural Health Report
+Repo: my-service
+Scan: 2026-05-17 11:12
+Branch: main
+Commit: 9f3c2a1
+Languages: typescript, javascript
+Score: 62/100 (Moderate risk)
+Confidence: high for coupling, depth, blast radius; medium for dead code
+
+Top Priorities
+#1 Critical — Blast radius hotspot
+  Target:   auth/createSession
+  Evidence: 41 downstream nodes
+  Confidence: high
+
+#2 High — Low cohesion
+  Target:   src/services
+  Evidence: 9 disconnected clusters
+  Confidence: medium
+
+#3 High — Dead code
+  Target:   billing/legacyApplyDiscount
+  Evidence: no production callers
+  Confidence: medium
+
+Metrics
+Health score: 62/100 — Moderate risk
+Cycles: 3 — Risk
+Tangle index: 4.2% — Risk
+Hotspots: 7 — Risk
+Dead functions: 18 — Review
+Avg coupling: 0.42 — Moderate
+Max call depth: 14 — Deep
+
+Next
+gridseak explain finding_001
+gridseak graph callers auth/createSession
+gridseak graph blast-radius auth/createSession
+gridseak compare --previous
+
+Free vs hosted SaaS (signaling)
+Free in this build:
+  - Local scans (CLI + MCP server)
+  - Scan history on this machine
+  - Table / Markdown / JSON / LLM output
+  - MCP server over stdio (twelve tools)
+  - Graph slice queries (callers, callees, blast radius, cycles)
+Future hosted SaaS (not in this binary):
+  - Multi-repo benchmarks across machines
+  - Team-tier judgment sync
+  - Audit log retention + RBAC
+  - Organisation dashboards
+
+Tell us what would unlock you: `gridseak feedback "<text>"`

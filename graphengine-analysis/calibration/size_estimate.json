@@ -1,0 +1,240 @@
+{
+  "total_repos": 35,
+  "total_github_size_mb": 8723.1,
+  "estimated_clone_gb": 6.0,
+  "estimated_db_gb": 2.6,
+  "by_language": {
+    "typescript": {
+      "count": 10,
+      "size_kb": 5388635
+    },
+    "javascript": {
+      "count": 5,
+      "size_kb": 1739113
+    },
+    "python": {
+      "count": 8,
+      "size_kb": 839318
+    },
+    "rust": {
+      "count": 6,
+      "size_kb": 355046
+    },
+    "go": {
+      "count": 6,
+      "size_kb": 610346
+    }
+  },
+  "repos": [
+    {
+      "repo": "vercel/next.js",
+      "language": "typescript",
+      "size_kb": 2493188,
+      "size_mb": 2434.8
+    },
+    {
+      "repo": "mrdoob/three.js",
+      "language": "javascript",
+      "size_kb": 1558759,
+      "size_mb": 1522.2
+    },
+    {
+      "repo": "tldraw/tldraw",
+      "language": "typescript",
+      "size_kb": 1267681,
+      "size_mb": 1238.0
+    },
+    {
+      "repo": "calcom/cal.com",
+      "language": "typescript",
+      "size_kb": 1136272,
+      "size_mb": 1109.6
+    },
+    {
+      "repo": "pydantic/pydantic",
+      "language": "python",
+      "size_kb": 364802,
+      "size_mb": 356.3
+    },
+    {
+      "repo": "hashicorp/terraform",
+      "language": "go",
+      "size_kb": 353198,
+      "size_mb": 344.9
+    },
+    {
+      "repo": "django/django",
+      "language": "python",
+      "size_kb": 276885,
+      "size_mb": 270.4
+    },
+    {
+      "repo": "denoland/deno",
+      "language": "rust",
+      "size_kb": 196887,
+      "size_mb": 192.3
+    },
+    {
+      "repo": "prisma/prisma",
+      "language": "typescript",
+      "size_kb": 166253,
+      "size_mb": 162.4
+    },
+    {
+      "repo": "containerd/containerd",
+      "language": "go",
+      "size_kb": 130859,
+      "size_mb": 127.8
+    },
+    {
+      "repo": "astral-sh/ruff",
+      "language": "rust",
+      "size_kb": 125516,
+      "size_mb": 122.6
+    },
+    {
+      "repo": "sqlalchemy/sqlalchemy",
+      "language": "python",
+      "size_kb": 103098,
+      "size_mb": 100.7
+    },
+    {
+      "repo": "Effect-TS/effect",
+      "language": "typescript",
+      "size_kb": 95869,
+      "size_mb": 93.6
+    },
+    {
+      "repo": "aidenybai/million",
+      "language": "typescript",
+      "size_kb": 89316,
+      "size_mb": 87.2
+    },
+    {
+      "repo": "webpack/webpack",
+      "language": "javascript",
+      "size_kb": 77585,
+      "size_mb": 75.8
+    },
+    {
+      "repo": "cli/cli",
+      "language": "go",
+      "size_kb": 74543,
+      "size_mb": 72.8
+    },
+    {
+      "repo": "trpc/trpc",
+      "language": "typescript",
+      "size_kb": 57160,
+      "size_mb": 55.8
+    },
+    {
+      "repo": "drizzle-team/drizzle-orm",
+      "language": "typescript",
+      "size_kb": 50993,
+      "size_mb": 49.8
+    },
+    {
+      "repo": "lodash/lodash",
+      "language": "javascript",
+      "size_kb": 49524,
+      "size_mb": 48.4
+    },
+    {
+      "repo": "chartjs/Chart.js",
+      "language": "javascript",
+      "size_kb": 43536,
+      "size_mb": 42.5
+    },
+    {
+      "repo": "gofiber/fiber",
+      "language": "go",
+      "size_kb": 37515,
+      "size_mb": 36.6
+    },
+    {
+      "repo": "tiangolo/fastapi",
+      "language": "python",
+      "size_kb": 37055,
+      "size_mb": 36.2
+    },
+    {
+      "repo": "python-poetry/poetry",
+      "language": "python",
+      "size_kb": 23900,
+      "size_mb": 23.3
+    },
+    {
+      "repo": "colinhacks/zod",
+      "language": "typescript",
+      "size_kb": 23325,
+      "size_mb": 22.8
+    },
+    {
+      "repo": "tokio-rs/tokio",
+      "language": "rust",
+      "size_kb": 16181,
+      "size_mb": 15.8
+    },
+    {
+      "repo": "psf/requests",
+      "language": "python",
+      "size_kb": 13295,
+      "size_mb": 13.0
+    },
+    {
+      "repo": "pallets/flask",
+      "language": "python",
+      "size_kb": 11689,
+      "size_mb": 11.4
+    },
+    {
+      "repo": "gin-gonic/gin",
+      "language": "go",
+      "size_kb": 10480,
+      "size_mb": 10.2
+    },
+    {
+      "repo": "expressjs/express",
+      "language": "javascript",
+      "size_kb": 9709,
+      "size_mb": 9.5
+    },
+    {
+      "repo": "serde-rs/serde",
+      "language": "rust",
+      "size_kb": 8757,
+      "size_mb": 8.6
+    },
+    {
+      "repo": "encode/httpx",
+      "language": "python",
+      "size_kb": 8594,
+      "size_mb": 8.4
+    },
+    {
+      "repo": "honojs/hono",
+      "language": "typescript",
+      "size_kb": 8578,
+      "size_mb": 8.4
+    },
+    {
+      "repo": "BurntSushi/ripgrep",
+      "language": "rust",
+      "size_kb": 5470,
+      "size_mb": 5.3
+    },
+    {
+      "repo": "go-chi/chi",
+      "language": "go",
+      "size_kb": 3751,
+      "size_mb": 3.7
+    },
+    {
+      "repo": "sharkdp/fd",
+      "language": "rust",
+      "size_kb": 2235,
+      "size_mb": 2.2
+    }
+  ]
+}

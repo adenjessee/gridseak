@@ -1,0 +1,92 @@
+# CLI bundle release — tag `cli-v*` only (never bare `v*` for CLI).
+#
+# Public release automation. Cuts the macOS + Windows install tarballs
+# that `curl -fsSL https://gridseak.com/install.sh | sh` consumes, and
+# uploads them to this repo's GitHub Releases. Uses only the
+# auto-provided GITHUB_TOKEN (no private secrets). Runs on the public
+# mirror, where macOS runner minutes are free.
+#
+# See docs/05-deployment/RELEASE.md.
+
+name: CLI Release
+
+on:
+  push:
+    tags: ["cli-v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: "0"
+
+jobs:
+  release:
+    name: Build and publish CLI tarballs
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: macos-cli-release-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: macos-cli-release-
+
+      - name: Build CLI release bundles
+        run: |
+          bash scripts/install/build-cli-release.sh \
+            aarch64-apple-darwin \
+            x86_64-apple-darwin \
+            x86_64-pc-windows-msvc
+
+      - name: Resolve version directory
+        id: ver
+        run: |
+          VERSION="$(python3 - <<'PY'
+          import json, pathlib
+          for p in sorted(pathlib.Path("target/cli-release").glob("*/cli-manifest.json")):
+              print(json.load(open(p)).get("version", ""))
+              break
+          PY
+          )"
+          echo "dir=target/cli-release/${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Verify manifest locally
+        run: |
+          MANIFEST="${{ steps.ver.outputs.dir }}/cli-manifest.json"
+          python3 - <<'PY' "$MANIFEST" "${{ steps.ver.outputs.dir }}"
+          import hashlib, json, sys
+          from pathlib import Path
+          manifest, base = Path(sys.argv[1]), Path(sys.argv[2])
+          data = json.load(open(manifest))
+          for a in data["artifacts"]:
+              f = base / a["url"]
+              body = f.read_bytes()
+              assert hashlib.sha256(body).hexdigest() == a["sha256"]
+              assert len(body) == a["size"]
+              print("ok", a["target"], len(body))
+          PY
+
+      - name: Upload GitHub Release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          DIR="${{ steps.ver.outputs.dir }}"
+          gh release create "$TAG" \
+            --title "GridSeak CLI ${{ steps.ver.outputs.version }}" \
+            --notes "See docs/05-deployment/RELEASE.md" \
+            "$DIR"/gridseak-*.tar.gz \
+            "$DIR/cli-manifest.json" \
+            || gh release upload "$TAG" \
+              "$DIR"/gridseak-*.tar.gz \
+              "$DIR/cli-manifest.json"

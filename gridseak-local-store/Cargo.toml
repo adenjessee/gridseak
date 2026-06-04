@@ -1,0 +1,22 @@
+[package]
+name = "gridseak-local-store"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Shared local-first GridSeak project, scan, metric, and artifact store"
+
+[dependencies]
+anyhow = "1"
+chrono = { version = "0.4", features = ["serde"] }
+rusqlite = { version = "0.32", features = ["bundled"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+uuid = { version = "1", features = ["v4", "serde"] }
+tracing = "0.1"
+
+graphengine-analysis = { path = "../graphengine-analysis" }
+graphengine-diagnostic = { path = "../graphengine-diagnostic" }
+
+[dev-dependencies]
+tempfile = "3"

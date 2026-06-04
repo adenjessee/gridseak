@@ -1,0 +1,35 @@
+[package]
+name = "graphengine-mcp"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "MCP server exposing the full graphengine parse-validate-analyze pipeline to AI coding agents"
+
+[[bin]]
+name = "ge-mcp"
+path = "src/main.rs"
+
+[dependencies]
+graphengine-parsing = { path = "../graphengine-parsing" }
+graphengine-analysis = { path = "../graphengine-analysis" }
+# R3: structured-progress wire-format + emitter abstraction shared by
+# parser, analyzer, runner, CLI, and MCP server. The MCP path opts in
+# to silent emission (parser is invoked as a library; the MCP envelope
+# is the user-visible artefact, not the JSONL stream).
+graphengine-progress = { path = "../graphengine-progress" }
+
+rmcp = { version = "0.17", features = ["server", "transport-io", "transport-streamable-http-server"] }
+schemars = "1"
+
+tokio = { workspace = true }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+anyhow = "1.0"
+clap = { version = "4", features = ["derive"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+url = "2.4"
+axum = "0.8"
+tower-http = { version = "0.6", features = ["cors"] }
+tempfile = "3"

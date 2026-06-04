@@ -1,0 +1,9 @@
+---
+source: gridseak-cli/src/render/compare.rs
+expression: "String::from_utf8(buf).unwrap()"
+---
+Scan Compare — demo
+Date        Branch  Commit   Score  Critical  High  Cycles  Hotspots  Dead  Coupling
+2026-05-10  main    2026-05  58     3         7     4       7         18    0.42    
+2026-05-17  main    2026-05  62     2         7     3       7         18    0.42    
+Delta                        +4     -1        0     -1      0         0     0.00

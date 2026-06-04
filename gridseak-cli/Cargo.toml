@@ -1,0 +1,68 @@
+[package]
+name = "gridseak-cli"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "GridSeak CLI and local MCP server for project scan memory"
+
+[[bin]]
+name = "gridseak"
+path = "src/main.rs"
+
+[lib]
+name = "gridseak_cli"
+path = "src/lib.rs"
+
+[features]
+# Default public build — only the deterministic structural-analysis surface
+# (CLI + MCP server). The visual view's MCP wiring is gated behind
+# `trace-internal` and is not part of v0.1.0's public scope.
+default = []
+
+# Internal feature for local development of the optional visual view's
+# setup module. Public release builds do not enable this; the default
+# binary exposes only the deterministic analysis MCP. Maintainers
+# build with it via `cargo install --path gridseak-cli --features trace-internal`.
+trace-internal = []
+
+[dependencies]
+anyhow = "1"
+chrono = { version = "0.4", features = ["serde"] }
+clap = { version = "4", features = ["derive"] }
+rmcp = { version = "0.17", features = ["server", "transport-io"] }
+schemars = "1"
+serde = { workspace = true }
+serde_json = { workspace = true }
+# Width-aware rendering for `gridseak scan .` — we read the live
+# terminal column count to pick between wide table / medium table /
+# narrow card / plain text layouts (spec §"Width-Aware Output"). The
+# crate has no transitive deps and falls back to `None` outside a TTY,
+# which the renderer interprets as "use the widest fallback that still
+# fits a typical 80-col pipe".
+terminal_size = "0.4"
+tokio = { workspace = true }
+# Read-only SQLite access for `gridseak graph *` queries against the
+# persisted scan artifact at `project-graphs/<scan_id>.sqlite`. Bundled
+# so the standalone CLI install never needs a system libsqlite3.
+rusqlite = { version = "0.32", features = ["bundled"] }
+thiserror = { workspace = true }
+uuid = { version = "1", features = ["v4", "serde"] }
+walkdir = "2"
+
+git2 = { version = "0.18", default-features = false, features = ["vendored-libgit2"] }
+
+graphengine-analysis = { path = "../graphengine-analysis" }
+graphengine-diagnostic = { path = "../graphengine-diagnostic" }
+graphengine-parsing = { path = "../graphengine-parsing" }
+graphengine-progress = { workspace = true }
+gridseak-engine-runner = { path = "../gridseak-engine-runner" }
+gridseak-local-store = { path = "../gridseak-local-store" }
+
+[dev-dependencies]
+# Snapshot testing for the renderers. Inline + file-based snapshots
+# kept under `gridseak-cli/src/render/snapshots/`. Pinned to 1.x; the
+# 1 ⇒ 2 break in 2024 was string formatting only and easy to migrate
+# when we choose to.
+insta = "1"
+tempfile = "3"
