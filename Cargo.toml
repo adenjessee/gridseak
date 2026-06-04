@@ -46,7 +46,7 @@ tokio-util = { version = "0.7", features = ["rt"] }
 # refactors — this is the single point of update.
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-thiserror = "1.0"
+thiserror = "2.0"
 # Shared progress-event vocabulary. Re-exported via workspace = true so a
 # version bump propagates to every consumer in one place.
 graphengine-progress = { path = "graphengine-progress" }
