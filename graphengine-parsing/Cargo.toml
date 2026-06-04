@@ -65,7 +65,7 @@ tree-sitter-typescript = "0.20"
 tree-sitter-python = "0.20"
 tree-sitter-go = "0.20"
 tree-sitter-java = "0.20"
-tree-sitter-c-sharp = "0.20"
+tree-sitter-c-sharp = "0.23"
 # Vendored Salesforce Apex / SOQL / SOSL grammars (upstream crate requires tree-sitter >=0.22).
 tree-sitter-sfapex-vendored = { path = "vendor/tree-sitter-sfapex" }
 # Streaming XML parser for Salesforce metadata files (object-meta.xml,
