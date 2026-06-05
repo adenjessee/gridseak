@@ -36,7 +36,7 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 walkdir = "2.4"
 toml = "0.8"
 serde_yaml = "0.9"
-tree-sitter = "0.20"
+tree-sitter = "0.22"
 # IMPORTANT — read before touching any tree-sitter pin, and before
 # telling anyone `cargo install gridseak-cli` works without `--locked`:
 #
