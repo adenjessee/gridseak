@@ -157,7 +157,7 @@ async fn main() -> anyhow::Result<()> {
     let filter = if cli.verbose {
         EnvFilter::new("debug")
     } else {
-        EnvFilter::new("info")
+        EnvFilter::new("warn")
     };
 
     // Logs go to stderr so stdout stays reserved for machine-readable payloads

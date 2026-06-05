@@ -77,6 +77,8 @@ const IGNORED_DIRS: &[&str] = &[
     ".next",
     ".nuxt",
     ".cache",
+    ".wrangler",
+    ".astro",
     "vendor",
     "Pods",
     ".gradle",
@@ -195,7 +197,7 @@ enum Commands {
     /// Wire the GridSeak MCP server into your IDE(s). Auto-writes for
     /// Cursor + Windsurf, prints instructions for Claude Code + Codex.
     /// Also writes the Cursor rule file that teaches the agent when to
-    /// call each of the thirteen GridSeak MCP tools.
+    /// call each of the fourteen GridSeak MCP tools.
     Setup(SetupArgs),
     /// (Internal, `--features trace-internal` only.) Wire the visual
     /// view's MCP — kept private until the visual view is ready to

@@ -25,6 +25,9 @@ const EXCLUDED_DIR_NAMES: &[&str] = &[
     ".output",
     ".cache",
     ".parcel-cache",
+    ".wrangler", // Cloudflare Workers / Astro dev bundles (not first-party source)
+    ".astro",    // Astro generated types (see .gitignore)
+    "archive",   // archived snapshots (e.g. docs/archive on gridseak.com)
     "__pycache__",
     ".tox",
     ".venv",
@@ -250,5 +253,13 @@ mod tests {
             &excluded
         ));
         assert!(!FileDiscovery::is_excluded_dir_name("resources", &excluded));
+    }
+
+    #[test]
+    fn is_excluded_dir_name_matches_astro_cloudflare_dirs() {
+        let excluded: HashSet<&str> = EXCLUDED_DIR_NAMES.iter().copied().collect();
+        assert!(FileDiscovery::is_excluded_dir_name(".wrangler", &excluded));
+        assert!(FileDiscovery::is_excluded_dir_name(".astro", &excluded));
+        assert!(FileDiscovery::is_excluded_dir_name("archive", &excluded));
     }
 }

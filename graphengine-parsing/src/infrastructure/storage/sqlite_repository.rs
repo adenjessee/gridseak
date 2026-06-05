@@ -483,9 +483,11 @@ impl SqliteRepository {
                 .as_ref()
                 .map(serde_json::to_string)
                 .transpose()?;
-            eprintln!(
-                "[SQLITE] Storing node {} with location: {}, trait_metadata: {:?}",
-                node.fqn, location_json, node.trait_metadata
+            debug!(
+                fqn = %node.fqn,
+                location = %location_json,
+                trait_metadata = ?node.trait_metadata,
+                "storing graph node"
             );
             stmt.execute(params![
                 node.id,

@@ -1,25 +1,24 @@
 # GridSeak
 
-**Maintainer:** one person, spare time, pre-1.0. Everything runs on your
-machine; there is no GridSeak cloud. **Use at your own risk** — same bargain
-as any indie OSS CLI you `curl | sh`.
+**Local call-graph intelligence for your codebase and your AI.**
 
-> **For your coding agent:** a deterministic call graph it can quote —
-> every edge tagged with its evidence tier, every answer grounded in a
-> path the agent did not hallucinate.
->
-> **For you:** GridSeak gives your AI a structural-knowledge layer
-> beside the IDE. Twelve MCP tools, all local, all 0 LLM tokens. The
-> agent stops re-grepping your repo and starts quoting facts.
+GridSeak scans your repo, builds a deterministic import/call graph, and
+exposes it through **fourteen MCP tools** (Cursor, Claude Code, Codex,
+Windsurf) plus a **`gridseak` CLI**. Your agent can answer structural
+questions with facts instead of grepping:
 
-GridSeak is built for the agent first and the human second. The MCP
-server is the primary surface — it is what Cursor, Claude Code, Codex,
-and Windsurf call to get verified answers to *"what does X depend
-on?"* / *"what breaks if I rename Y?"* / *"is there a cycle here?"*.
-The CLI is the secondary surface for scripting, CI, and direct use.
+- *Who calls this?* · *What breaks if I change it?* · *Are there cycles?*
+- *What should we refactor first?*
 
-It is not a smarter agent. It is the surface where the agent's
-structural claims become checkable.
+Everything runs on your machine. No cloud, no upload, no LLM tokens spent
+on discovery.
+
+**Languages:** Rust, TypeScript, JavaScript, Python, Go, Java, C#, and
+Salesforce Apex (plus Visualforce pages). See
+[Supported languages](#supported-languages) for extensions and detail.
+
+**Quick start:** [`60-second install`](#60-second-install) →
+`gridseak setup` → ask your agent *"what's risky to refactor here?"*
 
 ## What you see
 
@@ -51,10 +50,37 @@ Next: gridseak setup   (wires the MCP server into your IDE)
       gridseak context --for-llm    (compact bundle for any LLM)
 ```
 
+## Supported languages
+
+`gridseak scan` auto-detects languages from file extensions (see
+`graphengine-parsing/configs/*.yaml`). Override with `--lang` or
+`--languages`.
+
+| Language | Extensions | Tier 0 (tree-sitter) | Tier 3 (LSP-verified) |
+| --- | --- | --- | --- |
+| **Rust** | `.rs` | Full symbol + import/call graph | **Yes** — `rust-analyzer` |
+| **TypeScript** | `.ts`, `.tsx`, `.mts`, `.cts` | Full | Planned (`tsserver`) |
+| **JavaScript** | `.js`, `.jsx`, `.mjs`, `.cjs` | Full | Planned |
+| **Python** | `.py` | Skeleton — symbols + imports; thinner call graph than Rust/TS | Planned |
+| **Go** | `.go` | Parsed (import edges verified) | If `gopls` is installed |
+| **Java** | `.java` | Parsed | If `jdtls` is installed |
+| **C#** | `.cs` | Parsed | If OmniSharp is installed |
+| **Apex** (Salesforce) | `.cls`, `.trigger`, `.apxc` | Full + framework resolver | Optional (`apex-jorje`) |
+| **Visualforce** | `.page` | Discovery only — folded into the Apex scan | — |
+
+**Not supported today:** C, C++, Kotlin, Ruby, PHP, and anything else
+without a config under `graphengine-parsing/configs/`. Those files are
+not discovered; there is no tree-sitter pass and no automatic coverage
+for them.
+
+**Tier 1 (filtered grep):** heuristic name matches across the repo when
+a symbol is known from another language's parse. Useful but noisy —
+every MCP response labels the tier; see [`LIMITATIONS.md`](LIMITATIONS.md).
+
 ## What the agent calls (the MCP surface)
 
 GridSeak registers as an MCP server when you run `gridseak setup`.
-From that moment on, your agent has twelve tools available. Each one
+From that moment on, your agent has fourteen tools available. Each one
 is written so the agent knows *when* to call it, not just how. Every
 response carries an `evidence: "deterministic_local_analysis"` marker
 and a `tier_legend` — Cursor's planner reads those fields as "cheap
@@ -142,7 +168,7 @@ gridseak setup --verify       # post-install sanity check
 
 - **Cursor** + **Windsurf** — fully automated. `gridseak setup` writes
   `mcp.json` and (for Cursor) the rule file that teaches the agent
-  when to call each of the twelve MCP tools.
+  when to call each of the fourteen MCP tools.
 - **Claude Code** — prints the official `claude mcp add` command.
 - **Codex** — prints the TOML snippet to paste into `~/.codex/config.toml`.
 
@@ -152,15 +178,19 @@ its first two tool calls. If it doesn't, run `gridseak setup --verify`.
 
 ## v0.1.0 scope (honest disclosure)
 
+Pre-1.0, solo-maintained, spare time. **Use at your own risk** — same
+bargain as any indie OSS CLI you `curl | sh`. GridSeak is not a smarter
+agent; it is the layer where structural claims become checkable.
+
 - **Perspective implemented:** Reach (1–3 hop directed neighborhood).
 - **Perspectives planned:** Hierarchy (v0.2), Change (v0.3).
-- **Languages with Tier 3 (LSP-verified) edges:** Rust.
-- **Languages with Tier 0 (tree-sitter parsed) edges:** Rust,
-  TypeScript, JavaScript, Apex. Python is parsed at skeleton level.
+- **Languages:** see [Supported languages](#supported-languages) above.
+  Production-grade Tier 3 today is **Rust only**; other parsers may emit
+  Tier 3 edges when their language server is installed, but treat those as
+  best-effort until we ship them on the v1.x roadmap.
 - **Install platforms (v0.1.0):** macOS (Apple Silicon + Intel), Linux
   x86_64, and Windows x86_64 via the install scripts on GitHub Releases
   (see [`docs/05-deployment/INSTALL.md`](docs/05-deployment/INSTALL.md)).
-- **Other languages:** Tier 1 (filtered grep) only.
 - **Telemetry:** **None.** Everything stays in `.gridseak/` on your
   machine. There is nothing to opt out of because nothing is being
   collected. You can verify this yourself: `rg -n 'reqwest|hyper|ureq'
