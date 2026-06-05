@@ -1,4 +1,5 @@
-# GridSeak
+<img width="2172" height="724" alt="ChatGPT Image Jun 5, 2026, 04_24_23 PM" src="https://github.com/user-attachments/assets/5ca0a621-241f-4fdd-b2cd-d3a92f9466b7" />
+
 
 **Local call-graph intelligence for your codebase and your AI.**
 
