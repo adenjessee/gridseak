@@ -14,6 +14,9 @@ questions with facts instead of grepping:
 Everything runs on your machine. No cloud, no upload, no LLM tokens spent
 on discovery.
 
+<img width="848" height="818" alt="Screenshot 2026-06-05 at 4 40 23 PM" src="https://github.com/user-attachments/assets/9c3c977c-80bf-436e-9198-c2dfe1d00103" />
+
+
 **Languages:** Rust, TypeScript, JavaScript, Python, Go, Java, C#, and
 Salesforce Apex (plus Visualforce pages). See
 [Supported languages](#supported-languages) for extensions and detail.
