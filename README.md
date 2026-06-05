@@ -2,7 +2,7 @@
 
 # YOUR SOFTWARE ARCHITECTURE SHOULD BE BEAUTIFUL
 
-**Local call-graph intelligence for your codebase and your AI.**
+**Local deterministic call-graph intelligence for your codebase and your AI.**
 
 GridSeak scans your repo, builds a deterministic import/call graph, and
 exposes it through **fourteen MCP tools** (Cursor, Claude Code, Codex,
