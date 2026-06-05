@@ -18,7 +18,7 @@ categories = ["development-tools", "parsing"]
 readme = "README.md"
 
 [dependencies]
-thiserror = "1.0"
+thiserror = "2.0"
 sha2 = "0.10"
 # blake3 is used by the S1 incremental-scanning cache to hash file
 # contents at discovery time. Faster than sha2 on modern CPUs and the

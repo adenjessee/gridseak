@@ -26,7 +26,7 @@ ra_ap_project_model = "=0.0.307"
 ra_ap_vfs = "=0.0.307"
 ra_ap_paths = "=0.0.307"
 anyhow = "1.0"
-thiserror = "1.0"
+thiserror = "2.0"
 tracing = "0.1"
 
 [dev-dependencies]
