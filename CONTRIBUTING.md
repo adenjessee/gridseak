@@ -75,8 +75,8 @@ Unlikely to merge:
 
 ## Developer Certificate of Origin (DCO)
 
-[`LICENSE-COMMITMENT.md`](LICENSE-COMMITMENT.md) explains the MIT OR
-Apache-2.0 commitment. Contributions use the
+[`LICENSE-COMMITMENT.md`](LICENSE-COMMITMENT.md) explains the MIT license
+commitment. Contributions use the
 [Developer Certificate of Origin](https://developercertificate.org/) (not a
 CLA). Add a sign-off with `git commit -s`:
 

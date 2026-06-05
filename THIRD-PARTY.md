@@ -40,7 +40,7 @@ Rust-ecosystem set):
 
 We do **not** accept:
 
-- `GPL-*` (incompatible with MIT-OR-Apache-2.0 distribution)
+- `GPL-*` (incompatible with MIT distribution)
 - `LGPL-*` (license-compatibility complexity not worth it for this
   project's threat model)
 - `AGPL-*` (network-copyleft incompatible)

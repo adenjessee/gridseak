@@ -222,7 +222,7 @@ encrypted at rest.
 
 ## Free vs paid
 
-- **The whole on-machine experience is free, MIT-OR-Apache-2.0.**
+- **The whole on-machine experience is free and MIT-licensed.**
   There is no "pro version" of any single-machine surface and no
   "premium analysis pass" gated by a license check. Single-machine
   analysis is commoditizing; gating it is the wrong move.

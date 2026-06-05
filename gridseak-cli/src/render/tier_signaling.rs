@@ -71,7 +71,7 @@ pub fn write_text(signal: &TierSignal, out: &mut dyn Write) -> io::Result<()> {
 pub fn write_markdown(signal: &TierSignal, out: &mut dyn Write) -> io::Result<()> {
     writeln!(out, "## Free vs hosted SaaS (signaling)")?;
     writeln!(out)?;
-    writeln!(out, "**Included in this build (free, MIT-OR-Apache-2.0):**")?;
+    writeln!(out, "**Included in this build (free, MIT):**")?;
     for item in &signal.free {
         writeln!(out, "- {item}")?;
     }

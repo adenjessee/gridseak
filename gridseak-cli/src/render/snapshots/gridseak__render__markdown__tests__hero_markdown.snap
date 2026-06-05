@@ -41,7 +41,7 @@ expression: rendered
 
 ## Free vs hosted SaaS (signaling)
 
-**Included in this build (free, MIT-OR-Apache-2.0):**
+**Included in this build (free, MIT):**
 - Local scans (CLI + MCP server)
 - Scan history on this machine
 - Table / Markdown / JSON / LLM output

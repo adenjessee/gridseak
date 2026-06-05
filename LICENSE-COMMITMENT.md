@@ -1,12 +1,11 @@
 # License commitment
 
 GridSeak (the CLI, MCP server, and open-source crates in this repository) is
-and will remain licensed under **MIT OR Apache-2.0**. You pick one license;
-both apply to the same source tree.
+and will remain licensed under the **MIT License**.
 
 ## What I commit to
 
-1. **No relicensing** of code already published under MIT OR Apache-2.0 to a
+1. **No relicensing** of code already published under MIT to a
    more restrictive license (SSPL, BSL, PolyForm Noncommercial, proprietary,
    or similar).
 2. **No license gating in this repo.** Paid or hosted features, if they ever
@@ -16,16 +15,16 @@ both apply to the same source tree.
 
 ## What this does not mean
 
-- MIT and Apache-2.0 **allow** commercial use, forks, and competing products.
-  That's intentional.
+- MIT **allows** commercial use, forks, and competing products. That's
+  intentional.
 - The **GridSeak** name and logos are not covered by those licenses. Forks
   must not imply endorsement.
 - This file is a **public statement of intent**, not a separate contract.
-  The legal terms are in `LICENSE-MIT` and `LICENSE-APACHE`.
+  The legal terms are in [`LICENSE-MIT`](LICENSE-MIT).
 
 ## Forks
 
-You may fork under MIT OR Apache-2.0. I will not relicense upstream to block
+You may fork under MIT. I will not relicense upstream to block
 you.
 
 ## Questions

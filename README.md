@@ -203,8 +203,8 @@ agent; it is the layer where structural claims become checkable.
 
 ## Repo layout
 
-This is a Cargo workspace. Everything in it is open-source under
-`MIT OR Apache-2.0`.
+This is a Cargo workspace. Everything in it is open-source under the
+[MIT license](LICENSE-MIT).
 
 ```
 gridseak-cli/                `gridseak` binary — CLI + MCP server + setup
@@ -250,25 +250,12 @@ every `cargo test --workspace` and require no external fixtures:
 
 ## License
 
-Licensed under either of
+[MIT](LICENSE-MIT). See [`LICENSE-COMMITMENT.md`](LICENSE-COMMITMENT.md) —
+this tree stays permissive; no relicensing to restrictive terms.
 
-- Apache License, Version 2.0 ([`LICENSE-APACHE`](LICENSE-APACHE) or
-  <http://www.apache.org/licenses/LICENSE-2.0>)
-- MIT license ([`LICENSE-MIT`](LICENSE-MIT) or
-  <http://opensource.org/licenses/MIT>)
-
-at your option. The dual-license is the Rust ecosystem standard;
-recipients pick the one that fits their downstream constraints.
-
-The maintainer commits not to relicense this tree to more restrictive terms.
-See [`LICENSE-COMMITMENT.md`](LICENSE-COMMITMENT.md).
-
-### Contribution
-
-Unless you explicitly state otherwise, any contribution intentionally
-submitted for inclusion in the work by you, as defined in the
-Apache-2.0 license, shall be dual-licensed as above, without any
-additional terms or conditions.
+Contributions are MIT-licensed under the
+[Developer Certificate of Origin](https://developercertificate.org/)
+(`git commit -s`). See [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## Contributing
 
