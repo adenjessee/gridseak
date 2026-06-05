@@ -50,7 +50,7 @@ thiserror = { workspace = true }
 uuid = { version = "1", features = ["v4", "serde"] }
 walkdir = "2"
 
-git2 = { version = "0.18", default-features = false, features = ["vendored-libgit2"] }
+git2 = { version = "0.21", default-features = false, features = ["vendored-libgit2"] }
 
 graphengine-analysis = { path = "../graphengine-analysis" }
 graphengine-diagnostic = { path = "../graphengine-diagnostic" }
