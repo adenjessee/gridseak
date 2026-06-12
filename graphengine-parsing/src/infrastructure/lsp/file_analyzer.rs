@@ -5,7 +5,6 @@
 
 use crate::domain::{Node, Range};
 use anyhow::{Context, Result};
-use serde_json;
 use std::collections::HashMap;
 use std::path::Path;
 use tracing::info;
@@ -80,10 +79,10 @@ impl FileAnalyzer {
         content: &str,
         function: &Node,
     ) -> Result<Option<Vec<FunctionCall>>> {
-        // Parse the function's location to get its range
-        let location_json = serde_json::to_string(&function.location)
-            .with_context(|| "Failed to serialize location to JSON")?;
-        let function_range = self.parse_location(&location_json)?;
+        let function_range = FunctionRange {
+            start_line: function.location.start_line as usize,
+            end_line: function.location.end_line as usize,
+        };
 
         // Extract the function body
         let function_body = self.extract_function_body(content, &function_range)?;
@@ -92,19 +91,6 @@ impl FileAnalyzer {
         let calls = self.find_function_calls_in_text(&function_body, &function_range)?;
 
         Ok(Some(calls))
-    }
-
-    /// Parse location JSON to get range information
-    fn parse_location(&self, _location_json: &str) -> Result<FunctionRange> {
-        // Parse the JSON location to extract start/end line information
-        // This is a simplified implementation
-        let start_line = 1; // TODO: Parse from JSON
-        let end_line = 100; // TODO: Parse from JSON
-
-        Ok(FunctionRange {
-            start_line,
-            end_line,
-        })
     }
 
     /// Extract function body from content
