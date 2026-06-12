@@ -140,8 +140,8 @@ impl FileAnalyzer {
             let parts: Vec<&str> = before_paren.split_whitespace().collect();
 
             if let Some(last_part) = parts.last() {
-                // Check if it looks like a function call
-                if last_part.chars().all(|c| c.is_alphanumeric() || c == '_') {
+                // Check if it looks like a function call (including method calls like foo.bar() or namespace paths like foo::bar())
+                if last_part.chars().all(|c| c.is_alphanumeric() || c == '_' || c == '.' || c == ':') {
                     return Some(FunctionCall {
                         callee_name: last_part.to_string(),
                         location: Range {
