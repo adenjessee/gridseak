@@ -5,7 +5,6 @@
 
 use crate::domain::{Node, Range};
 use anyhow::{Context, Result};
-use serde_json;
 use std::collections::HashMap;
 use std::path::Path;
 use tracing::info;
@@ -80,10 +79,10 @@ impl FileAnalyzer {
         content: &str,
         function: &Node,
     ) -> Result<Option<Vec<FunctionCall>>> {
-        // Parse the function's location to get its range
-        let location_json = serde_json::to_string(&function.location)
-            .with_context(|| "Failed to serialize location to JSON")?;
-        let function_range = self.parse_location(&location_json)?;
+        let function_range = FunctionRange {
+            start_line: function.location.start_line as usize,
+            end_line: function.location.end_line as usize,
+        };
 
         // Extract the function body
         let function_body = self.extract_function_body(content, &function_range)?;
@@ -94,28 +93,18 @@ impl FileAnalyzer {
         Ok(Some(calls))
     }
 
-    /// Parse location JSON to get range information
-    fn parse_location(&self, _location_json: &str) -> Result<FunctionRange> {
-        // Parse the JSON location to extract start/end line information
-        // This is a simplified implementation
-        let start_line = 1; // TODO: Parse from JSON
-        let end_line = 100; // TODO: Parse from JSON
-
-        Ok(FunctionRange {
-            start_line,
-            end_line,
-        })
-    }
-
     /// Extract function body from content
     fn extract_function_body(&self, content: &str, range: &FunctionRange) -> Result<String> {
         let lines: Vec<&str> = content.lines().collect();
 
-        if range.start_line > lines.len() || range.end_line > lines.len() {
+        // Protect against 0-index underflows and starting out of bounds
+        if range.start_line == 0 || range.start_line > lines.len() {
             return Ok(String::new());
         }
 
-        let body_lines = &lines[range.start_line - 1..range.end_line];
+        // Gracefully cap the end line to the end of the file
+        let safe_end = std::cmp::min(range.end_line, lines.len());
+        let body_lines = &lines[range.start_line - 1..safe_end];
         Ok(body_lines.join("\n"))
     }
 
@@ -151,8 +140,8 @@ impl FileAnalyzer {
             let parts: Vec<&str> = before_paren.split_whitespace().collect();
 
             if let Some(last_part) = parts.last() {
-                // Check if it looks like a function call
-                if last_part.chars().all(|c| c.is_alphanumeric() || c == '_') {
+                // Check if it looks like a function call (including method calls like foo.bar() or namespace paths like foo::bar())
+                if last_part.chars().all(|c| c.is_alphanumeric() || c == '_' || c == '.' || c == ':') {
                     return Some(FunctionCall {
                         callee_name: last_part.to_string(),
                         location: Range {
