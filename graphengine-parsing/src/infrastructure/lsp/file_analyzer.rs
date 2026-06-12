@@ -97,11 +97,14 @@ impl FileAnalyzer {
     fn extract_function_body(&self, content: &str, range: &FunctionRange) -> Result<String> {
         let lines: Vec<&str> = content.lines().collect();
 
-        if range.start_line > lines.len() || range.end_line > lines.len() {
+        // Protect against 0-index underflows and starting out of bounds
+        if range.start_line == 0 || range.start_line > lines.len() {
             return Ok(String::new());
         }
 
-        let body_lines = &lines[range.start_line - 1..range.end_line];
+        // Gracefully cap the end line to the end of the file
+        let safe_end = std::cmp::min(range.end_line, lines.len());
+        let body_lines = &lines[range.start_line - 1..safe_end];
         Ok(body_lines.join("\n"))
     }
 
