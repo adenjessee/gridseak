@@ -75,7 +75,7 @@ jobs:
           mkdir -p cli-dist
           cp target/cli-release/*/gridseak-*.tar.gz cli-dist/
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: cli-${{ matrix.os }}
           path: cli-dist/*.tar.gz
