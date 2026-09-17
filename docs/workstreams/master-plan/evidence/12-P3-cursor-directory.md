@@ -15,14 +15,16 @@ verdict is deny / ask / allow with a named evidence tier.
 ## Install
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/adenjessee/gridseak-graphengine/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/adenjessee/gridseak/main/scripts/install/install.sh | bash
 export PATH="$HOME/.gridseak/bin:$PATH"
+gridseak --version   # must print 0.1.1
+gridseak gate --help # must exist; 0.1.0 does not have this
 gridseak setup
 gridseak setup --verify
 ```
 
-Requires a published GitHub release tarball. Local proof today is
-`scripts/stranger-repro.sh` (tarball override, not `curl | sh`).
+Public release `cli-v0.1.1` is live. Do **not** use the private
+`gridseak-graphengine` URL or `scripts/install.sh` (that path 404s).
 
 ## Hooks (three layers on Cursor 3.20.21)
 
