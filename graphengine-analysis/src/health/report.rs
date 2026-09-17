@@ -62,6 +62,13 @@ pub const CAVEAT_DEAD_CODE_REASONS_V1: &str = "dead_code_reasons_v1";
 /// render but its numbers reduce to "this scan cannot be measured".
 pub const CAVEAT_DUAL_METRIC_EMISSION_V1: &str = "dual_metric_emission_v1";
 
+/// Stamped when `resolution_quality.lsp_resolution_telemetry` is
+/// populated from parser graph metadata (fallback-reason counters and
+/// LSP request metrics). Reports missing this caveat predate the
+/// universal-fidelity LSP reliability sprint and cannot explain *why*
+/// individual references fell back to heuristics.
+pub const CAVEAT_LSP_RESOLUTION_TELELEMETRY_V1: &str = "lsp_resolution_telemetry_v1";
+
 /// Emitted when `ge-analyze` loads a parse DB whose persisted schema
 /// version is **older** than the engine's current
 /// `APEX_CLASS_SYMBOLS_SCHEMA_VERSION`. Such a DB was produced by a
@@ -785,6 +792,49 @@ pub struct ScoreComponent {
 // Resolution quality (import resolution diagnostics)
 // ---------------------------------------------------------------------------
 
+/// Per-reason LSP miss counters persisted by the parser.
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, Eq)]
+pub struct FallbackReasonCounts {
+    #[serde(default)]
+    pub server_missing: u64,
+    #[serde(default)]
+    pub rejected_by_availability: u64,
+    #[serde(default)]
+    pub server_crashed: u64,
+    #[serde(default)]
+    pub request_timeout: u64,
+    #[serde(default)]
+    pub returned_null: u64,
+    #[serde(default)]
+    pub definition_unmappable: u64,
+    /// Definition resolved to a location outside the analyzed repository
+    /// (third-party dependency, builtin, or stdlib stub). Expected, not a
+    /// fidelity defect — tracked separately from `definition_unmappable`.
+    #[serde(default)]
+    pub external_definition: u64,
+    #[serde(default)]
+    pub no_call_site_location: u64,
+    #[serde(default)]
+    pub heuristic_produced_edge: u64,
+}
+
+/// Transport- and definition-layer counters from the LSP client.
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, PartialEq, Eq)]
+pub struct LspRequestMetrics {
+    pub request_successes: u64,
+    pub request_timeouts: u64,
+    pub definition_hits: u64,
+    pub definition_nulls: u64,
+    pub definition_errors: u64,
+}
+
+/// Explainable LSP telemetry bundled into health reports.
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, Eq)]
+pub struct LspResolutionTelemetry {
+    pub fallback_reasons: FallbackReasonCounts,
+    pub request_metrics: LspRequestMetrics,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ResolutionQuality {
     pub import_edges_total: usize,
@@ -803,6 +853,46 @@ pub struct ResolutionQuality {
     pub measured_fidelity: MeasuredFidelity,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub recommendation: Option<String>,
+    /// Present when the parser persisted LSP fallback-reason and
+    /// request counters into graph metadata.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lsp_resolution_telemetry: Option<LspResolutionTelemetry>,
+    /// Per-language resolver routing disclosure (`resolution_disclosure_<lang>` keys).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub resolution_disclosure: Vec<LanguageResolutionDisclosure>,
+}
+
+/// Mirror of the parser's `ResolutionDisclosure` wire shape (no crate dep).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct LanguageResolutionDisclosure {
+    pub language: String,
+    pub tier_attempted: ResolutionDisclosureTier,
+    pub tier_used: ResolutionDisclosureTier,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub skip_reason: Option<ResolutionSkipReason>,
+    #[serde(default, skip_serializing_if = "Option::is_none", alias = "high_edges")]
+    pub emitted_edges: Option<u64>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ResolutionDisclosureTier {
+    Layer2,
+    SubprocessLsp,
+    Heuristic,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ResolutionSkipReason {
+    AdapterInitFailed,
+    ServerMissing,
+    LanguageNotRouted,
+    NoReferences,
+    PolicyDisabled,
+    IndexerFailed,
+    IndexerNotProvisioned,
+    IndexStale,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -984,6 +1074,24 @@ mod measured_fidelity_tests {
     }
 }
 
+#[cfg(test)]
+mod resolution_disclosure_tests {
+    use super::{LanguageResolutionDisclosure, ResolutionDisclosureTier, ResolutionSkipReason};
+
+    #[test]
+    fn deserializes_indexer_failed_skip_reason() {
+        let json = r#"{
+            "language": "typescript",
+            "tier_attempted": "layer2",
+            "tier_used": "heuristic",
+            "skip_reason": "indexer_failed"
+        }"#;
+        let row: LanguageResolutionDisclosure = serde_json::from_str(json).unwrap();
+        assert_eq!(row.skip_reason, Some(ResolutionSkipReason::IndexerFailed));
+        assert_eq!(row.tier_used, ResolutionDisclosureTier::Heuristic);
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Summary statistics
 // ---------------------------------------------------------------------------
@@ -1144,6 +1252,9 @@ pub struct NodeAnnotation {
     pub fan_in: usize,
     pub fan_out: usize,
     pub blast_radius: usize,
+    /// Callers reachable only via High-confidence production edges.
+    #[serde(default)]
+    pub blast_high_confidence: usize,
     pub depth_from_root: usize,
     pub information_flow_complexity: usize,
     pub is_hotspot: bool,

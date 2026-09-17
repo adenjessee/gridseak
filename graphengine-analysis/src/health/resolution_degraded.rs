@@ -26,7 +26,7 @@
 //! Fallback rate is computed over the total resolved edge population:
 //!
 //! ```text
-//! fallback_rate = total_heuristic_fallbacks / (lsp_edges + heuristic_edges + total_heuristic_fallbacks)
+//! fallback_rate = heuristic_and_drops / (compiler_edges + lsp_edges + heuristic_edges + ambiguous_drops)
 //! ```
 //!
 //! Where `total_heuristic_fallbacks` is the sum of
@@ -64,6 +64,8 @@ use crate::health::report::{Confidence, Finding, FindingType, Severity};
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub struct ResolutionStatsSnapshot {
     pub lsp_edges: usize,
+    /// In-process compiler / batch-index call edges (rust Layer-2, SCIP).
+    pub compiler_edges: usize,
     pub heuristic_edges: usize,
     pub heuristic_call_fallbacks: usize,
     pub heuristic_import_fallbacks: usize,
@@ -88,7 +90,8 @@ impl ResolutionStatsSnapshot {
     /// so a scan that dropped everything doesn't read as "0% fallback"
     /// just because the edges didn't land.
     pub fn total_resolution_work(&self) -> usize {
-        self.lsp_edges
+        self.compiler_edges
+            .saturating_add(self.lsp_edges)
             .saturating_add(self.heuristic_edges)
             .saturating_add(self.heuristic_call_ambiguous_drops)
     }
@@ -168,13 +171,14 @@ pub fn evaluate(stats: &ResolutionStatsSnapshot, thresholds: Thresholds) -> Opti
     );
 
     let detail = Some(format!(
-        "LSP edges: {lsp}; heuristic edges: {heur}; dropped-for-ambiguity sites: {drops}; \
+        "Compiler edges: {compiler}; compiler/LSP edges: {lsp}; heuristic edges: {heur}; dropped-for-ambiguity sites: {drops}; \
          heuristic call fallbacks: {call_fb}; heuristic import fallbacks: {import_fb}; \
          heuristic type fallbacks: {type_fb}. Dropped-for-ambiguity sites are recoverable \
          call-graph signal that LSP would have disambiguated — they exist because the \
          heuristic resolver refuses to emit edges when a short name matches more than \
          HEURISTIC_CALL_FANOUT_CAP candidates (currently 8). Restart the language server \
          or verify the resolver binary before acting on cross-file findings.",
+        compiler = stats.compiler_edges,
         lsp = stats.lsp_edges,
         heur = stats.heuristic_edges,
         drops = stats.heuristic_call_ambiguous_drops,
@@ -245,12 +249,28 @@ mod tests {
     fn snap(lsp: usize, heur: usize, drops: usize) -> ResolutionStatsSnapshot {
         ResolutionStatsSnapshot {
             lsp_edges: lsp,
+            compiler_edges: 0,
             heuristic_edges: heur,
             heuristic_call_fallbacks: 0,
             heuristic_import_fallbacks: 0,
             heuristic_type_fallbacks: 0,
             heuristic_call_ambiguous_drops: drops,
         }
+    }
+
+    #[test]
+    fn pure_compiler_edges_is_not_degraded() {
+        let s = ResolutionStatsSnapshot {
+            lsp_edges: 0,
+            compiler_edges: 5000,
+            heuristic_edges: 0,
+            ..Default::default()
+        };
+        assert!((s.fallback_rate().unwrap() - 0.0).abs() < 1e-9);
+        assert!(
+            evaluate(&s, Thresholds::default()).is_none(),
+            "compiler-only resolution must not fire ResolutionDegraded"
+        );
     }
 
     #[test]
@@ -335,6 +355,7 @@ mod tests {
     fn finding_detail_includes_all_counter_fields() {
         let stats = ResolutionStatsSnapshot {
             lsp_edges: 100,
+            compiler_edges: 50,
             heuristic_edges: 30,
             heuristic_call_fallbacks: 5,
             heuristic_import_fallbacks: 2,
@@ -344,7 +365,8 @@ mod tests {
         let f = evaluate(&stats, Thresholds::default()).expect("should fire");
         let detail = f.detail.expect("detail present");
         for expected in [
-            "LSP edges: 100",
+            "Compiler edges: 50",
+            "compiler/LSP edges: 100",
             "heuristic edges: 30",
             "dropped-for-ambiguity sites: 10",
             "heuristic call fallbacks: 5",

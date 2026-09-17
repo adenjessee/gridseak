@@ -6,10 +6,13 @@ file_extensions:
 version: "1.0"
 
 # LSP configuration
-lsp_command: "pyright"
+lsp_command: "pyright-langserver"
 lsp_args:
   - "--stdio"
-lsp_request_timeout_ms: 1000
+# Base (fast-policy) floor. A cold server's first textDocument/definition can
+# take seconds to return; 1000ms caused premature heuristic fallback. Patient/
+# exhaustive policies raise this further at runtime.
+lsp_request_timeout_ms: 5000
 lsp_max_concurrent_requests: 32
 
 queries:

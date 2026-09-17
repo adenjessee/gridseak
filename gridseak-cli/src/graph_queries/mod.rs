@@ -24,6 +24,7 @@ use anyhow::Result;
 use rusqlite::{Connection, OpenFlags};
 use serde::Serialize;
 
+pub mod agent_tools;
 pub mod queries;
 
 pub use queries::*;
@@ -460,6 +461,9 @@ pub struct SliceNode {
     /// hits as "possibly affected" — that's the trust contract.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub edge_evidence_tier: Option<String>,
+    /// Calibrated P(true) of the Call edge that pulled this node in.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub p_true: Option<f64>,
 }
 
 #[derive(Debug, Clone, Copy, Serialize)]
@@ -492,6 +496,8 @@ pub struct FileBlastRadiusRow {
     /// reuse the same legend.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub edge_evidence_tier: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub p_true: Option<f64>,
 }
 
 /// Pick the more-trusted of two edge tiers for aggregation
@@ -570,9 +576,9 @@ fn walk_calls(
     direction: Direction,
     max_depth: usize,
     cap: usize,
-) -> Result<Vec<(usize, NodeRef, Option<String>)>, GraphQueryError> {
+) -> Result<Vec<(usize, NodeRef, Option<String>, Option<f64>)>, GraphQueryError> {
     let mut seen = HashSet::<String>::new();
-    let mut order = Vec::<(usize, NodeRef, Option<String>)>::new();
+    let mut order = Vec::<(usize, NodeRef, Option<String>, Option<f64>)>::new();
     let mut queue: VecDeque<(usize, String)> = VecDeque::new();
     seen.insert(seed.to_string());
     queue.push_back((0, seed.to_string()));
@@ -609,8 +615,11 @@ fn walk_calls(
             let tier = provenance_json
                 .as_deref()
                 .and_then(provenance_source_to_tier);
+            let p_true = provenance_json.as_deref().and_then(|raw| {
+                graphengine_parsing::domain::p_true_from_provenance_json("unknown", raw, "Call")
+            });
             if seen.insert(next.id.clone()) {
-                order.push((depth + 1, next.clone(), tier));
+                order.push((depth + 1, next.clone(), tier, p_true));
                 queue.push_back((depth + 1, next.id.clone()));
                 if order.len() >= cap {
                     return Ok(order);
@@ -627,25 +636,12 @@ fn walk_calls(
 /// — the agent rules in `.cursor/rules/gridseak.mdc` depend on this
 /// exact set of strings.
 ///
-/// Mapping (matches `graphengine_parsing::domain::ProvenanceSource`):
-/// - `TreeSitter` → `tier_0` (deterministic syntactic parse)
-/// - `Heuristic`  → `tier_1` (grep/name-match fallback; may be noisy)
-/// - `Lsp`        → `tier_3` (semantic resolution; deterministic but
-///   not always available)
-///
+/// Mapping is owned by `graphengine_parsing::domain::evidence_tier`.
 /// Returns `None` for unrecognised sources rather than guessing; the
 /// caller renders that as "unknown tier" so the agent doesn't get
 /// fooled into treating an unknown source as Tier 0.
 fn provenance_source_to_tier(raw: &str) -> Option<String> {
-    let value: serde_json::Value = serde_json::from_str(raw).ok()?;
-    let source = value.get("source")?.as_str()?;
-    let tier = match source {
-        "TreeSitter" => "tier_0",
-        "Heuristic" => "tier_1",
-        "Lsp" => "tier_3",
-        _ => return None,
-    };
-    Some(tier.to_string())
+    graphengine_parsing::domain::evidence_tier::provenance_json_to_tier_id(raw).map(str::to_string)
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -845,6 +841,14 @@ mod tier_tests {
         assert_eq!(
             provenance_source_to_tier(r#"{"source":"Lsp","confidence":"High"}"#).as_deref(),
             Some("tier_3")
+        );
+        assert_eq!(
+            provenance_source_to_tier(r#"{"source":"Compiler","confidence":"High"}"#).as_deref(),
+            Some("tier_3")
+        );
+        assert_eq!(
+            provenance_source_to_tier(r#"{"source":"Runtime","confidence":"High"}"#).as_deref(),
+            Some("runtime_verified")
         );
         assert!(provenance_source_to_tier("{}").is_none());
         assert!(provenance_source_to_tier(r#"{"source":"Wat"}"#).is_none());

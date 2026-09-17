@@ -216,6 +216,8 @@ mod tests {
                 all_edges_by_confidence: Default::default(),
             },
             recommendation: None,
+            lsp_resolution_telemetry: None,
+            resolution_disclosure: Vec::new(),
         };
         let inp = StatusInputs {
             graph: &g,

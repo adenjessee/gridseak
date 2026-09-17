@@ -17,12 +17,18 @@ pub mod node_id;
 // CLI, and MCP server reference one canonical type system. See
 // `docs/02-strategy/V0_1_0_RC1_FOLLOWUP_ISSUES.md` (R3 plan-of-attack)
 // for the migration record.
+pub mod authority;
+pub mod evidence_tier;
+pub mod fusion;
 pub mod provenance;
 
 // Re-export main types for convenience
+pub use authority::*;
 pub use classification::*;
 pub use edge::*;
 pub use errors::*;
+pub use evidence_tier::*;
+pub use fusion::*;
 pub use graph::*;
 pub use node::*;
 pub use provenance::*;

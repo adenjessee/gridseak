@@ -347,7 +347,7 @@ pub(crate) fn build_hotspot_findings(
             co_change_count: None,
             temporal_coupling_score: None,
             has_import_edge: None,
-            confidence: None,
+            confidence: Some(report::Confidence::High),
         });
     }
 
@@ -480,6 +480,7 @@ pub(crate) fn node_annotation_for(node: &graph::GraphNode) -> NodeAnnotation {
         fan_in: 0,
         fan_out: 0,
         blast_radius: 0,
+        blast_high_confidence: 0,
         depth_from_root: 0,
         information_flow_complexity: 0,
         is_hotspot: false,
@@ -866,7 +867,7 @@ pub(crate) fn empty_report(
         boundary_violations: vec![],
         resolution_quality: None,
         analysis_errors: vec![],
-        integrity_status: build_integrity_status(false, false, 0),
+        integrity_status: build_integrity_status(false, false, 0, false),
         // Empty-report path: the DB had no nodes. Git signals are
         // computed against the working tree so they could in
         // principle still be meaningful here, but the orchestrator
@@ -950,6 +951,7 @@ pub(crate) fn build_integrity_status(
     invariant_violations: bool,
     stale_parse_db: bool,
     unknown_edge_kind_count: usize,
+    lsp_resolution_telemetry_present: bool,
 ) -> IntegrityStatus {
     let mut schema_caveats = vec![
         report::CAVEAT_CYCLES_ORDERFIX_APPLIED.to_string(),
@@ -957,6 +959,9 @@ pub(crate) fn build_integrity_status(
         report::CAVEAT_DEAD_CODE_REASONS_V1.to_string(),
         report::CAVEAT_DUAL_METRIC_EMISSION_V1.to_string(),
     ];
+    if lsp_resolution_telemetry_present {
+        schema_caveats.push(report::CAVEAT_LSP_RESOLUTION_TELELEMETRY_V1.to_string());
+    }
     if stale_parse_db {
         schema_caveats.push(report::CAVEAT_STALE_PARSE_DB_V1.to_string());
     }

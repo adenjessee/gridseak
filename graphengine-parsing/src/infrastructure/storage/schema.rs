@@ -128,6 +128,12 @@ CREATE TABLE IF NOT EXISTS file_cache (
 );
 CREATE INDEX IF NOT EXISTS idx_file_cache_hash ON file_cache(content_hash);
 
+CREATE TABLE IF NOT EXISTS call_site_bindings (
+    caller_file TEXT NOT NULL,
+    target_file TEXT NOT NULL,
+    PRIMARY KEY (caller_file, target_file)
+);
+
 CREATE TABLE IF NOT EXISTS analysis_segment_cache (
     segment_id TEXT NOT NULL,
     graph_fingerprint TEXT NOT NULL,

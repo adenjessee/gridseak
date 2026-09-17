@@ -117,6 +117,7 @@ pub fn pipeline_config(scratch: &Path, scan_id: Uuid, languages: Vec<String>) ->
         // pipeline should override with `incremental: false`.
         incremental: true,
         full_analysis: false,
+        lsp_policy: "fast".to_string(),
         // Fixture is not a git repo, so temporal-coupling signals are off.
         // That's intentional: keeping `git_dir = None` means the parity
         // test isn't subject to "what happens if the on-disk .git/HEAD

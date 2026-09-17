@@ -34,6 +34,9 @@
 //! * Negative / zero values are not meaningful — the function
 //!   operates on `u32` in both directions, matching
 //!   `domain::Range::start_char`.
+//! * Inbound LSP definition ranges use UTF-16 columns; convert back
+//!   with [`utf16_col_to_byte`] / [`byte_column_for_utf16`] before
+//!   building a byte-based [`domain::Range`].
 
 use std::fs;
 use std::path::Path;
@@ -79,6 +82,48 @@ pub fn utf16_column_for_file(file_path: &Path, line_1based: u32, byte_col: u32) 
         return byte_col;
     };
     byte_col_to_utf16(line, byte_col)
+}
+
+/// Convert a UTF-16 code-unit offset within `line_source` to a byte
+/// offset. This is the inverse of [`byte_col_to_utf16`].
+pub fn utf16_col_to_byte(line_source: &str, utf16_col: u32) -> u32 {
+    let mut utf16 = 0u32;
+    let mut byte_cursor = 0usize;
+    for ch in line_source.chars() {
+        if utf16 >= utf16_col {
+            break;
+        }
+        let ch_utf16 = ch.len_utf16() as u32;
+        if utf16.saturating_add(ch_utf16) > utf16_col {
+            break;
+        }
+        utf16 = utf16.saturating_add(ch_utf16);
+        byte_cursor += ch.len_utf8();
+    }
+    byte_cursor as u32
+}
+
+/// Convert `utf16_col` on 1-based `line_1based` of `file_path` to a
+/// byte column for tree-sitter / `domain::Range`.
+///
+/// Returns `utf16_col` unchanged on I/O or indexing error (graceful
+/// degradation identical to the outbound path).
+pub fn byte_column_for_utf16(file_path: &Path, line_1based: u32, utf16_col: u32) -> u32 {
+    let Ok(contents) = fs::read_to_string(file_path) else {
+        return utf16_col;
+    };
+    let Some(line) = contents
+        .lines()
+        .nth((line_1based.saturating_sub(1)) as usize)
+    else {
+        return utf16_col;
+    };
+    utf16_col_to_byte(line, utf16_col)
+}
+
+/// UTF-16 code-unit length of `s` (for qualified-name segment offsets).
+pub fn utf16_code_unit_len(s: &str) -> u32 {
+    s.chars().map(|c| c.len_utf16() as u32).sum()
 }
 
 #[cfg(test)]
@@ -151,6 +196,53 @@ mod tests {
             utf16_column_for_file(tmp.path(), 2, 6),
             4,
             "utf16 offset of 'foo' after multibyte char"
+        );
+    }
+
+    #[test]
+    fn utf16_col_to_byte_inverts_byte_col_to_utf16() {
+        let line = "// 漢 foo()";
+        for byte_col in [0, 3, 6, 9] {
+            let utf16 = byte_col_to_utf16(line, byte_col);
+            let back = utf16_col_to_byte(line, utf16);
+            assert_eq!(
+                back, byte_col,
+                "round-trip failed for byte_col={byte_col} (utf16={utf16})"
+            );
+        }
+    }
+
+    #[test]
+    fn utf16_col_to_byte_handles_supplementary_character() {
+        let line = "// 😀 foo()";
+        let utf16_at_foo = byte_col_to_utf16(line, 7);
+        assert_eq!(utf16_col_to_byte(line, utf16_at_foo), 7);
+    }
+
+    #[test]
+    fn byte_column_for_utf16_reads_file_line() {
+        let tmp = tempfile::NamedTempFile::new().unwrap();
+        std::fs::write(tmp.path(), "hello\n// 漢 foo()\n").unwrap();
+        let utf16_foo = byte_col_to_utf16("// 漢 foo()", 6);
+        assert_eq!(
+            byte_column_for_utf16(tmp.path(), 2, utf16_foo),
+            6,
+            "inbound utf16 col of 'foo' must map back to byte col 6"
+        );
+    }
+
+    #[test]
+    fn utf16_code_unit_len_counts_supplementary_as_two() {
+        assert_eq!(utf16_code_unit_len("A::"), 3);
+        assert_eq!(
+            utf16_code_unit_len("漢::"),
+            3,
+            "BMP glyph is one utf16 unit"
+        );
+        assert_eq!(
+            utf16_code_unit_len("😀::"),
+            4,
+            "supplementary glyph is two utf16 units"
         );
     }
 

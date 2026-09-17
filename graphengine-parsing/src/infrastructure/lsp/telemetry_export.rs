@@ -22,11 +22,12 @@
 
 use serde::{Deserialize, Serialize};
 
+use crate::application::lsp_telemetry::{FallbackReasonCounts, LspRequestMetrics};
 use crate::application::ports::ResolutionStatsSummary;
 
 /// Current on-disk schema version. Bump when adding / renaming /
 /// removing fields.
-pub const SCHEMA_VERSION: &str = "1";
+pub const SCHEMA_VERSION: &str = "2";
 
 /// Full telemetry document written by `--lsp-telemetry`.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -41,15 +42,13 @@ pub struct LspTelemetryReport {
     pub scan_duration_ms: u64,
     pub counters: ResolutionCounters,
     pub derived: DerivedResolutionMetrics,
+    /// Per-reason counters explaining LSP misses during this scan.
+    #[serde(default)]
+    pub fallback_reasons: FallbackReasonCounts,
     /// `SessionSupervisor`-level metrics (start attempts, crash
-    /// counts, last error). Currently `None` because
-    /// [`SessionMetrics`](super::session::SessionMetrics) is not yet
-    /// threaded through `ParseRepositoryUseCase` → `ResolvedGraph`.
-    /// The field is present in v1 of the schema so downstream
-    /// consumers can start expecting it without a schema bump when
-    /// the wiring lands. Being explicit (rather than silently
-    /// omitting) prevents the "we thought LSP was healthy" failure
-    /// mode this whole telemetry layer exists to prevent.
+    /// counts, last error, request counters). Populated when the
+    /// resolver path attaches session metrics via
+    /// [`LspTelemetryReport::with_session_metrics`].
     #[serde(default)]
     pub session_metrics: Option<SessionMetricsSnapshot>,
 }
@@ -78,6 +77,8 @@ pub struct SessionMetricsSnapshot {
     pub stderr_lines_observed: u64,
     #[serde(default)]
     pub indexing_messages_seen: u64,
+    #[serde(default)]
+    pub request_metrics: LspRequestMetrics,
 }
 
 impl From<&crate::application::ports::SessionMetricsSnapshot> for SessionMetricsSnapshot {
@@ -90,6 +91,7 @@ impl From<&crate::application::ports::SessionMetricsSnapshot> for SessionMetrics
             notifications_received: m.notifications_received,
             stderr_lines_observed: m.stderr_lines_observed,
             indexing_messages_seen: m.indexing_messages_seen,
+            request_metrics: m.request_metrics,
         }
     }
 }
@@ -104,6 +106,7 @@ impl From<&crate::infrastructure::lsp::session::SessionMetrics> for SessionMetri
             notifications_received: m.notifications_received,
             stderr_lines_observed: m.stderr_lines_observed,
             indexing_messages_seen: m.indexing_messages_seen,
+            request_metrics: m.request_metrics,
         }
     }
 }
@@ -190,6 +193,7 @@ impl LspTelemetryReport {
             scan_duration_ms,
             counters,
             derived,
+            fallback_reasons: stats.fallback_reasons.clone(),
             session_metrics: None,
         }
     }
@@ -223,6 +227,7 @@ mod tests {
     fn sample_stats() -> ResolutionStatsSummary {
         ResolutionStatsSummary {
             lsp_edges: 700,
+            compiler_edges: 0,
             heuristic_edges: 200,
             lsp_failures: Vec::new(),
             heuristic_failures: Vec::new(),
@@ -230,6 +235,7 @@ mod tests {
             heuristic_import_fallbacks: 10,
             heuristic_type_fallbacks: 5,
             heuristic_call_ambiguous_drops: 100,
+            fallback_reasons: FallbackReasonCounts::default(),
         }
     }
 
@@ -358,6 +364,7 @@ mod tests {
             "\"heuristic_call_ambiguous_drops\"",
             "\"fallback_rate\"",
             "\"total_resolution_work\"",
+            "\"fallback_reasons\"",
         ] {
             assert!(
                 json.contains(key),

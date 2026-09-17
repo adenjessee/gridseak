@@ -50,7 +50,7 @@ fn resolve_format(format: ScanOutputFormat, for_llm: bool, global_json: bool) ->
     match format {
         ScanOutputFormat::Table => Resolved::Table,
         ScanOutputFormat::Markdown => Resolved::Markdown,
-        ScanOutputFormat::Json => Resolved::Json,
+        ScanOutputFormat::Json | ScanOutputFormat::Html => Resolved::Json,
     }
 }
 
@@ -459,6 +459,39 @@ pub fn run_report(store: &ProjectStore, args: ReportArgs, global_json: bool) -> 
         .with_context(|| format!("scan `{scan_id}` not in this project's history"))?;
     let report: HealthReport = serde_json::from_value(report_value)?;
     let view = ScanReportView::build(&report, &project, &scan);
+
+    if args.format == crate::scan_command::ScanOutputFormat::Html && !args.for_llm && !global_json {
+        let artifact = scan.graph_artifact_path.as_ref();
+        let repo = project
+            .roots
+            .first()
+            .map(|r| std::path::PathBuf::from(&r.path))
+            .unwrap_or_else(|| std::path::PathBuf::from("."));
+        let impact = if let Some(path) = artifact {
+            crate::graph_queries::agent_tools::diff_impact(
+                std::path::Path::new(path),
+                &repo,
+                None,
+                None,
+            )
+            .unwrap_or_else(|_| crate::graph_queries::agent_tools::diff_impact_empty(vec![]))
+        } else {
+            crate::graph_queries::agent_tools::diff_impact_empty(vec![])
+        };
+        let inv = if let Some(path) = artifact {
+            crate::graph_queries::agent_tools::structural_invariants(
+                std::path::Path::new(path),
+                None,
+            )
+            .unwrap_or_else(|_| crate::graph_queries::agent_tools::structural_invariants_ok())
+        } else {
+            crate::graph_queries::agent_tools::structural_invariants_ok()
+        };
+        let stdout = std::io::stdout();
+        let mut handle = stdout.lock();
+        crate::render::html::render_html(&impact, &[], &inv, &mut handle)?;
+        return Ok(());
+    }
 
     let format = match resolve_format(args.format, args.for_llm, global_json) {
         Resolved::Table => HeroFormat::Table {

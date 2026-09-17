@@ -113,6 +113,18 @@ pub struct FeedbackDto {
     pub text: String,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JudgmentDto {
+    pub id: String,
+    pub project_id: Option<String>,
+    pub created_at: String,
+    pub subject: String,
+    pub verdict: String,
+    pub note: Option<String>,
+    pub scan_id: Option<String>,
+    pub actor: String,
+}
+
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub struct GitContext {
@@ -257,6 +269,17 @@ impl ProjectStore {
               source TEXT NOT NULL DEFAULT 'cli',
               text TEXT NOT NULL
             );
+
+            CREATE TABLE IF NOT EXISTS judgments (
+              id TEXT PRIMARY KEY,
+              project_id TEXT REFERENCES projects(id) ON DELETE SET NULL,
+              created_at TEXT NOT NULL,
+              subject TEXT NOT NULL,
+              verdict TEXT NOT NULL,
+              note TEXT,
+              scan_id TEXT,
+              actor TEXT NOT NULL DEFAULT 'human'
+            );
             "#,
         )?;
 
@@ -333,6 +356,50 @@ impl ProjectStore {
         Ok(rows)
     }
 
+    pub fn record_judgment(
+        &self,
+        project_id: Option<&str>,
+        subject: &str,
+        verdict: &str,
+        note: Option<&str>,
+        scan_id: Option<&str>,
+        actor: &str,
+    ) -> Result<String> {
+        let id = Uuid::new_v4().to_string();
+        let now = chrono::Utc::now().to_rfc3339();
+        let conn = self.conn()?;
+        conn.execute(
+            "INSERT INTO judgments (id, project_id, created_at, subject, verdict, note, scan_id, actor)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
+            params![id, project_id, now, subject, verdict, note, scan_id, actor],
+        )?;
+        Ok(id)
+    }
+
+    pub fn list_judgments(&self) -> Result<Vec<JudgmentDto>> {
+        let conn = self.conn()?;
+        let mut stmt = conn.prepare(
+            "SELECT id, project_id, created_at, subject, verdict, note, scan_id, actor
+             FROM judgments
+             ORDER BY created_at DESC",
+        )?;
+        let rows = stmt
+            .query_map([], |row| {
+                Ok(JudgmentDto {
+                    id: row.get(0)?,
+                    project_id: row.get(1)?,
+                    created_at: row.get(2)?,
+                    subject: row.get(3)?,
+                    verdict: row.get(4)?,
+                    note: row.get(5)?,
+                    scan_id: row.get(6)?,
+                    actor: row.get(7)?,
+                })
+            })?
+            .collect::<rusqlite::Result<Vec<_>>>()?;
+        Ok(rows)
+    }
+
     pub fn create_project_for_folder(&self, folder: &Path) -> Result<ProjectDto> {
         let canonical = folder
             .canonicalize()
@@ -381,13 +448,10 @@ impl ProjectStore {
     /// Behaves like [`Self::resolve_project`] for any reference the
     /// user typed deliberately (a name, an absolute path, a UUID).
     /// For implicit references — empty string, `null` shaped as an
-    /// empty string by serde, `.`, `./` — it tries the current
-    /// working directory first and then falls back to the most
-    /// recently completed scan in the store. This is what we want
-    /// from the MCP layer: an agent that hands us `project: "."`
-    /// from a workspace that hasn't been registered should NOT get
-    /// a `project not found` error if there's any local scan we
-    /// can reasonably attribute the call to.
+    /// empty string by serde, `.`, `./` — it matches the current
+    /// working directory against registered project roots exactly,
+    /// then errors with the list of known projects. It does **not**
+    /// fall back to the most recently scanned unrelated project (F2).
     ///
     /// Errors carry actionable guidance (the lenient layer is what
     /// agents and humans see most often), so the surface should
@@ -401,22 +465,59 @@ impl ProjectStore {
             return self.resolve_project(reference);
         }
 
-        // Explicit "current location" intent. Try cwd first.
-        if let Ok(project) = self.resolve_project(trimmed) {
-            return Ok(project);
+        // Explicit "current location" intent — exact cwd root match only
+        // (no fuzzy `%./%` partial resolution; see F2 / plan 01 T5).
+        if let Ok(cwd) = std::env::current_dir() {
+            let canonical = cwd.canonicalize().unwrap_or(cwd);
+            if let Some(project) = self.project_for_root_path(&canonical)? {
+                return Ok(project);
+            }
         }
 
-        // Cwd had no project. Fall back to the most recently scanned
-        // project in the store so the agent can answer the user's
-        // question instead of bouncing them with `project not found`.
-        if let Some(project) = self.latest_scanned_project()? {
-            return Ok(project);
+        // Cwd had no project — return an actionable error listing known projects.
+        let projects = self.list_projects()?;
+        if projects.is_empty() {
+            anyhow::bail!(
+                "no GridSeak project at the current directory and no scans found in the local store. \
+                 Run `gridseak scan .` from the project you want to analyse, then retry."
+            );
         }
-
+        let names: Vec<String> = projects
+            .iter()
+            .map(|p| {
+                if p.display_name.is_empty() {
+                    p.id.clone()
+                } else {
+                    format!("{} ({})", p.display_name, p.id)
+                }
+            })
+            .collect();
         anyhow::bail!(
-            "no GridSeak project at the current directory and no scans found in the local store. \
-             Run `gridseak scan .` from the project you want to analyse, then retry."
+            "no GridSeak project at the current directory. Registered projects: {}. \
+             Run `gridseak scan .` from the project you want to analyse, then retry.",
+            names.join(", ")
         )
+    }
+
+    /// Lookup a project whose registered root path exactly matches `path`.
+    pub fn project_for_root_path(&self, path: &Path) -> Result<Option<ProjectDto>> {
+        let canonical = path
+            .canonicalize()
+            .unwrap_or_else(|_| path.to_path_buf())
+            .display()
+            .to_string();
+        let conn = self.conn()?;
+        let id: Option<String> = conn
+            .query_row(
+                "SELECT project_id FROM project_roots WHERE path = ?1 LIMIT 1",
+                params![canonical],
+                |row| row.get(0),
+            )
+            .optional()?;
+        match id {
+            Some(project_id) => Ok(Some(self.get_project(&project_id)?)),
+            None => Ok(None),
+        }
     }
 
     /// Project whose most recently completed scan is newest across
@@ -1457,10 +1558,10 @@ mod tests {
     /// Q5 regression: when the MCP agent passes an implicit
     /// reference (`""`, `"."`, `"./"`) and the current working
     /// directory has no registered project, lenient resolution
-    /// must fall back to the most recently completed scan in the
-    /// store rather than erroring with `project not found: "."`.
+    /// must error with registered projects listed (F2 — no silent
+    /// latest-scan fallback).
     #[test]
-    fn lenient_resolve_falls_back_to_latest_scan_when_cwd_has_no_project() -> Result<()> {
+    fn lenient_resolve_errors_when_cwd_has_no_project() -> Result<()> {
         let temp = tempfile::tempdir()?;
         let repo = temp.path().join("a_repo_we_will_scan");
         std::fs::create_dir_all(&repo)?;
@@ -1530,18 +1631,95 @@ mod tests {
             "strict resolve_project must NOT silently fall back for explicit non-matching refs"
         );
 
-        // But lenient resolution on an implicit reference MUST find
-        // the project via the latest-scan fallback, even though the
-        // ProjectStore can't see a project at "." (cwd is whatever
-        // cargo test happens to run from, almost certainly not the
-        // tempdir we just registered).
+        // Lenient resolution on an implicit reference when cwd has no
+        // project must error with actionable guidance (F2 fix — no
+        // silent latest-scan fallback).
         for implicit_ref in ["", ".", "./", "  "] {
-            let resolved = store.resolve_project_lenient(implicit_ref)?;
-            assert_eq!(
-                resolved.id, project.id,
-                "lenient resolution of {implicit_ref:?} should yield the latest-scanned project"
+            let err = store
+                .resolve_project_lenient(implicit_ref)
+                .expect_err("lenient resolution must not fall back to unrelated projects");
+            assert!(
+                err.to_string().contains("Registered projects"),
+                "error should list registered projects, got: {err}"
             );
         }
+
+        Ok(())
+    }
+
+    #[test]
+    fn resolve_project_lenient_errors_when_cwd_misses_both_projects() -> Result<()> {
+        let temp = tempfile::tempdir()?;
+        let repo_a = temp.path().join("repo_a");
+        let repo_b = temp.path().join("repo_b");
+        std::fs::create_dir_all(&repo_a)?;
+        std::fs::create_dir_all(&repo_b)?;
+        let store = ProjectStore::open(
+            temp.path().join("projects.sqlite"),
+            temp.path().join("reports"),
+            temp.path().join("graphs"),
+        )?;
+        let project_a = store.create_project_for_folder(&repo_a)?;
+        let project_b = store.create_project_for_folder(&repo_b)?;
+
+        let report = serde_json::json!({
+            "health_score": 50,
+            "findings": [],
+            "summary": {
+                "total_nodes": 1,
+                "total_edges": 0,
+                "total_modules": 1,
+                "total_functions": 1,
+                "cycles_found": 0,
+                "hotspot_concentration": { "count": 0 },
+                "dead_code": { "count": 0 }
+            },
+            "metrics": {
+                "cycles": { "count": 0 },
+                "hotspot_concentration": { "count": 0 },
+                "dead_code": { "count": 0 }
+            }
+        });
+
+        for (project, label) in [(&project_a, "a"), (&project_b, "b")] {
+            let scan_id = Uuid::new_v4();
+            store.begin_scan(BeginScanRecord {
+                scan_id,
+                project_id: project.id.clone(),
+                root_id: project.roots.first().map(|r| r.id.clone()),
+                started_at: Utc::now(),
+                app_version: "test-app".to_string(),
+                engine_version: "test-engine".to_string(),
+                primary_language: Some("rust".to_string()),
+                scan_languages: vec!["rust".to_string()],
+                git: GitContext {
+                    branch: Some("main".into()),
+                    commit: Some("abc".into()),
+                    dirty: Some(false),
+                },
+                scan_trigger: "test".into(),
+                requested_by: Some("agent".into()),
+            })?;
+            let report_path = temp.path().join(format!("report_{label}.json"));
+            let graph_path = temp.path().join(format!("graph_{label}.sqlite"));
+            std::fs::write(&report_path, serde_json::to_vec_pretty(&report)?)?;
+            std::fs::write(&graph_path, b"sqlite stub")?;
+            store.complete_scan(
+                scan_id,
+                &project.id,
+                &report,
+                &report_path,
+                &graph_path,
+                None,
+            )?;
+        }
+
+        let err = store
+            .resolve_project_lenient(".")
+            .expect_err("cwd miss must not return latest scan");
+        let msg = err.to_string();
+        assert!(msg.contains(&project_a.id) || msg.contains(&project_a.display_name));
+        assert!(msg.contains(&project_b.id) || msg.contains(&project_b.display_name));
 
         Ok(())
     }

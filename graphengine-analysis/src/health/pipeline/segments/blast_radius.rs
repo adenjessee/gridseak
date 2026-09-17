@@ -17,11 +17,14 @@ pub fn run(ctx: &mut AnalysisRunContext<'_>) -> Result<Option<HealthReport>> {
     ctx.blast_result = run_safe("blast_radius", &mut ctx.analysis_errors, || {
         blast_radius::compute_blast_radius(&ctx.graph)
     });
+    let weighted = blast_radius::compute_weighted_blast_radius(&ctx.graph);
 
     if let Some(ref br) = ctx.blast_result {
         for (id, &radius) in &br.radii {
             if let Some(ann) = ctx.node_annotations.get_mut(id) {
                 ann.blast_radius = radius;
+                ann.blast_high_confidence =
+                    weighted.blast_high_confidence.get(id).copied().unwrap_or(0);
             }
         }
 

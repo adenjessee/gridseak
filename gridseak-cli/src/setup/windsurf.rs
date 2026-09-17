@@ -27,7 +27,7 @@ pub fn wire(binary: &str, dry_run: bool) -> Result<WireOutcome> {
     let previous_block = doc.pointer("/mcpServers/gridseak").cloned();
     let new_block = serde_json::json!({
         "command": binary,
-        "args": ["mcp"],
+        "args": ["mcp", "--slim"],
     });
     splice(&mut doc, "gridseak", new_block)?;
 

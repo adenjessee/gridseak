@@ -17,6 +17,7 @@
 //! formatting; either can be swapped in isolation (e.g. when MCP
 //! re-uses the query module in Stage 8).
 
+use std::io::Write;
 use std::path::PathBuf;
 
 use anyhow::{Context, Result};
@@ -76,6 +77,12 @@ pub enum GraphSubcommand {
     Cycles(CyclesArgs),
     /// Upstream + downstream slice around a symbol.
     Slice(SliceArgs),
+    /// Changed files → affected callers (tiered, p_true).
+    DiffImpact(DiffImpactArgs),
+    /// Verify a typed claim: calls(A,B) | reaches(A,B) | in_cycle(X) | dead(X).
+    VerifyClaim(VerifyClaimArgs),
+    /// Compare structural invariants vs an optional base artifact.
+    Invariants(InvariantsArgs),
 }
 
 #[derive(Args, Debug, Clone)]
@@ -129,6 +136,25 @@ pub struct CyclesArgs {
     pub limit: usize,
     #[arg(long, default_value_t = DEFAULT_CYCLE_DEPTH)]
     pub max_depth: usize,
+}
+
+#[derive(Args, Debug, Clone)]
+pub struct DiffImpactArgs {
+    #[arg(long)]
+    pub base: Option<String>,
+    #[arg(long)]
+    pub head: Option<String>,
+}
+
+#[derive(Args, Debug, Clone)]
+pub struct VerifyClaimArgs {
+    pub claim: String,
+}
+
+#[derive(Args, Debug, Clone)]
+pub struct InvariantsArgs {
+    #[arg(long)]
+    pub base_artifact: Option<PathBuf>,
 }
 
 #[derive(Args, Debug, Clone)]
@@ -343,6 +369,38 @@ pub fn run_graph(store: &ProjectStore, args: GraphArgs, global_json: bool) -> Re
                 body: GraphBody::Slice { rows },
             }
         }
+        GraphSubcommand::DiffImpact(a) => {
+            let repo = project
+                .roots
+                .first()
+                .map(|r| PathBuf::from(&r.path))
+                .unwrap_or_else(|| PathBuf::from("."));
+            let view = gq::agent_tools::diff_impact(
+                &artifact,
+                &repo,
+                a.base.as_deref(),
+                a.head.as_deref(),
+            )?;
+            serde_json::to_writer_pretty(&mut out, &view)?;
+            writeln!(out)?;
+            return Ok(());
+        }
+        GraphSubcommand::VerifyClaim(a) => {
+            let view = gq::agent_tools::verify_claim(&artifact, &a.claim)?;
+            serde_json::to_writer_pretty(&mut out, &view)?;
+            writeln!(out)?;
+            return Ok(());
+        }
+        GraphSubcommand::Invariants(a) => {
+            let view =
+                gq::agent_tools::structural_invariants(&artifact, a.base_artifact.as_deref())?;
+            serde_json::to_writer_pretty(&mut out, &view)?;
+            writeln!(out)?;
+            if !view.passed {
+                anyhow::bail!("structural invariants failed");
+            }
+            return Ok(());
+        }
     };
 
     graph_render::render(format, &view, &mut out)?;
@@ -376,7 +434,7 @@ fn resolve_format(format: ScanOutputFormat, for_llm: bool, global_json: bool) ->
     match format {
         ScanOutputFormat::Table => GraphFormat::Table,
         ScanOutputFormat::Markdown => GraphFormat::Markdown,
-        ScanOutputFormat::Json => GraphFormat::Json,
+        ScanOutputFormat::Json | ScanOutputFormat::Html => GraphFormat::Json,
     }
 }
 

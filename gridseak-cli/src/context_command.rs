@@ -339,6 +339,9 @@ fn confidence_caveats(report: &HealthReport) -> Vec<String> {
             "Resolution tier: {:?} ({} import edges total)",
             rq.resolution_tier, rq.import_edges_total
         ));
+        for row in &rq.resolution_disclosure {
+            out.push(crate::render::resolution_disclosure::format_disclosure_line(row));
+        }
     }
     if !report.analysis_errors.is_empty() {
         out.push(format!(

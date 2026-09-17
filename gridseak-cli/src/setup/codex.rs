@@ -13,5 +13,5 @@ pub fn print_instructions(binary: &str) {
     println!();
     println!("    [mcp_servers.gridseak]");
     println!("    command = \"{binary}\"");
-    println!("    args = [\"mcp\"]");
+    println!("    args = [\"mcp\", \"--slim\"]");
 }

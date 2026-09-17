@@ -434,6 +434,7 @@ impl SemanticResolver for ApexHeuristicResolver {
 
         edges.stats = ResolutionStatsSummary {
             lsp_edges: 0,
+            compiler_edges: 0,
             heuristic_edges: heuristic_call_count,
             lsp_failures: Vec::new(),
             heuristic_failures: Vec::new(),
@@ -441,6 +442,7 @@ impl SemanticResolver for ApexHeuristicResolver {
             heuristic_import_fallbacks: 0,
             heuristic_type_fallbacks: heuristic_type_count,
             heuristic_call_ambiguous_drops,
+            fallback_reasons: Default::default(),
         };
 
         info!(
@@ -682,9 +684,10 @@ impl ResolvedEdgesExt for ResolvedEdges {
             // `EdgeKind` itself, not the bucket, so co-locating them
             // with Call preserves ResolvedEdges' "invoked-at-runtime"
             // grouping.
-            EdgeKind::Call | EdgeKind::Framework(_) | EdgeKind::Declarative(_) => {
-                self.add_call_edge(Edge::new(from, to, kind, prov))
-            }
+            EdgeKind::Call
+            | EdgeKind::Framework(_)
+            | EdgeKind::Declarative(_)
+            | EdgeKind::Boundary(_) => self.add_call_edge(Edge::new(from, to, kind, prov)),
             EdgeKind::Import => self.add_import_edge(Edge::new(from, to, kind, prov)),
             EdgeKind::Contains => self.add_containment_edge(Edge::new(from, to, kind, prov)),
         }

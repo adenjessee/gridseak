@@ -11,6 +11,7 @@ pub mod incremental;
 pub mod orchestrator;
 pub mod per_file_slicer;
 pub mod persistence;
+pub mod semantic_delta;
 pub mod semantic_resolution;
 pub mod symbol_table;
 pub mod syntax_extraction;

@@ -1,0 +1,8 @@
+
+
+/fixturek"python
+main.py,
+
+#scip-python python . main.callee().*
+
+#scip-python python . main.callee().

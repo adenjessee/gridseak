@@ -96,6 +96,18 @@ pub enum EdgeKind {
     /// non-Salesforce analogues (Spring XML, Django URLconf, etc.) as
     /// their readers land in future phases.
     Declarative(DeclarativeKind),
+    /// Cross-language / process boundary (HTTP, SQL, FFI, schema contract).
+    /// String match is heuristic; contract files are compiler-grade witnesses.
+    Boundary(BoundaryMechanism),
+}
+
+/// How a boundary edge was witnessed.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum BoundaryMechanism {
+    Http,
+    Sql,
+    Ffi,
+    Schema,
 }
 
 /// Concrete framework dispatch mechanism for `EdgeKind::Framework`.

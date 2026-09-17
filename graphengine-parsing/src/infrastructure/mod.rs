@@ -17,6 +17,7 @@
 
 pub mod config;
 pub mod lsp;
+pub mod runtime_fuse;
 pub mod semantic;
 pub mod storage;
 pub mod utils;
@@ -24,7 +25,10 @@ pub mod utils;
 // Re-export main types for convenience
 pub use config::*;
 pub use lsp::*;
+pub use semantic::DisclosedSemanticResolver;
 #[cfg(feature = "rust-layer2")]
 pub use semantic::RustLayer2SemanticResolver;
+#[cfg(feature = "scip")]
+pub use semantic::{IndexBackedSemanticResolver, ScipSemanticIndex};
 pub use storage::*;
 pub use utils::*;

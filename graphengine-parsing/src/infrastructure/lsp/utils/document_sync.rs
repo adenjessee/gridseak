@@ -4,8 +4,12 @@
 //! and waiting for the server to index documents.
 
 use crate::infrastructure::lsp::definition_provider::DefinitionProvider;
+use crate::infrastructure::lsp::policy::runtime_policy;
 use std::collections::{HashMap, HashSet};
-use tokio::{fs, time::Duration};
+use tokio::{
+    fs,
+    time::{sleep, Duration},
+};
 use tracing::{debug, info, warn};
 
 /// Manages document synchronization with LSP server
@@ -93,6 +97,16 @@ impl DocumentSyncManager {
             );
         }
 
+        let settle = Self::document_settle_timeout();
+        if !opened_documents.is_empty() && !settle.is_zero() {
+            info!(
+                "[LSP_PATIENT] Settling {} opened documents for {:?}",
+                opened_documents.len(),
+                settle
+            );
+            sleep(settle).await;
+        }
+
         info!(
             "[TIMING] sync_documents total ({} files): {:?}",
             file_count,
@@ -129,6 +143,18 @@ impl DocumentSyncManager {
         let (opened, _) =
             Self::sync_documents(definition_provider, files, wait_for_indexing, wait_timeout).await;
         opened
+    }
+
+    pub fn index_wait_timeout() -> Duration {
+        runtime_policy().index_wait
+    }
+
+    pub fn document_settle_timeout() -> Duration {
+        runtime_policy().document_settle
+    }
+
+    pub fn lsp_chunk_size(_default: usize) -> usize {
+        runtime_policy().chunk_size.max(1)
     }
 }
 

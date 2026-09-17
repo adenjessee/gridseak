@@ -53,7 +53,10 @@ fn test_python_config_loading() {
     let config = config.unwrap();
     assert_eq!(config.language, "python");
     assert!(config.file_extensions.contains(&".py".to_string()));
-    assert_eq!(config.lsp_command, Some("pyright".to_string()));
+    // Must match the LSP config contract: the server binary is
+    // `pyright-langserver`; plain `pyright` is the type-check CLI and
+    // does not speak LSP over stdio (see tests/lsp_config_contract.rs).
+    assert_eq!(config.lsp_command, Some("pyright-langserver".to_string()));
 }
 
 #[test]

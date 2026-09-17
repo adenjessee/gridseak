@@ -9,6 +9,28 @@ will call those out explicitly here when they happen.
 
 ## [Unreleased]
 
+## [0.1.1] — 2026-09-16
+
+Cursor edit-boundary gate and stranger-proof setup. This is the first
+CLI that has `gridseak gate`. `cli-v0.1.0` does not.
+
+### Added
+
+- `gridseak gate` for Claude `PreToolUse` and Cursor `preToolUse`
+  (`Write|StrReplace|Delete|Shell`) plus `beforeShellExecution`.
+- Same-name preferred-path deny (Go interface `Use` vs `Mux.Use`).
+- `setup --verify` rejects a gateless or non-absolute hook binary and
+  an empty Claude `PreToolUse` array.
+- `scripts/stranger-repro.sh` — fresh-HOME tarball install + NewRouter
+  fixture deny (not `curl | sh`).
+- Root `LICENSE` (MIT OR Apache-2.0).
+
+### Changed
+
+- Cursor 3.20.21 honours three hook layers: user `hooks.json`, plugin
+  manifests, and `~/.claude/settings.json`.
+- Workspace version `0.1.0` → `0.1.1`.
+
 ## [0.1.0] — 2026-06-03
 
 First public open-source release: the fourteen-tool agent-first MCP surface

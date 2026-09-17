@@ -175,6 +175,7 @@ pub fn compute_priorities(report: &HealthReport, top_n: usize) -> Vec<PriorityIt
     let mut scored: Vec<(f64, &Finding)> = report
         .findings
         .iter()
+        .filter(|f| f.confidence.is_some())
         .map(|f| (score_finding(f, &worsening), f))
         .collect();
 

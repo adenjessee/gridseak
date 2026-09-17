@@ -45,7 +45,7 @@ fn resolve_format(format: ScanOutputFormat, for_llm: bool, global_json: bool) ->
     match format {
         ScanOutputFormat::Table => ResolvedFormat::Table,
         ScanOutputFormat::Markdown => ResolvedFormat::Markdown,
-        ScanOutputFormat::Json => ResolvedFormat::Json,
+        ScanOutputFormat::Json | ScanOutputFormat::Html => ResolvedFormat::Json,
     }
 }
 

@@ -3,6 +3,7 @@
 //! Tracks resolution statistics including edge counts by provenance source,
 //! failures, and fallback counts.
 
+use crate::application::lsp_telemetry::FallbackReasonCounts;
 use crate::application::ports::ResolutionStatsSummary;
 use crate::domain::ProvenanceSource;
 use std::collections::HashMap;
@@ -27,6 +28,7 @@ pub struct ResolutionStats {
     pub heuristic_type_fallbacks: usize,
     /// See [`ResolutionStatsSummary::heuristic_call_ambiguous_drops`].
     pub heuristic_call_ambiguous_drops: usize,
+    pub fallback_reasons: FallbackReasonCounts,
 }
 
 impl ResolutionStats {
@@ -45,12 +47,21 @@ impl ResolutionStats {
         self.heuristic_failures.push(message);
     }
 
+    pub fn merge_fallback_reasons(&mut self, other: &FallbackReasonCounts) {
+        self.fallback_reasons.merge(other);
+    }
+
     /// Convert to summary format
     pub fn into_summary(self) -> ResolutionStatsSummary {
         ResolutionStatsSummary {
             lsp_edges: self
                 .counts
                 .get(&ProvenanceSource::Lsp)
+                .copied()
+                .unwrap_or(0),
+            compiler_edges: self
+                .counts
+                .get(&ProvenanceSource::Compiler)
                 .copied()
                 .unwrap_or(0),
             heuristic_edges: self
@@ -64,6 +75,7 @@ impl ResolutionStats {
             heuristic_import_fallbacks: self.heuristic_import_fallbacks,
             heuristic_type_fallbacks: self.heuristic_type_fallbacks,
             heuristic_call_ambiguous_drops: self.heuristic_call_ambiguous_drops,
+            fallback_reasons: self.fallback_reasons,
         }
     }
 }

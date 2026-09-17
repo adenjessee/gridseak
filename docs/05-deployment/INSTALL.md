@@ -8,8 +8,14 @@ latest GitHub release and SHA256-verifies every download — no website or
 CDN in the path.
 
 ```bash
-# macOS (Apple Silicon + Intel) and Linux x86_64:
-curl -fsSL https://raw.githubusercontent.com/adenjessee/gridseak/main/scripts/install/install.sh | bash
+# Product binary from a tagged GitHub release → ~/.gridseak/bin
+# macOS (Apple Silicon + Intel) and Linux (x86_64 + aarch64):
+curl -fsSL https://raw.githubusercontent.com/adenjessee/gridseak-graphengine/main/scripts/install.sh | bash
+export PATH="$HOME/.gridseak/bin:$PATH"
+gridseak --version
+
+# Optional SHA256-verified sidecar bundle (graphengine-parsing, ge-analyze):
+# curl -fsSL https://raw.githubusercontent.com/adenjessee/gridseak-graphengine/main/scripts/install/install.sh | bash
 ```
 
 Windows (PowerShell):
@@ -76,8 +82,15 @@ This installs **only** the `gridseak` binary — not the sidecar analyzers or
 `configs/`. A working `gridseak scan` needs the full bundle from `curl | sh`
 or a workspace release build.
 
+**PATH footgun:** `~/.cargo/bin/gridseak` from an older `cargo install`
+often has no `gate` subcommand. Cursor's fail-closed hook then blocks
+every shell command. Prefer `scripts/install.sh` (writes
+`~/.gridseak/bin`) or `cargo install --path gridseak-cli --locked`
+followed by `gridseak setup`, which pins the running binary's absolute
+path. Then `gridseak setup --verify`.
+
 **MCP from a dev build:** Cursor’s MCP server must see the same binary as your shell.
-After `cargo install --path gridseak-cli`, run `gridseak setup` and restart the IDE.
+After `cargo install --path gridseak-cli --locked`, run `gridseak setup` and restart the IDE.
 
 ---
 

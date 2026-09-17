@@ -1,0 +1,24 @@
+[package]
+name = "graphengine-scip-adapter"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Universal SCIP index ingestion and per-language indexer provisioning for GridSeak"
+
+[dependencies]
+blake3 = "1"
+protobuf = "3.7.2"
+scip = "0.9.0"
+thiserror = "2.0"
+
+[dev-dependencies]
+tempfile = "3.14"
+
+[[bin]]
+name = "write_minimal_fixture"
+path = "src/bin/write_minimal_fixture.rs"
+
+[[bin]]
+name = "write_python_fixture"
+path = "src/bin/write_python_fixture.rs"

@@ -5,6 +5,7 @@
 //! "SEM" part of the FAST-SEM pipeline, providing high-confidence semantic
 //! relationships that complement the fast syntactic extraction.
 
+use crate::application::lsp_telemetry::{classify_init_error, FallbackReason};
 use crate::application::ports::{
     ResolutionStatsSummary, ResolvedEdges, SemanticResolver, SyntaxResults, UnresolvedReference,
 };
@@ -107,6 +108,7 @@ impl LspResolver {
             Ok(_) => match self.resolve_calls_with_lsp(syntax_results, misses).await {
                 Ok(outcome) => {
                     aggregator.add_edges(outcome.edges);
+                    aggregator.merge_fallback_reasons(&outcome.fallback_reasons);
                     unresolved_calls = outcome.unresolved_calls;
                 }
                 Err(err) => {
@@ -115,6 +117,9 @@ impl LspResolver {
                         err
                     );
                     aggregator.record_lsp_failure(err.to_string());
+                    let mut fb = crate::application::lsp_telemetry::FallbackReasonCounts::default();
+                    fb.record(crate::application::lsp_telemetry::classify_lsp_error(&err));
+                    aggregator.merge_fallback_reasons(&fb);
                 }
             },
             Err(err) => {
@@ -123,6 +128,9 @@ impl LspResolver {
                     err
                 );
                 aggregator.record_lsp_failure(err.to_string());
+                let mut fb = crate::application::lsp_telemetry::FallbackReasonCounts::default();
+                fb.record(classify_init_error(&err));
+                aggregator.merge_fallback_reasons(&fb);
             }
         }
         info!("[TIMING] LSP call resolution: {:?}", t_lsp_calls.elapsed());
@@ -130,7 +138,15 @@ impl LspResolver {
         let t_heuristic_calls = std::time::Instant::now();
         if !unresolved_calls.is_empty() {
             match self.resolve_calls_with_heuristics(syntax_results, &unresolved_calls) {
-                Ok(edges) => aggregator.add_edges(edges),
+                Ok(edges) => {
+                    aggregator.add_edges(edges.clone());
+                    aggregator.merge_fallback_reasons(&{
+                        let mut fb =
+                            crate::application::lsp_telemetry::FallbackReasonCounts::default();
+                        fb.record_heuristic_edges(edges.len());
+                        fb
+                    });
+                }
                 Err(err) => {
                     warn!("Heuristic call resolution failed: {}", err);
                     aggregator.record_heuristic_failure(err.to_string());
@@ -197,7 +213,14 @@ impl LspResolver {
         misses: &mut Vec<LspMiss>,
         total_work: usize,
         completed_work: usize,
-    ) -> Result<(Vec<Edge>, Vec<Range>), LspError> {
+    ) -> Result<
+        (
+            Vec<Edge>,
+            Vec<Range>,
+            crate::application::lsp_telemetry::FallbackReasonCounts,
+        ),
+        LspError,
+    > {
         ImportResolver::resolve_with_lsp(
             self.definition_provider.as_ref(),
             syntax_results,
@@ -213,7 +236,14 @@ impl LspResolver {
         &self,
         syntax_results: &SyntaxResults,
         misses: &mut Vec<LspMiss>,
-    ) -> Result<(Vec<Edge>, Vec<Range>), LspError> {
+    ) -> Result<
+        (
+            Vec<Edge>,
+            Vec<Range>,
+            crate::application::lsp_telemetry::FallbackReasonCounts,
+        ),
+        LspError,
+    > {
         TypeResolver::resolve_with_lsp(self.definition_provider.as_ref(), syntax_results, misses)
             .await
     }
@@ -299,6 +329,11 @@ impl LspResolver {
         );
 
         let mut aggregator = ResolutionAggregator::default();
+        if !is_available {
+            let mut fb = crate::application::lsp_telemetry::FallbackReasonCounts::default();
+            fb.record(FallbackReason::RejectedByAvailability);
+            aggregator.merge_fallback_reasons(&fb);
+        }
         let mut heuristic_call_fallbacks = 0;
         let mut heuristic_import_fallbacks = 0;
         let mut heuristic_type_fallbacks = 0;
@@ -307,6 +342,7 @@ impl LspResolver {
             Ok((call_edges, call_stats)) => {
                 let count = call_edges.len();
                 aggregator.add_edges(call_edges);
+                aggregator.merge_fallback_reasons(&call_stats.fallback_reasons);
                 heuristic_call_fallbacks = call_stats.heuristic_edges;
                 info!(
                     "[1/5] Calls resolved: {} edges from {} call sites",
@@ -320,9 +356,10 @@ impl LspResolver {
         }
 
         let unresolved_imports = match import_result {
-            Ok((edges, unresolved)) => {
+            Ok((edges, unresolved, import_fb)) => {
                 let count = edges.len();
                 aggregator.add_edges(edges);
+                aggregator.merge_fallback_reasons(&import_fb);
                 info!(
                     "[2/5] Imports resolved: {} edges, {} unresolved",
                     count,
@@ -346,7 +383,13 @@ impl LspResolver {
             match self.resolve_imports_with_heuristics(syntax_results, &unresolved_imports) {
                 Ok(fallback_edges) => {
                     heuristic_import_fallbacks = fallback_edges.len();
-                    aggregator.add_edges(fallback_edges);
+                    aggregator.add_edges(fallback_edges.clone());
+                    aggregator.merge_fallback_reasons(&{
+                        let mut fb =
+                            crate::application::lsp_telemetry::FallbackReasonCounts::default();
+                        fb.record_heuristic_edges(fallback_edges.len());
+                        fb
+                    });
                 }
                 Err(e) => {
                     warn!("Heuristic import resolution failed: {}", e);
@@ -369,9 +412,10 @@ impl LspResolver {
         }
 
         let unresolved_types = match type_result {
-            Ok((edges, unresolved)) => {
+            Ok((edges, unresolved, type_fb)) => {
                 let count = edges.len();
                 aggregator.add_edges(edges);
+                aggregator.merge_fallback_reasons(&type_fb);
                 info!(
                     "[3/5] Types resolved: {} edges, {} unresolved",
                     count,
@@ -391,7 +435,13 @@ impl LspResolver {
             match self.resolve_types_with_heuristics(syntax_results, &unresolved_types) {
                 Ok(fallback_edges) => {
                     heuristic_type_fallbacks = fallback_edges.len();
-                    aggregator.add_edges(fallback_edges);
+                    aggregator.add_edges(fallback_edges.clone());
+                    aggregator.merge_fallback_reasons(&{
+                        let mut fb =
+                            crate::application::lsp_telemetry::FallbackReasonCounts::default();
+                        fb.record_heuristic_edges(fallback_edges.len());
+                        fb
+                    });
                 }
                 Err(e) => {
                     warn!("Heuristic type resolution failed: {}", e);
@@ -440,9 +490,10 @@ impl LspResolver {
                 // as typed variants of that same family; they share the
                 // bucket because downstream consumers already pivot on
                 // `EdgeKind` at the metric layer where granularity matters.
-                EdgeKind::Call | EdgeKind::Framework(_) | EdgeKind::Declarative(_) => {
-                    call_edges.push(edge)
-                }
+                EdgeKind::Call
+                | EdgeKind::Framework(_)
+                | EdgeKind::Declarative(_)
+                | EdgeKind::Boundary(_) => call_edges.push(edge),
                 EdgeKind::Import => resolved_import_edges.push(edge),
                 // `Type`, `Uses`, `Extends`, `Implements` are all type-flavored
                 // relationships and share the `type_edges` bucket. The edge

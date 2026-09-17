@@ -9,8 +9,9 @@
 //! file are required; Claude Code / Codex / Windsurf are best-effort
 //! because they're either user-controlled or optional.
 
+use std::io::Write;
 use std::path::{Path, PathBuf};
-use std::process::Command;
+use std::process::{Command, Stdio};
 
 use anyhow::Result;
 use serde_json::Value;
@@ -34,6 +35,7 @@ pub fn run() -> Result<()> {
     all_required_pass &= check_cursor_routing_rule(&cursor_routing);
 
     all_required_pass &= check_binary_resolvable();
+    all_required_pass &= check_hooks();
 
     println!();
     if all_required_pass {
@@ -82,6 +84,13 @@ fn check_cursor_mcp(path: &Path) -> bool {
             return false;
         }
     };
+    if !Path::new(command).is_absolute() {
+        println!(
+            "{label} FAIL  {} command={command} is not absolute — IDE MCP spawn has no PATH",
+            path.display()
+        );
+        return false;
+    }
     println!("{label} OK    {} (command={})", path.display(), command);
     true
 }
@@ -171,4 +180,294 @@ fn check_binary_resolvable() -> bool {
     }
 
     true
+}
+
+fn check_hooks() -> bool {
+    let label = "  hooks + skill";
+    if !super::hooks::verify_installed() {
+        println!(
+            "{label} FAIL  missing real host hooks (PreToolUse / beforeShellExecution) \
+             — re-run `gridseak setup`. Advisory postEdit stubs do not count."
+        );
+        return false;
+    }
+    println!("{label} OK    PreToolUse + beforeShellExecution + gate skill present");
+    check_hook_binary_has_gate() && check_hook_wrapper_json()
+}
+
+/// The hook command must name a binary that (a) hosts can spawn without
+/// the shell `PATH` and (b) actually has the `gate` subcommand. A bare
+/// `gridseak` that resolves to a stale install fail-closes every shell
+/// command in Cursor — this is the check that catches it.
+fn check_hook_binary_has_gate() -> bool {
+    let label = "  hook binary";
+    let Ok(path) = super::hooks::cursor_hooks_path() else {
+        return true;
+    };
+    let Some(bin) = super::hooks::hook_binary(&path) else {
+        println!(
+            "{label} FAIL  could not read the gate command from {}",
+            path.display()
+        );
+        return false;
+    };
+    let is_absolute = Path::new(&bin).is_absolute();
+    let has_gate = Command::new(&bin)
+        .args(["gate", "--help"])
+        .output()
+        .map(|o| o.status.success())
+        .unwrap_or(false);
+    match (is_absolute, has_gate) {
+        (true, true) => {
+            println!("{label} OK    {bin} (absolute, has `gate`)");
+            true
+        }
+        (false, true) => {
+            println!(
+                "{label} FAIL  {bin} is not an absolute path — IDE hook runners do not \
+                 inherit your shell PATH. Re-run `gridseak setup` (or pass --command)."
+            );
+            false
+        }
+        (_, false) => {
+            println!(
+                "{label} FAIL  `{bin} gate --help` failed — this binary has no `gate` \
+                 subcommand, so Cursor's failClosed hook will block every shell command. \
+                 Re-run `gridseak setup` from the build you want."
+            );
+            false
+        }
+    }
+}
+
+/// Shared hook-health report used by `setup --verify` and `gridseak doctor`.
+#[derive(Debug, Clone)]
+pub struct HookHealth {
+    pub status: String,
+    pub detail: String,
+    pub binary: Option<String>,
+    pub absolute: bool,
+    pub has_gate: bool,
+    pub wrapper_json_ok: bool,
+}
+
+pub fn hook_health() -> HookHealth {
+    let Ok(path) = super::hooks::cursor_hooks_path() else {
+        return HookHealth {
+            status: "not_configured".into(),
+            detail: "HOME not set".into(),
+            binary: None,
+            absolute: false,
+            has_gate: false,
+            wrapper_json_ok: false,
+        };
+    };
+    if !path.is_file() {
+        return HookHealth {
+            status: "not_configured".into(),
+            detail: format!("{} missing — run `gridseak setup`", path.display()),
+            binary: None,
+            absolute: false,
+            has_gate: false,
+            wrapper_json_ok: false,
+        };
+    }
+    let Some(bin) = super::hooks::hook_binary(&path) else {
+        return HookHealth {
+            status: "fail".into(),
+            detail: format!("could not read the gate command from {}", path.display()),
+            binary: None,
+            absolute: false,
+            has_gate: false,
+            wrapper_json_ok: false,
+        };
+    };
+    let absolute = Path::new(&bin).is_absolute();
+    let has_gate = Command::new(&bin)
+        .args(["gate", "--help"])
+        .output()
+        .map(|o| {
+            o.status.success()
+                && String::from_utf8_lossy(&o.stdout).contains("Usage: gridseak gate")
+        })
+        .unwrap_or(false);
+    let wrapper_json_ok = wrapper_returns_json();
+    let (status, detail) = match (absolute, has_gate, wrapper_json_ok) {
+        (true, true, true) => (
+            "ok".into(),
+            format!("{bin} (absolute, has `gate`, wrapper JSON)"),
+        ),
+        (false, _, _) => (
+            "fail".into(),
+            format!("{bin} is not an absolute path — IDE hook runners do not inherit PATH"),
+        ),
+        (_, false, _) => (
+            "fail".into(),
+            format!("`{bin} gate --help` failed — this binary has no `gate` subcommand"),
+        ),
+        (_, _, false) => (
+            "fail".into(),
+            "hook wrapper did not return valid JSON for a pwd payload".into(),
+        ),
+    };
+    HookHealth {
+        status,
+        detail,
+        binary: Some(bin),
+        absolute,
+        has_gate,
+        wrapper_json_ok,
+    }
+}
+
+fn wrapper_returns_json() -> bool {
+    let Ok(wrapper) = super::hooks::hook_wrapper_path() else {
+        return false;
+    };
+    if !wrapper.is_file() {
+        return false;
+    }
+    let mut child = match Command::new("/bin/bash")
+        .arg(&wrapper)
+        .arg("cursor")
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+    {
+        Ok(c) => c,
+        Err(_) => return false,
+    };
+    if let Some(mut stdin) = child.stdin.take() {
+        let _ = stdin.write_all(br#"{"command":"pwd"}"#);
+    }
+    let output = match child.wait_with_output() {
+        Ok(o) => o,
+        Err(_) => return false,
+    };
+    if !output.status.success() {
+        return false;
+    }
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let line = stdout
+        .lines()
+        .find(|l| l.trim().starts_with('{'))
+        .unwrap_or("");
+    serde_json::from_str::<Value>(line)
+        .ok()
+        .and_then(|v| {
+            v.get("permission")
+                .and_then(Value::as_str)
+                .map(|s| !s.is_empty())
+        })
+        .unwrap_or(false)
+}
+
+fn check_hook_wrapper_json() -> bool {
+    let label = "  hook crash-safe";
+    let health = hook_health();
+    if health.wrapper_json_ok {
+        println!("{label} OK    wrapper returns JSON for a pwd payload");
+        true
+    } else {
+        println!("{label} FAIL  {}", health.detail);
+        false
+    }
+}
+
+#[cfg(test)]
+mod setup_verify_g2 {
+    use super::super::hooks;
+    use super::*;
+    use tempfile::TempDir;
+
+    fn fake_gate_bin(dir: &std::path::Path) -> PathBuf {
+        let p = dir.join("gridseak");
+        std::fs::write(
+            &p,
+            r#"#!/bin/sh
+if [ "$1" = "gate" ]; then
+  if [ "$2" = "--help" ]; then
+    echo "Usage: gridseak gate"
+    exit 0
+  fi
+  echo '{"permission":"allow","user_message":"ok","failClosed":true}'
+  exit 0
+fi
+exit 1
+"#,
+        )
+        .unwrap();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            let mut perms = std::fs::metadata(&p).unwrap().permissions();
+            perms.set_mode(0o755);
+            std::fs::set_permissions(&p, perms).unwrap();
+        }
+        p
+    }
+
+    #[test]
+    fn fails_non_absolute_hook_command() {
+        let _g = hooks::lock_home();
+        let dir = TempDir::new().unwrap();
+        std::env::set_var("HOME", dir.path());
+        let hooks_path = dir.path().join(".cursor").join("hooks.json");
+        std::fs::create_dir_all(hooks_path.parent().unwrap()).unwrap();
+        std::fs::write(
+            &hooks_path,
+            r#"{"version":1,"hooks":{"beforeShellExecution":[{"command":"gridseak gate --format cursor"}]}}"#,
+        )
+        .unwrap();
+        let health = hook_health();
+        assert_eq!(health.status, "fail", "{health:?}");
+        assert!(!health.absolute);
+    }
+
+    #[test]
+    fn fails_gateless_binary() {
+        let _g = hooks::lock_home();
+        let dir = TempDir::new().unwrap();
+        std::env::set_var("HOME", dir.path());
+        let bin = dir.path().join("stale-gridseak");
+        std::fs::write(&bin, b"#!/bin/sh\necho old\n").unwrap();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            let mut perms = std::fs::metadata(&bin).unwrap().permissions();
+            perms.set_mode(0o755);
+            std::fs::set_permissions(&bin, perms).unwrap();
+        }
+        hooks::install(&bin.display().to_string(), false, false).unwrap();
+        let health = hook_health();
+        assert_eq!(health.status, "fail", "{health:?}");
+        assert!(!health.has_gate);
+    }
+
+    #[test]
+    fn fails_crashing_wrapper() {
+        let _g = hooks::lock_home();
+        let dir = TempDir::new().unwrap();
+        std::env::set_var("HOME", dir.path());
+        let bin = fake_gate_bin(dir.path());
+        hooks::install(&bin.display().to_string(), false, false).unwrap();
+        std::fs::write(hooks::hook_wrapper_path().unwrap(), "#!/bin/bash\nexit 1\n").unwrap();
+        let health = hook_health();
+        assert_eq!(health.status, "fail", "{health:?}");
+        assert!(!health.wrapper_json_ok);
+    }
+
+    #[test]
+    fn passes_absolute_gate_and_json_wrapper() {
+        let _g = hooks::lock_home();
+        let dir = TempDir::new().unwrap();
+        std::env::set_var("HOME", dir.path());
+        let bin = fake_gate_bin(dir.path());
+        hooks::install(&bin.display().to_string(), false, false).unwrap();
+        let health = hook_health();
+        assert_eq!(health.status, "ok", "{health:?}");
+        assert!(health.absolute && health.has_gate && health.wrapper_json_ok);
+        println!("setup verify G2 checks passed");
+    }
 }

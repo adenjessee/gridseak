@@ -4,12 +4,13 @@ members = [
     "graphengine-analysis",
     "graphengine-diagnostic",
     "graphengine-git-signals",
-    "graphengine-infra",
-    "graphengine-mcp",
     "graphengine-parsing",
     "graphengine-parsing-test-support",
     "graphengine-progress",
     "graphengine-ra-ide-adapter",
+    "graphengine-scip-adapter",
+    "graphengine-runtime-witness",
+    "gridseak-truth-benchmark",
     "gridseak-cli",
     "gridseak-engine-runner",
     "gridseak-local-store",
@@ -18,19 +19,20 @@ default-members = [
     "graphengine-analysis",
     "graphengine-diagnostic",
     "graphengine-git-signals",
-    "graphengine-infra",
-    "graphengine-mcp",
     "graphengine-parsing",
     "graphengine-parsing-test-support",
     "graphengine-progress",
     "graphengine-ra-ide-adapter",
+    "graphengine-scip-adapter",
+    "graphengine-runtime-witness",
+    "gridseak-truth-benchmark",
     "gridseak-cli",
     "gridseak-engine-runner",
     "gridseak-local-store",
 ]
 
 [workspace.package]
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["The GridSeak Authors"]
 license = "MIT"

@@ -1,13 +1,20 @@
 mod analyze_command;
 mod context_command;
 mod doctor_command;
+mod doctor_configs;
+mod doctor_lsp;
 mod drilldown_command;
 mod feedback_command;
+mod gate;
 mod graph_command;
 mod graph_queries;
 mod history_command;
 mod intent_router;
+mod judge_command;
+#[cfg(test)]
+mod mcp_contract_tests;
 mod mcp_preflight;
+mod mcp_slim;
 mod progress;
 mod render;
 mod route_command;
@@ -45,19 +52,21 @@ use crate::drilldown_command::{
     FindingsArgs, MetricsCmdArgs, RecommendationsArgs, ReportArgs,
 };
 use crate::feedback_command::{run_feedback, FeedbackArgs};
+use crate::gate::{run as run_gate, GateArgs};
 use crate::graph_command::{run_graph, GraphArgs};
 use crate::history_command::{
     run_compare, run_scan_latest, run_scans_list, run_trends, CompareArgs, ScanLatestArgs,
     ScansListArgs, TrendsArgs,
 };
 use crate::intent_router::{route, routing_table, RouteInput, RoutedTool};
+use crate::judge_command::{run_judge, JudgeArgs};
 use crate::mcp_preflight::{
     check_analysis_complete, check_stale_snapshot, enrich_envelope, load_analysis_readiness,
     symbol_file_path, AnalysisNotReadyError, StaleSnapshotError,
 };
 use crate::progress::{CliProgressSink, ProgressMode};
 use crate::route_command::{run_route, RouteArgs};
-use crate::scan_command::{run_scan_now, ScanArgs};
+use crate::scan_command::{run_scan_now, LspPolicyCli, ScanArgs};
 use crate::scan_manifest::write_scan_manifest;
 use crate::setup::{run as run_setup, SetupArgs};
 #[cfg(feature = "trace-internal")]
@@ -194,6 +203,8 @@ enum Commands {
     Context(ContextArgs),
     /// Deterministic symptom → MCP tool routing (debug / non-MCP agents).
     Route(RouteArgs),
+    /// Structural verdict at the edit boundary (PreToolUse / beforeShell).
+    Gate(GateArgs),
     /// Wire the GridSeak MCP server into your IDE(s). Auto-writes for
     /// Cursor + Windsurf, prints instructions for Claude Code + Codex.
     /// Also writes the Cursor rule file that teaches the agent when to
@@ -207,6 +218,8 @@ enum Commands {
     /// Append a free-form note to the local feedback table. Everything
     /// stays on this machine until you decide to share it.
     Feedback(FeedbackArgs),
+    /// Record a human/agent judgment on an edge or node.
+    Judge(JudgeArgs),
     /// Run a fresh parse + analysis on an absolute or relative repo path.
     Scan(ScanArgs),
     /// Background or one-shot analysis against the latest scan artifact.
@@ -215,13 +228,30 @@ enum Commands {
         #[command(subcommand)]
         command: ExportCommand,
     },
-    Mcp,
+    Mcp {
+        /// Reserved: one MCP server. `--engine` is accepted and ignored
+        /// (graphengine-mcp / ge-mcp is folded into this process).
+        #[arg(long, default_value_t = false)]
+        engine: bool,
+        /// Hint only (used by hooks): which agent tool to prefer next.
+        #[arg(long)]
+        hint: Option<String>,
+        /// Plugin catalog: router + verify_claim + blast_radius +
+        /// diff_impact + gate_status. Full fourteen-tool schema is the
+        /// default (`gridseak mcp` without this flag).
+        #[arg(long, default_value_t = false)]
+        slim: bool,
+    },
     /// Verify install consistency: probe each sidecar binary
     /// (`graphengine-parsing`, `ge-analyze`) and confirm its reported
     /// version matches this CLI's. Use this when scans behave oddly
     /// after an install/upgrade; a mismatch usually means a stale
     /// sidecar got left behind.
-    Doctor,
+    Doctor {
+        /// Install a language's SCIP indexer (may use the network).
+        #[arg(long)]
+        provision: Option<String>,
+    },
 }
 
 #[derive(Subcommand)]
@@ -386,13 +416,20 @@ async fn main() -> Result<()> {
         Commands::Graph(args) => run_graph(&store, args, cli.json)?,
         Commands::Context(args) => run_context(&store, args, cli.json)?,
         Commands::Route(args) => run_route(args)?,
+        Commands::Gate(args) => {
+            let code = run_gate(&store, args)?;
+            if code != 0 {
+                std::process::exit(code);
+            }
+        }
         Commands::Setup(args) => run_setup(args)?,
         #[cfg(feature = "trace-internal")]
         Commands::SetupTrace(args) => run_setup_trace(args)?,
         Commands::Feedback(args) => {
             run_feedback(&store, args, env!("CARGO_PKG_VERSION"), cli.json)?
         }
-        Commands::Doctor => run_doctor(cli.json).await?,
+        Commands::Judge(args) => run_judge(&store, args)?,
+        Commands::Doctor { provision } => run_doctor(cli.json, provision).await?,
         Commands::Analyze(args) => run_analyze_background(&store, &paths, args)?,
         Commands::Scan(args) => match args.sub.clone() {
             None => {
@@ -431,6 +468,7 @@ async fn main() -> Result<()> {
                         // `gridseak scan --no-incremental`.
                         true,
                         false,
+                        LspPolicyCli::Fast,
                     )
                     .await?;
                 }
@@ -470,7 +508,14 @@ async fn main() -> Result<()> {
                 }
             }
         }
-        Commands::Mcp => serve_mcp(store, paths).await?,
+        Commands::Mcp { engine, hint, slim } => {
+            let _ = (engine, hint);
+            if slim {
+                mcp_slim::serve_slim(store, paths).await?;
+            } else {
+                serve_mcp(store, paths).await?;
+            }
+        }
     }
 
     Ok(())
@@ -769,6 +814,7 @@ pub(crate) async fn rescan_project(
     progress_mode: ProgressMode,
     incremental: bool,
     full_analysis: bool,
+    lsp_policy: LspPolicyCli,
 ) -> Result<serde_json::Value> {
     let project = store.resolve_project_lenient(project_ref)?;
     let root = project
@@ -811,6 +857,7 @@ pub(crate) async fn rescan_project(
         progress_mode,
         incremental,
         full_analysis,
+        lsp_policy,
     )
     .await
     {
@@ -969,6 +1016,7 @@ async fn run_scan_pipeline(
     progress_mode: ProgressMode,
     incremental: bool,
     full_analysis: bool,
+    lsp_policy: LspPolicyCli,
 ) -> Result<ScanOutput> {
     if languages.is_empty() {
         anyhow::bail!("no parseable languages selected");
@@ -1022,6 +1070,7 @@ async fn run_scan_pipeline(
         exclude_generated: true,
         incremental,
         full_analysis,
+        lsp_policy: lsp_policy.as_cli_str().to_string(),
         git_dir,
         progress: Box::new(sink),
         cancel: None,
@@ -1179,9 +1228,9 @@ impl GridSeakMcp {
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-struct ProjectRef {
+pub(crate) struct ProjectRef {
     #[serde(default = "default_project_ref")]
-    project: String,
+    pub(crate) project: String,
 }
 
 /// Default value for the `project` parameter shared by every MCP
@@ -1190,7 +1239,7 @@ struct ProjectRef {
 /// entirely — the store will fall back to the cwd's project and
 /// then to the most recently completed scan in the local store
 /// before erroring.
-fn default_project_ref() -> String {
+pub(crate) fn default_project_ref() -> String {
     ".".to_string()
 }
 
@@ -1236,34 +1285,34 @@ struct GraphSymbolParams {
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-struct GraphBlastRadiusParams {
+pub(crate) struct GraphBlastRadiusParams {
     #[serde(default = "default_project_ref")]
-    project: String,
-    symbol: String,
+    pub(crate) project: String,
+    pub(crate) symbol: String,
     #[serde(default)]
-    depth: Option<usize>,
+    pub(crate) depth: Option<usize>,
     #[serde(default)]
-    cap: Option<usize>,
+    pub(crate) cap: Option<usize>,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-struct GraphFileBlastRadiusParams {
+pub(crate) struct GraphFileBlastRadiusParams {
     #[serde(default = "default_project_ref")]
-    project: String,
+    pub(crate) project: String,
     /// Repo-relative path of the file whose upstream blast radius
     /// you want, e.g. `gridseak-cli/src/main.rs`. Must match the
     /// path the parser recorded — typically POSIX-style and rooted
     /// at the project's primary repo root. Absolute paths are
     /// accepted but stripped of the project-root prefix before
     /// matching.
-    file: String,
+    pub(crate) file: String,
     #[serde(default)]
-    depth: Option<usize>,
+    pub(crate) depth: Option<usize>,
     /// Per-seed BFS cap. The total number of unique rows may be up
     /// to `cap * number_of_symbols_in_file` if there's no overlap,
     /// but in practice overlap is high and the result stays small.
     #[serde(default)]
-    cap: Option<usize>,
+    pub(crate) cap: Option<usize>,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
@@ -1282,6 +1331,37 @@ struct GraphCyclesParams {
     limit: Option<usize>,
     #[serde(default)]
     max_depth: Option<usize>,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+pub(crate) struct DiffImpactParams {
+    #[serde(default = "default_project_ref")]
+    pub(crate) project: String,
+    #[serde(default)]
+    pub(crate) base: Option<String>,
+    #[serde(default)]
+    pub(crate) head: Option<String>,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+pub(crate) struct VerifyClaimParams {
+    #[serde(default = "default_project_ref")]
+    pub(crate) project: String,
+    pub(crate) claim: String,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+struct JudgmentParams {
+    #[serde(default = "default_project_ref")]
+    project: String,
+    subject: String,
+    verdict: String,
+    #[serde(default)]
+    note: Option<String>,
+    #[serde(default)]
+    scan_id: Option<String>,
+    #[serde(default)]
+    actor: Option<String>,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
@@ -1318,15 +1398,15 @@ struct ScanRunParams {
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-struct RouteParams {
+pub(crate) struct RouteParams {
     /// Plain-language user question to route deterministically.
-    question: String,
+    pub(crate) question: String,
     #[serde(default)]
-    file: Option<String>,
+    pub(crate) file: Option<String>,
     #[serde(default)]
-    symbol: Option<String>,
+    pub(crate) symbol: Option<String>,
     #[serde(default = "default_project_ref")]
-    project: String,
+    pub(crate) project: String,
 }
 
 // ---------------------------------------------------------------------------
@@ -1452,6 +1532,7 @@ impl GridSeakMcp {
             // out-of-band; the MCP surface stays minimal.
             true,
             false,
+            LspPolicyCli::Fast,
         )
         .await
         .map_err(mcp_err)?;
@@ -1655,6 +1736,107 @@ impl GridSeakMcp {
     ) -> Result<CallToolResult, McpError> {
         ok_json(&graph_tool_cycles(&self.store, &params)?)
     }
+
+    #[tool(
+        description = "Minimal context-graph slice for a diff: changed symbols → affected callers (tiered, p_true) → reaching tests. Trigger: after a multi-file edit, or a PR."
+    )]
+    async fn gridseak_diff_impact(
+        &self,
+        Parameters(params): Parameters<DiffImpactParams>,
+    ) -> Result<CallToolResult, McpError> {
+        let project = self
+            .store
+            .resolve_project_lenient(&params.project)
+            .map_err(mcp_err)?;
+        let artifact = project
+            .latest_scan
+            .as_ref()
+            .and_then(|s| s.graph_artifact_path.as_ref())
+            .ok_or_else(|| mcp_err("no graph artifact; run gridseak_scan"))?;
+        let repo = project
+            .roots
+            .first()
+            .map(|r| std::path::PathBuf::from(&r.path))
+            .unwrap_or_else(|| std::path::PathBuf::from("."));
+        let view = crate::graph_queries::agent_tools::diff_impact(
+            std::path::Path::new(artifact),
+            &repo,
+            params.base.as_deref(),
+            params.head.as_deref(),
+        )
+        .map_err(mcp_err)?;
+        ok_json(&view)
+    }
+
+    #[tool(
+        description = "Verify a typed structural claim: calls(A,B) | no_callers(X) | reaches(A,B) | in_cycle(X) | dead(X). Returns verified | refuted | unknown plus witnesses."
+    )]
+    async fn gridseak_verify_claim(
+        &self,
+        Parameters(params): Parameters<VerifyClaimParams>,
+    ) -> Result<CallToolResult, McpError> {
+        let project = self
+            .store
+            .resolve_project_lenient(&params.project)
+            .map_err(mcp_err)?;
+        let artifact = project
+            .latest_scan
+            .as_ref()
+            .and_then(|s| s.graph_artifact_path.as_ref())
+            .ok_or_else(|| mcp_err("no graph artifact; run gridseak_scan"))?;
+        let view = crate::graph_queries::agent_tools::verify_claim(
+            std::path::Path::new(artifact),
+            &params.claim,
+        )
+        .map_err(mcp_err)?;
+        ok_json(&view)
+    }
+
+    #[tool(
+        description = "Machine-readable structural invariants for a diff: no new cycles, no orphaned public symbols, no forbidden-layer edges, hotspot tests. Pass/fail."
+    )]
+    async fn gridseak_structural_invariants(
+        &self,
+        Parameters(params): Parameters<DiffImpactParams>,
+    ) -> Result<CallToolResult, McpError> {
+        let project = self
+            .store
+            .resolve_project_lenient(&params.project)
+            .map_err(mcp_err)?;
+        let artifact = project
+            .latest_scan
+            .as_ref()
+            .and_then(|s| s.graph_artifact_path.as_ref())
+            .ok_or_else(|| mcp_err("no graph artifact; run gridseak_scan"))?;
+        let view = crate::graph_queries::agent_tools::structural_invariants(
+            std::path::Path::new(artifact),
+            None,
+        )
+        .map_err(mcp_err)?;
+        ok_json(&view)
+    }
+
+    #[tool(
+        description = "Record a human or agent judgment on an edge or node. Feeds Batch C reliability tables. Verdict: confirm | reject | unsure."
+    )]
+    async fn gridseak_record_judgment(
+        &self,
+        Parameters(params): Parameters<JudgmentParams>,
+    ) -> Result<CallToolResult, McpError> {
+        let project = self.store.resolve_project_lenient(&params.project).ok();
+        let id = self
+            .store
+            .record_judgment(
+                project.as_ref().map(|p| p.id.as_str()),
+                &params.subject,
+                &params.verdict,
+                params.note.as_deref(),
+                params.scan_id.as_deref(),
+                params.actor.as_deref().unwrap_or("agent"),
+            )
+            .map_err(mcp_err)?;
+        ok_json(&serde_json::json!({ "id": id, "ok": true }))
+    }
 }
 
 #[tool_handler]
@@ -1685,7 +1867,7 @@ async fn serve_mcp(store: ProjectStore, paths: LocalStorePaths) -> Result<()> {
     Ok(())
 }
 
-fn mcp_err(error: impl std::fmt::Display) -> McpError {
+pub(crate) fn mcp_err(error: impl std::fmt::Display) -> McpError {
     McpError {
         code: ErrorCode::INTERNAL_ERROR,
         message: error.to_string().into(),
@@ -1693,7 +1875,7 @@ fn mcp_err(error: impl std::fmt::Display) -> McpError {
     }
 }
 
-fn ok_json<T: Serialize>(value: &T) -> Result<CallToolResult, McpError> {
+pub(crate) fn ok_json<T: Serialize>(value: &T) -> Result<CallToolResult, McpError> {
     let json = serde_json::to_string_pretty(value).map_err(mcp_err)?;
     Ok(CallToolResult::success(vec![Content::text(json)]))
 }
@@ -1866,12 +2048,7 @@ fn extract_scan_provenance(value: &serde_json::Value) -> Option<serde_json::Valu
 }
 
 fn tier_legend() -> serde_json::Value {
-    serde_json::json!({
-        "tier_0": "tree-sitter parsed import / call site (deterministic, fast)",
-        "tier_1": "filtered grep heuristic (may include false positives)",
-        "tier_3": "LSP-verified via language server (deterministic, slower)",
-        "agent_directive": "When you state a structural fact derived from this response, name the tier you're quoting. Quote `confidence_caveats` verbatim. Do not flatten tiers into 'GridSeak says…'.",
-    })
+    graphengine_parsing::domain::evidence_tier::tier_legend_json()
 }
 
 fn resolve_project_and_graph(
@@ -2011,7 +2188,7 @@ fn attach_resolution_warning(
     }
 }
 
-fn graph_tool_blast_radius(
+pub(crate) fn graph_tool_blast_radius(
     store: &ProjectStore,
     params: &GraphBlastRadiusParams,
 ) -> Result<serde_json::Value, McpError> {
@@ -2039,6 +2216,11 @@ fn graph_tool_blast_radius(
     let cap = params.cap.unwrap_or(200);
     let rows = graph_queries::blast_radius(&conn, &target.id, depth, cap)
         .map_err(|e| mcp_err(e.to_string()))?;
+    let blast_total = rows.len();
+    let blast_high_confidence = rows
+        .iter()
+        .filter(|r| r.edge_evidence_tier.as_deref() == Some("tier_3"))
+        .count();
     let mut inner = serde_json::json!({
         "project": project.display_name,
         "scan_id": scan_id,
@@ -2047,6 +2229,8 @@ fn graph_tool_blast_radius(
         "depth": depth,
         "direction": "upstream",
         "semantic": "transitive callers — what would have to be re-validated if the seed changes",
+        "blast_total": blast_total,
+        "blast_high_confidence": blast_high_confidence,
         "rows": rows,
     });
     attach_resolution_warning(&mut inner, &params.symbol, &resolution);
@@ -2067,7 +2251,7 @@ fn graph_tool_blast_radius(
     ))
 }
 
-fn graph_tool_file_blast_radius(
+pub(crate) fn graph_tool_file_blast_radius(
     store: &ProjectStore,
     params: &GraphFileBlastRadiusParams,
 ) -> Result<serde_json::Value, McpError> {
@@ -2301,12 +2485,18 @@ fn context_for_llm_envelope(
         "commit": scan.git_commit,
         "dirty": scan.git_dirty,
         "languages": scan.scan_languages,
-        "score": report.health_score,
         "total_findings": report.findings.len(),
     });
+    let mut metrics = serde_json::to_value(&project.latest_metrics)?;
+    if let Some(obj) = metrics.as_object_mut() {
+        obj.insert(
+            "health_score".into(),
+            serde_json::json!(report.health_score),
+        );
+    }
     let inner = serde_json::json!({
         "summary": summary,
-        "metrics": project.latest_metrics,
+        "metrics": metrics,
         "top_recommendations": priorities,
         "report_path": scan.report_path,
         "graph_artifact_path": scan.graph_artifact_path,

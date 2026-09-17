@@ -134,6 +134,8 @@ pub fn run(ctx: &mut AnalysisRunContext<'_>) -> Result<Option<HealthReport>> {
         } else {
             Some(call_edges.high_ratio())
         };
+        let lsp_resolution_telemetry = load_lsp_resolution_telemetry(&ctx.conn);
+        let resolution_disclosure = load_resolution_disclosures(&ctx.conn);
         ResolutionQuality {
             import_edges_total: effective_import_count,
             resolution_tier: tier,
@@ -144,6 +146,8 @@ pub fn run(ctx: &mut AnalysisRunContext<'_>) -> Result<Option<HealthReport>> {
                 all_edges_by_confidence: all_edges,
             },
             recommendation,
+            lsp_resolution_telemetry,
+            resolution_disclosure,
         }
     };
 
@@ -246,4 +250,63 @@ pub fn run(ctx: &mut AnalysisRunContext<'_>) -> Result<Option<HealthReport>> {
     }
 
     Ok(None)
+}
+
+fn load_resolution_disclosures(conn: &Connection) -> Vec<report::LanguageResolutionDisclosure> {
+    let Ok(mut stmt) = conn.prepare(
+        "SELECT value FROM metadata WHERE key LIKE 'resolution_disclosure_%' ORDER BY key",
+    ) else {
+        return Vec::new();
+    };
+    let rows = stmt.query_map([], |row| row.get::<_, String>(0));
+    let Ok(rows) = rows else {
+        return Vec::new();
+    };
+    rows.filter_map(|r| r.ok())
+        .filter_map(|json| serde_json::from_str(&json).ok())
+        .collect()
+}
+
+fn load_lsp_resolution_telemetry(conn: &Connection) -> Option<LspResolutionTelemetry> {
+    let parse_u = |key: &str| graph::read_metadata(conn, key).and_then(|v| v.parse().ok());
+
+    let fallback_reasons: FallbackReasonCounts =
+        graph::read_metadata(conn, "resolution_fallback_reasons_json")
+            .and_then(|json| serde_json::from_str(&json).ok())
+            .unwrap_or_default();
+
+    let request_metrics = LspRequestMetrics {
+        request_successes: parse_u("lsp_request_successes").unwrap_or(0),
+        request_timeouts: parse_u("lsp_request_timeouts").unwrap_or(0),
+        definition_hits: parse_u("lsp_definition_hits").unwrap_or(0),
+        definition_nulls: parse_u("lsp_definition_nulls").unwrap_or(0),
+        definition_errors: parse_u("lsp_definition_errors").unwrap_or(0),
+    };
+
+    let has_fallback = fallback_reasons.server_missing > 0
+        || fallback_reasons.rejected_by_availability > 0
+        || fallback_reasons.server_crashed > 0
+        || fallback_reasons.request_timeout > 0
+        || fallback_reasons.returned_null > 0
+        || fallback_reasons.definition_unmappable > 0
+        || fallback_reasons.external_definition > 0
+        || fallback_reasons.no_call_site_location > 0
+        || fallback_reasons.heuristic_produced_edge > 0;
+    let has_requests = request_metrics.request_successes > 0
+        || request_metrics.request_timeouts > 0
+        || request_metrics.definition_hits > 0
+        || request_metrics.definition_nulls > 0
+        || request_metrics.definition_errors > 0;
+
+    if has_fallback
+        || has_requests
+        || graph::read_metadata(conn, "resolution_fallback_reasons_json").is_some()
+    {
+        Some(LspResolutionTelemetry {
+            fallback_reasons,
+            request_metrics,
+        })
+    } else {
+        None
+    }
 }

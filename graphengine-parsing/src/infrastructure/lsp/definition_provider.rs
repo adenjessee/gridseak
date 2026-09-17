@@ -127,6 +127,7 @@ impl DefinitionProvider for SessionDefinitionProvider {
             notifications_received: m.notifications_received,
             stderr_lines_observed: m.stderr_lines_observed,
             indexing_messages_seen: m.indexing_messages_seen,
+            request_metrics: m.request_metrics,
         })
     }
 }

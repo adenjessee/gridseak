@@ -115,8 +115,8 @@ async fn rust_layer2_resolves_main_to_callee_and_marks_site() {
     );
     assert_eq!(
         edge.provenance.source,
-        graphengine_parsing::domain::ProvenanceSource::Lsp,
-        "Layer-2 edges must carry Lsp provenance so downstream observers can distinguish them from heuristic edges"
+        graphengine_parsing::domain::ProvenanceSource::Compiler,
+        "Layer-2 edges must carry Compiler provenance (in-process rust-analyzer, not subprocess LSP)"
     );
 
     assert!(
@@ -127,8 +127,8 @@ async fn rust_layer2_resolves_main_to_callee_and_marks_site() {
     );
 
     assert_eq!(
-        edges.stats.lsp_edges, 1,
-        "lsp_edges stat must count the Layer-2 emission"
+        edges.stats.compiler_edges, 1,
+        "compiler_edges stat must count the Layer-2 emission"
     );
 
     let snap = resolver.snapshot();

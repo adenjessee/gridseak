@@ -45,7 +45,7 @@ Top priorities (deterministic_local_analysis · 0 LLM tokens):
 Tier legend
   Tier 0 (tree-sitter parsed)    — deterministic, fast
   Tier 1 (filtered grep)         — may include false positives
-  Tier 3 (LSP-verified)          — deterministic, slower
+  Tier 3 (compiler / LSP / SCIP) — deterministic, slower
 
 Confidence caveats
   - "Dead code" findings are heuristic; quote with low confidence.
@@ -61,7 +61,7 @@ Next: gridseak setup   (wires the MCP server into your IDE)
 `graphengine-parsing/configs/*.yaml`). Override with `--lang` or
 `--languages`.
 
-| Language | Extensions | Tier 0 (tree-sitter) | Tier 3 (LSP-verified) |
+| Language | Extensions | Tier 0 (tree-sitter) | Tier 3 (compiler / LSP / SCIP) |
 | --- | --- | --- | --- |
 | **Rust** | `.rs` | Full symbol + import/call graph | **Yes** — `rust-analyzer` |
 | **TypeScript** | `.ts`, `.tsx`, `.mts`, `.cts` | Full | Planned (`tsserver`) |
@@ -138,18 +138,20 @@ do — the single most important page for trust in a tool of this kind.
 configs into `~/.gridseak/bin`. SHA256-verified against the public manifest.
 
 ```sh
-# macOS (Apple Silicon + Intel) and Linux x86_64:
-curl -fsSL https://raw.githubusercontent.com/adenjessee/gridseak/main/scripts/install/install.sh | bash
-# Windows:
-iwr https://raw.githubusercontent.com/adenjessee/gridseak/main/scripts/install/install.ps1 -useb | iex
+# macOS (Apple Silicon + Intel) and Linux (x86_64 + aarch64):
+# tagged GitHub release tarball → ~/.gridseak/bin/gridseak
+curl -fsSL https://raw.githubusercontent.com/adenjessee/gridseak-graphengine/main/scripts/install.sh | bash
+
+# Optional: SHA256-verified sidecar bundle (graphengine-parsing, ge-analyze)
+# curl -fsSL https://raw.githubusercontent.com/adenjessee/gridseak-graphengine/main/scripts/install/install.sh | bash
 ```
+
+Then: `export PATH="$HOME/.gridseak/bin:$PATH"` and `gridseak --version`.
+`release.yml` packages the `gridseak` binary for darwin + linux; the
+install script fails closed if the tarball is missing that binary.
 
 Shorter `gridseak.com` URLs work when that host mirrors the release; GitHub
 is the canonical source today.
-
-**Supported at v0.1.0:** macOS (aarch64 + x86_64) and Windows (x86_64).
-Linux tarballs are not shipped yet — `install.sh` will fail with an explicit
-"no artifact" message on Linux until we add them.
 
 **From source (full workspace build):**
 
@@ -160,9 +162,10 @@ cargo build --release -p gridseak-cli
 # binaries land in target/release/ — see BUILD.md for PATH + sidecars
 ```
 
-`cargo install --path gridseak-cli` installs the **CLI binary only** — not
+`cargo install --path gridseak-cli --locked` installs the **CLI binary only** — not
 `graphengine-parsing`, `ge-analyze`, or `configs/`. Use `curl | sh` or a
-full workspace build for a working scan.
+full workspace build for a working scan. An older `~/.cargo/bin/gridseak`
+without `gate` will fail-close Cursor; run `gridseak setup --verify`.
 
 Then wire it into your IDE(s):
 

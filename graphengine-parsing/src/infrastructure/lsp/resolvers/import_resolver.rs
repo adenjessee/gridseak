@@ -4,6 +4,10 @@
 //! with LSP-based resolution and heuristic fallback. Processes imports
 //! in concurrent chunks via `join_all` for throughput.
 
+use crate::application::lsp_telemetry::{
+    classify_init_error, classify_lsp_error, classify_unresolved_location, FallbackReason,
+    FallbackReasonCounts,
+};
 use crate::application::ports::{CallSite, SyntaxResults};
 use crate::domain::{Confidence, Edge, EdgeKind, Provenance, ProvenanceSource, Range};
 use crate::infrastructure::lsp::definition_provider::DefinitionProvider;
@@ -17,7 +21,6 @@ use crate::module_resolution::ModuleResolver;
 use crate::symbol_index::SymbolIndex;
 use futures::future::join_all;
 use std::collections::HashSet;
-use tokio::time::Duration;
 use tracing::{info, warn};
 
 const DEFAULT_CHUNK_SIZE: usize = 32;
@@ -33,9 +36,18 @@ impl ImportResolver {
         misses: &mut Vec<LspMiss>,
         total_work: usize,
         completed_work: usize,
-    ) -> Result<(Vec<Edge>, Vec<Range>), LspError> {
+    ) -> Result<(Vec<Edge>, Vec<Range>, FallbackReasonCounts), LspError> {
         let mut edges = Vec::new();
         let mut unresolved_imports = Vec::new();
+        let mut fallback_reasons = FallbackReasonCounts::default();
+
+        // Files we parsed, used to tell an in-repo mapping gap from a
+        // definition that resolved into an external dependency/builtin.
+        let repo_files: HashSet<&str> = syntax_results
+            .symbols
+            .iter()
+            .map(|s| s.location.file.as_str())
+            .collect();
 
         match definition_provider.ensure_ready().await {
             Ok(_) => {
@@ -48,14 +60,15 @@ impl ImportResolver {
                     definition_provider,
                     files_to_sync,
                     true,
-                    Duration::from_secs(5),
+                    DocumentSyncManager::index_wait_timeout(),
                 )
                 .await;
 
                 let total_imports = syntax_results.import_specs.len();
                 let mut processed = 0usize;
+                let chunk_size = DocumentSyncManager::lsp_chunk_size(DEFAULT_CHUNK_SIZE);
 
-                for chunk in syntax_results.import_specs.chunks(DEFAULT_CHUNK_SIZE) {
+                for chunk in syntax_results.import_specs.chunks(chunk_size) {
                     let futs: Vec<_> = chunk
                         .iter()
                         .map(|spec| {
@@ -115,6 +128,8 @@ impl ImportResolver {
                                                 module_id, imported_symbol.fqn
                                             );
                                             unresolved_imports.push(spec.range.clone());
+                                            fallback_reasons
+                                                .record(FallbackReason::DefinitionUnmappable);
                                             continue;
                                         }
                                         let edge = Edge::new(
@@ -129,13 +144,18 @@ impl ImportResolver {
                                         edges.push(edge);
                                     } else {
                                         unresolved_imports.push(spec.range.clone());
+                                        let in_repo = repo_files.contains(def_range.file.as_str());
+                                        fallback_reasons
+                                            .record(classify_unresolved_location(in_repo));
                                     }
                                 } else {
                                     unresolved_imports.push(spec.range.clone());
+                                    fallback_reasons.record(FallbackReason::DefinitionUnmappable);
                                 }
                             }
                             Ok(None) => {
                                 unresolved_imports.push(spec.range.clone());
+                                fallback_reasons.record(FallbackReason::ReturnedNull);
                                 misses.push(LspMiss {
                                     file: spec.range.file.clone(),
                                     symbol: import_name,
@@ -146,6 +166,7 @@ impl ImportResolver {
                             Err(e) => {
                                 warn!("Failed to resolve import with LSP: {}", e);
                                 unresolved_imports.push(spec.range.clone());
+                                fallback_reasons.record(classify_lsp_error(&e));
                             }
                         }
                     }
@@ -155,13 +176,14 @@ impl ImportResolver {
             }
             Err(err) => {
                 warn!("Unable to prepare definition provider for imports: {}", err);
+                fallback_reasons.record(classify_init_error(&err));
                 for spec in &syntax_results.import_specs {
                     unresolved_imports.push(spec.range.clone());
                 }
             }
         }
 
-        Ok((edges, unresolved_imports))
+        Ok((edges, unresolved_imports, fallback_reasons))
     }
 
     /// Resolve imports using heuristics (fallback when LSP fails)

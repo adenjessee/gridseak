@@ -226,11 +226,12 @@ pub fn blast_radius(
     let rows = walk_calls(conn, seed_id, Direction::In, max_depth, cap)?;
     Ok(rows
         .into_iter()
-        .map(|(depth, node, edge_evidence_tier)| SliceNode {
+        .map(|(depth, node, edge_evidence_tier, p_true)| SliceNode {
             depth,
             direction: SliceDirection::Upstream,
             node,
             edge_evidence_tier,
+            p_true,
         })
         .collect())
 }
@@ -304,24 +305,29 @@ pub fn file_blast_radius(
     // Tier 3 LSP edge, the file-aggregated row is Tier 3 even if
     // another seed only reached it heuristically.
     let seed_ids: HashSet<String> = seeds.iter().map(|s| s.id.clone()).collect();
-    let mut by_id: HashMap<String, (usize, NodeRef, Vec<NodeRef>, Option<String>)> = HashMap::new();
+    let mut by_id: HashMap<String, (usize, NodeRef, Vec<NodeRef>, Option<String>, Option<f64>)> =
+        HashMap::new();
     let mut cap_hit = false;
     for seed in &seeds {
         let rows = walk_calls(conn, &seed.id, Direction::In, max_depth, cap_per_seed)?;
         if rows.len() >= cap_per_seed {
             cap_hit = true;
         }
-        for (depth, node, tier) in rows {
+        for (depth, node, tier, p_true) in rows {
             if seed_ids.contains(&node.id) {
                 continue;
             }
             let entry = by_id
                 .entry(node.id.clone())
-                .or_insert_with(|| (depth, node.clone(), Vec::new(), tier.clone()));
+                .or_insert_with(|| (depth, node.clone(), Vec::new(), tier.clone(), p_true));
             if depth < entry.0 {
                 entry.0 = depth;
             }
             entry.3 = best_tier(entry.3.as_deref(), tier.as_deref()).map(|s| s.to_string());
+            entry.4 = match (entry.4, p_true) {
+                (Some(a), Some(b)) => Some(a.max(b)),
+                (a, b) => a.or(b),
+            };
             if !entry.2.iter().any(|s| s.id == seed.id) {
                 entry.2.push(seed.clone());
             }
@@ -330,13 +336,14 @@ pub fn file_blast_radius(
 
     let mut rows: Vec<FileBlastRadiusRow> = by_id
         .into_values()
-        .map(|(depth, node, mut via_seeds, edge_evidence_tier)| {
+        .map(|(depth, node, mut via_seeds, edge_evidence_tier, p_true)| {
             via_seeds.sort_by(|a, b| a.fqn.cmp(&b.fqn));
             FileBlastRadiusRow {
                 depth,
                 node,
                 via_seeds,
                 edge_evidence_tier,
+                p_true,
             }
         })
         .collect();
@@ -725,20 +732,22 @@ pub fn slice(
     let upstream = walk_calls(conn, seed_id, Direction::In, depth, cap)?;
     let downstream = walk_calls(conn, seed_id, Direction::Out, depth, cap)?;
     let mut out: Vec<SliceNode> = Vec::with_capacity(upstream.len() + downstream.len());
-    for (d, n, tier) in upstream {
+    for (d, n, tier, p_true) in upstream {
         out.push(SliceNode {
             depth: d,
             direction: SliceDirection::Upstream,
             node: n,
             edge_evidence_tier: tier,
+            p_true,
         });
     }
-    for (d, n, tier) in downstream {
+    for (d, n, tier, p_true) in downstream {
         out.push(SliceNode {
             depth: d,
             direction: SliceDirection::Downstream,
             node: n,
             edge_evidence_tier: tier,
+            p_true,
         });
     }
     Ok(out)

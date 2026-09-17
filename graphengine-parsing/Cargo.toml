@@ -90,6 +90,7 @@ futures = "0.3.32"
 # CLI all reference one type system. See
 # `docs/02-strategy/V0_1_0_RC1_FOLLOWUP_ISSUES.md` for the migration plan.
 graphengine-progress = { path = "../graphengine-progress" }
+graphengine-runtime-witness = { path = "../graphengine-runtime-witness" }
 
 [dev-dependencies]
 proptest = "1.0"
@@ -127,7 +128,7 @@ harness = false
 # compiles against the subprocess-LSP path that pre-dates T6, which
 # keeps the rollback criterion cheap (just drop the feature flag;
 # no code path is deleted).
-default = ["rust-layer2"]
+default = ["rust-layer2", "scip"]
 lsp-tests = []
 e2e-tests = []
 # T6 (universal-fidelity sprint) — Layer 2 semantic resolution for
@@ -138,6 +139,11 @@ e2e-tests = []
 # default-on, subject to the tiered-dogfood decision recorded in
 # `docs/workstreams/universal-fidelity/tasks/T6-rust-layer2.md` §9.G2.
 rust-layer2 = ["dep:graphengine-ra-ide-adapter"]
+scip = ["dep:graphengine-scip-adapter"]
+
+[dependencies.graphengine-scip-adapter]
+path = "../graphengine-scip-adapter"
+optional = true
 
 [dependencies.graphengine-ra-ide-adapter]
 path = "../graphengine-ra-ide-adapter"

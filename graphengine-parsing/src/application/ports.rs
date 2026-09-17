@@ -4,6 +4,13 @@
 //! The application layer depends on these abstractions, not concrete implementations.
 //! This enables testability (via mocks) and extensibility (swap adapters).
 
+pub mod runtime_evidence;
+pub mod semantic_index;
+
+pub use runtime_evidence::{RuntimeEvidencePort, StaticRuntimeEvidence};
+pub use semantic_index::{IndexTarget, SemanticIndex};
+
+use crate::application::lsp_telemetry::{FallbackReasonCounts, LspRequestMetrics};
 use crate::domain::apex::class_symbols::ApexTypeRef;
 use crate::domain::{DeclarativeKind, Edge, FrameworkKind, Graph, Node, NodeKind, Range};
 use async_trait::async_trait;
@@ -878,6 +885,8 @@ pub struct ModDecl {
 #[derive(Debug, Clone, Default)]
 pub struct ResolutionStatsSummary {
     pub lsp_edges: usize,
+    /// Call edges from in-process compiler / batch-index resolution (rust Layer-2, SCIP).
+    pub compiler_edges: usize,
     pub heuristic_edges: usize,
     pub lsp_failures: Vec<String>,
     pub heuristic_failures: Vec<String>,
@@ -890,6 +899,8 @@ pub struct ResolutionStatsSummary {
     /// guesses. Surfaced as first-class telemetry so users can see how
     /// much call-graph signal they would recover by switching to LSP.
     pub heuristic_call_ambiguous_drops: usize,
+    /// Per-reason counters explaining why LSP lookups fell back.
+    pub fallback_reasons: FallbackReasonCounts,
 }
 
 impl ResolutionStatsSummary {
@@ -898,7 +909,7 @@ impl ResolutionStatsSummary {
     }
 
     pub fn total_call_edges(&self) -> usize {
-        self.lsp_edges + self.heuristic_edges
+        self.compiler_edges + self.lsp_edges + self.heuristic_edges
     }
 
     pub fn total_fallbacks(&self) -> usize {
@@ -941,6 +952,8 @@ pub struct SessionMetricsSnapshot {
     /// mention "indexing"). Used by the F.2 readiness barrier as
     /// evidence the server has begun real work.
     pub indexing_messages_seen: u64,
+    /// JSON-RPC transport and `textDocument/definition` counters.
+    pub request_metrics: LspRequestMetrics,
 }
 
 impl SessionMetricsSnapshot {
@@ -1186,6 +1199,19 @@ pub trait SemanticResolver: Send + Sync {
     async fn session_metrics(&self) -> Option<SessionMetricsSnapshot> {
         None
     }
+
+    /// Per-language resolution tier disclosure for this scan pass.
+    /// Default `None`; resolvers that know their routing path override.
+    async fn resolution_disclosure(
+        &self,
+    ) -> Option<crate::application::resolution_disclosure::ResolutionDisclosure> {
+        None
+    }
+
+    /// Optional Layer-2 resolver telemetry JSON for metadata persistence.
+    async fn layer2_telemetry_json(&self) -> Option<String> {
+        None
+    }
 }
 
 /// Port for graph persistence
@@ -1264,6 +1290,20 @@ pub trait GraphRepository: Send + Sync {
         _records: &[FileExtractionCoverage],
     ) -> anyhow::Result<()> {
         Ok(())
+    }
+
+    /// Previous-scan call-site → target-file bindings for semantic delta.
+    async fn load_call_bindings(&self) -> anyhow::Result<Vec<(String, String)>> {
+        Ok(Vec::new())
+    }
+
+    async fn save_call_bindings(&self, _rows: &[(String, String)]) -> anyhow::Result<()> {
+        Ok(())
+    }
+
+    /// Call edges from the last persisted graph (used to keep unchanged files).
+    async fn load_prior_call_edges(&self) -> anyhow::Result<Vec<crate::domain::Edge>> {
+        Ok(Vec::new())
     }
 
     /// Read every cached `file_cache` row for the S1 incremental scan

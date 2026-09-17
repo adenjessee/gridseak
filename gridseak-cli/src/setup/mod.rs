@@ -21,19 +21,22 @@ mod claude_code;
 mod codex;
 mod common;
 mod cursor;
+mod hooks;
 mod routing_rule;
 mod rule;
 mod verify;
+pub use verify::hook_health;
 mod windsurf;
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use clap::{Args, ValueEnum};
 
 #[derive(Args, Debug, Clone)]
 pub struct SetupArgs {
-    /// Override the binary we register (default: `gridseak`). Useful when
-    /// the binary lives at a non-PATH location (e.g.
-    /// `/Users/me/.gridseak/bin/gridseak`).
+    /// Override the binary we register. Default: this executable's
+    /// canonical absolute path. Cursor's GUI and hook runner do not
+    /// inherit a login-shell PATH, so a bare `gridseak` hits an older
+    /// install (or nothing). Pass an absolute path only.
     #[arg(long)]
     pub command: Option<String>,
 
@@ -85,10 +88,7 @@ pub fn run(args: SetupArgs) -> Result<()> {
         return verify::run();
     }
 
-    let binary = args
-        .command
-        .clone()
-        .unwrap_or_else(|| "gridseak".to_string());
+    let binary = resolve_setup_binary(args.command.clone())?;
 
     let targets = resolve_targets(&args);
 
@@ -109,15 +109,56 @@ pub fn run(args: SetupArgs) -> Result<()> {
         println!();
     }
 
+    match hooks::install(&binary, args.dry_run, args.workspace) {
+        Ok(paths) => {
+            println!("Hooks + shadow skill:");
+            for p in paths {
+                println!("  {}", p.display());
+            }
+        }
+        Err(err) => println!("Hooks not installed ({err})."),
+    }
+
     println!("Done.");
     println!();
     println!("Next steps:");
     println!("  1. Restart your IDE so the MCP server registers.");
+    println!("     Always-on catalog is `gridseak mcp --slim` (router + 4 verbs).");
+    println!("     Or `/plugin install` from plugin/ — see plugin/README.md.");
     println!("  2. From this repo, run `gridseak scan .` to produce the first scan.");
     println!("  3. Open a fresh chat and ask: \"what's risky to refactor here?\"");
     println!("     — your agent should call gridseak_get_recommendations within");
     println!("     its first two tool calls. If it doesn't, run `gridseak setup --verify`.");
     Ok(())
+}
+
+/// IDE GUIs spawn MCP servers and hooks without the user's shell PATH.
+/// A bare `gridseak` either fails to spawn (MCP "down" → auth prompts)
+/// or resolves to a stale install with no `gate` (fail-closed DoS).
+fn default_binary() -> Result<String> {
+    let exe = std::env::current_exe().context("could not resolve current_exe")?;
+    canonicalize_setup_command(&exe)
+}
+
+fn resolve_setup_binary(explicit: Option<String>) -> Result<String> {
+    match explicit {
+        Some(cmd) => canonicalize_setup_command(std::path::Path::new(&cmd)),
+        None => default_binary(),
+    }
+}
+
+fn canonicalize_setup_command(cmd: &std::path::Path) -> Result<String> {
+    if !cmd.is_absolute() {
+        anyhow::bail!(
+            "refusing bare command `{}` — IDE hook runners do not inherit PATH. \
+             Pass --command with an absolute path, or run this binary so setup \
+             can write current_exe().",
+            cmd.display()
+        );
+    }
+    cmd.canonicalize()
+        .map(|p| p.display().to_string())
+        .with_context(|| format!("cannot canonicalize {}", cmd.display()))
 }
 
 fn resolve_targets(args: &SetupArgs) -> Vec<IdeTarget> {
@@ -193,4 +234,27 @@ fn wire_windsurf(args: &SetupArgs, binary: &str) -> Result<()> {
         println!("  written.");
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod setup_binary {
+    use super::canonicalize_setup_command;
+    use std::path::Path;
+
+    #[test]
+    fn refuses_bare_path_name() {
+        let err = canonicalize_setup_command(Path::new("gridseak")).unwrap_err();
+        assert!(err.to_string().contains("refusing bare command"), "{err}");
+        println!("setup binary resolver tests passed");
+    }
+
+    #[test]
+    fn accepts_absolute_existing_file() {
+        let dir = tempfile::TempDir::new().unwrap();
+        let p = dir.path().join("gridseak");
+        std::fs::write(&p, b"x").unwrap();
+        let got = canonicalize_setup_command(&p).unwrap();
+        assert!(std::path::Path::new(&got).is_absolute(), "{got}");
+        assert!(got.ends_with("gridseak"), "{got}");
+    }
 }

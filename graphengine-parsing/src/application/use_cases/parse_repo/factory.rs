@@ -7,6 +7,7 @@ use super::super::super::errors::ParsingError;
 use super::use_case::ParseRepositoryUseCase;
 use crate::application::ports::SemanticResolver;
 use crate::domain::Confidence;
+use crate::infrastructure::lsp::build_session_options;
 use crate::infrastructure::{load_config, LspResolver, SqliteRepository};
 use crate::syntax::language::apex::{
     build_apex_session_options, ApexHeuristicResolver, ApexResolverDispatcher,
@@ -172,8 +173,19 @@ impl UseCaseFactory {
             Box::new(ApexResolverDispatcher::new(lsp, heuristic))
         } else if language == "rust" {
             build_rust_semantic_resolver(config, workspace_root.as_ref())
+        } else if language == "typescript" || language == "javascript" {
+            build_index_backed_or_heuristic("typescript", workspace_root.as_ref(), config)
+        } else if language == "python" {
+            build_index_backed_or_heuristic("python", workspace_root.as_ref(), config)
+        } else if language == "go" {
+            build_index_backed_or_heuristic("go", workspace_root.as_ref(), config)
         } else {
-            Box::new(LspResolver::new(config, workspace_root))
+            let session_options = build_session_options(&language, workspace_root.as_ref());
+            Box::new(LspResolver::with_options(
+                config,
+                workspace_root,
+                session_options,
+            ))
         };
 
         info!(
@@ -223,7 +235,8 @@ fn build_rust_semantic_resolver(
     config: crate::infrastructure::LanguageConfig,
     workspace_root: Option<&url::Url>,
 ) -> Box<dyn SemanticResolver> {
-    use crate::infrastructure::RustLayer2SemanticResolver;
+    use crate::application::resolution_disclosure::{ResolutionDisclosure, SkipReason};
+    use crate::infrastructure::{DisclosedSemanticResolver, RustLayer2SemanticResolver};
 
     let ws_path = workspace_root
         .and_then(|u| u.to_file_path().ok())
@@ -243,7 +256,12 @@ fn build_rust_semantic_resolver(
                 err
             );
             let ws_clone = workspace_root.cloned();
-            Box::new(LspResolver::new(config, ws_clone))
+            let session_options = build_session_options("rust", workspace_root);
+            let lsp = Box::new(LspResolver::with_options(config, ws_clone, session_options));
+            Box::new(DisclosedSemanticResolver::new(
+                lsp,
+                ResolutionDisclosure::layer2_fallback_to_lsp("rust", SkipReason::AdapterInitFailed),
+            ))
         }
     }
 }
@@ -253,5 +271,155 @@ fn build_rust_semantic_resolver(
     config: crate::infrastructure::LanguageConfig,
     workspace_root: Option<&url::Url>,
 ) -> Box<dyn SemanticResolver> {
-    Box::new(LspResolver::new(config, workspace_root.cloned()))
+    Box::new(LspResolver::with_options(
+        config,
+        workspace_root.cloned(),
+        build_session_options("rust", workspace_root),
+    ))
+}
+
+/// Resolver that emits no semantic edges — used when the batch indexer fails
+/// and the pipeline falls through to heuristic fallback only.
+#[cfg(feature = "scip")]
+struct HeuristicOnlySemanticResolver {
+    language: String,
+}
+
+#[cfg(feature = "scip")]
+impl HeuristicOnlySemanticResolver {
+    fn new(language: &str) -> Self {
+        Self {
+            language: language.to_string(),
+        }
+    }
+}
+
+#[cfg(feature = "scip")]
+#[async_trait::async_trait]
+impl SemanticResolver for HeuristicOnlySemanticResolver {
+    async fn resolve(
+        &self,
+        _hints: &crate::application::ports::SyntaxResults,
+    ) -> anyhow::Result<crate::application::ports::ResolvedEdges> {
+        Ok(crate::application::ports::ResolvedEdges::new())
+    }
+
+    fn supported_language(&self) -> &str {
+        &self.language
+    }
+
+    async fn is_available(&self) -> bool {
+        true
+    }
+}
+
+#[cfg(feature = "scip")]
+fn build_index_backed_or_heuristic(
+    language: &str,
+    workspace_root: Option<&url::Url>,
+    _config: crate::infrastructure::LanguageConfig,
+) -> Box<dyn SemanticResolver> {
+    use crate::application::resolution_disclosure::{ResolutionDisclosure, SkipReason};
+    use crate::infrastructure::{
+        DisclosedSemanticResolver, IndexBackedSemanticResolver, ScipSemanticIndex,
+    };
+    use graphengine_scip_adapter::fingerprint::{fingerprint_workspace, is_fresh, write_sidecar};
+    use graphengine_scip_adapter::{provision_index, IndexerError, IndexerLanguage};
+    use tracing::warn;
+
+    let indexer_lang = match language {
+        "typescript" | "javascript" => IndexerLanguage::TypeScript,
+        "python" => IndexerLanguage::Python,
+        "go" => IndexerLanguage::Go,
+        other => {
+            warn!("no SCIP registry mapping for {other}; heuristic only");
+            return Box::new(DisclosedSemanticResolver::new(
+                Box::new(HeuristicOnlySemanticResolver::new(language)),
+                ResolutionDisclosure::layer2_fallback_to_heuristic(
+                    language,
+                    SkipReason::LanguageNotRouted,
+                ),
+            ));
+        }
+    };
+
+    let ws_path = workspace_root
+        .and_then(|u| u.to_file_path().ok())
+        .unwrap_or_else(|| std::env::current_dir().unwrap_or_default());
+
+    let skip_from_err = |err: &IndexerError| -> SkipReason {
+        if err.not_provisioned() {
+            SkipReason::IndexerNotProvisioned
+        } else {
+            SkipReason::IndexerFailed
+        }
+    };
+
+    let heuristic = |reason: SkipReason| -> Box<dyn SemanticResolver> {
+        Box::new(DisclosedSemanticResolver::new(
+            Box::new(HeuristicOnlySemanticResolver::new(language)),
+            ResolutionDisclosure::layer2_fallback_to_heuristic(language, reason),
+        ))
+    };
+
+    let index_path = ws_path.join("index.scip");
+    let stale = index_path.is_file() && !is_fresh(&ws_path, indexer_lang);
+    if stale {
+        warn!("{language} SCIP index fingerprint mismatch (IndexStale)");
+        // Still load the file if present; disclose staleness after load fails
+        // only when we cannot reuse. Prefer cache from provision_index.
+    }
+
+    let load_result = if index_path.is_file() && !stale {
+        ScipSemanticIndex::from_file_at_workspace(&index_path, ws_path.clone(), language)
+    } else {
+        match provision_index(&ws_path, indexer_lang) {
+            Ok(generated) => {
+                if let Some(fp) = fingerprint_workspace(&ws_path, indexer_lang) {
+                    write_sidecar(&ws_path, indexer_lang, &fp);
+                }
+                ScipSemanticIndex::from_file_at_workspace(generated, ws_path.clone(), language)
+            }
+            Err(err) => {
+                warn!(
+                    "{language} SCIP indexer skipped (exit {}): {}",
+                    err.exit_code, err.message
+                );
+                let reason = if stale {
+                    SkipReason::IndexStale
+                } else {
+                    skip_from_err(&err)
+                };
+                return heuristic(reason);
+            }
+        }
+    };
+
+    match load_result {
+        Ok(index) => {
+            let root = index.project_root().to_path_buf();
+            info!(
+                "{language} index-backed resolver loaded SCIP at {}",
+                root.display()
+            );
+            Box::new(IndexBackedSemanticResolver::new(index, root, language))
+        }
+        Err(err) => {
+            warn!("Failed to load SCIP index for {language}: {err}");
+            heuristic(SkipReason::IndexerFailed)
+        }
+    }
+}
+
+#[cfg(not(feature = "scip"))]
+fn build_index_backed_or_heuristic(
+    language: &str,
+    workspace_root: Option<&url::Url>,
+    config: crate::infrastructure::LanguageConfig,
+) -> Box<dyn SemanticResolver> {
+    Box::new(LspResolver::with_options(
+        config,
+        workspace_root.cloned(),
+        build_session_options(language, workspace_root),
+    ))
 }

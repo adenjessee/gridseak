@@ -325,7 +325,24 @@ fn find_bundled_apex_jar() -> Option<PathBuf> {
     None
 }
 
-fn resolve_executable(candidate: &str) -> Result<PathBuf, String> {
+/// Resolve a command string to a concrete executable path.
+///
+/// This is the single source of truth for "does this LSP server exist?"
+/// across the codebase. The rule is deliberately based on *resolution*,
+/// not on running the binary:
+///
+/// * If `candidate` is an absolute path or contains a path separator
+///   (more than one component), it is treated as a literal path and we
+///   only check that it exists on disk.
+/// * Otherwise it is a bare command name and we resolve it against
+///   `PATH` via `which`.
+///
+/// Crucially, we never spawn the binary with `--help`/`--version` to
+/// decide availability. Some valid language servers (notably
+/// `pyright-langserver`) exit non-zero unless launched with their
+/// transport flag, so a probe-by-running test wrongly rejects them.
+/// See the LSP reliability handoff for the concrete bug this prevents.
+pub fn resolve_executable(candidate: &str) -> Result<PathBuf, String> {
     let path = Path::new(candidate);
 
     if path.is_absolute() || path.components().count() > 1 {
@@ -340,6 +357,17 @@ fn resolve_executable(candidate: &str) -> Result<PathBuf, String> {
             Err(e) => Err(format!("{}", e)),
         }
     }
+}
+
+/// Whether an LSP server command can be located, using the same
+/// resolution rule as [`resolve_executable`]. Returns `true` without
+/// ever executing the binary — availability is decided by path
+/// existence / `PATH` resolution only.
+///
+/// Both the LSP client startup check and the `doctor` dependency probe
+/// call through here so the two can never drift apart.
+pub fn is_command_available(command: &str) -> bool {
+    resolve_executable(command).is_ok()
 }
 
 #[cfg(test)]
@@ -593,6 +621,86 @@ mod tests {
         assert!(
             msg.contains("does not exist"),
             "error should mention missing jar, got: {msg}"
+        );
+    }
+
+    // ────────────────────────────────────────────────────────────────
+    // Availability rule (LSP reliability handoff fix #2).
+    //
+    // Availability is decided by path existence / PATH resolution, NOT
+    // by running the binary with `--help`/`--version`. These tests pin
+    // that contract so a future refactor cannot quietly reintroduce the
+    // probe-by-running bug that rejected `pyright-langserver`.
+    // ────────────────────────────────────────────────────────────────
+
+    /// Write a file that is marked executable but exits non-zero when run.
+    /// If availability ever depended on running the binary, this would be
+    /// (wrongly) reported as unavailable.
+    fn write_failing_exe(dir: &Path, name: &str) -> PathBuf {
+        let leaf = if cfg!(windows) {
+            format!("{name}.bat")
+        } else {
+            name.to_string()
+        };
+        let p = dir.join(leaf);
+        if cfg!(windows) {
+            std::fs::write(&p, b"@echo off\r\nexit /b 1\r\n").unwrap();
+        } else {
+            std::fs::write(&p, b"#!/bin/sh\nexit 1\n").unwrap();
+            #[cfg(unix)]
+            {
+                use std::os::unix::fs::PermissionsExt;
+                let mut perms = std::fs::metadata(&p).unwrap().permissions();
+                perms.set_mode(0o755);
+                std::fs::set_permissions(&p, perms).unwrap();
+            }
+        }
+        p
+    }
+
+    #[test]
+    fn available_for_existing_absolute_path() {
+        let exe = std::env::current_exe().unwrap();
+        assert!(is_command_available(&exe.to_string_lossy()));
+    }
+
+    #[test]
+    fn not_available_for_missing_absolute_path() {
+        let missing = std::env::temp_dir().join("gridseak-no-such-lsp-binary-xyz");
+        assert!(!is_command_available(&missing.to_string_lossy()));
+    }
+
+    #[test]
+    fn available_for_bare_command_on_path_without_running_it() {
+        let _guard = env_mutex().lock().unwrap();
+        let temp = tempfile::tempdir().unwrap();
+        // A unique name so we don't collide with anything real on PATH.
+        let name = "gridseak_fake_lsp_probe";
+        write_failing_exe(temp.path(), name);
+
+        let prev_path = env::var_os("PATH");
+        let new_path = match &prev_path {
+            Some(existing) => {
+                let mut dirs = vec![temp.path().to_path_buf()];
+                dirs.extend(env::split_paths(existing));
+                env::join_paths(dirs).unwrap()
+            }
+            None => env::join_paths([temp.path().to_path_buf()]).unwrap(),
+        };
+        env::set_var("PATH", &new_path);
+
+        // The binary exits non-zero; if availability ran it, this would be
+        // false. It must be true: resolution is path-based only.
+        let available = is_command_available(name);
+
+        match prev_path {
+            Some(v) => env::set_var("PATH", v),
+            None => env::remove_var("PATH"),
+        }
+
+        assert!(
+            available,
+            "a resolvable command must be 'available' even if running it would fail"
         );
     }
 }

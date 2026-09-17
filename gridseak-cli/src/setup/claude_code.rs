@@ -15,7 +15,8 @@ pub fn print_instructions(binary: &str) {
     println!("[Claude Code]");
     println!("  Run once in your terminal to register the GridSeak MCP:");
     println!();
-    println!("    claude mcp add gridseak {binary} mcp");
+    println!("    claude mcp add gridseak {binary} mcp --slim");
+    println!("    # plugin install: see plugin/README.md (router + 4 verbs)");
     println!();
     println!("  GridSeak's analysis MCP does not require the `sampling` capability,");
     println!("  so this works on every Claude Code version that supports MCP.");

@@ -11,7 +11,9 @@ version: "1.0"
 lsp_command: "typescript-language-server"
 lsp_args:
   - "--stdio"
-lsp_request_timeout_ms: 2000
+# Base (fast-policy) floor, aligned with the other languages. 2000ms was tight
+# for a cold tsserver project load; patient/exhaustive raise it at runtime.
+lsp_request_timeout_ms: 5000
 lsp_max_concurrent_requests: 32
 
 queries:

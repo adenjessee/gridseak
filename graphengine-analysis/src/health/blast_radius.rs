@@ -38,6 +38,39 @@ pub fn compute_blast_radius(graph: &AnalysisGraph) -> BlastRadiusResult {
     BlastRadiusResult { radii }
 }
 
+/// Dual blast-radius: all reachable callers vs high-confidence callers only.
+#[derive(Debug, Default)]
+pub struct WeightedBlastRadius {
+    pub blast_total: HashMap<String, usize>,
+    pub blast_high_confidence: HashMap<String, usize>,
+}
+
+pub fn compute_weighted_blast_radius(graph: &AnalysisGraph) -> WeightedBlastRadius {
+    let mut reverse_all: HashMap<&str, Vec<&str>> = HashMap::new();
+    let mut reverse_high: HashMap<&str, Vec<&str>> = HashMap::new();
+    for &ei in &graph.production_structural_edge_indices {
+        let edge = &graph.edges[ei];
+        reverse_all
+            .entry(edge.to_id.as_str())
+            .or_default()
+            .push(edge.from_id.as_str());
+        if edge.confidence == crate::health::graph::Confidence::High {
+            reverse_high
+                .entry(edge.to_id.as_str())
+                .or_default()
+                .push(edge.from_id.as_str());
+        }
+    }
+    let mut out = WeightedBlastRadius::default();
+    for id in &graph.function_node_ids {
+        out.blast_total
+            .insert(id.clone(), bfs_count_reachable(id, &reverse_all));
+        out.blast_high_confidence
+            .insert(id.clone(), bfs_count_reachable(id, &reverse_high));
+    }
+    out
+}
+
 /// BFS from `start` in the reverse graph, counting unique reachable nodes (excluding start itself).
 fn bfs_count_reachable(start: &str, reverse_adj: &HashMap<&str, Vec<&str>>) -> usize {
     let mut visited = HashSet::new();

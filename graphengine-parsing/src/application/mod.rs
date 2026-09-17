@@ -11,7 +11,9 @@
 //! - Enables testability through dependency injection
 
 pub mod errors;
+pub mod lsp_telemetry;
 pub mod ports;
+pub mod resolution_disclosure;
 pub mod use_cases;
 
 // Re-export main types for convenience.

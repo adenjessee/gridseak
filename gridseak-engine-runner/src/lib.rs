@@ -335,6 +335,8 @@ async fn run_parser_for_language(
     if !cfg.incremental {
         args.push("--no-incremental".into());
     }
+    args.push("--lsp-policy".into());
+    args.push(cfg.lsp_policy.as_str().into());
 
     let outcome = subprocess::run_with_progress(subprocess::SubprocessSpec {
         bin: &cfg.parser_bin,

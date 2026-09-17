@@ -336,6 +336,8 @@ fn provenance_label(p: &ProvenanceSource) -> String {
         ProvenanceSource::Lsp => "lsp",
         ProvenanceSource::Heuristic => "heuristic",
         ProvenanceSource::TreeSitter => "treesitter",
+        ProvenanceSource::Compiler => "compiler",
+        ProvenanceSource::Runtime => "runtime",
     }
     .to_string()
 }

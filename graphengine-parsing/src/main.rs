@@ -13,6 +13,9 @@ use graphengine_parsing::infrastructure::config::{
     set_configs_dir_override,
 };
 use graphengine_parsing::infrastructure::lsp::command_locator::resolve_lsp_command;
+use graphengine_parsing::infrastructure::lsp::policy::{
+    install_runtime_policy, LspPolicy, LspRuntimePolicy,
+};
 use graphengine_parsing::infrastructure::SqliteRepository;
 use graphengine_progress::{EngineEvent, EngineEventEmitter, StdoutEngineEventEmitter};
 use std::path::PathBuf;
@@ -100,6 +103,13 @@ enum Commands {
         /// upload only the telemetry JSON.
         #[arg(long, value_name = "PATH")]
         lsp_telemetry: Option<PathBuf>,
+
+        /// LSP effort tier for this parse: `fast` (default), `patient`,
+        /// or `exhaustive`. Controls request timeouts, concurrency,
+        /// indexing waits, and chunk size. `GRIDSEAK_LSP_PROFILE` env
+        /// overrides this flag when set.
+        #[arg(long, default_value = "fast")]
+        lsp_policy: String,
     },
 
     /// Query the parsed graph database
@@ -138,6 +148,9 @@ enum Commands {
         /// Optional language to check (defaults to all)
         #[arg(short, long)]
         language: Option<String>,
+        /// Install a SCIP indexer for this language (network allowed).
+        #[arg(long)]
+        provision: Option<String>,
     },
 }
 
@@ -180,6 +193,7 @@ async fn main() -> anyhow::Result<()> {
             output,
             progress_json,
             lsp_telemetry,
+            lsp_policy,
         } => {
             parse_command(
                 root,
@@ -191,6 +205,7 @@ async fn main() -> anyhow::Result<()> {
                 output,
                 progress_json,
                 lsp_telemetry,
+                lsp_policy,
             )
             .await
         }
@@ -201,7 +216,28 @@ async fn main() -> anyhow::Result<()> {
         } => query_command(db, query_type, params).await,
         Commands::Languages { json } => languages_command(json).await,
         Commands::Stats { db } => stats_command(db).await,
-        Commands::Doctor { language } => doctor_command(language).await,
+        Commands::Doctor {
+            language,
+            provision,
+        } => {
+            if let Some(lang) = provision {
+                #[cfg(feature = "scip")]
+                {
+                    let parsed = graphengine_scip_adapter::IndexerLanguage::parse(&lang)
+                        .ok_or_else(|| anyhow::anyhow!("unknown language {lang}"))?;
+                    let cwd = std::env::current_dir()?;
+                    let path = graphengine_scip_adapter::install_indexer(cwd, parsed)?;
+                    println!("provisioned {lang} → {}", path.display());
+                    return Ok(());
+                }
+                #[cfg(not(feature = "scip"))]
+                {
+                    let _ = lang;
+                    anyhow::bail!("scip feature disabled");
+                }
+            }
+            doctor_command(language).await
+        }
     }
 }
 
@@ -216,6 +252,7 @@ async fn parse_command(
     output: String,
     progress_json: bool,
     lsp_telemetry: Option<PathBuf>,
+    lsp_policy: String,
 ) -> anyhow::Result<()> {
     // Parser writes structured progress to **stdout** because its
     // tracing logs go to stderr. R3 consolidated the emitter
@@ -258,6 +295,25 @@ async fn parse_command(
             );
         }
     }
+
+    let config =
+        load_config(&lang).map_err(|e| anyhow::anyhow!("failed to load config for {lang}: {e}"))?;
+    let cli_policy = LspPolicy::parse(&lsp_policy).ok_or_else(|| {
+        anyhow::anyhow!(
+            "invalid --lsp-policy '{lsp_policy}'; expected fast, patient, or exhaustive"
+        )
+    })?;
+    let runtime = LspRuntimePolicy::resolve(Some(cli_policy), &config);
+    install_runtime_policy(runtime.clone()).map_err(|_| {
+        anyhow::anyhow!("LSP runtime policy was already installed for this process")
+    })?;
+    info!(
+        "LSP policy: {} (request_timeout_ms={}, max_concurrent={}, chunk_size={})",
+        runtime.tier.as_str(),
+        runtime.request_timeout_ms,
+        runtime.max_concurrent_requests,
+        runtime.chunk_size
+    );
 
     // Determine database path
     let db_path = db.unwrap_or_else(|| root.join(format!("{}.db", lang)));

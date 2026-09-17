@@ -1,0 +1,27 @@
+[package]
+name = "gridseak-truth-benchmark"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Pinned corpus + P/R/ECE harness for GridSeak compiler-tier calibration"
+default-run = "gridseak-truth-benchmark"
+
+[[bin]]
+name = "gridseak-truth-benchmark"
+path = "src/main.rs"
+
+[[bin]]
+name = "agent-ab"
+path = "src/bin/agent_ab.rs"
+
+[[bin]]
+name = "false-claim-suite"
+path = "src/bin/false_claim_suite.rs"
+
+[dependencies]
+anyhow = "1"
+serde = { workspace = true }
+serde_json = { workspace = true }
+rusqlite = { version = "0.32", features = ["bundled"] }
+graphengine-parsing = { path = "../graphengine-parsing" }

@@ -6,7 +6,9 @@ version: "1.0"
 lsp_command: "gopls"
 lsp_args:
   - "-mode=stdio"
-lsp_request_timeout_ms: 1000
+# Base (fast-policy) floor. gopls module load makes early requests slow;
+# 1000ms caused premature heuristic fallback. Patient/exhaustive raise it.
+lsp_request_timeout_ms: 5000
 lsp_max_concurrent_requests: 32
 
 queries:
@@ -40,9 +42,13 @@ queries:
       function: (identifier) @func
     ) @call
 
+    ; `pkg.Func()` / `recv.Method()` / `r.URL.Query()` — capture the
+    ; selector operand as @receiver so caret_for_callee lands on the
+    ; method ident, not the package or receiver (SCIP occurrences are
+    ; on the field, not `chi` / `r`).
     (call_expression
       function: (selector_expression
-        operand: (identifier) @obj
+        operand: (_) @receiver
         field: (field_identifier) @method
       )
     ) @call

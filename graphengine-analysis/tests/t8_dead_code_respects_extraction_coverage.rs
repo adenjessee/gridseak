@@ -97,6 +97,7 @@ fn make_dead_annotation(file_path: &str) -> NodeAnnotation {
         fan_in: 0,
         fan_out: 0,
         blast_radius: 0,
+        blast_high_confidence: 0,
         depth_from_root: 0,
         information_flow_complexity: 0,
         is_hotspot: false,

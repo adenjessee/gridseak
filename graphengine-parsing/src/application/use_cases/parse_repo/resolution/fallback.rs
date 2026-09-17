@@ -5,6 +5,7 @@ use super::super::super::super::ports::{
     CallSite, GlobalSymbolTable, ResolvedEdges, SyntaxResults, TypeUsageKind,
 };
 use super::trait_filter::TraitCandidateFilter;
+use crate::domain::fusion::stamp_heuristic_corroboration;
 use crate::domain::{Confidence, Edge, EdgeKind, NodeKind, Provenance, ProvenanceSource};
 use std::collections::HashMap;
 use tracing::{debug, info};
@@ -73,6 +74,39 @@ impl FallbackEdgeBuilder {
                 .resolved_call_sites
                 .contains(&call_site.location)
             {
+                // Phase B: if the heuristic would pick the same unique callee,
+                // stamp corroboration on the existing semantic edge — never a sibling.
+                if let Some(caller_fn) = Self::find_caller_function(call_site, global) {
+                    let name = call_site
+                        .function_name
+                        .split(':')
+                        .next_back()
+                        .unwrap_or(call_site.function_name.as_str());
+                    let candidates: Vec<_> = global
+                        .find_symbols_by_name(name)
+                        .into_iter()
+                        .filter(|s| s.kind == NodeKind::Function)
+                        .collect();
+                    let caller_is_trait_method = caller_fn.trait_metadata.is_some();
+                    let is_trait_method_call = caller_is_trait_method
+                        && call_site.function_name.starts_with("method_call:");
+                    let filtered = TraitCandidateFilter::filter_candidates(
+                        candidates,
+                        &call_site.location.file,
+                        caller_is_trait_method,
+                        is_trait_method_call,
+                    );
+                    if filtered.len() == 1 {
+                        let callee_id = filtered[0].id.clone();
+                        if let Some(edge) = resolved_edges
+                            .call_edges
+                            .iter_mut()
+                            .find(|e| e.from_id == caller_fn.id && e.to_id == callee_id)
+                        {
+                            stamp_heuristic_corroboration(edge);
+                        }
+                    }
+                }
                 continue;
             }
             let fallback_edge_kind = reference.edge_kind();

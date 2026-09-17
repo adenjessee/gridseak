@@ -46,7 +46,7 @@ pub fn wire(
     let previous_block = doc.pointer("/mcpServers/gridseak").cloned();
     let new_block = serde_json::json!({
         "command": binary,
-        "args": ["mcp"],
+        "args": ["mcp", "--slim"],
     });
 
     splice_mcp_server(&mut doc, "gridseak", new_block)?;

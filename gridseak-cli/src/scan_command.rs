@@ -91,10 +91,36 @@ pub struct ScanArgs {
     #[arg(long, default_value_t = false)]
     pub full_analysis: bool,
 
+    /// LSP effort tier: `fast` (default), `patient`, or `exhaustive`.
+    /// Forwarded to the parser subprocess. `GRIDSEAK_LSP_PROFILE` env
+    /// overrides this when set in the parser process.
+    #[arg(long, value_enum, default_value_t = LspPolicyCli::Fast)]
+    pub lsp_policy: LspPolicyCli,
+
     /// Legacy `scan` namespace subcommands. Without one of these,
     /// the driver runs the first-run flow on `path`.
     #[command(subcommand)]
     pub sub: Option<crate::ScanCommand>,
+}
+
+/// LSP effort tier forwarded to the parser subprocess.
+#[derive(Copy, Clone, Debug, Default, ValueEnum, PartialEq, Eq)]
+#[clap(rename_all = "lower")]
+pub enum LspPolicyCli {
+    #[default]
+    Fast,
+    Patient,
+    Exhaustive,
+}
+
+impl LspPolicyCli {
+    pub fn as_cli_str(self) -> &'static str {
+        match self {
+            Self::Fast => "fast",
+            Self::Patient => "patient",
+            Self::Exhaustive => "exhaustive",
+        }
+    }
 }
 
 /// Output format selector for `gridseak scan [PATH]`.
@@ -107,6 +133,8 @@ pub enum ScanOutputFormat {
     Markdown,
     /// Stable JSON envelope around `ScanReportView`.
     Json,
+    /// Single-file offline HTML report card.
+    Html,
 }
 
 impl ScanArgs {
@@ -132,7 +160,7 @@ impl ScanArgs {
                 layout: width::detect(),
             },
             ScanOutputFormat::Markdown => HeroFormat::Markdown,
-            ScanOutputFormat::Json => HeroFormat::Json,
+            ScanOutputFormat::Json | ScanOutputFormat::Html => HeroFormat::Json,
         }
     }
 
@@ -206,6 +234,7 @@ pub async fn run_scan_now(
         progress_mode,
         incremental,
         args.full_analysis,
+        args.lsp_policy,
     )
     .await?;
 
@@ -229,5 +258,11 @@ pub async fn run_scan_now(
     let stdout = std::io::stdout();
     let mut handle = stdout.lock();
     render_hero(&format, &view, &mut handle)?;
+    if !global_json {
+        crate::render::resolution_disclosure::render_resolution_disclosure_lines(
+            &report,
+            &mut handle,
+        )?;
+    }
     Ok(())
 }

@@ -17,6 +17,7 @@ pub mod file_analyzer;
 // supervisor moved to `graphengine-parsing-test-support` so they no
 // longer live in production source.
 pub mod notification_sink;
+pub mod policy;
 pub mod protocol;
 pub mod real_resolver;
 pub mod receiver_detector;
@@ -24,6 +25,7 @@ pub mod resolver;
 pub mod resolvers;
 pub mod security;
 pub mod session;
+pub mod session_options;
 pub mod simple_client;
 pub mod stats;
 pub mod synchronization;
@@ -40,12 +42,14 @@ pub use errors::LspError as LspErrorType;
 pub use file_analyzer::*;
 // `pub use mock_resolver::*;` + `pub use mock_session::*;` removed in
 // R2. See sibling note on the `mock_*` mod declarations above.
+pub use policy::*;
 pub use protocol::{LspError as LspProtocolError, *};
 pub use real_resolver::*;
 pub use receiver_detector::*;
 pub use resolver::*;
 pub use security::*;
 pub use session::*;
+pub use session_options::build_session_options;
 pub use simple_client::*;
 pub use synchronization::*;
 pub use timing::*;

@@ -414,7 +414,7 @@ mod tests {
             impact: None,
             blast_radius: Some(10),
             recommendation: None,
-            confidence: None,
+            confidence: Some(graphengine_analysis::health::report::Confidence::High),
             cycle_length: None,
             fan_in: None,
             coupling_score: None,

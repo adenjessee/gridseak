@@ -121,6 +121,7 @@ pub fn run(ctx: &mut AnalysisRunContext<'_>) -> Result<Option<HealthReport>> {
         };
         let stats_snapshot = resolution_degraded::ResolutionStatsSnapshot {
             lsp_edges: parse_u("resolution_lsp_edges"),
+            compiler_edges: parse_u("resolution_compiler_edges"),
             heuristic_edges: parse_u("resolution_heuristic_edges"),
             heuristic_call_fallbacks: parse_u("resolution_heuristic_call_fallbacks"),
             heuristic_import_fallbacks: parse_u("resolution_heuristic_import_fallbacks"),

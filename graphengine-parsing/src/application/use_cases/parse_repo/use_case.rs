@@ -130,6 +130,12 @@ impl ParseRepositoryUseCase {
         self.progress_emitter = Some(emitter);
     }
 
+    /// Test and diagnostics hook for inspecting the wired resolver.
+    #[doc(hidden)]
+    pub fn semantic_resolver(&self) -> &dyn SemanticResolver {
+        self.semantic_resolver.as_ref()
+    }
+
     // Convenience factory methods that delegate to UseCaseFactory.
 
     /// Create a use case with SQLite storage for persistent graph data

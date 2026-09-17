@@ -107,6 +107,8 @@ impl<'a> AnalysisRunContext<'a> {
                     all_edges_by_confidence: EdgesByConfidence::default(),
                 },
                 recommendation: None,
+                lsp_resolution_telemetry: None,
+                resolution_disclosure: Vec::new(),
             },
             override_entry_point_ids: HashSet::new(),
             findings: Vec::new(),

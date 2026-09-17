@@ -9,8 +9,10 @@ use crate::domain::{Confidence, Edge, Provenance, ProvenanceSource, Range};
 use crate::infrastructure::lsp::definition_provider::DefinitionProvider;
 use crate::infrastructure::lsp::errors::LspError;
 use crate::infrastructure::lsp::receiver_detector::ReceiverTypeDetector;
-use crate::infrastructure::lsp::stats::LspMiss;
 use crate::infrastructure::lsp::stats::LspResolutionOutcome;
+use crate::infrastructure::lsp::stats::{
+    classify_lsp_error, classify_unresolved_location, FallbackReason, LspMiss,
+};
 use crate::infrastructure::lsp::utils::{
     call_site_utils::extract_function_name, document_sync::DocumentSyncManager,
     symbol_lookup::find_containing_function,
@@ -20,7 +22,6 @@ use futures::future::join_all;
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 use std::sync::Mutex;
-use tokio::time::Duration;
 use tracing::{debug, warn};
 
 const DEFAULT_CHUNK_SIZE: usize = 32;
@@ -51,14 +52,15 @@ impl LspCallResolver {
             definition_provider,
             files_to_sync,
             true,
-            Duration::from_secs(5),
+            DocumentSyncManager::index_wait_timeout(),
         )
         .await;
 
         let definition_cache: Mutex<HashMap<(String, String), Option<Range>>> =
             Mutex::new(HashMap::new());
 
-        for chunk in syntax_results.references.chunks(DEFAULT_CHUNK_SIZE) {
+        let chunk_size = DocumentSyncManager::lsp_chunk_size(DEFAULT_CHUNK_SIZE);
+        for chunk in syntax_results.references.chunks(chunk_size) {
             let futs: Vec<_> = chunk
                 .iter()
                 .map(|reference| {
@@ -78,11 +80,22 @@ impl LspCallResolver {
             for (reference, result) in chunk.iter().zip(chunk_results) {
                 let call_site = reference.call_site();
                 match result {
-                    Ok(Some(edge)) => {
+                    Ok((Some(edge), _)) => {
                         outcome.edges.push(edge);
                     }
-                    Ok(None) => {
+                    Ok((None, reason)) => {
                         outcome.unresolved_calls.push(reference.clone());
+                        // Record why LSP missed this call site so the
+                        // fallback histogram is accurate for the call
+                        // channel, not just imports/types. A site may
+                        // also later contribute `heuristic_produced_edge`
+                        // if the heuristic recovers it — the two lenses
+                        // (why LSP missed vs. what recovered it) are
+                        // intentionally separate, matching the import
+                        // and type resolvers.
+                        if let Some(reason) = reason {
+                            outcome.fallback_reasons.record(reason);
+                        }
                         misses.push(LspMiss {
                             file: call_site.location.file.clone(),
                             symbol: call_site.function_name.clone(),
@@ -92,6 +105,7 @@ impl LspCallResolver {
                     }
                     Err(e) => {
                         warn!("Failed to resolve call site with LSP: {}", e);
+                        outcome.fallback_reasons.record(classify_lsp_error(&e));
                         outcome.unresolved_calls.push(reference.clone());
                     }
                 }
@@ -110,7 +124,7 @@ impl LspCallResolver {
         syntax_results: &SyntaxResults,
         symbol_index: &SymbolIndex,
         definition_cache: &Mutex<HashMap<(String, String), Option<Range>>>,
-    ) -> Result<Option<Edge>, LspError> {
+    ) -> Result<(Option<Edge>, Option<FallbackReason>), LspError> {
         let call_site = reference.call_site();
         let edge_kind = reference.edge_kind();
         let containing_function = find_containing_function(&call_site.location, syntax_results);
@@ -123,7 +137,9 @@ impl LspCallResolver {
                     "Skipping LSP lookup for empty/invalid function name: '{}'",
                     call_site.function_name
                 );
-                return Ok(None);
+                // No usable identifier to query — not an LSP failure, but
+                // a call site we cannot bind through LSP at all.
+                return Ok((None, Some(FallbackReason::NoCallSiteLocation)));
             }
 
             let is_trait_object_call = if let Some(detector) = receiver_detector {
@@ -227,12 +243,27 @@ impl LspCallResolver {
                                 edge_kind,
                                 Provenance::new(ProvenanceSource::Lsp, Confidence::High),
                             );
-                            return Ok(Some(edge));
+                            return Ok((Some(edge), None));
                         } else {
+                            // Self-loop: LSP resolved correctly, we just
+                            // do not emit a recursion edge. Not a fallback
+                            // miss, so no reason is recorded.
                             debug!("Skipping self-loop: {} -> {}", caller_id, callee_id);
+                            return Ok((None, None));
                         }
                     } else {
-                        debug!("No symbol found for LSP definition at {}", location.file);
+                        // LSP returned a definition location but it did
+                        // not map to a symbol in our index. If the file
+                        // is one we parsed, that is a genuine
+                        // symbol-index/location gap; otherwise the target
+                        // lives in an external dependency or builtin,
+                        // which is expected and not a fidelity defect.
+                        let in_repo = symbol_index.has_file(&location.file);
+                        debug!(
+                            "No symbol found for LSP definition at {} (in_repo={})",
+                            location.file, in_repo
+                        );
+                        return Ok((None, Some(classify_unresolved_location(in_repo))));
                     }
                 }
                 Ok(None) => {
@@ -240,16 +271,20 @@ impl LspCallResolver {
                         "LSP could not find definition for '{}' (original: '{}') - will fall back to heuristics",
                         actual_function_name, call_site.function_name
                     );
+                    return Ok((None, Some(FallbackReason::ReturnedNull)));
                 }
                 Err(e) => {
                     warn!(
                         "LSP definition lookup failed for '{}': {}",
                         actual_function_name, e
                     );
+                    return Ok((None, Some(classify_lsp_error(&e))));
                 }
             }
         }
 
-        Ok(None)
+        // No containing function: the call site cannot be anchored to a
+        // caller symbol, so no edge is possible regardless of LSP.
+        Ok((None, Some(FallbackReason::NoCallSiteLocation)))
     }
 }

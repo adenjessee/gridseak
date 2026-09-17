@@ -10,13 +10,21 @@ alwaysApply: true
 
 # GridSeak — structural ground truth for this repo
 
+The **gate** (`gridseak gate`) is the authority at the edit boundary.
+Claude: `PreToolUse`. Cursor: `preToolUse` (Write/StrReplace/Delete/Shell)
+plus `beforeShellExecution` (`rm` / `git rm`). Cursor `preToolUse`
+does not enforce ask — tree-sitter-only is deny-with-reason.
+Never flatten tiers into "GridSeak says…".
+After compact, re-query `gridseak gate --card`.
+
 ## The contract
 
 GridSeak gives you **deterministic** answers to structural questions —
 "who calls X", "what does X reach", "is there a cycle", "what's risky
 to refactor". The data comes from a parsed call/import graph backed by
-tree-sitter (Tier 0), filtered grep (Tier 1), and the language server
-(Tier 3). It does NOT replace your reading of the code. The point is
+tree-sitter (Tier 0), filtered grep (Tier 1), and compiler/LSP
+verification (Tier 3: rust-analyzer, SCIP, or a language server).
+It does NOT replace your reading of the code. The point is
 to give you trustworthy structural ground truth so you spend the LLM
 budget on synthesis, not on rediscovering the graph by re-grepping.
 
@@ -29,8 +37,8 @@ Every MCP response carries:
 
 When you state a structural fact derived from GridSeak, **name the
 tier you're quoting**. Don't flatten tiers into "GridSeak says…". A
-grep-heuristic edge is not the same as an LSP-verified edge, and the
-user can tell when you flatten them.
+grep-heuristic edge is not the same as a compiler- or LSP-verified
+edge, and the user can tell when you flatten them.
 
 ## Scan-provenance preamble (mandatory)
 

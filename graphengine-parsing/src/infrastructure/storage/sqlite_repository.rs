@@ -130,6 +130,14 @@ impl SqliteRepository {
             "CREATE INDEX IF NOT EXISTS idx_file_cache_hash ON file_cache(content_hash)",
             [],
         )?;
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS call_site_bindings (
+                caller_file TEXT NOT NULL,
+                target_file TEXT NOT NULL,
+                PRIMARY KEY (caller_file, target_file)
+            )",
+            [],
+        )?;
 
         conn.execute(
             "CREATE TABLE IF NOT EXISTS analysis_segment_cache (
@@ -811,6 +819,52 @@ impl GraphRepository for SqliteRepository {
         stats: &super::parse_meta_store::IncrementalScanStats,
     ) -> anyhow::Result<()> {
         SqliteRepository::write_incremental_scan_stats_sync(self, stats)
+    }
+
+    async fn load_call_bindings(&self) -> anyhow::Result<Vec<(String, String)>> {
+        let conn = self.conn.lock().unwrap();
+        let mut stmt = match conn.prepare("SELECT caller_file, target_file FROM call_site_bindings")
+        {
+            Ok(s) => s,
+            Err(_) => return Ok(Vec::new()),
+        };
+        let rows = stmt
+            .query_map([], |row| {
+                Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?))
+            })?
+            .collect::<rusqlite::Result<Vec<_>>>()?;
+        Ok(rows)
+    }
+
+    async fn save_call_bindings(&self, rows: &[(String, String)]) -> anyhow::Result<()> {
+        let conn = self.conn.lock().unwrap();
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS call_site_bindings (
+                caller_file TEXT NOT NULL,
+                target_file TEXT NOT NULL,
+                PRIMARY KEY (caller_file, target_file)
+            )",
+            [],
+        )?;
+        conn.execute("DELETE FROM call_site_bindings", [])?;
+        for (caller, target) in rows {
+            conn.execute(
+                "INSERT OR REPLACE INTO call_site_bindings (caller_file, target_file) VALUES (?1, ?2)",
+                params![caller, target],
+            )?;
+        }
+        Ok(())
+    }
+
+    async fn load_prior_call_edges(&self) -> anyhow::Result<Vec<crate::domain::Edge>> {
+        let conn = self.conn.lock().unwrap();
+        let mut stmt = conn.prepare("SELECT from_id, to_id, kind, provenance FROM edges")?;
+        let edges = stmt
+            .query_map([], Self::row_to_edge)?
+            .filter_map(|r| r.ok())
+            .filter(|e| matches!(e.kind, crate::domain::EdgeKind::Call))
+            .collect();
+        Ok(edges)
     }
 
     #[instrument(skip(self))]

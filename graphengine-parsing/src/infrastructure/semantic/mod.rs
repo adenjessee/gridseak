@@ -16,5 +16,20 @@
 #[cfg(feature = "rust-layer2")]
 pub mod rust_layer2;
 
+pub mod caret;
+pub mod disclosed_resolver;
+pub mod symbol_mapping;
+
+#[cfg(feature = "scip")]
+pub mod index_backed;
+#[cfg(feature = "scip")]
+pub mod scip_semantic_index;
+
 #[cfg(feature = "rust-layer2")]
 pub use rust_layer2::RustLayer2SemanticResolver;
+
+pub use disclosed_resolver::DisclosedSemanticResolver;
+#[cfg(feature = "scip")]
+pub use index_backed::IndexBackedSemanticResolver;
+#[cfg(feature = "scip")]
+pub use scip_semantic_index::ScipSemanticIndex;

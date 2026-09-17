@@ -730,6 +730,7 @@ pub fn run(ctx: &mut AnalysisRunContext<'_>) -> Result<Option<HealthReport>> {
             invariant_violations,
             ctx.stale_parse_db,
             ctx.graph.unknown_edge_kind_count(),
+            ctx.resolution_quality.lsp_resolution_telemetry.is_some(),
         ),
         git_signals: None,
         file_extraction_coverage: Vec::new(),

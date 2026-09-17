@@ -14,6 +14,10 @@ use super::per_file_slicer::{
     reconstitute_from_slices, slice_per_file, PerFileSlice, ScanMetadata, ORPHAN_FILE_KEY,
 };
 use super::persistence::GraphPersistence;
+use super::semantic_delta::{
+    bindings_from_graph, bindings_from_rows, files_needing_resolution, filter_refs_to_files,
+    merge_prior_call_edges,
+};
 use super::semantic_resolution::SemanticResolverService;
 use super::symbol_table::SymbolTableBuilder;
 use super::syntax_extraction::SyntaxExtraction;
@@ -142,10 +146,22 @@ impl ParsingPipeline {
 
         if files.is_empty() {
             warn!("No source files found for language: {}", language);
-            return Ok(ResolvedGraph::new(
-                Graph::new(),
-                ResolutionStatsSummary::new(),
-            ));
+            let mut graph = Graph::new();
+            graph.metadata.insert("language".into(), language.clone());
+            persist_resolution_disclosure(
+                semantic_resolver,
+                &language,
+                false,
+                &ResolutionStatsSummary::new(),
+                &mut graph,
+            )
+            .await;
+            graph_repo.upsert(&graph).await.map_err(|e| {
+                ParsingError::repository(format!(
+                    "Failed to persist empty-language disclosure: {e}"
+                ))
+            })?;
+            return Ok(ResolvedGraph::new(graph, ResolutionStatsSummary::new()));
         }
 
         // S1: incremental-scan plan. Hash every discovered file, load
@@ -414,15 +430,53 @@ impl ParsingPipeline {
         let lsp_available = semantic_resolver.is_available().await;
         info!("LSP available for {}: {}", language, lsp_available);
 
+        let prior_bindings = graph_repo.load_call_bindings().await.unwrap_or_default();
+        let resolve_set =
+            if !plan_disabled && !plan.changed.is_empty() && !prior_bindings.is_empty() {
+                let set =
+                    files_needing_resolution(&plan.changed, &bindings_from_rows(prior_bindings));
+                info!(
+                "semantic-delta: resolving {} of {} files (changed + callers of changed targets)",
+                set.len(),
+                files.len()
+            );
+                Some(set)
+            } else {
+                None
+            };
+
+        let mut resolution_results = syntax_results.clone();
+        if let Some(ref set) = resolve_set {
+            let before = resolution_results.references.len();
+            resolution_results.references =
+                filter_refs_to_files(resolution_results.references, set);
+            info!(
+                "semantic-delta: filtered references {} → {}",
+                before,
+                resolution_results.references.len()
+            );
+        }
+
         let t_resolution = std::time::Instant::now();
-        let resolved_edges = Self::execute_step_async("resolve_semantics", || {
+        let mut resolved_edges = Self::execute_step_async("resolve_semantics", || {
             SemanticResolverService::resolve_with_fallback(
-                &syntax_results,
+                &resolution_results,
                 &global_symbol_table,
                 semantic_resolver,
             )
         })
         .await?;
+        if let Some(ref set) = resolve_set {
+            if let Ok(prior) = graph_repo.load_prior_call_edges().await {
+                let before = resolved_edges.call_edges.len();
+                merge_prior_call_edges(&mut resolved_edges, prior, &syntax_results.symbols, set);
+                info!(
+                    "semantic-delta: merged prior call edges {} → {}",
+                    before,
+                    resolved_edges.call_edges.len()
+                );
+            }
+        }
         info!(
             "[TIMING] Semantic resolution (total): {:?}",
             t_resolution.elapsed()
@@ -471,6 +525,14 @@ impl ParsingPipeline {
         let mut graph = Self::execute_step("build_graph", || {
             GraphBuilder::build_from_results(syntax_results, resolved_edges, min_confidence)
         })?;
+        if let Some(ev) = crate::infrastructure::runtime_fuse::load_workspace_coverage(&root) {
+            crate::infrastructure::runtime_fuse::fuse_runtime_evidence(&mut graph, &ev);
+            info!(
+                "runtime-fuse: executed={} observed={}",
+                ev.executed.len(),
+                ev.observed.len()
+            );
+        }
         graph
             .metadata
             .insert("lsp_available".into(), lsp_available.to_string());
@@ -489,6 +551,10 @@ impl ParsingPipeline {
         graph
             .metadata
             .insert("resolution_lsp_edges".into(), stats.lsp_edges.to_string());
+        graph.metadata.insert(
+            "resolution_compiler_edges".into(),
+            stats.compiler_edges.to_string(),
+        );
         graph.metadata.insert(
             "resolution_heuristic_edges".into(),
             stats.heuristic_edges.to_string(),
@@ -509,6 +575,11 @@ impl ParsingPipeline {
             "resolution_heuristic_call_ambiguous_drops".into(),
             stats.heuristic_call_ambiguous_drops.to_string(),
         );
+        if let Ok(json) = serde_json::to_string(&stats.fallback_reasons) {
+            graph
+                .metadata
+                .insert("resolution_fallback_reasons_json".into(), json);
+        }
 
         // Sprint D.4 completion: also persist LSP session-lifecycle
         // metrics alongside the resolution stats. The CLI's
@@ -543,7 +614,55 @@ impl ParsingPipeline {
                     .metadata
                     .insert("session_last_error".into(), truncated);
             }
+            graph.metadata.insert(
+                "session_notifications_received".into(),
+                m.notifications_received.to_string(),
+            );
+            graph.metadata.insert(
+                "session_stderr_lines_observed".into(),
+                m.stderr_lines_observed.to_string(),
+            );
+            graph.metadata.insert(
+                "session_indexing_messages_seen".into(),
+                m.indexing_messages_seen.to_string(),
+            );
+            let rm = &m.request_metrics;
+            graph.metadata.insert(
+                "lsp_request_successes".into(),
+                rm.request_successes.to_string(),
+            );
+            graph.metadata.insert(
+                "lsp_request_timeouts".into(),
+                rm.request_timeouts.to_string(),
+            );
+            graph
+                .metadata
+                .insert("lsp_definition_hits".into(), rm.definition_hits.to_string());
+            graph.metadata.insert(
+                "lsp_definition_nulls".into(),
+                rm.definition_nulls.to_string(),
+            );
+            graph.metadata.insert(
+                "lsp_definition_errors".into(),
+                rm.definition_errors.to_string(),
+            );
         }
+
+        persist_resolution_disclosure(
+            semantic_resolver,
+            &language,
+            lsp_available,
+            &stats,
+            &mut graph,
+        )
+        .await;
+
+        if let Some(json) = semantic_resolver.layer2_telemetry_json().await {
+            graph
+                .metadata
+                .insert("resolution_layer2_telemetry_json".into(), json);
+        }
+
         info!(
             "[TIMING] Graph build ({} nodes, {} edges): {:?}",
             graph.node_count(),
@@ -575,6 +694,12 @@ impl ParsingPipeline {
             t_persist.elapsed()
         );
         emit(89, "db", "done", "Graph persisted");
+        if let Err(err) = graph_repo
+            .save_call_bindings(&bindings_from_graph(&graph))
+            .await
+        {
+            warn!("semantic-delta: call_site_bindings persist failed: {err}");
+        }
 
         // TR-A.0: persist the Apex class-symbols payload. Runs after
         // graph persist so a class-symbols write failure cannot
@@ -983,6 +1108,59 @@ fn system_time_to_iso8601(t: SystemTime) -> String {
     let year = y + if month <= 2 { 1 } else { 0 };
 
     format!("{year:04}-{month:02}-{day:02}T{hour:02}:{minute:02}:{second:02}Z")
+}
+
+async fn persist_resolution_disclosure(
+    semantic_resolver: &dyn SemanticResolver,
+    language: &str,
+    lsp_available: bool,
+    stats: &ResolutionStatsSummary,
+    graph: &mut Graph,
+) {
+    use crate::application::resolution_disclosure::{
+        ResolutionDisclosure, ResolutionTierKind, SkipReason,
+    };
+
+    let mut disclosure = if let Some(d) = semantic_resolver.resolution_disclosure().await {
+        d
+    } else if !lsp_available {
+        ResolutionDisclosure::heuristic_only(language, SkipReason::ServerMissing)
+    } else if stats.lsp_edges > 0 || stats.compiler_edges > 0 {
+        if stats.compiler_edges > 0 && stats.lsp_edges == 0 {
+            // Resolver did not override disclosure; infer Layer-2 from compiler edge count.
+            ResolutionDisclosure::layer2_active(language, stats.compiler_edges as u64)
+        } else {
+            ResolutionDisclosure::subprocess_lsp(language, Some(stats.lsp_edges as u64))
+        }
+    } else if stats.heuristic_edges > 0 {
+        ResolutionDisclosure::heuristic_only(language, SkipReason::PolicyDisabled)
+    } else {
+        ResolutionDisclosure {
+            language: language.to_string(),
+            tier_attempted: ResolutionTierKind::SubprocessLsp,
+            tier_used: ResolutionTierKind::Heuristic,
+            skip_reason: Some(SkipReason::NoReferences),
+            emitted_edges: None,
+            index_fingerprint: None,
+            index_age_seconds: None,
+        }
+    };
+
+    if disclosure.language.is_empty() {
+        disclosure.language = language.to_string();
+    }
+
+    let key = ResolutionDisclosure::metadata_key(language);
+    match serde_json::to_string(&disclosure) {
+        Ok(json) => {
+            graph.metadata.insert(key, json);
+        }
+        Err(err) => {
+            warn!(
+                "failed to serialize resolution disclosure for {language}: {err}; skipping metadata write"
+            );
+        }
+    }
 }
 
 #[cfg(test)]

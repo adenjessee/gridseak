@@ -95,6 +95,10 @@ pub struct RunPipelineConfig {
     /// S2-γ: force full analysis (L3); forwarded to ge-analyze as `--full-analysis`.
     pub full_analysis: bool,
 
+    /// LSP effort tier forwarded to each parser subprocess (`fast`,
+    /// `patient`, `exhaustive`). Default `fast` preserves shipping behaviour.
+    pub lsp_policy: String,
+
     /// Optional git directory for analyzer's temporal-coupling pass. When
     /// present, analyzer reads `git log --name-only` from `{git_dir}` and
     /// produces co-change signals. When absent, temporal metrics are

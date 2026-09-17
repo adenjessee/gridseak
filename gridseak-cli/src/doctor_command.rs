@@ -41,6 +41,43 @@ use serde_json::Value;
 
 use crate::resolve_engine_bin;
 
+fn run_provision(lang: &str, json: bool) -> Result<()> {
+    let language = graphengine_scip_adapter::IndexerLanguage::parse(lang).ok_or_else(|| {
+        anyhow::anyhow!("unknown language '{lang}' (try typescript, python, go, rust)")
+    })?;
+    let cwd = std::env::current_dir()?;
+    match graphengine_scip_adapter::install_indexer(&cwd, language) {
+        Ok(path) => {
+            if json {
+                println!(
+                    "{}",
+                    serde_json::json!({
+                        "ok": true,
+                        "language": lang,
+                        "index": path.display().to_string()
+                    })
+                );
+            } else {
+                println!("provisioned {lang} → {}", path.display());
+            }
+            Ok(())
+        }
+        Err(err) => {
+            if json {
+                println!(
+                    "{}",
+                    serde_json::json!({
+                        "ok": false,
+                        "language": lang,
+                        "error": err.to_string()
+                    })
+                );
+            }
+            Err(anyhow::anyhow!(err))
+        }
+    }
+}
+
 /// Structured JSON shape returned with `--json`.
 ///
 /// Fields are append-only: machines parse this. Adding a new field is
@@ -62,6 +99,30 @@ struct DoctorReport {
     /// `~/.cursor/mcp.json` still pointing at a valid binary?" This is
     /// the surface the website's /cli walkthrough relies on.
     mcp_check: McpCheck,
+    /// "Will scans load the language configs, and are they the ones
+    /// shipped with this build?" A fix to `python.yaml` is worthless if
+    /// the installed sidecar loads a stale `configs/` dir — this is the
+    /// exact drift the LSP reliability work hit. A `not_found` here is a
+    /// hard failure (scans cannot run); `incomplete` / non-co-located is
+    /// surfaced as a warning.
+    configs_check: crate::doctor_configs::ConfigsCheck,
+    /// "Are the language servers (`pyright-langserver`,
+    /// `typescript-language-server`, `jdtls`, `gopls`, …) installed?"
+    /// Informational: a missing server only matters for the languages a
+    /// user actually scans, so it never fails the command.
+    lsp_servers_check: crate::doctor_lsp::LspServersCheck,
+    /// Cursor hook: absolute command, binary has `gate`, wrapper returns JSON.
+    hook_check: HookCheck,
+}
+
+#[derive(Debug, Serialize)]
+struct HookCheck {
+    status: String,
+    binary: Option<String>,
+    absolute: bool,
+    has_gate: bool,
+    wrapper_json_ok: bool,
+    detail: Option<String>,
 }
 
 /// Outcome of the PATH check.
@@ -136,7 +197,10 @@ struct DoctorBinaryRow {
 /// Run the doctor command. Returns `Err` if any binary fails to match —
 /// the CLI translates that into a non-zero exit code so script-driven
 /// callers can detect drift.
-pub async fn run_doctor(json: bool) -> Result<()> {
+pub async fn run_doctor(json: bool, provision: Option<String>) -> Result<()> {
+    if let Some(lang) = provision {
+        return run_provision(&lang, json);
+    }
     let cli_version = env!("CARGO_PKG_VERSION").to_string();
 
     // Resolve each sidecar using the same rules `gridseak scan` uses.
@@ -233,13 +297,30 @@ pub async fn run_doctor(json: bool) -> Result<()> {
     // them to run doctor again after fixing the first.
     let path_check = check_path();
     let mcp_check = check_mcp();
+    let hook_check = check_hooks();
+
+    // Configs + LSP-server checks. Configs resolution uses the same
+    // rules `scan` uses; the sidecar path feeds the co-location signal.
+    let configs_dir = crate::resolve_configs_dir();
+    let configs_check =
+        crate::doctor_configs::check_configs(configs_dir.clone(), parser_path.as_deref());
+    let lsp_servers_check = crate::doctor_lsp::check_lsp_servers(configs_dir.as_deref());
 
     // `all_consistent` historically meant "all sidecars match". We
     // preserve that semantics so existing CI doesn't suddenly fail on
     // PATH issues. PATH + MCP statuses are surfaced separately for
     // callers that want stricter gating.
-    let all_consistent =
-        rows.iter().all(|r| r.status == "match") && cli_version == EXPECTED_SIDECAR_VERSION;
+    //
+    // Configs are the one addition that DOES gate the exit code: a
+    // `not_found` configs dir means scans cannot run at all, which is as
+    // fatal as a missing sidecar. `incomplete` (stale/partial dir) and a
+    // non-co-located dir are surfaced as warnings but do not fail, to
+    // avoid breaking installs that deliberately point
+    // `GRAPHENGINE_CONFIGS_DIR` elsewhere. Missing LSP servers never
+    // gate — they only matter per language scanned.
+    let all_consistent = rows.iter().all(|r| r.status == "match")
+        && cli_version == EXPECTED_SIDECAR_VERSION
+        && configs_check.status != "not_found";
 
     let report = DoctorReport {
         cli_version: cli_version.clone(),
@@ -248,6 +329,9 @@ pub async fn run_doctor(json: bool) -> Result<()> {
         all_consistent,
         path_check,
         mcp_check,
+        configs_check,
+        lsp_servers_check,
+        hook_check,
     };
 
     if json {
@@ -257,6 +341,11 @@ pub async fn run_doctor(json: bool) -> Result<()> {
         render_human(&report);
     }
 
+    if report.hook_check.status == "fail" {
+        anyhow::bail!(
+            "gridseak doctor: Cursor hook is unsafe — see Hook section above.              Re-run `gridseak setup` from the binary you want (absolute path, `gate` subcommand)."
+        );
+    }
     if !report.all_consistent {
         // Use a non-fatal error so the calling script sees a non-zero
         // exit. Don't propagate to anyhow's full backtrace formatting
@@ -312,6 +401,22 @@ fn probe_to_row(probe: VersionProbe) -> DoctorBinaryRow {
             actual_version: None,
             status: "unreadable".to_string(),
             detail: Some(detail),
+        },
+    }
+}
+
+fn check_hooks() -> HookCheck {
+    let health = crate::setup::hook_health();
+    HookCheck {
+        status: health.status,
+        binary: health.binary,
+        absolute: health.absolute,
+        has_gate: health.has_gate,
+        wrapper_json_ok: health.wrapper_json_ok,
+        detail: if health.detail.is_empty() {
+            None
+        } else {
+            Some(health.detail)
         },
     }
 }
@@ -643,6 +748,93 @@ fn render_human(report: &DoctorReport) {
     }
     println!();
 
+    // Hook check
+    let hook_tag = match report.hook_check.status.as_str() {
+        "ok" => ok("✓ ok"),
+        "not_configured" => "○ not configured".to_string(),
+        "fail" => bad("✗ fail"),
+        other => other.to_string(),
+    };
+    println!("Cursor hook: {}", hook_tag);
+    if let Some(b) = &report.hook_check.binary {
+        println!("    binary:            {b}");
+    }
+    println!("    absolute:          {}", report.hook_check.absolute);
+    println!("    has_gate:          {}", report.hook_check.has_gate);
+    println!(
+        "    wrapper_json:      {}",
+        report.hook_check.wrapper_json_ok
+    );
+    if let Some(detail) = &report.hook_check.detail {
+        println!("    detail:            {detail}");
+    }
+    println!();
+
+    // Configs check
+    let configs = &report.configs_check;
+    let configs_tag = match configs.status.as_str() {
+        "ok" => ok("✓ ok"),
+        "incomplete" => bad("✗ incomplete"),
+        "not_found" => bad("✗ not found"),
+        other => other.to_string(),
+    };
+    println!("Configs: {}", configs_tag);
+    if let Some(p) = &configs.configs_dir {
+        println!("    dir:               {p} (via {})", configs.source);
+    }
+    match configs.colocated_with_sidecar {
+        Some(true) => println!("    co-located:        yes (same build as sidecar)"),
+        Some(false) => println!(
+            "    co-located:        {}",
+            bad("no — possible config/build drift")
+        ),
+        None => {}
+    }
+    if !configs.present_languages.is_empty() {
+        println!(
+            "    languages:         {}",
+            configs.present_languages.join(", ")
+        );
+    }
+    if !configs.missing_languages.is_empty() {
+        println!(
+            "    missing:           {}",
+            bad(&configs.missing_languages.join(", "))
+        );
+    }
+    if let Some(detail) = &configs.detail {
+        println!("    detail:            {detail}");
+    }
+    println!();
+
+    // LSP servers check
+    let lsp = &report.lsp_servers_check;
+    println!("LSP servers:");
+    if lsp.status != "ok" {
+        if let Some(detail) = &lsp.detail {
+            println!("    {}", detail);
+        }
+    } else if lsp.servers.is_empty() {
+        println!("    (no LSP-backed languages declared)");
+    } else {
+        for row in &lsp.servers {
+            let tag = match row.status.as_str() {
+                "found" => ok("✓ found"),
+                "missing" => "○ missing".to_string(),
+                other => other.to_string(),
+            };
+            println!("  - {:<28} {}", row.command, tag);
+            println!("      languages: {}", row.languages.join(", "));
+            if let Some(path) = &row.resolved_path {
+                println!("      path:      {path}");
+            }
+            if let Some(note) = &row.note {
+                println!("      note:      {note}");
+            }
+        }
+    }
+    println!();
+
     if report.all_consistent {
         println!("{}", ok("All binaries consistent."));
         // Even when sidecars are fine, surface a one-line nudge if PATH
@@ -657,6 +849,23 @@ fn render_human(report: &DoctorReport) {
             println!(
                 "{}",
                 bad("…but Cursor MCP config is unhealthy. See Cursor MCP section above.")
+            );
+        }
+        if report.hook_check.status == "fail" {
+            println!(
+                "{}",
+                bad("…but the Cursor hook is unsafe. See Cursor hook section above.")
+            );
+        }
+        if report.configs_check.status != "ok" {
+            println!(
+                "{}",
+                bad("…but the language configs are stale/incomplete. See Configs section above.")
+            );
+        } else if report.configs_check.colocated_with_sidecar == Some(false) {
+            println!(
+                "{}",
+                bad("…but the configs dir is not co-located with the sidecar (possible build drift). See Configs section above.")
             );
         }
     } else {

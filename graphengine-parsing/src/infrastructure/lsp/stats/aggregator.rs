@@ -3,6 +3,7 @@
 //! Provides functionality to aggregate edges from multiple resolution phases,
 //! deduplicate them, and track statistics.
 
+use crate::application::lsp_telemetry::FallbackReasonCounts;
 use crate::application::ports::{ResolutionStatsSummary, UnresolvedReference};
 use crate::domain::{Edge, EdgeKind};
 use crate::infrastructure::lsp::stats::collector::ResolutionStats;
@@ -20,6 +21,7 @@ use std::collections::HashSet;
 pub struct LspResolutionOutcome {
     pub edges: Vec<Edge>,
     pub unresolved_calls: Vec<UnresolvedReference>,
+    pub fallback_reasons: FallbackReasonCounts,
 }
 
 /// Aggregates edges from multiple resolution phases with deduplication
@@ -55,6 +57,10 @@ impl ResolutionAggregator {
     /// Record a heuristic failure
     pub fn record_heuristic_failure(&mut self, message: String) {
         self.stats.record_heuristic_failure(message);
+    }
+
+    pub fn merge_fallback_reasons(&mut self, other: &FallbackReasonCounts) {
+        self.stats.merge_fallback_reasons(other);
     }
 
     /// Set heuristic fallback counts

@@ -4,6 +4,7 @@
 //! for definition lookup and symbol resolution. Supports concurrent
 //! in-flight requests via per-request oneshot response routing.
 
+use crate::application::lsp_telemetry::LspRequestMetrics;
 use crate::infrastructure::config::LanguageConfig;
 use crate::infrastructure::lsp::command_locator::resolve_lsp_command;
 use crate::infrastructure::lsp::errors::LspError;
@@ -44,6 +45,9 @@ pub struct SimpleLspClient {
     default_timeout: Duration,
     timeout_count: std::sync::atomic::AtomicU64,
     success_count: std::sync::atomic::AtomicU64,
+    definition_hit_count: std::sync::atomic::AtomicU64,
+    definition_null_count: std::sync::atomic::AtomicU64,
+    definition_error_count: std::sync::atomic::AtomicU64,
     /// Latency histogram buckets (atomic counters): <10ms, <50ms, <100ms, <250ms, <500ms, <1s, <2s, <5s
     latency_buckets: [std::sync::atomic::AtomicU64; 8],
     max_latency_us: std::sync::atomic::AtomicU64,
@@ -107,8 +111,13 @@ pub struct TextRange {
 impl SimpleLspClient {
     /// Create a new simple LSP client
     pub fn new(config: LanguageConfig) -> Self {
-        let max_concurrent = config.lsp_max_concurrent_requests.unwrap_or(32) as usize;
-        let timeout_ms = config.lsp_request_timeout_ms.unwrap_or(5000) as u64;
+        // Single source of truth: read the resolved runtime policy
+        // (installed once per `parse` invocation) instead of re-reading
+        // env vars here. Tests that construct a client without installing
+        // a policy get the deterministic fast-policy fallback.
+        let policy = crate::infrastructure::lsp::policy::runtime_policy();
+        let max_concurrent = policy.max_concurrent_requests as usize;
+        let timeout_ms = policy.request_timeout_ms as u64;
         Self {
             config: Arc::new(config),
             child: None,
@@ -120,6 +129,9 @@ impl SimpleLspClient {
             default_timeout: Duration::from_millis(timeout_ms),
             timeout_count: std::sync::atomic::AtomicU64::new(0),
             success_count: std::sync::atomic::AtomicU64::new(0),
+            definition_hit_count: std::sync::atomic::AtomicU64::new(0),
+            definition_null_count: std::sync::atomic::AtomicU64::new(0),
+            definition_error_count: std::sync::atomic::AtomicU64::new(0),
             latency_buckets: Default::default(),
             max_latency_us: std::sync::atomic::AtomicU64::new(0),
             dead: Arc::new(AtomicBool::new(false)),
@@ -162,6 +174,27 @@ impl SimpleLspClient {
     /// in-flight request.
     pub fn is_alive(&self) -> bool {
         !self.dead.load(Ordering::Acquire)
+    }
+
+    /// Snapshot transport and definition counters for telemetry export.
+    pub fn request_metrics(&self) -> LspRequestMetrics {
+        LspRequestMetrics {
+            request_successes: self
+                .success_count
+                .load(std::sync::atomic::Ordering::Relaxed),
+            request_timeouts: self
+                .timeout_count
+                .load(std::sync::atomic::Ordering::Relaxed),
+            definition_hits: self
+                .definition_hit_count
+                .load(std::sync::atomic::Ordering::Relaxed),
+            definition_nulls: self
+                .definition_null_count
+                .load(std::sync::atomic::Ordering::Relaxed),
+            definition_errors: self
+                .definition_error_count
+                .load(std::sync::atomic::Ordering::Relaxed),
+        }
     }
 
     fn record_latency(&self, elapsed: Duration) {
@@ -458,6 +491,7 @@ impl SimpleLspClient {
                     .lock()
                     .ok()
                     .map(|mut p| p.remove(&request_id));
+                let timeout_ms = timeout_duration.as_millis() as u64;
                 let count = self
                     .timeout_count
                     .fetch_add(1, std::sync::atomic::Ordering::Relaxed)
@@ -469,7 +503,10 @@ impl SimpleLspClient {
                     "[LSP_TIMEOUT] request {} timed out after {:?} (total timeouts: {}, successes: {})",
                     request_id, timeout_duration, count, successes
                 );
-                Err(LspError::ProtocolError("Request timeout".to_string()))
+                // Structured timeout (not a generic ProtocolError) so
+                // `classify_lsp_error` attributes the miss to
+                // `FallbackReason::RequestTimeout` deterministically.
+                Err(LspError::timeout(timeout_ms))
             }
         }
     }
@@ -497,29 +534,53 @@ impl SimpleLspClient {
             LspMessage::Response { result, error, .. } => {
                 if let Some(err) = error {
                     warn!("Definition request failed: {}", err.message);
+                    self.definition_error_count
+                        .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
                     return Ok(None);
                 }
 
                 if let Some(result) = result {
                     if result.is_null() {
+                        self.definition_null_count
+                            .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
                         return Ok(None);
                     }
 
                     if let Some(locations) = result.as_array() {
                         if let Some(location) = locations.first() {
-                            return Self::location_from_value(location);
+                            let parsed = Self::location_from_value(location)?;
+                            if parsed.is_some() {
+                                self.definition_hit_count
+                                    .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                            } else {
+                                self.definition_null_count
+                                    .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                            }
+                            return Ok(parsed);
                         }
                     }
 
                     if result.is_object() {
-                        return Self::location_from_value(&result);
+                        let parsed = Self::location_from_value(&result)?;
+                        if parsed.is_some() {
+                            self.definition_hit_count
+                                .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                        } else {
+                            self.definition_null_count
+                                .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                        }
+                        return Ok(parsed);
                     }
                 }
 
+                self.definition_null_count
+                    .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
                 Ok(None)
             }
             _ => {
                 warn!("Unexpected response type for definition request");
+                self.definition_error_count
+                    .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
                 Ok(None)
             }
         }
@@ -788,16 +849,12 @@ impl SimpleLspClient {
     }
 
     fn is_lsp_server_available(&self, command: &str) -> bool {
-        match std::process::Command::new(command)
-            .arg("--version")
-            .output()
-        {
-            Ok(output) => output.status.success(),
-            Err(_) => match std::process::Command::new(command).arg("--help").output() {
-                Ok(output) => output.status.success(),
-                Err(_) => false,
-            },
-        }
+        // Delegate to the single canonical resolver so the startup check
+        // and `gridseak doctor`'s dependency probe can never drift. The
+        // rule is path-existence / PATH resolution only — we never run
+        // the binary, because valid servers like `pyright-langserver`
+        // exit non-zero without a transport flag.
+        crate::infrastructure::lsp::command_locator::is_command_available(command)
     }
 
     fn get_server_command(&self) -> Result<Vec<String>, LspError> {

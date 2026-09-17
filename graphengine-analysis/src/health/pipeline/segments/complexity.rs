@@ -110,7 +110,7 @@ pub fn run(ctx: &mut AnalysisRunContext<'_>) -> Result<Option<HealthReport>> {
                     co_change_count: None,
                     temporal_coupling_score: None,
                     has_import_edge: None,
-                    confidence: None,
+                    confidence: Some(crate::health::report::Confidence::Medium),
                 });
             }
         }

@@ -300,3 +300,6 @@ graphengine-infra/rust.json
 # canary repos are cloned here at pinned refs (see experiments/canary_repos.lock)
 # and are never vendored into this repo. Override with CANARY_ROOTS_DIR.
 .gridseak/
+
+# Unlazy ledgers live in /tmp, never the repo root.
+/GATES.md

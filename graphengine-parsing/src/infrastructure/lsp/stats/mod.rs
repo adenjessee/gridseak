@@ -8,3 +8,8 @@ pub mod collector;
 
 pub use aggregator::*;
 pub use collector::*;
+
+pub use crate::application::lsp_telemetry::{
+    classify_init_error, classify_lsp_error, classify_unresolved_location, FallbackReason,
+    FallbackReasonCounts, LspRequestMetrics,
+};

@@ -164,6 +164,15 @@ impl SymbolIndex {
         self.records.is_empty()
     }
 
+    /// True when `file` was part of the parsed repository (i.e. we
+    /// indexed at least one symbol from it). Used to distinguish a
+    /// definition that resolved inside the repo but could not be mapped
+    /// (a real index/location gap) from one that resolved into an
+    /// external dependency or builtin (expected).
+    pub fn has_file(&self, file: &str) -> bool {
+        self.all_symbols_by_file.contains_key(file)
+    }
+
     // ---------------------------------------------------------------
     // O(1) lookups
     // ---------------------------------------------------------------

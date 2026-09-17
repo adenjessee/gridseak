@@ -5,8 +5,11 @@
 //! read-only operations (definition lookups, hover) while serializing lifecycle
 //! operations (start, stop, restart).
 
+use crate::application::lsp_telemetry::LspRequestMetrics;
 use crate::infrastructure::config::LanguageConfig;
-use crate::infrastructure::lsp::column_utils::utf16_column_for_file;
+use crate::infrastructure::lsp::column_utils::{
+    byte_column_for_utf16, utf16_code_unit_len, utf16_column_for_file,
+};
 use crate::infrastructure::lsp::def_trace::{self, DefOutcome};
 use crate::infrastructure::lsp::errors::LspError;
 use crate::infrastructure::lsp::notification_sink::{
@@ -111,7 +114,7 @@ pub struct SessionSupervisor {
 ///   before indexing completes but always returns `null` in that
 ///   window — so we must not flip to `Ready` prematurely or the
 ///   whole scan falls through to heuristic resolution.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, PartialEq)]
 pub enum ReadinessStrategy {
     #[default]
     Immediate,
@@ -178,6 +181,7 @@ pub struct SessionMetrics {
     pub stderr_lines_observed: u64,
     pub indexing_messages_seen: u64,
     pub last_indexing_progress: Option<IndexingProgress>,
+    pub request_metrics: LspRequestMetrics,
 }
 
 /// Cross-task observability state shared between the supervisor (who
@@ -929,6 +933,9 @@ impl SessionSupervisor {
     pub async fn metrics(&self) -> SessionMetrics {
         let mut snap = self.metrics.lock().await.clone();
         self.observability.fill_metrics(&mut snap);
+        if let Some(client) = self.lsp_client.read().await.as_ref() {
+            snap.request_metrics = client.request_metrics();
+        }
         snap
     }
 
@@ -965,8 +972,9 @@ impl SessionSupervisor {
             location.start_char,
         );
         if let Some(last_segment) = symbol_name.rsplit("::").next() {
-            if let Some(offset) = symbol_name.rfind(last_segment) {
-                character = character.saturating_add(offset as u32);
+            if let Some(byte_offset) = symbol_name.rfind(last_segment) {
+                let prefix = &symbol_name[..byte_offset];
+                character = character.saturating_add(utf16_code_unit_len(prefix));
             }
         }
 
@@ -1041,9 +1049,9 @@ impl SessionSupervisor {
                         let range = def_loc.range.map(|r| {
                             crate::domain::Range::with_file(
                                 r.start_line + 1,
-                                r.start_character,
+                                byte_column_for_utf16(&path, r.start_line + 1, r.start_character),
                                 r.end_line + 1,
-                                r.end_character,
+                                byte_column_for_utf16(&path, r.end_line + 1, r.end_character),
                                 file_string.clone(),
                             )
                         });

@@ -207,3 +207,36 @@ async fn test_large_graph_performance() {
     let retrieved_graph = repo.get(&node_ids[0]).await.unwrap().unwrap();
     assert!(retrieved_graph.node_count() > 0);
 }
+
+#[tokio::test]
+async fn provenance_with_corroboration_round_trips_through_sqlite() {
+    let repo = SqliteRepository::new_in_memory().unwrap();
+
+    let mut prov = Provenance::compiler();
+    prov.corroborating.insert(ProvenanceSource::Heuristic);
+
+    let node1 = Node::function("test::a".into(), Range::test(1, 0, 1, 10));
+    let node2 = Node::function("test::b".into(), Range::test(2, 0, 2, 10));
+    let edge = Edge::call(node1.id.clone(), node2.id.clone(), prov);
+
+    let mut graph = Graph::new();
+    graph.add_node(node1.clone());
+    graph.add_node(node2.clone());
+    graph.add_edge(edge);
+
+    repo.upsert(&graph).await.unwrap();
+    let retrieved = repo.get(&node1.id).await.unwrap().unwrap();
+    let stored = retrieved.edges.first().expect("edge stored");
+    assert!(stored
+        .provenance
+        .corroborating
+        .contains(ProvenanceSource::Heuristic));
+    assert_eq!(stored.provenance.source, ProvenanceSource::Compiler);
+}
+
+#[test]
+fn old_provenance_json_without_corroborating_deserializes() {
+    let legacy = r#"{"source":"TreeSitter","confidence":"High"}"#;
+    let p: Provenance = serde_json::from_str(legacy).unwrap();
+    assert!(p.corroborating.is_empty());
+}

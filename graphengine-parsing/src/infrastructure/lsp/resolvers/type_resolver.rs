@@ -4,6 +4,10 @@
 //! with LSP-based resolution and heuristic fallback. Processes type refs
 //! in concurrent chunks via `join_all` for throughput.
 
+use crate::application::lsp_telemetry::{
+    classify_init_error, classify_lsp_error, classify_unresolved_location, FallbackReason,
+    FallbackReasonCounts,
+};
 use crate::application::ports::{CallSite, SyntaxResults};
 use crate::domain::{Confidence, Edge, EdgeKind, NodeKind, Provenance, ProvenanceSource, Range};
 use crate::infrastructure::lsp::definition_provider::DefinitionProvider;
@@ -16,7 +20,6 @@ use crate::infrastructure::lsp::utils::{
 };
 use futures::future::join_all;
 use std::collections::HashSet;
-use tokio::time::Duration;
 use tracing::warn;
 
 const DEFAULT_CHUNK_SIZE: usize = 32;
@@ -30,9 +33,18 @@ impl TypeResolver {
         definition_provider: &dyn DefinitionProvider,
         syntax_results: &SyntaxResults,
         misses: &mut Vec<LspMiss>,
-    ) -> Result<(Vec<Edge>, Vec<Range>), LspError> {
+    ) -> Result<(Vec<Edge>, Vec<Range>, FallbackReasonCounts), LspError> {
         let mut edges = Vec::new();
         let mut unresolved_types = Vec::new();
+        let mut fallback_reasons = FallbackReasonCounts::default();
+
+        // Files we parsed, used to tell an in-repo mapping gap from a
+        // definition that resolved into an external dependency/builtin.
+        let repo_files: HashSet<&str> = syntax_results
+            .symbols
+            .iter()
+            .map(|s| s.location.file.as_str())
+            .collect();
 
         match definition_provider.ensure_ready().await {
             Ok(_) => {
@@ -45,11 +57,12 @@ impl TypeResolver {
                     definition_provider,
                     files_to_sync,
                     true,
-                    Duration::from_secs(5),
+                    DocumentSyncManager::index_wait_timeout(),
                 )
                 .await;
 
-                for chunk in syntax_results.type_refs.chunks(DEFAULT_CHUNK_SIZE) {
+                let chunk_size = DocumentSyncManager::lsp_chunk_size(DEFAULT_CHUNK_SIZE);
+                for chunk in syntax_results.type_refs.chunks(chunk_size) {
                     let futs: Vec<_> = chunk
                         .iter()
                         .map(|type_ref| {
@@ -79,6 +92,7 @@ impl TypeResolver {
                             Some(name) => name,
                             None => {
                                 unresolved_types.push(type_ref.clone());
+                                fallback_reasons.record(FallbackReason::NoCallSiteLocation);
                                 continue;
                             }
                         };
@@ -87,6 +101,7 @@ impl TypeResolver {
                             Some(r) => r,
                             None => {
                                 unresolved_types.push(type_ref.clone());
+                                fallback_reasons.record(FallbackReason::ReturnedNull);
                                 continue;
                             }
                         };
@@ -118,16 +133,23 @@ impl TypeResolver {
                                             edges.push(edge);
                                         } else {
                                             unresolved_types.push(type_ref.clone());
+                                            fallback_reasons
+                                                .record(FallbackReason::DefinitionUnmappable);
                                         }
                                     } else {
                                         unresolved_types.push(type_ref.clone());
+                                        let in_repo = repo_files.contains(def_range.file.as_str());
+                                        fallback_reasons
+                                            .record(classify_unresolved_location(in_repo));
                                     }
                                 } else {
                                     unresolved_types.push(type_ref.clone());
+                                    fallback_reasons.record(FallbackReason::DefinitionUnmappable);
                                 }
                             }
                             Ok(None) => {
                                 unresolved_types.push(type_ref.clone());
+                                fallback_reasons.record(FallbackReason::ReturnedNull);
                                 misses.push(LspMiss {
                                     file: type_ref.file.clone(),
                                     symbol: type_name,
@@ -138,6 +160,7 @@ impl TypeResolver {
                             Err(e) => {
                                 warn!("Failed to resolve type reference with LSP: {}", e);
                                 unresolved_types.push(type_ref.clone());
+                                fallback_reasons.record(classify_lsp_error(&e));
                             }
                         }
                     }
@@ -147,13 +170,14 @@ impl TypeResolver {
             }
             Err(err) => {
                 warn!("Unable to prepare definition provider for types: {}", err);
+                fallback_reasons.record(classify_init_error(&err));
                 for type_ref in &syntax_results.type_refs {
                     unresolved_types.push(type_ref.clone());
                 }
             }
         }
 
-        Ok((edges, unresolved_types))
+        Ok((edges, unresolved_types, fallback_reasons))
     }
 
     /// Resolve types using heuristics (fallback when LSP fails)
