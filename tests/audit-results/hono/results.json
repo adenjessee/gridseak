@@ -1,0 +1,1535 @@
+{
+ "repo": "hono",
+ "root": "<repo root>",
+ "date": "2026-10-12",
+ "agent": "Claude Code",
+ "model": "claude-sonnet-5-5, claude-opus-5-5",
+ "mode": "read-only tools + language toolchain",
+ "answer_key": "GridSeak compiler-indexed call graph (3012 edges, 100% from the compiler index); the 137 files outside the compiler project are excluded from questions and keys; targets whose callers could reach the 8 partly parsed file(s) are not asked",
+ "call_edges": 3012,
+ "tasks": [
+  {
+   "id": "t1",
+   "band": "small",
+   "target": "resumeWithContextValues",
+   "file": "src/jsx/context.ts",
+   "line": 117,
+   "question": "In this repository (hono), list every function and method, including those in test files, that transitively calls `resumeWithContextValues` (declared at src/jsx/context.ts:117) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `resumeWithContextValues` itself. The list must be complete. In TypeScript, an arrow function or function expression assigned to a variable or class field is a named function (named by the variable or field); one written anywhere else (an argument, an object-literal property value, a JSX attribute) is anonymous. `new C(...)` calls C's constructor, `super(...)` calls the base class's constructor, and a tagged template f`...` calls f. Reading a getter, rendering a JSX element (`<C />`) and `f.call`/`f.apply`/`f.bind` are not direct calls. Only consider code the compiler project covers: ignore `adapters/`, `benchmarks/`, `perf-measures/`, `runtime-tests/`, `vite.config.ts`, `vitest.config.ts`.",
+   "max_depth": 4,
+   "answer": [
+    {
+     "file": "src/jsx/base.ts",
+     "line": 316,
+     "name": "toStringToBuffer"
+    },
+    {
+     "file": "src/jsx/components.ts",
+     "line": 14,
+     "name": "childrenToString"
+    },
+    {
+     "file": "src/jsx/components.ts",
+     "line": 51,
+     "name": "ErrorBoundary"
+    },
+    {
+     "file": "src/jsx/components.ts",
+     "line": 69,
+     "name": "getResume"
+    },
+    {
+     "file": "src/jsx/components.ts",
+     "line": 72,
+     "name": "resolveFallbackStr"
+    },
+    {
+     "file": "src/jsx/components.ts",
+     "line": 91,
+     "name": "renderFallback"
+    },
+    {
+     "file": "src/jsx/components.ts",
+     "line": 131,
+     "name": "catchCallback"
+    },
+    {
+     "file": "src/jsx/context.ts",
+     "line": 196,
+     "name": "captureRenderContext"
+    },
+    {
+     "file": "src/jsx/index.test.tsx",
+     "line": 1441,
+     "name": "ResumedReader"
+    },
+    {
+     "file": "src/jsx/index.test.tsx",
+     "line": 1471,
+     "name": "CaptureOuter"
+    },
+    {
+     "file": "src/jsx/index.test.tsx",
+     "line": 1503,
+     "name": "CaptureOuter"
+    },
+    {
+     "file": "src/jsx/streaming.ts",
+     "line": 51,
+     "name": "Suspense"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t2",
+   "band": "small",
+   "target": "checkUserAgentEquals",
+   "file": "src/helper/adapter/index.ts",
+   "line": 86,
+   "question": "In this repository (hono), list every function and method, including those in test files, that transitively calls `checkUserAgentEquals` (declared at src/helper/adapter/index.ts:86) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `checkUserAgentEquals` itself. The list must be complete. In TypeScript, an arrow function or function expression assigned to a variable or class field is a named function (named by the variable or field); one written anywhere else (an argument, an object-literal property value, a JSX attribute) is anonymous. `new C(...)` calls C's constructor, `super(...)` calls the base class's constructor, and a tagged template f`...` calls f. Reading a getter, rendering a JSX element (`<C />`) and `f.call`/`f.apply`/`f.bind` are not direct calls. Only consider code the compiler project covers: ignore `adapters/`, `benchmarks/`, `perf-measures/`, `runtime-tests/`, `vite.config.ts`, `vitest.config.ts`.",
+   "max_depth": 6,
+   "answer": [
+    {
+     "file": "src/helper/adapter/index.ts",
+     "line": 10,
+     "name": "env"
+    },
+    {
+     "file": "src/helper/adapter/index.ts",
+     "line": 50,
+     "name": "getRuntimeKey"
+    },
+    {
+     "file": "src/middleware/jwk/index.test.ts",
+     "line": 304,
+     "name": "jwtSignWithoutHeader"
+    },
+    {
+     "file": "src/middleware/jwk/index.test.ts",
+     "line": 331,
+     "name": "jwtSignWithoutKid"
+    },
+    {
+     "file": "src/utils/jwt/jws.ts",
+     "line": 29,
+     "name": "signing"
+    },
+    {
+     "file": "src/utils/jwt/jws.ts",
+     "line": 39,
+     "name": "verifying"
+    },
+    {
+     "file": "src/utils/jwt/jws.ts",
+     "line": 54,
+     "name": "importPrivateKey"
+    },
+    {
+     "file": "src/utils/jwt/jws.ts",
+     "line": 78,
+     "name": "importPublicKey"
+    },
+    {
+     "file": "src/utils/jwt/jws.ts",
+     "line": 226,
+     "name": "isCryptoKey"
+    },
+    {
+     "file": "src/utils/jwt/jwt.ts",
+     "line": 56,
+     "name": "sign"
+    },
+    {
+     "file": "src/utils/jwt/jwt.ts",
+     "line": 96,
+     "name": "verify"
+    },
+    {
+     "file": "src/utils/jwt/jwt.ts",
+     "line": 198,
+     "name": "verifyWithJwks"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t3",
+   "band": "small",
+   "target": "fetch",
+   "file": "src/hono-base.ts",
+   "line": 483,
+   "question": "In this repository (hono), list every function and method, including those in test files, that transitively calls `fetch` (declared at src/hono-base.ts:483) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `fetch` itself. The list must be complete. In TypeScript, an arrow function or function expression assigned to a variable or class field is a named function (named by the variable or field); one written anywhere else (an argument, an object-literal property value, a JSX attribute) is anonymous. `new C(...)` calls C's constructor, `super(...)` calls the base class's constructor, and a tagged template f`...` calls f. Reading a getter, rendering a JSX element (`<C />`) and `f.call`/`f.apply`/`f.bind` are not direct calls. Only consider code the compiler project covers: ignore `adapters/`, `benchmarks/`, `perf-measures/`, `runtime-tests/`, `vite.config.ts`, `vitest.config.ts`.",
+   "max_depth": 3,
+   "answer": [
+    {
+     "file": "src/adapter/aws-lambda/handler.ts",
+     "line": 163,
+     "name": "streamHandle"
+    },
+    {
+     "file": "src/adapter/aws-lambda/handler.ts",
+     "line": 265,
+     "name": "handle"
+    },
+    {
+     "file": "src/adapter/bun/ssg.ts",
+     "line": 27,
+     "name": "toSSG"
+    },
+    {
+     "file": "src/adapter/cloudflare-pages/handler.ts",
+     "line": 38,
+     "name": "handle"
+    },
+    {
+     "file": "src/adapter/deno/ssg.ts",
+     "line": 27,
+     "name": "toSSG"
+    },
+    {
+     "file": "src/adapter/lambda-edge/handler.ts",
+     "line": 133,
+     "name": "handle"
+    },
+    {
+     "file": "src/adapter/netlify/handler.ts",
+     "line": 7,
+     "name": "handle"
+    },
+    {
+     "file": "src/adapter/service-worker/handler.ts",
+     "line": 22,
+     "name": "handle"
+    },
+    {
+     "file": "src/adapter/service-worker/index.ts",
+     "line": 32,
+     "name": "fire"
+    },
+    {
+     "file": "src/adapter/vercel/handler.ts",
+     "line": 7,
+     "name": "handle"
+    },
+    {
+     "file": "src/helper/ssg/ssg.ts",
+     "line": 205,
+     "name": "fetchRoutesContent"
+    },
+    {
+     "file": "src/helper/ssg/ssg.ts",
+     "line": 369,
+     "name": "toSSG"
+    },
+    {
+     "file": "src/helper/testing/index.ts",
+     "line": 22,
+     "name": "customFetch"
+    },
+    {
+     "file": "src/hono-base.ts",
+     "line": 503,
+     "name": "request"
+    },
+    {
+     "file": "src/middleware/cache/index.test.ts",
+     "line": 779,
+     "name": "request"
+    },
+    {
+     "file": "src/middleware/cache/index.test.ts",
+     "line": 806,
+     "name": "request"
+    },
+    {
+     "file": "src/middleware/cache/index.test.ts",
+     "line": 848,
+     "name": "request"
+    },
+    {
+     "file": "src/middleware/cache/index.test.ts",
+     "line": 877,
+     "name": "request"
+    },
+    {
+     "file": "src/middleware/cache/index.test.ts",
+     "line": 986,
+     "name": "request"
+    },
+    {
+     "file": "src/middleware/cache/index.test.ts",
+     "line": 1018,
+     "name": "request"
+    },
+    {
+     "file": "src/middleware/cache/index.test.ts",
+     "line": 1067,
+     "name": "request"
+    },
+    {
+     "file": "src/middleware/cache/index.test.ts",
+     "line": 1105,
+     "name": "request"
+    },
+    {
+     "file": "src/middleware/cache/index.test.ts",
+     "line": 1142,
+     "name": "request"
+    },
+    {
+     "file": "src/middleware/cache/index.test.ts",
+     "line": 1172,
+     "name": "request"
+    },
+    {
+     "file": "src/middleware/compress/index.test.ts",
+     "line": 95,
+     "name": "testCompression"
+    },
+    {
+     "file": "src/middleware/method-override/index.ts",
+     "line": 60,
+     "name": "methodOverride"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t4",
+   "band": "medium",
+   "target": "encodeBase64",
+   "file": "src/utils/encode.ts",
+   "line": 15,
+   "question": "In this repository (hono), list every function and method, including those in test files, that transitively calls `encodeBase64` (declared at src/utils/encode.ts:15) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `encodeBase64` itself. The list must be complete. In TypeScript, an arrow function or function expression assigned to a variable or class field is a named function (named by the variable or field); one written anywhere else (an argument, an object-literal property value, a JSX attribute) is anonymous. `new C(...)` calls C's constructor, `super(...)` calls the base class's constructor, and a tagged template f`...` calls f. Reading a getter, rendering a JSX element (`<C />`) and `f.call`/`f.apply`/`f.bind` are not direct calls. Only consider code the compiler project covers: ignore `adapters/`, `benchmarks/`, `perf-measures/`, `runtime-tests/`, `vite.config.ts`, `vitest.config.ts`.",
+   "max_depth": 3,
+   "answer": [
+    {
+     "file": "src/adapter/aws-lambda/handler.ts",
+     "line": 265,
+     "name": "handle"
+    },
+    {
+     "file": "src/adapter/aws-lambda/handler.ts",
+     "line": 373,
+     "name": "createResult"
+    },
+    {
+     "file": "src/adapter/lambda-edge/handler.ts",
+     "line": 133,
+     "name": "handle"
+    },
+    {
+     "file": "src/adapter/lambda-edge/handler.ts",
+     "line": 167,
+     "name": "createResult"
+    },
+    {
+     "file": "src/middleware/jwk/index.test.ts",
+     "line": 300,
+     "name": "encodeJwtPart"
+    },
+    {
+     "file": "src/middleware/jwk/index.test.ts",
+     "line": 302,
+     "name": "encodeSignaturePart"
+    },
+    {
+     "file": "src/middleware/jwk/index.test.ts",
+     "line": 304,
+     "name": "jwtSignWithoutHeader"
+    },
+    {
+     "file": "src/middleware/jwk/index.test.ts",
+     "line": 327,
+     "name": "encodeJwtPart"
+    },
+    {
+     "file": "src/middleware/jwk/index.test.ts",
+     "line": 329,
+     "name": "encodeSignaturePart"
+    },
+    {
+     "file": "src/middleware/jwk/index.test.ts",
+     "line": 331,
+     "name": "jwtSignWithoutKid"
+    },
+    {
+     "file": "src/middleware/jwk/index.test.ts",
+     "line": 1040,
+     "name": "encode"
+    },
+    {
+     "file": "src/middleware/secure-headers/secure-headers.ts",
+     "line": 131,
+     "name": "generateNonce"
+    },
+    {
+     "file": "src/middleware/secure-headers/secure-headers.ts",
+     "line": 137,
+     "name": "NONCE"
+    },
+    {
+     "file": "src/utils/encode.ts",
+     "line": 10,
+     "name": "encodeBase64Url"
+    },
+    {
+     "file": "src/utils/jwt/jwt.test.ts",
+     "line": 149,
+     "name": "encode"
+    },
+    {
+     "file": "src/utils/jwt/jwt.test.ts",
+     "line": 248,
+     "name": "encode"
+    },
+    {
+     "file": "src/utils/jwt/jwt.test.ts",
+     "line": 323,
+     "name": "encode"
+    },
+    {
+     "file": "src/utils/jwt/jwt.test.ts",
+     "line": 1060,
+     "name": "encode"
+    },
+    {
+     "file": "src/utils/jwt/jwt.test.ts",
+     "line": 1102,
+     "name": "encode"
+    },
+    {
+     "file": "src/utils/jwt/jwt.test.ts",
+     "line": 1134,
+     "name": "encode"
+    },
+    {
+     "file": "src/utils/jwt/jwt.test.ts",
+     "line": 1166,
+     "name": "encode"
+    },
+    {
+     "file": "src/utils/jwt/jwt.test.ts",
+     "line": 1210,
+     "name": "encode"
+    },
+    {
+     "file": "src/utils/jwt/jwt.test.ts",
+     "line": 1258,
+     "name": "encode"
+    },
+    {
+     "file": "src/utils/jwt/jwt.test.ts",
+     "line": 1306,
+     "name": "encode"
+    },
+    {
+     "file": "src/utils/jwt/jwt.test.ts",
+     "line": 1357,
+     "name": "encode"
+    },
+    {
+     "file": "src/utils/jwt/jwt.test.ts",
+     "line": 1405,
+     "name": "encode"
+    },
+    {
+     "file": "src/utils/jwt/jwt.test.ts",
+     "line": 1448,
+     "name": "encode"
+    },
+    {
+     "file": "src/utils/jwt/jwt.test.ts",
+     "line": 1533,
+     "name": "exportPEMPrivateKey"
+    },
+    {
+     "file": "src/utils/jwt/jwt.test.ts",
+     "line": 1539,
+     "name": "exportPEMPublicKey"
+    },
+    {
+     "file": "src/utils/jwt/jwt.ts",
+     "line": 31,
+     "name": "encodeJwtPart"
+    },
+    {
+     "file": "src/utils/jwt/jwt.ts",
+     "line": 33,
+     "name": "encodeSignaturePart"
+    },
+    {
+     "file": "src/utils/jwt/jwt.ts",
+     "line": 56,
+     "name": "sign"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t5",
+   "band": "medium",
+   "target": "tryDecode",
+   "file": "src/utils/url.ts",
+   "line": 81,
+   "question": "In this repository (hono), list every function and method, including those in test files, that transitively calls `tryDecode` (declared at src/utils/url.ts:81) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `tryDecode` itself. The list must be complete. In TypeScript, an arrow function or function expression assigned to a variable or class field is a named function (named by the variable or field); one written anywhere else (an argument, an object-literal property value, a JSX attribute) is anonymous. `new C(...)` calls C's constructor, `super(...)` calls the base class's constructor, and a tagged template f`...` calls f. Reading a getter, rendering a JSX element (`<C />`) and `f.call`/`f.apply`/`f.bind` are not direct calls. Only consider code the compiler project covers: ignore `adapters/`, `benchmarks/`, `perf-measures/`, `runtime-tests/`, `vite.config.ts`, `vitest.config.ts`.",
+   "max_depth": 5,
+   "answer": [
+    {
+     "file": "src/adapter/bun/serve-static.ts",
+     "line": 11,
+     "name": "serveStatic"
+    },
+    {
+     "file": "src/adapter/cloudflare-workers/serve-static-module.ts",
+     "line": 6,
+     "name": "module"
+    },
+    {
+     "file": "src/adapter/cloudflare-workers/serve-static.ts",
+     "line": 24,
+     "name": "serveStatic"
+    },
+    {
+     "file": "src/adapter/deno/serve-static.ts",
+     "line": 11,
+     "name": "serveStatic"
+    },
+    {
+     "file": "src/helper/cookie/index.ts",
+     "line": 27,
+     "name": "getCookie"
+    },
+    {
+     "file": "src/helper/cookie/index.ts",
+     "line": 50,
+     "name": "getSignedCookie"
+    },
+    {
+     "file": "src/helper/cookie/index.ts",
+     "line": 141,
+     "name": "deleteCookie"
+    },
+    {
+     "file": "src/hono.test.ts",
+     "line": 2502,
+     "name": "handler"
+    },
+    {
+     "file": "src/hono.test.ts",
+     "line": 2617,
+     "name": "anotherApp"
+    },
+    {
+     "file": "src/hono.test.ts",
+     "line": 2744,
+     "name": "anotherApp"
+    },
+    {
+     "file": "src/hono.test.ts",
+     "line": 2778,
+     "name": "anotherApp"
+    },
+    {
+     "file": "src/hono.test.ts",
+     "line": 2832,
+     "name": "anotherApp"
+    },
+    {
+     "file": "src/hono.test.ts",
+     "line": 2868,
+     "name": "anotherApp"
+    },
+    {
+     "file": "src/hono.test.ts",
+     "line": 2889,
+     "name": "anotherApp"
+    },
+    {
+     "file": "src/middleware/combine/index.test.ts",
+     "line": 232,
+     "name": "paramMiddleware"
+    },
+    {
+     "file": "src/middleware/jwk/jwk.ts",
+     "line": 49,
+     "name": "jwk"
+    },
+    {
+     "file": "src/middleware/jwt/jwt.ts",
+     "line": 54,
+     "name": "jwt"
+    },
+    {
+     "file": "src/middleware/language/language.ts",
+     "line": 145,
+     "name": "detectFromCookie"
+    },
+    {
+     "file": "src/middleware/mount/index.test.ts",
+     "line": 9,
+     "name": "anotherApp"
+    },
+    {
+     "file": "src/middleware/mount/index.test.ts",
+     "line": 142,
+     "name": "anotherApp"
+    },
+    {
+     "file": "src/middleware/mount/index.test.ts",
+     "line": 176,
+     "name": "anotherApp"
+    },
+    {
+     "file": "src/middleware/mount/index.test.ts",
+     "line": 230,
+     "name": "anotherApp"
+    },
+    {
+     "file": "src/middleware/mount/index.test.ts",
+     "line": 266,
+     "name": "anotherApp"
+    },
+    {
+     "file": "src/middleware/mount/index.test.ts",
+     "line": 290,
+     "name": "anotherApp"
+    },
+    {
+     "file": "src/middleware/mount/index.test.ts",
+     "line": 309,
+     "name": "anotherApp"
+    },
+    {
+     "file": "src/middleware/serve-static/index.ts",
+     "line": 37,
+     "name": "serveStatic"
+    },
+    {
+     "file": "src/request.ts",
+     "line": 99,
+     "name": "param"
+    },
+    {
+     "file": "src/request.ts",
+     "line": 103,
+     "name": "#getDecodedParam"
+    },
+    {
+     "file": "src/request.ts",
+     "line": 109,
+     "name": "#getAllDecodedParams"
+    },
+    {
+     "file": "src/request.ts",
+     "line": 166,
+     "name": "queries"
+    },
+    {
+     "file": "src/types.test.ts",
+     "line": 569,
+     "name": "handler"
+    },
+    {
+     "file": "src/utils/cookie.ts",
+     "line": 109,
+     "name": "parse"
+    },
+    {
+     "file": "src/utils/cookie.ts",
+     "line": 146,
+     "name": "parseSigned"
+    },
+    {
+     "file": "src/utils/url.ts",
+     "line": 104,
+     "name": "tryDecodeURI"
+    },
+    {
+     "file": "src/utils/url.ts",
+     "line": 106,
+     "name": "getPath"
+    },
+    {
+     "file": "src/utils/url.ts",
+     "line": 154,
+     "name": "getPathNoStrict"
+    },
+    {
+     "file": "src/utils/url.ts",
+     "line": 221,
+     "name": "tryDecodeURIComponent"
+    },
+    {
+     "file": "src/utils/url.ts",
+     "line": 225,
+     "name": "_decodeURI"
+    },
+    {
+     "file": "src/utils/url.ts",
+     "line": 232,
+     "name": "_getQueryParam"
+    },
+    {
+     "file": "src/utils/url.ts",
+     "line": 328,
+     "name": "getQueryParams"
+    },
+    {
+     "file": "src/validator/validator.test.ts",
+     "line": 36,
+     "name": "zodValidator"
+    },
+    {
+     "file": "src/validator/validator.ts",
+     "line": 46,
+     "name": "validator"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t6",
+   "band": "medium",
+   "target": "escapeToBuffer",
+   "file": "src/utils/html.ts",
+   "line": 90,
+   "question": "In this repository (hono), list every function and method, including those in test files, that transitively calls `escapeToBuffer` (declared at src/utils/html.ts:90) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `escapeToBuffer` itself. The list must be complete. In TypeScript, an arrow function or function expression assigned to a variable or class field is a named function (named by the variable or field); one written anywhere else (an argument, an object-literal property value, a JSX attribute) is anonymous. `new C(...)` calls C's constructor, `super(...)` calls the base class's constructor, and a tagged template f`...` calls f. Reading a getter, rendering a JSX element (`<C />`) and `f.call`/`f.apply`/`f.bind` are not direct calls. Only consider code the compiler project covers: ignore `adapters/`, `benchmarks/`, `perf-measures/`, `runtime-tests/`, `vite.config.ts`, `vitest.config.ts`.",
+   "max_depth": 6,
+   "answer": [
+    {
+     "file": "src/helper/css/index.ts",
+     "line": 72,
+     "name": "createCssContext"
+    },
+    {
+     "file": "src/helper/css/index.ts",
+     "line": 88,
+     "name": "newCssClassNameObject"
+    },
+    {
+     "file": "src/helper/css/index.ts",
+     "line": 169,
+     "name": "css"
+    },
+    {
+     "file": "src/helper/css/index.ts",
+     "line": 173,
+     "name": "cx"
+    },
+    {
+     "file": "src/helper/html/index.ts",
+     "line": 11,
+     "name": "html"
+    },
+    {
+     "file": "src/helper/ssg/plugins.ts",
+     "line": 24,
+     "name": "generateRedirectHtml"
+    },
+    {
+     "file": "src/helper/ssg/plugins.ts",
+     "line": 55,
+     "name": "redirectPlugin"
+    },
+    {
+     "file": "src/jsx/base.test.tsx",
+     "line": 41,
+     "name": "Partial"
+    },
+    {
+     "file": "src/jsx/base.ts",
+     "line": 129,
+     "name": "render"
+    },
+    {
+     "file": "src/jsx/base.ts",
+     "line": 139,
+     "name": "childrenToStringToBuffer"
+    },
+    {
+     "file": "src/jsx/base.ts",
+     "line": 176,
+     "name": "renderChildren"
+    },
+    {
+     "file": "src/jsx/base.ts",
+     "line": 194,
+     "name": "renderUntrustedObject"
+    },
+    {
+     "file": "src/jsx/base.ts",
+     "line": 198,
+     "name": "escape"
+    },
+    {
+     "file": "src/jsx/base.ts",
+     "line": 228,
+     "name": "render"
+    },
+    {
+     "file": "src/jsx/base.ts",
+     "line": 240,
+     "name": "toStringToBuffer"
+    },
+    {
+     "file": "src/jsx/base.ts",
+     "line": 316,
+     "name": "toStringToBuffer"
+    },
+    {
+     "file": "src/jsx/base.ts",
+     "line": 353,
+     "name": "toStringToBuffer"
+    },
+    {
+     "file": "src/jsx/base.ts",
+     "line": 358,
+     "name": "jsx"
+    },
+    {
+     "file": "src/jsx/base.ts",
+     "line": 373,
+     "name": "jsxFn"
+    },
+    {
+     "file": "src/jsx/base.ts",
+     "line": 471,
+     "name": "cloneElement"
+    },
+    {
+     "file": "src/jsx/components.ts",
+     "line": 30,
+     "name": "resolveChildEarly"
+    },
+    {
+     "file": "src/jsx/components.ts",
+     "line": 51,
+     "name": "ErrorBoundary"
+    },
+    {
+     "file": "src/jsx/components.ts",
+     "line": 72,
+     "name": "resolveFallbackStr"
+    },
+    {
+     "file": "src/jsx/components.ts",
+     "line": 91,
+     "name": "renderFallback"
+    },
+    {
+     "file": "src/jsx/components.ts",
+     "line": 131,
+     "name": "catchCallback"
+    },
+    {
+     "file": "src/jsx/context.ts",
+     "line": 213,
+     "name": "createContext"
+    },
+    {
+     "file": "src/jsx/dom/index.test.tsx",
+     "line": 3212,
+     "name": "App"
+    },
+    {
+     "file": "src/jsx/dom/index.test.tsx",
+     "line": 3227,
+     "name": "App"
+    },
+    {
+     "file": "src/jsx/dom/server.ts",
+     "line": 16,
+     "name": "prepareRoot"
+    },
+    {
+     "file": "src/jsx/dom/server.ts",
+     "line": 25,
+     "name": "renderToString"
+    },
+    {
+     "file": "src/jsx/dom/server.ts",
+     "line": 55,
+     "name": "renderToReadableStream"
+    },
+    {
+     "file": "src/jsx/index.test.tsx",
+     "line": 44,
+     "name": "Layout"
+    },
+    {
+     "file": "src/jsx/index.test.tsx",
+     "line": 1597,
+     "name": "AsyncParentWithHtml"
+    },
+    {
+     "file": "src/jsx/index.test.tsx",
+     "line": 1613,
+     "name": "AsyncParentWithHtml"
+    },
+    {
+     "file": "src/jsx/intrinsic-element/components.ts",
+     "line": 93,
+     "name": "returnWithoutSpecialBehavior"
+    },
+    {
+     "file": "src/jsx/intrinsic-element/components.ts",
+     "line": 96,
+     "name": "documentMetadataTag"
+    },
+    {
+     "file": "src/jsx/intrinsic-element/components.ts",
+     "line": 121,
+     "name": "title"
+    },
+    {
+     "file": "src/jsx/intrinsic-element/components.ts",
+     "line": 136,
+     "name": "script"
+    },
+    {
+     "file": "src/jsx/intrinsic-element/components.ts",
+     "line": 151,
+     "name": "style"
+    },
+    {
+     "file": "src/jsx/intrinsic-element/components.ts",
+     "line": 162,
+     "name": "link"
+    },
+    {
+     "file": "src/jsx/intrinsic-element/components.ts",
+     "line": 171,
+     "name": "meta"
+    },
+    {
+     "file": "src/jsx/jsx-dev-runtime.ts",
+     "line": 12,
+     "name": "jsxDEV"
+    },
+    {
+     "file": "src/jsx/jsx-runtime.ts",
+     "line": 16,
+     "name": "jsxAttr"
+    },
+    {
+     "file": "src/jsx/streaming.ts",
+     "line": 36,
+     "name": "serializeBoundaryChild"
+    },
+    {
+     "file": "src/jsx/streaming.ts",
+     "line": 51,
+     "name": "Suspense"
+    },
+    {
+     "file": "src/middleware/jsx-renderer/index.test.tsx",
+     "line": 9,
+     "name": "RequestUrl"
+    },
+    {
+     "file": "src/middleware/jsx-renderer/index.test.tsx",
+     "line": 383,
+     "name": "VariableFoo"
+    },
+    {
+     "file": "src/middleware/jsx-renderer/index.test.tsx",
+     "line": 389,
+     "name": "BindingsBar"
+    },
+    {
+     "file": "src/middleware/jsx-renderer/index.ts",
+     "line": 31,
+     "name": "createRenderer"
+    },
+    {
+     "file": "src/middleware/jsx-renderer/index.ts",
+     "line": 114,
+     "name": "jsxRenderer"
+    },
+    {
+     "file": "src/utils/html.ts",
+     "line": 53,
+     "name": "stringBufferToString"
+    }
+   ],
+   "kind": "callers"
+  }
+ ],
+ "runs": [
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 41.9653285,
+   "cost_usd": 0.1339944,
+   "turns": 13,
+   "tokens": 121477,
+   "score": {
+    "pass": false,
+    "recall": 0.9166666666666666,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [
+     "src/jsx/components.ts:131 catchCallback"
+    ],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 9.135151916,
+   "cost_usd": 0.0434192,
+   "turns": 2,
+   "tokens": 34829,
+   "score": {
+    "pass": false,
+    "recall": 0.9166666666666666,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [
+     "src/jsx/index.test.tsx:1503 CaptureOuter"
+    ],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 38.037699209,
+   "cost_usd": 0.1295746,
+   "turns": 12,
+   "tokens": 160558,
+   "score": {
+    "pass": false,
+    "recall": 0.8333333333333334,
+    "precision": 1.0,
+    "n_answer": 10,
+    "flagged_incomplete": false,
+    "missed": [
+     "src/middleware/jwk/index.test.ts:304 jwtSignWithoutHeader",
+     "src/middleware/jwk/index.test.ts:331 jwtSignWithoutKid"
+    ],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 11.681529083,
+   "cost_usd": 0.0432576,
+   "turns": 2,
+   "tokens": 35690,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 12,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 160.759826458,
+   "cost_usd": 0.6133502,
+   "turns": 29,
+   "tokens": 1027360,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 26,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 148.109514917,
+   "cost_usd": 0.5622074,
+   "turns": 39,
+   "tokens": 1190181,
+   "score": {
+    "pass": false,
+    "recall": 0.8846153846153846,
+    "precision": 1.0,
+    "n_answer": 23,
+    "flagged_incomplete": false,
+    "missed": [
+     "src/adapter/bun/ssg.ts:27 toSSG",
+     "src/adapter/deno/ssg.ts:27 toSSG",
+     "src/middleware/compress/index.test.ts:95 testCompression"
+    ],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 61.263874958,
+   "cost_usd": 0.18498619999999996,
+   "turns": 12,
+   "tokens": 209975,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 32,
+    "flagged_incomplete": true,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 33.433730333,
+   "cost_usd": 0.1196358,
+   "turns": 4,
+   "tokens": 98663,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 32,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 164.353095459,
+   "cost_usd": 0.708628,
+   "turns": 44,
+   "tokens": 1405967,
+   "score": {
+    "pass": true,
+    "recall": 0.9761904761904762,
+    "precision": 1.0,
+    "n_answer": 41,
+    "flagged_incomplete": false,
+    "missed": [
+     "src/adapter/cloudflare-workers/serve-static-module.ts:6 module"
+    ],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 17.261717291,
+   "cost_usd": 0.0681946,
+   "turns": 2,
+   "tokens": 40590,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 42,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 152.693217125,
+   "cost_usd": 0.7514433999999999,
+   "turns": 49,
+   "tokens": 1307646,
+   "score": {
+    "pass": false,
+    "recall": 0.7647058823529411,
+    "precision": 0.7358490566037735,
+    "n_answer": 53,
+    "flagged_incomplete": false,
+    "missed": [
+     "src/helper/css/index.ts:72 createCssContext",
+     "src/jsx/base.test.tsx:41 Partial",
+     "src/jsx/base.ts:129 render",
+     "src/jsx/base.ts:198 escape",
+     "src/jsx/base.ts:228 render",
+     "src/jsx/base.ts:358 jsx",
+     "src/jsx/base.ts:373 jsxFn",
+     "src/jsx/base.ts:471 cloneElement",
+     "src/jsx/context.ts:213 createContext",
+     "src/jsx/dom/index.test.tsx:3212 App",
+     "src/jsx/dom/index.test.tsx:3227 App",
+     "src/jsx/jsx-dev-runtime.ts:12 jsxDEV"
+    ],
+    "extra": [
+     "src/helper/css/index.ts:183 viewTransition",
+     "src/jsx/base.ts:116 resolveFunctionComponentResult",
+     "src/jsx/base.ts:227 JSXNode.toString",
+     "src/jsx/context.ts:215 context",
+     "src/jsx/streaming.ts:157 renderToReadableStream",
+     "src/jsx/index.test.tsx:846 render",
+     "src/jsx/context-isolation.test.ts:61 render",
+     "src/jsx/context-isolation.test.ts:114 render",
+     "src/helper/css/index.test.tsx:12 toString",
+     "src/helper/css/index.test.tsx:24 toCSS",
+     "src/jsx/streaming.test.tsx:36 readInitialSuspenseChunk",
+     "src/jsx/streaming.test.tsx:1141 drain",
+     "src/jsx/intrinsic-element/components.test.tsx:202 renderDocument",
+     "src/jsx/intrinsic-element/components.test.tsx:209 assertHeadAndBody"
+    ],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 42.597586167,
+   "cost_usd": 0.1825772,
+   "turns": 7,
+   "tokens": 213677,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 51,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 49.03402775,
+   "cost_usd": 0.2140424,
+   "turns": 9,
+   "tokens": 129145,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 12,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 20.780655291,
+   "cost_usd": 0.12689,
+   "turns": 4,
+   "tokens": 73028,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 12,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 58.797200708,
+   "cost_usd": 0.362724,
+   "turns": 17,
+   "tokens": 255928,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 12,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 38.49055975,
+   "cost_usd": 0.2072866,
+   "turns": 9,
+   "tokens": 178318,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 12,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 325.429779375,
+   "cost_usd": 1.4970434,
+   "turns": 51,
+   "tokens": 1687513,
+   "score": {
+    "pass": true,
+    "recall": 0.9615384615384616,
+    "precision": 1.0,
+    "n_answer": 25,
+    "flagged_incomplete": false,
+    "missed": [
+     "src/middleware/compress/index.test.ts:95 testCompression"
+    ],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 306.660367875,
+   "cost_usd": 1.6412871999999998,
+   "turns": 67,
+   "tokens": 2237565,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 26,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 122.192837917,
+   "cost_usd": 0.5449116,
+   "turns": 20,
+   "tokens": 448452,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 32,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 47.190163583,
+   "cost_usd": 0.27651080000000006,
+   "turns": 8,
+   "tokens": 191880,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 32,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 280.847578542,
+   "cost_usd": 1.2807598,
+   "turns": 46,
+   "tokens": 1518803,
+   "score": {
+    "pass": true,
+    "recall": 0.9761904761904762,
+    "precision": 1.0,
+    "n_answer": 41,
+    "flagged_incomplete": false,
+    "missed": [
+     "src/adapter/cloudflare-workers/serve-static-module.ts:6 module"
+    ],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 36.00681475,
+   "cost_usd": 0.2021,
+   "turns": 6,
+   "tokens": 135421,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 42,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 253.060149,
+   "cost_usd": 1.5054394,
+   "turns": 47,
+   "tokens": 2295909,
+   "score": {
+    "pass": false,
+    "recall": 0.7647058823529411,
+    "precision": 0.78,
+    "n_answer": 50,
+    "flagged_incomplete": false,
+    "missed": [
+     "src/helper/css/index.ts:72 createCssContext",
+     "src/jsx/base.test.tsx:41 Partial",
+     "src/jsx/base.ts:129 render",
+     "src/jsx/base.ts:198 escape",
+     "src/jsx/base.ts:228 render",
+     "src/jsx/base.ts:358 jsx",
+     "src/jsx/base.ts:373 jsxFn",
+     "src/jsx/base.ts:471 cloneElement",
+     "src/jsx/context.ts:213 createContext",
+     "src/jsx/dom/index.test.tsx:3212 App",
+     "src/jsx/dom/index.test.tsx:3227 App",
+     "src/jsx/jsx-dev-runtime.ts:12 jsxDEV"
+    ],
+    "extra": [
+     "src/helper/css/index.ts:183 viewTransition",
+     "src/jsx/base.ts:116 resolveFunctionComponentResult",
+     "src/jsx/base.ts:227 JSXNode.toString",
+     "src/jsx/streaming.ts:157 renderToReadableStream",
+     "src/jsx/context.ts:215 context",
+     "src/helper/css/index.test.tsx:12 toString",
+     "src/helper/css/index.test.tsx:24 toCSS",
+     "src/jsx/streaming.test.tsx:36 readInitialSuspenseChunk",
+     "src/jsx/streaming.test.tsx:1141 drain",
+     "src/jsx/context-isolation.test.ts:61 render",
+     "src/jsx/context-isolation.test.ts:114 render"
+    ],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 52.242410834,
+   "cost_usd": 0.2866016,
+   "turns": 12,
+   "tokens": 226921,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 51,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  }
+ ]
+}

@@ -1,0 +1,1776 @@
+{
+ "repo": "zod",
+ "root": "<repo root>",
+ "date": "2026-10-12",
+ "agent": "Claude Code",
+ "model": "claude-sonnet-5-5, claude-opus-5-5",
+ "mode": "read-only tools + language toolchain",
+ "answer_key": "GridSeak compiler-indexed call graph (1713 edges, 100% from the compiler index); the 84 files outside the compiler project are excluded from questions and keys",
+ "call_edges": 1713,
+ "tasks": [
+  {
+   "id": "t1",
+   "band": "small",
+   "target": "_addCheck",
+   "file": "src/types.ts",
+   "line": 1095,
+   "question": "In this repository (zod), list every function and method, including those in test files, that transitively calls `_addCheck` (declared at src/types.ts:1095) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `_addCheck` itself. The list must be complete. In TypeScript, an arrow function or function expression assigned to a variable or class field is a named function (named by the variable or field); one written anywhere else (an argument, an object-literal property value, a JSX attribute) is anonymous. `new C(...)` calls C's constructor, `super(...)` calls the base class's constructor, and a tagged template f`...` calls f. Reading a getter, rendering a JSX element (`<C />`) and `f.call`/`f.apply`/`f.bind` are not direct calls. Only consider code the compiler project covers: ignore `configs/`, `deno/`, `index.d.ts`.",
+   "max_depth": 2,
+   "answer": [
+    {
+     "file": "src/types.ts",
+     "line": 1102,
+     "name": "email"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1106,
+     "name": "url"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1110,
+     "name": "emoji"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1114,
+     "name": "uuid"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1117,
+     "name": "nanoid"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1120,
+     "name": "cuid"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1124,
+     "name": "cuid2"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1127,
+     "name": "ulid"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1130,
+     "name": "base64"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1133,
+     "name": "base64url"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1141,
+     "name": "jwt"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1145,
+     "name": "ip"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1149,
+     "name": "cidr"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1153,
+     "name": "datetime"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1183,
+     "name": "date"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1187,
+     "name": "time"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1210,
+     "name": "duration"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1214,
+     "name": "regex"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1222,
+     "name": "includes"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1231,
+     "name": "startsWith"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1239,
+     "name": "endsWith"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1247,
+     "name": "min"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1255,
+     "name": "max"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1263,
+     "name": "length"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1274,
+     "name": "nonempty"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t2",
+   "band": "small",
+   "target": "addIssueToContext",
+   "file": "src/helpers/parseUtil.ts",
+   "line": 72,
+   "question": "In this repository (zod), list every function and method, including those in test files, that transitively calls `addIssueToContext` (declared at src/helpers/parseUtil.ts:72) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `addIssueToContext` itself. The list must be complete. In TypeScript, an arrow function or function expression assigned to a variable or class field is a named function (named by the variable or field); one written anywhere else (an argument, an object-literal property value, a JSX attribute) is anonymous. `new C(...)` calls C's constructor, `super(...)` calls the base class's constructor, and a tagged template f`...` calls f. Reading a getter, rendering a JSX element (`<C />`) and `f.call`/`f.apply`/`f.bind` are not direct calls. Only consider code the compiler project covers: ignore `configs/`, `deno/`, `index.d.ts`.",
+   "max_depth": 2,
+   "answer": [
+    {
+     "file": "src/types.ts",
+     "line": 774,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1417,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1702,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1767,
+     "name": "_getInvalidInput"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1911,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1957,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 2091,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 2130,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 2165,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 2249,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 2278,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 2334,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 2588,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 3093,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 3097,
+     "name": "handleResults"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 3278,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 3468,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 3470,
+     "name": "handleParsed"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 3587,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 3711,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 3810,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 3908,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 4046,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 4263,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 4352,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 4462,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 4534,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 4628,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 5027,
+     "name": "_parse"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t3",
+   "band": "medium",
+   "target": "toString",
+   "file": "src/helpers/errorUtil.ts",
+   "line": 5,
+   "question": "In this repository (zod), list every function and method, including those in test files, that transitively calls `toString` (declared at src/helpers/errorUtil.ts:5) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `toString` itself. The list must be complete. In TypeScript, an arrow function or function expression assigned to a variable or class field is a named function (named by the variable or field); one written anywhere else (an argument, an object-literal property value, a JSX attribute) is anonymous. `new C(...)` calls C's constructor, `super(...)` calls the base class's constructor, and a tagged template f`...` calls f. Reading a getter, rendering a JSX element (`<C />`) and `f.call`/`f.apply`/`f.bind` are not direct calls. Only consider code the compiler project covers: ignore `configs/`, `deno/`, `index.d.ts`.",
+   "max_depth": 2,
+   "answer": [
+    {
+     "file": "src/types.ts",
+     "line": 1517,
+     "name": "gte"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1522,
+     "name": "gt"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1526,
+     "name": "lte"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1531,
+     "name": "lt"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1535,
+     "name": "setLimit"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1562,
+     "name": "int"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1569,
+     "name": "positive"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1578,
+     "name": "negative"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1587,
+     "name": "nonpositive"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1596,
+     "name": "nonnegative"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1605,
+     "name": "multipleOf"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1614,
+     "name": "finite"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1621,
+     "name": "safe"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1788,
+     "name": "gte"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1793,
+     "name": "gt"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1797,
+     "name": "lte"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1802,
+     "name": "lt"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1806,
+     "name": "setLimit"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1833,
+     "name": "positive"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1842,
+     "name": "negative"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1851,
+     "name": "nonpositive"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1860,
+     "name": "nonnegative"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1869,
+     "name": "multipleOf"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 2029,
+     "name": "min"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 2037,
+     "name": "max"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 2418,
+     "name": "min"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 2425,
+     "name": "max"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 2432,
+     "name": "length"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 2439,
+     "name": "nonempty"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 3972,
+     "name": "min"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 3979,
+     "name": "max"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 3986,
+     "name": "size"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 3990,
+     "name": "nonempty"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t4",
+   "band": "medium",
+   "target": "processCreateParams",
+   "file": "src/types.ts",
+   "line": 130,
+   "question": "In this repository (zod), list every function and method, including those in test files, that transitively calls `processCreateParams` (declared at src/types.ts:130) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `processCreateParams` itself. The list must be complete. In TypeScript, an arrow function or function expression assigned to a variable or class field is a named function (named by the variable or field); one written anywhere else (an argument, an object-literal property value, a JSX attribute) is anonymous. `new C(...)` calls C's constructor, `super(...)` calls the base class's constructor, and a tagged template f`...` calls f. Reading a getter, rendering a JSX element (`<C />`) and `f.call`/`f.apply`/`f.bind` are not direct calls. Only consider code the compiler project covers: ignore `configs/`, `deno/`, `index.d.ts`.",
+   "max_depth": 3,
+   "answer": [
+    {
+     "file": "src/__tests__/generics.test.ts",
+     "line": 8,
+     "name": "stripOuter"
+    },
+    {
+     "file": "src/__tests__/nullable.test.ts",
+     "line": 6,
+     "name": "checkErrors"
+    },
+    {
+     "file": "src/__tests__/optional.test.ts",
+     "line": 6,
+     "name": "checkErrors"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 484,
+     "name": "optional"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 487,
+     "name": "nullable"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 490,
+     "name": "nullish"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 493,
+     "name": "array"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 496,
+     "name": "promise"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 500,
+     "name": "or"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 504,
+     "name": "and"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 508,
+     "name": "transform"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 521,
+     "name": "default"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 533,
+     "name": "brand"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 545,
+     "name": "catch"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 567,
+     "name": "readonly"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1376,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1506,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1777,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 1929,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 2067,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 2106,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 2145,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 2178,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 2203,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 2229,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 2258,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 2292,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 2443,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 2542,
+     "name": "deepPartialify"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 2942,
+     "name": "deepPartial"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 2960,
+     "name": "partial"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 3017,
+     "name": "keyof"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 3023,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 3042,
+     "name": "strictCreate"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 3055,
+     "name": "lazycreate"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 3198,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 3340,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 3523,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 3653,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 3761,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 3871,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 3994,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 4146,
+     "name": "args"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 4194,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 4238,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 4280,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 4334,
+     "name": "createZodEnum"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 4500,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 4563,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 4753,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 4766,
+     "name": "createWithPreprocess"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 4814,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 4858,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 4906,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 4998,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 5042,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 5215,
+     "name": "create"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 5250,
+     "name": "custom"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 5373,
+     "name": "instanceOfType"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 5415,
+     "name": "ostring"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 5416,
+     "name": "onumber"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 5417,
+     "name": "oboolean"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t5",
+   "band": "medium",
+   "target": "isAsync",
+   "file": "src/helpers/parseUtil.ts",
+   "line": 189,
+   "question": "In this repository (zod), list every function and method, including those in test files, that transitively calls `isAsync` (declared at src/helpers/parseUtil.ts:189) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `isAsync` itself. The list must be complete. In TypeScript, an arrow function or function expression assigned to a variable or class field is a named function (named by the variable or field); one written anywhere else (an argument, an object-literal property value, a JSX attribute) is anonymous. `new C(...)` calls C's constructor, `super(...)` calls the base class's constructor, and a tagged template f`...` calls f. Reading a getter, rendering a JSX element (`<C />`) and `f.call`/`f.apply`/`f.bind` are not direct calls. Only consider code the compiler project covers: ignore `configs/`, `deno/`, `index.d.ts`.",
+   "max_depth": 4,
+   "answer": [
+    {
+     "file": "src/__tests__/generics.test.ts",
+     "line": 8,
+     "name": "stripOuter"
+    },
+    {
+     "file": "src/__tests__/nullable.test.ts",
+     "line": 6,
+     "name": "checkErrors"
+    },
+    {
+     "file": "src/__tests__/object-augmentation.test.ts",
+     "line": 23,
+     "name": "bad"
+    },
+    {
+     "file": "src/__tests__/optional.test.ts",
+     "line": 6,
+     "name": "checkErrors"
+    },
+    {
+     "file": "src/__tests__/pickomit.test.ts",
+     "line": 34,
+     "name": "bad1"
+    },
+    {
+     "file": "src/__tests__/pickomit.test.ts",
+     "line": 35,
+     "name": "bad2"
+    },
+    {
+     "file": "src/__tests__/pickomit.test.ts",
+     "line": 36,
+     "name": "bad3"
+    },
+    {
+     "file": "src/__tests__/pickomit.test.ts",
+     "line": 40,
+     "name": "bad4"
+    },
+    {
+     "file": "src/__tests__/pickomit.test.ts",
+     "line": 65,
+     "name": "bad1"
+    },
+    {
+     "file": "src/__tests__/pickomit.test.ts",
+     "line": 66,
+     "name": "bad2"
+    },
+    {
+     "file": "src/__tests__/pickomit.test.ts",
+     "line": 67,
+     "name": "bad3"
+    },
+    {
+     "file": "src/__tests__/pickomit.test.ts",
+     "line": 71,
+     "name": "bad4"
+    },
+    {
+     "file": "src/__tests__/pickomit.test.ts",
+     "line": 93,
+     "name": "bad"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 43,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 48,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 53,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 58,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 63,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 72,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 77,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 82,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 87,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 96,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 101,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 106,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 111,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 120,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 125,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 130,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 135,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 150,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 155,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 160,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 165,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 170,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 179,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 184,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 189,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 194,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 199,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 204,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 213,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 218,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 223,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 228,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 233,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 242,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 247,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 254,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 259,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 264,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 273,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 278,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 294,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 299,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 304,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 309,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 318,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 323,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 330,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 335,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 340,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 349,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 354,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 359,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 364,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/primitive.test.ts",
+     "line": 369,
+     "name": "f"
+    },
+    {
+     "file": "src/__tests__/promise.test.ts",
+     "line": 58,
+     "name": "bad"
+    },
+    {
+     "file": "src/__tests__/record.test.ts",
+     "line": 47,
+     "name": "badCheck"
+    },
+    {
+     "file": "src/__tests__/record.test.ts",
+     "line": 57,
+     "name": "badCheck"
+    },
+    {
+     "file": "src/__tests__/record.test.ts",
+     "line": 65,
+     "name": "badCheck"
+    },
+    {
+     "file": "src/__tests__/tuple.test.ts",
+     "line": 35,
+     "name": "checker"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 228,
+     "name": "_parseSync"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 241,
+     "name": "parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 247,
+     "name": "safeParse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 268,
+     "name": "~validate"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 317,
+     "name": "parseAsync"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 326,
+     "name": "safeParseAsync"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 571,
+     "name": "isOptional"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 574,
+     "name": "isNullable"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 2334,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 3093,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 3278,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 3468,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 4046,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 4164,
+     "name": "implement"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 4173,
+     "name": "strictImplement"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 4534,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 4628,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 4943,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 5106,
+     "name": "_parse"
+    },
+    {
+     "file": "src/types.ts",
+     "line": 5202,
+     "name": "_parse"
+    }
+   ],
+   "kind": "callers"
+  }
+ ],
+ "runs": [
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 34.329493625,
+   "cost_usd": 0.1191172,
+   "turns": 8,
+   "tokens": 104113,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 25,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 36.53002875,
+   "cost_usd": 0.146881,
+   "turns": 8,
+   "tokens": 168699,
+   "score": {
+    "pass": false,
+    "recall": 1.0,
+    "precision": 0.7575757575757576,
+    "n_answer": 33,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [
+     "src/__tests__/string.test.ts:1 <file scope>",
+     "src/__tests__/validations.test.ts:1 <file scope>",
+     "src/__tests__/preprocess.test.ts:1 <file scope>",
+     "src/__tests__/unions.test.ts:1 <file scope>",
+     "src/__tests__/refine.test.ts:1 <file scope>",
+     "src/__tests__/error.test.ts:1 <file scope>",
+     "src/__tests__/nullable.test.ts:1 <file scope>",
+     "src/__tests__/optional.test.ts:1 <file scope>"
+    ],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 30.958203792,
+   "cost_usd": 0.08773500000000001,
+   "turns": 6,
+   "tokens": 64771,
+   "score": {
+    "pass": false,
+    "recall": 0.9310344827586208,
+    "precision": 1.0,
+    "n_answer": 27,
+    "flagged_incomplete": false,
+    "missed": [
+     "src/types.ts:3097 handleResults",
+     "src/types.ts:3470 handleParsed"
+    ],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 23.852422792,
+   "cost_usd": 0.08458179999999998,
+   "turns": 5,
+   "tokens": 97554,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 29,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 49.154103334,
+   "cost_usd": 0.1623852,
+   "turns": 13,
+   "tokens": 156057,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 33,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 29.402684375,
+   "cost_usd": 0.1259594,
+   "turns": 8,
+   "tokens": 145739,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 33,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 104.4249835,
+   "cost_usd": 0.31902339999999996,
+   "turns": 31,
+   "tokens": 330783,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 0.984126984126984,
+    "n_answer": 63,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [
+     "src/types.ts:564 ZodType.pipe"
+    ],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 28.847617833,
+   "cost_usd": 0.1230102,
+   "turns": 6,
+   "tokens": 115719,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 62,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 104.904554291,
+   "cost_usd": 0.39146259999999994,
+   "turns": 22,
+   "tokens": 514723,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 92,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 38.528350666,
+   "cost_usd": 0.1693518,
+   "turns": 7,
+   "tokens": 168247,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 92,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 55.157832417,
+   "cost_usd": 0.3170518,
+   "turns": 12,
+   "tokens": 208640,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 25,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 50.694384,
+   "cost_usd": 0.4368718,
+   "turns": 12,
+   "tokens": 356899,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 25,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 47.160100542,
+   "cost_usd": 0.2207864,
+   "turns": 6,
+   "tokens": 89395,
+   "score": {
+    "pass": true,
+    "recall": 0.9655172413793104,
+    "precision": 1.0,
+    "n_answer": 28,
+    "flagged_incomplete": false,
+    "missed": [
+     "src/types.ts:3097 handleResults"
+    ],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 30.44523425,
+   "cost_usd": 0.16763260000000002,
+   "turns": 5,
+   "tokens": 103021,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 29,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 56.272592292,
+   "cost_usd": 0.2975932,
+   "turns": 11,
+   "tokens": 179640,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 33,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 41.050212875,
+   "cost_usd": 0.2036394,
+   "turns": 9,
+   "tokens": 160307,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 33,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 132.246908125,
+   "cost_usd": 0.6868058,
+   "turns": 19,
+   "tokens": 553656,
+   "score": {
+    "pass": false,
+    "recall": 0.9193548387096774,
+    "precision": 0.9661016949152542,
+    "n_answer": 59,
+    "flagged_incomplete": false,
+    "missed": [
+     "src/__tests__/nullable.test.ts:6 checkErrors",
+     "src/__tests__/optional.test.ts:6 checkErrors",
+     "src/types.ts:3761 create",
+     "src/types.ts:4194 create",
+     "src/types.ts:5373 instanceOfType"
+    ],
+    "extra": [
+     "src/types.ts:3752 ZodRecord.create",
+     "src/types.ts:4182 ZodFunction.create"
+    ],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 46.636751417,
+   "cost_usd": 0.2395424,
+   "turns": 5,
+   "tokens": 115716,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 62,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 297.045231292,
+   "cost_usd": 1.5354952,
+   "turns": 45,
+   "tokens": 1623645,
+   "score": {
+    "pass": false,
+    "recall": 1.0,
+    "precision": 0.39148936170212767,
+    "n_answer": 235,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [
+     "src/types.ts:353 ZodType.refine",
+     "src/types.ts:400 ZodType.refinement",
+     "src/types.ts:426 ZodType._refinement",
+     "src/types.ts:436 ZodType.superRefine",
+     "src/types.ts:451 ZodType.constructor",
+     "src/types.ts:484 ZodType.optional",
+     "src/types.ts:487 ZodType.nullable",
+     "src/types.ts:490 ZodType.nullish",
+     "src/types.ts:493 ZodType.array",
+     "src/types.ts:496 ZodType.promise",
+     "src/types.ts:500 ZodType.or",
+     "src/types.ts:504 ZodType.and",
+     "src/types.ts:508 ZodType.transform",
+     "src/types.ts:519 ZodType.default",
+     "src/types.ts:532 ZodType.brand",
+     "src/types.ts:541 ZodType.catch",
+     "src/types.ts:564 ZodType.pipe",
+     "src/types.ts:567 ZodType.readonly",
+     "src/types.ts:1095 ZodString._addCheck",
+     "src/types.ts:1102 ZodString.email",
+     "src/types.ts:1106 ZodString.url",
+     "src/types.ts:1110 ZodString.emoji",
+     "src/types.ts:1114 ZodString.uuid",
+     "src/types.ts:1117 ZodString.nanoid",
+     "src/types.ts:1120 ZodString.cuid"
+    ],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 528.319916916,
+   "cost_usd": 2.1332744,
+   "turns": 39,
+   "tokens": 1942351,
+   "score": {
+    "pass": false,
+    "recall": 1.0,
+    "precision": 0.3898305084745763,
+    "n_answer": 236,
+    "flagged_incomplete": true,
+    "missed": [],
+    "extra": [
+     "src/types.ts:361 ZodType.refine",
+     "src/types.ts:408 ZodType.refinement",
+     "src/types.ts:426 ZodType._refinement",
+     "src/types.ts:445 ZodType.superRefine",
+     "src/types.ts:451 ZodType.constructor",
+     "src/types.ts:484 ZodType.optional",
+     "src/types.ts:487 ZodType.nullable",
+     "src/types.ts:490 ZodType.nullish",
+     "src/types.ts:493 ZodType.array",
+     "src/types.ts:496 ZodType.promise",
+     "src/types.ts:500 ZodType.or",
+     "src/types.ts:504 ZodType.and",
+     "src/types.ts:508 ZodType.transform",
+     "src/types.ts:521 ZodType.default",
+     "src/types.ts:533 ZodType.brand",
+     "src/types.ts:545 ZodType.catch",
+     "src/types.ts:564 ZodType.pipe",
+     "src/types.ts:567 ZodType.readonly",
+     "src/types.ts:1083 ZodString._regex",
+     "src/types.ts:1095 ZodString._addCheck",
+     "src/types.ts:1102 ZodString.email",
+     "src/types.ts:1106 ZodString.url",
+     "src/types.ts:1110 ZodString.emoji",
+     "src/types.ts:1114 ZodString.uuid",
+     "src/types.ts:1117 ZodString.nanoid"
+    ],
+    "out_of_scope": [],
+    "error": null
+   }
+  }
+ ]
+}
