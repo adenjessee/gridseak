@@ -1,16 +1,17 @@
 # 20 — `gridseak audit`: agents graded against compiler truth on five repos
 
 Date: 2026-10-12/13. Command: `gridseak audit` (`gridseak-cli/src/audit.rs`,
-`audit_edit.rs`, `audit/scope.rs`). Raw results, tasks, answer keys and every
-agent reply are kept per audit directory (`results.json`, `tasks.json`,
-`t*-<arm>-r*.json`).
+`audit_edit.rs`, `audit/scope.rs`). Per-repo results, tasks with answer keys
+and report cards: `tests/audit-results/<repo>/` (paths sanitised). 378 graded
+caller-question runs plus 12 edit runs.
 
 ## What the audit does
 
 - Plans tasks from the scan's call graph: "list every function that
   transitively calls X through direct calls", small (8–30 callers), medium
   (31–120) and large (121–400). Refuses to run unless every call edge came from
-  the compiler index; states in each question which code the compiler covers.
+  the compiler index, and states in each question which code the compiler
+  covers.
 - Runs each task in a fresh headless Claude Code session, alone ("plain") and
   with GridSeak's MCP tools ("gridseak"), read-only tools plus the language
   toolchain. Grades recall and precision against the key; pass = recall ≥ 0.95
@@ -22,46 +23,54 @@ agent reply are kept per audit directory (`results.json`, `tasks.json`,
 
 ## Are the answer keys right?
 
-Checked against independent oracles built on each language's own type checker:
+| Repo | Oracle | Keys checked | Exact |
+|---|---|---:|---:|
+| Caddy (Go) | go/types | 12 targets (two plans) | 12/12 |
+| chi (Go) | go/types | 8 targets (two plans) | 8/8 |
+| zod (TS) | TypeScript checker (fixed oracle) | 17 eligible targets | 17/17 |
+| hono (TS) | TypeScript checker (fixed oracle) | 73 eligible targets | 73/73 |
+| Kubernetes (Go) | — | not re-checked transitively; direct callers matched go/types file-for-file in `18` | — |
 
-| Repo | Keys checked | Exact |
-|---|---:|---:|
-| Caddy (Go, go/types) | 12 targets (two plans) | 12/12 |
-| chi (Go, go/types) | 8 targets (two plans) | 8/8 |
-| zod (TS, TypeScript checker) | 15 → 17 candidate targets | ~~15/15~~ invalid, see correction; 17/17 after fix |
-| hono (TS, TypeScript checker) | 73 candidate targets | ~~73/73~~ 71/73 with the fixed oracle; 73/73 after fix |
-| Kubernetes (Go) | not re-checked transitively (direct callers matched go/types file-for-file in `18`) | — |
+**Correction made during this work.** The first TypeScript oracle shared two
+blind spots with GridSeak: string-keyed element-access calls
+(`this["~validate"](x)`) and `new X()` reaching an inherited constructor. Both
+agreed on keys that missed real callers (zod `isAsync`: 236 true callers, the
+first key had 92). Both were fixed; the first TypeScript results were discarded
+and re-run. Go keys never depended on that oracle.
 
-Getting there fixed real defects: TS function nodes for class fields, private
-and keyword-named methods; node-id collisions between identical method bodies;
-calls misread as value uses; `super()` edges; and the question scope (Go
-`_examples/`, files the TS project excludes, files tree-sitter only partly
-parses).
+Other defects fixed on the way: TS function nodes for class fields, private and
+keyword-named methods; node-id collisions between identical method bodies;
+calls misread as value uses; `super()` edges; MCP rows listing `<file scope>`
+pseudo-callers; `file:line` symbol lookup for common names; question scope (Go
+`_examples/`, files the TS project excludes, partly parsed files).
 
 ## Results — caller questions
 
-Go (Caddy ×3 repeats, chi, Kubernetes; 6 tasks per repo per model):
+Go: Caddy, chi and Kubernetes, 6 tasks each, 3 repeats per cell (162 runs per arm):
 
-| Model | Alone: exact | Alone: silent misses | + GridSeak: exact | + GridSeak: silent | $ per correct, alone → GridSeak | Minutes, alone → GridSeak |
-|---|---:|---:|---:|---:|---:|---:|
-| Haiku 5.5 | 25/30 | 0 | **30/30** | 0 | 1.86 → 0.90 | 99 → 51 |
-| Sonnet 5.5 | 24/30 | 5 | **30/30** | 0 | 0.45 → 0.14 | 50 → 18 |
-| Opus 5.5 | 29/30 | 1 | **30/30** | 0 | 0.66 → 0.27 | 58 → 26 |
-| **All** | **78/90** | **6** | **90/90** | **0** | **0.98 → 0.44** | **208 → 96** |
+| Model | Alone: exact | Alone: silent | + GridSeak: exact | + GridSeak: silent | $ per correct (alone → GridSeak) | Minutes | Tokens |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Haiku 5.5 | 45/54 | 0 | **54/54** | 0 | 1.65 → 0.74 | 160 → 78 | 42.3M → 21.0M |
+| Sonnet 5.5 | 47/54 | 6 | **54/54** | 0 | 0.41 → 0.12 | 89 → 30 | 27.7M → 5.5M |
+| Opus 5.5 | 51/54 | 3 | **54/54** | 0 | 0.58 → 0.25 | 100 → 45 | 24.3M → 7.0M |
+| **All** | **143/162** | **9** | **162/162** | **0** | **0.86 → 0.37** | **349 → 153** | **94.4M → 33.5M** |
 
-Tokens processed: 59.3M alone vs 22.5M with GridSeak (2.6× fewer).
+Per repo (all models): Caddy 47/54 → 54/54, chi 49/54 → 54/54, Kubernetes
+47/54 → 54/54.
 
-**Correction (2026-10-13): the TypeScript results below were graded against wrong answer keys.** The first TS oracle shared two blind spots with GridSeak — string-keyed element-access calls (`this["~validate"](x)`) and `new X()` reaching an inherited constructor — so both agreed on keys that missed real callers (zod `isAsync`: 236 true callers, the key had 92). Both are fixed and the keys now match the fixed oracle exactly (zod 17/17, hono 73/73). The TS runs are being re-done; the numbers below are kept only as a record and must not be quoted.
+TypeScript: zod (3 tasks) and hono (6 tasks), one run per cell, corrected keys:
 
-~~TypeScript (zod, hono; Sonnet and Opus): alone 15/22 (7 silent), with
-GridSeak 18/22 (3 silent); $0.80 → $0.42 per correct answer. The GridSeak-arm
-misses trace to three product gaps, being fixed: MCP rows included synthetic
-`<file scope>` pseudo-callers (an agent listed them); the tools could not
-resolve a class-field function with a common name (`fetch`), so the agent fell
-back to grep; and string-keyed element-access calls (`this["~validate"](x)`)
-are not recorded as calls — Opus spotted this one itself and flagged its
-answer as unverified. One hono miss was the agent merging two distinct test
-functions with the same name.~~
+| Model | Alone | + GridSeak | $ per correct (alone → GridSeak) |
+|---|---:|---:|---:|
+| Haiku 5.5 | 7/9 (1 silent) | 8/9 (1 silent) | 2.98 → 1.30 |
+| Sonnet 5.5 | 5/9 (4 silent) | **9/9** | 0.71 → 0.08 |
+| Opus 5.5 | 7/9 (2 silent) | **9/9** | 0.77 → 0.24 |
+| **All** | **19/27 (7 silent)** | **26/27 (1 silent)** | **1.57 → 0.51** |
+
+The one GridSeak-arm miss: Haiku received GridSeak's certified 51-caller list
+for hono `escapeToBuffer`, then removed 9 correct callers it judged did not
+count (calls inside an arrow wrapped in an `as` cast). The key matches the
+TypeScript checker. A weaker model can argue itself out of a certified answer.
 
 ## Results — edit tasks (Go, Caddy)
 
@@ -72,26 +81,27 @@ not where agents fail.
 
 ## What this changes
 
-- `19` found that plain agents solve single caller questions when they can
-  write code. Across a spread of tasks and repos, plain agents are wrong on
-  about 1 in 7 Go questions, and **half of those wrong answers are presented as
-  complete**. With GridSeak no Go answer was wrong.
-- Model choice matters as much as tools: Sonnet + GridSeak gave the cheapest
-  correct answers on every Go repo ($0.04–0.16 each), while plain Haiku was the
-  most expensive and least accurate.
-- The audit itself is the product surface: a per-repo, per-model card with
+- `19` found that plain agents solve a single caller question when they can
+  write code. Across a spread of tasks, repos and repeats, plain agents with
+  read-only tools are wrong on about 1 in 8 Go questions, and almost half of
+  those wrong lists are presented as complete. With GridSeak, no Go answer was
+  wrong in 162 runs.
+- Cost per correct answer fell 2.3× (Go) and 3.1× (TS); time 2.3× and 2.6×;
+  tokens 2.8× and 3.1×. Sonnet + GridSeak gave the cheapest correct answers on
+  every repo.
+- The audit is the product surface: a per-repo, per-model card with
   compiler-checked answers, silent-miss counts and cost per correct answer.
 
 ## Spend
 
-About $139 at API prices for the audits in this doc (Claude Code's per-run
-figure), billed to the claude.ai subscription.
+About $250 at API prices for all audits behind this doc, including the
+discarded first TypeScript runs (Claude Code's per-run figure), billed to the
+claude.ai subscription.
 
 ## Limits
 
-One task family where agents fail (transitive callers); edits are easy. Go
-results rest on 3 repos; TypeScript on 2 repos and 2 models. Caddy has 3
-repeats per cell; other repos 1. Read-only tools (agents could not write
-helper programs; `19` showed that closes much of the gap at 3–7× the time).
+One task family where agents fail (transitive callers); edits are easy.
+Read-only tools: agents that may write helper programs close much of the gap at
+several times the time (`19`). TypeScript has one run per cell on two repos.
 Kubernetes transitive keys were not re-checked against go/types. Pass-rate
-ranges per cell are wide (Wilson 95%, e.g. 30/30 → 89–100%).
+ranges per cell are wide (Wilson 95%: 54/54 → 93–100%; 162/162 → 98–100%).
