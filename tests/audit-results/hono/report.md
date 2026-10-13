@@ -8,7 +8,7 @@ Answer key: GridSeak compiler-indexed call graph (3014 edges, 100% from the comp
 
 | Setup | Exact answers | Pass rate (95% range) | Silent misses | Flagged misses | Minutes | Cost | Cost per correct answer | Tokens |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
-| Haiku 5.5 alone | 4/6 | 67% (30–90%) | 1 | 1 | 29.9 | $14.49 | $3.62 | 9.96M |
+| Haiku 5.5 alone | 4/6 | 67% (30–90%) | 0 | 2 | 29.9 | $14.49 | $3.62 | 9.96M |
 | Haiku 5.5 + GridSeak | 5/6 | 83% (44–97%) | 1 | 0 | 13.7 | $6.87 | $1.37 | 4.51M |
 | Opus 5.5 alone | 5/6 | 83% (44–97%) | 1 | 0 | 14.8 | $4.41 | $0.88 | 5.46M |
 | Opus 5.5 + GridSeak | 6/6 | 100% (61–100%) | 0 | 0 | 3.0 | $1.01 | $0.17 | 0.58M |
@@ -29,7 +29,7 @@ Answer key: GridSeak compiler-indexed call graph (3014 edges, 100% from the comp
 | t2 (callers) | `checkUserAgentEquals` (src/helper/adapter/index.ts:86) | 12 | 6 | Sonnet 5.5 + GridSeak | 1 | PASS | 1.00 | 1.00 | 0.2 | $0.04 |
 | t2 (callers) | `checkUserAgentEquals` (src/helper/adapter/index.ts:86) | 12 | 6 | Opus 5.5 alone | 1 | PASS | 1.00 | 1.00 | 0.9 | $0.29 |
 | t2 (callers) | `checkUserAgentEquals` (src/helper/adapter/index.ts:86) | 12 | 6 | Opus 5.5 + GridSeak | 1 | PASS | 1.00 | 1.00 | 0.4 | $0.12 |
-| t3 (callers) | `fetch` (src/hono-base.ts:483) | 26 | 3 | Haiku 5.5 alone | 1 | MISS (silent) | 0.92 | 1.00 | 7.6 | $3.43 |
+| t3 (callers) | `fetch` (src/hono-base.ts:483) | 26 | 3 | Haiku 5.5 alone | 1 | MISS (flagged) | 0.92 | 1.00 | 7.6 | $3.43 |
 | t3 (callers) | `fetch` (src/hono-base.ts:483) | 26 | 3 | Haiku 5.5 + GridSeak | 1 | PASS | 1.00 | 1.00 | 2.1 | $1.19 |
 | t3 (callers) | `fetch` (src/hono-base.ts:483) | 26 | 3 | Sonnet 5.5 alone | 1 | MISS (silent) | 0.92 | 1.00 | 3.8 | $0.73 |
 | t3 (callers) | `fetch` (src/hono-base.ts:483) | 26 | 3 | Sonnet 5.5 + GridSeak | 1 | PASS | 1.00 | 1.00 | 0.2 | $0.07 |

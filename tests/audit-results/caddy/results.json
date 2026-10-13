@@ -3843,7 +3843,7 @@
     "recall": 0.027303754266211604,
     "precision": 1.0,
     "n_answer": 8,
-    "flagged_incomplete": false,
+    "flagged_incomplete": true,
     "missed": [
      "caddyconfig/caddyfile/adapter.go:32 Adapter.Adapt",
      "caddyconfig/caddyfile/adapter.go:127 UnmarshalModule",
@@ -4082,7 +4082,7 @@
     "recall": 1.0,
     "precision": 1.0,
     "n_answer": 129,
-    "flagged_incomplete": false,
+    "flagged_incomplete": true,
     "missed": [],
     "extra": [],
     "out_of_scope": [],
