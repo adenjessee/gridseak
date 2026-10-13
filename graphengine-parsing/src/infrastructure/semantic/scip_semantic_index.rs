@@ -94,6 +94,24 @@ impl SemanticIndex for ScipSemanticIndex {
             .collect()
     }
 
+    fn reference_occurrences(&self) -> Option<Vec<(IndexTarget, IndexTarget)>> {
+        let root = self.inner.project_root();
+        let to_target = |d: graphengine_scip_adapter::ScipDefinition| IndexTarget {
+            file: root.join(&d.relative_path),
+            line: d.line.saturating_add(1),
+            col: d.character,
+            symbol_moniker: d.symbol,
+            confidence: Confidence::High,
+        };
+        Some(
+            self.inner
+                .reference_occurrences()
+                .into_iter()
+                .map(|(r, d)| (to_target(r), to_target(d)))
+                .collect(),
+        )
+    }
+
     fn references_of(&self, symbol: &str) -> Vec<IndexTarget> {
         self.inner
             .references_of(symbol)

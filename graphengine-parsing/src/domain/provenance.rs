@@ -43,6 +43,20 @@ pub struct Provenance {
     /// Non-winning witnesses that agreed with the resolved target (plan 02 Phase B).
     #[serde(default)]
     pub corroborating: crate::domain::authority::SourceSet,
+    /// How a Call-kind edge uses its target, when the compiler index says.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub via: Option<UseKind>,
+}
+
+/// How a caller uses a callee: invoked directly, referenced as a value
+/// (passed, stored, assigned), or reached through interface/virtual dispatch.
+/// "Who calls X" usually means `Call`; impact analysis wants all three.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum UseKind {
+    Call,
+    Dispatch,
+    Value,
 }
 
 impl Provenance {
@@ -52,7 +66,14 @@ impl Provenance {
             source,
             confidence,
             corroborating: crate::domain::authority::SourceSet::default(),
+            via: None,
         }
+    }
+
+    /// The same provenance, tagged with how the edge uses its target.
+    pub fn with_via(mut self, via: UseKind) -> Self {
+        self.via = Some(via);
+        self
     }
 
     /// Create a high-confidence Tree-sitter provenance

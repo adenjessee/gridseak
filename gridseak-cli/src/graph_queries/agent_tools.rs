@@ -377,6 +377,8 @@ fn functions_in_file(conn: &Connection, file: &str) -> Result<Vec<NodeRef>, Grap
                 id: row.get(0)?,
                 fqn: row.get(1)?,
                 kind: row.get(2)?,
+                file: None,
+                line: None,
             })
         })?
         .collect::<rusqlite::Result<Vec<_>>>()?;
@@ -438,6 +440,8 @@ pub fn diff_impact(
                     id: row.get(0)?,
                     fqn: row.get(1)?,
                     kind: row.get(2)?,
+                    file: None,
+                    line: None,
                 })
             })
             .ok()

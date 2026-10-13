@@ -231,6 +231,8 @@ fn load_graph_slice(
             id: id.clone(),
             fqn: focus.target_fqn.clone(),
             kind: "Function".into(),
+            file: None,
+            line: None,
         },
         None => gq::resolve_symbol(&conn, &focus.target_fqn)
             .map_err(|e| anyhow::anyhow!("resolve focus: {e}"))?,

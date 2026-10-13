@@ -9,6 +9,51 @@ will call those out explicitly here when they happen.
 
 ## [Unreleased]
 
+## [0.1.2] — 2026-10-12
+
+Compiler-grade call graph, measured against the compilers themselves,
+and answers that say when they are complete.
+
+### Added
+
+- `gridseak pr-check`: compares the call graph before and after a change
+  and flags callers left pointing at a removed or renamed symbol. 0 false
+  alarms on 113 merged pull requests; 46 of 46 seeded breaks caught.
+- Blast-radius certificate (MCP): `certificate.complete` is true only when
+  every call edge came from the compiler index, no source file changed
+  since the scan, and the walk hit neither the depth limit nor the row
+  cap. Otherwise `reasons` names each failed check.
+- Call edges record how the callee is used (`call`, `dispatch` through an
+  interface, `value` passed or stored). `blast-radius --uses` and the MCP
+  `uses` parameter take `all` (default), `calls` or `static`.
+- `GRIDSEAK_SKIP_IMPORT_HEURISTICS` opts out of the heuristic import pass
+  on very large repositories.
+- Evidence docs 13–19 under `docs/workstreams/master-plan/evidence/` and
+  the recall-audit and graph-benchmark harnesses under `tests/`.
+
+### Changed
+
+- The compiler tier reads every SCIP reference occurrence instead of
+  mapping call sites one at a time. Caller recall against `go/types` is
+  100% on chi, Caddy and Kubernetes (3.5M lines, indexed in 11.5 min);
+  97.4–98.5% of TypeScript functions have every caller listed against
+  `tsc` (zod, hono).
+- Go methods are named `Receiver.Method`, so methods and functions with
+  the same name no longer collide.
+- Top-level uses (Go `var x = f()`, TypeScript module scope) are credited
+  to the enclosing declaration, so those callees no longer look unused.
+- scip-go pinned to 0.2.7 (0.1.25 crashed on Caddy). Python repositories
+  index without a root marker file.
+- MCP: caller, callee and blast-radius rows carry file and line; symbols
+  resolve from Go import paths and `file::Name`; stale-snapshot responses
+  cap the listed paths instead of listing every changed file.
+- `graph blast-radius` help text now says it walks upstream (callers).
+
+### Fixed
+
+- Import resolution on Kubernetes-size Go repositories no longer scans the
+  whole graph per import (children index plus a path cache).
+
 ## [0.1.1] — 2026-09-16
 
 Cursor edit-boundary gate and stranger-proof setup. This is the first

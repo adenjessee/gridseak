@@ -13,7 +13,7 @@ use crate::application::ports::{
     SyntaxResults, UnresolvedReference,
 };
 use crate::application::resolution_disclosure::ResolutionDisclosure;
-use crate::domain::{Edge, EdgeKind, Provenance, ProvenanceSource, Range};
+use crate::domain::{Edge, EdgeKind, Provenance, ProvenanceSource, Range, UseKind};
 use crate::infrastructure::semantic::symbol_mapping::SymbolIndex;
 
 /// Outcome of one SCIP-backed call-site lookup.
@@ -98,6 +98,98 @@ impl<I: SemanticIndex + Send + Sync> IndexBackedSemanticResolver<I> {
         Some(SiteHit::Mapped(edge, location))
     }
 
+    /// Map every compiler-resolved use to `(enclosing function → defining
+    /// function)`. Uses through an interface/abstract method fan out to its
+    /// implementations at reduced confidence when there is more than one.
+    fn resolve_from_occurrences(
+        &self,
+        occurrences: &[(IndexTarget, IndexTarget)],
+        symbol_index: &SymbolIndex<'_>,
+        seen: &mut std::collections::HashSet<(String, String)>,
+        out: &mut ResolvedEdges,
+    ) {
+        let mut source_cache: std::collections::HashMap<PathBuf, Vec<String>> =
+            std::collections::HashMap::new();
+        let mut uses: std::collections::BTreeMap<
+            (String, String),
+            (UseKind, crate::domain::Confidence),
+        > = std::collections::BTreeMap::new();
+        for (site, def) in occurrences {
+            if !file_is_under(&def.file, &self.workspace_root)
+                || !is_callable_symbol(&def.symbol_moniker)
+            {
+                continue;
+            }
+            let site_file = site.file.to_string_lossy().to_string();
+            let site_range =
+                Range::with_file(site.line, site.col, site.line, site.col + 1, site_file);
+            // Top-level uses (Go `var x = f()`, TS module scope) have no
+            // enclosing function; credit the enclosing declaration so the
+            // callee never looks unused.
+            let Some(caller) = symbol_index
+                .find_enclosing_function(&site_range)
+                .or_else(|| symbol_index.find_enclosing_declaration(&site_range))
+            else {
+                continue;
+            };
+            let name = if def.symbol_moniker.starts_with("local ") {
+                // Local monikers carry no name; read the identifier at the
+                // definition site so only a same-named function node matches.
+                match identifier_at(&mut source_cache, def) {
+                    Some(n) => n,
+                    None => continue,
+                }
+            } else {
+                short_symbol_name(&def.symbol_moniker)
+            };
+            let direct = symbol_index.find_definition_node(def, &name);
+            let callees: Vec<(&crate::domain::Node, crate::domain::Confidence, UseKind)> =
+                match direct {
+                    Some(node) => {
+                        let via = use_kind_at(&mut source_cache, site);
+                        vec![(node, def.confidence, via)]
+                    }
+                    None => self
+                        .index
+                        .implementations_of(&def.symbol_moniker)
+                        .iter()
+                        .filter_map(|imp| {
+                            let imp_name = short_symbol_name(&imp.symbol_moniker);
+                            symbol_index
+                                .find_definition_node(imp, &imp_name)
+                                .map(|n| (n, imp.confidence, UseKind::Dispatch))
+                        })
+                        .collect(),
+                };
+            for (callee, confidence, via) in callees {
+                if caller.id == callee.id {
+                    continue;
+                }
+                // Keep the strongest use per pair: Call > Dispatch > Value.
+                let entry = uses
+                    .entry((caller.id.clone(), callee.id.clone()))
+                    .or_insert((via, confidence));
+                if via < entry.0 {
+                    *entry = (via, confidence);
+                }
+            }
+        }
+        for ((caller, callee), (via, confidence)) in uses {
+            if !seen.insert((caller.clone(), callee.clone())) {
+                continue;
+            }
+            out.add_call_edge(Edge::new(
+                caller,
+                callee,
+                EdgeKind::Call,
+                Provenance::new(ProvenanceSource::Compiler, confidence).with_via(via),
+            ));
+            out.stats.compiler_edges += 1;
+            self.emitted_edges
+                .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+        }
+    }
+
     fn resolve_imports_heuristic(&self, hints: &SyntaxResults, out: &mut ResolvedEdges) {
         let all_ranges: Vec<Range> = hints
             .import_specs
@@ -169,6 +261,9 @@ fn language_matches(expected: &str, got: &str) -> bool {
 /// Taking the backtick interior used to return `types.ts` / the Go module
 /// path, so `find_callee_for` missed in-repo functions even after a hit.
 pub(crate) fn short_symbol_name(symbol: &str) -> String {
+    if let Some(name) = last_descriptor_name(symbol) {
+        return name;
+    }
     let descriptor = match symbol.rfind('`') {
         Some(end) => &symbol[end + 1..],
         None => symbol,
@@ -202,6 +297,159 @@ pub(crate) fn short_symbol_name(symbol: &str) -> String {
         .to_string()
 }
 
+/// `Call` when the identifier at `site` is immediately invoked —
+/// `f(`, `x.f(`, `f[T](` (Go), `f<T>(` (TS), `f?.(` — else `Value`.
+fn use_kind_at(
+    cache: &mut std::collections::HashMap<PathBuf, Vec<String>>,
+    site: &IndexTarget,
+) -> UseKind {
+    let lines = cache.entry(site.file.clone()).or_insert_with(|| {
+        std::fs::read_to_string(&site.file)
+            .map(|s| s.lines().map(str::to_string).collect())
+            .unwrap_or_default()
+    });
+    let Some(line) = site
+        .line
+        .checked_sub(1)
+        .and_then(|i| lines.get(i as usize))
+    else {
+        return UseKind::Value;
+    };
+    let rest: Vec<char> = line.chars().skip(site.col as usize).collect();
+    let mut i = rest
+        .iter()
+        .take_while(|c| c.is_alphanumeric() || **c == '_' || **c == '$')
+        .count();
+    while rest.get(i).is_some_and(|c| c.is_whitespace()) {
+        i += 1;
+    }
+    if rest.get(i) == Some(&'?') && rest.get(i + 1) == Some(&'.') {
+        i += 2;
+    }
+    if let Some(open) = rest.get(i).copied().filter(|c| *c == '[' || *c == '<') {
+        let close = if open == '[' { ']' } else { '>' };
+        let mut depth = 0;
+        while let Some(c) = rest.get(i) {
+            if *c == open {
+                depth += 1;
+            } else if *c == close {
+                depth -= 1;
+                if depth == 0 {
+                    i += 1;
+                    break;
+                }
+            }
+            i += 1;
+        }
+    }
+    if rest.get(i) == Some(&'(') {
+        UseKind::Call
+    } else {
+        UseKind::Value
+    }
+}
+
+/// Identifier text starting at an index target's (1-based line, 0-based UTF-16
+/// col) position. ASCII identifiers make the UTF-16 col equal the char index.
+fn identifier_at(
+    cache: &mut std::collections::HashMap<PathBuf, Vec<String>>,
+    target: &IndexTarget,
+) -> Option<String> {
+    let lines = cache.entry(target.file.clone()).or_insert_with(|| {
+        std::fs::read_to_string(&target.file)
+            .map(|s| s.lines().map(str::to_string).collect())
+            .unwrap_or_default()
+    });
+    let line = lines.get(target.line.checked_sub(1)? as usize)?;
+    let ident: String = line
+        .chars()
+        .skip(target.col as usize)
+        .take_while(|c| c.is_alphanumeric() || *c == '_' || *c == '$')
+        .collect();
+    (!ident.is_empty()).then_some(ident)
+}
+
+/// Parameters `(p)`, type parameters `[T]`, namespaces `ns/` and meta `m:`
+/// never name a function; only terms, methods and locals can.
+fn is_callable_symbol(symbol: &str) -> bool {
+    symbol.starts_with("local ")
+        || !(symbol.ends_with(')')
+            || symbol.ends_with(']')
+            || symbol.ends_with('/')
+            || symbol.ends_with(':'))
+}
+
+/// Name of the last term/method/type descriptor in a SCIP symbol, parsed per
+/// the SCIP grammar (`ns/`, `Type#`, `term.`, `method(disambig).`, `` `escaped` ``).
+/// Namespace-nested symbols (`util/objectValues.`) need this: the naive
+/// split on `.` returned the file name instead of the function.
+fn last_descriptor_name(symbol: &str) -> Option<String> {
+    let parts: Vec<&str> = symbol.splitn(5, ' ').collect();
+    let descriptors = match parts.len() {
+        5 => parts[4],
+        _ => *parts.last()?,
+    };
+    let chars: Vec<char> = descriptors.chars().collect();
+    let mut i = 0;
+    let mut last: Option<String> = None;
+    while i < chars.len() {
+        let mut name = String::new();
+        if chars[i] == '`' {
+            i += 1;
+            while i < chars.len() {
+                if chars[i] == '`' {
+                    if chars.get(i + 1) == Some(&'`') {
+                        name.push('`');
+                        i += 2;
+                        continue;
+                    }
+                    i += 1;
+                    break;
+                }
+                name.push(chars[i]);
+                i += 1;
+            }
+        } else {
+            while i < chars.len() && (chars[i].is_alphanumeric() || "_$+-".contains(chars[i])) {
+                name.push(chars[i]);
+                i += 1;
+            }
+        }
+        let suffix = chars.get(i).copied()?;
+        match suffix {
+            '/' | ':' | '!' => i += 1,
+            '#' | '.' => {
+                i += 1;
+                last = Some(name);
+            }
+            '(' => {
+                // `name(disambiguator).` is a method; `(param)` is a parameter.
+                let close = chars[i..].iter().position(|c| *c == ')')? + i;
+                i = close + 1;
+                if !name.is_empty() && chars.get(i) == Some(&'.') {
+                    i += 1;
+                    last = Some(name);
+                }
+            }
+            '[' => {
+                let close = chars[i..].iter().position(|c| *c == ']')? + i;
+                i = close + 1;
+            }
+            _ => return None,
+        }
+    }
+    let name = last?;
+    let name = match name.as_str() {
+        "<constructor>" => "constructor".to_string(),
+        _ => name
+            .strip_prefix("<get>")
+            .or_else(|| name.strip_prefix("<set>"))
+            .map(str::to_string)
+            .unwrap_or(name),
+    };
+    (!name.is_empty()).then_some(name)
+}
+
 #[async_trait]
 impl<I: SemanticIndex + Send + Sync> SemanticResolver for IndexBackedSemanticResolver<I> {
     async fn resolve(&self, hints: &SyntaxResults) -> anyhow::Result<ResolvedEdges> {
@@ -218,6 +466,25 @@ impl<I: SemanticIndex + Send + Sync> SemanticResolver for IndexBackedSemanticRes
 
         let symbol_index = SymbolIndex::new(&hints.symbols);
         let mut seen = std::collections::HashSet::new();
+
+        if let Some(occurrences) = self.index.reference_occurrences() {
+            // The index enumerates every use the compiler resolved, so it is
+            // the sole authority: no caret guessing, no name-match fallback.
+            for reference in &hints.references {
+                if let UnresolvedReference::Call(call_site) = reference {
+                    out.mark_call_site_resolved(call_site.location.clone());
+                }
+            }
+            self.resolve_from_occurrences(&occurrences, &symbol_index, &mut seen, &mut out);
+            // Heuristic import edges build a per-file name table that is
+            // O(files x imported symbols) and, on Kubernetes-size Go repos,
+            // runs for hours. Callers above never use it. Opt-out until the
+            // binding table is rebuilt to scale.
+            if std::env::var_os("GRIDSEAK_SKIP_IMPORT_HEURISTICS").is_none() {
+                self.resolve_imports_heuristic(hints, &mut out);
+            }
+            return Ok(out);
+        }
 
         for reference in &hints.references {
             let UnresolvedReference::Call(call_site) = reference else {
@@ -362,6 +629,26 @@ mod tests {
                 "scip-go gomod github.com/golang/go/src go1.20 `net/http`/HandlerFunc#"
             ),
             "HandlerFunc"
+        );
+    }
+
+    #[test]
+    fn short_symbol_name_handles_namespace_nested_terms() {
+        assert_eq!(
+            short_symbol_name(
+                "scip-typescript npm zod 3.24.2 src/helpers/`util.ts`/util/objectValues."
+            ),
+            "objectValues"
+        );
+        assert_eq!(
+            short_symbol_name(
+                "scip-typescript npm zod 3.24.2 src/`types.ts`/ZodType#`<constructor>`()."
+            ),
+            "constructor"
+        );
+        assert_eq!(
+            short_symbol_name("scip-python python pkg 1.0 `pkg.mod`/Klass#method()."),
+            "method"
         );
     }
 

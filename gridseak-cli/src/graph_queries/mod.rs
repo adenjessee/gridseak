@@ -322,6 +322,13 @@ pub fn resolve_symbol_detailed(
             total,
         });
     }
+    // Path-shaped names agents write naturally: Go import paths
+    // (`k8s.io/kubernetes/pkg/api/v1/pod.GetPodCondition`) and file paths
+    // (`pkg/api/v1/pod/util.go::GetPodCondition`). Without this the lookup
+    // failed and agents fell back to grep (P3 scale-test calibration).
+    if let Some(resolution) = resolve_path_shaped(conn, needle)? {
+        return Ok(resolution);
+    }
     // Substring fallback. Gate it on the generic-name blocklist so
     // a bare `load` doesn't silently match `lazy_load` from another
     // module. See P2 dogfood evidence in V0_1_0_RC1_FOLLOWUP_ISSUES.
@@ -354,6 +361,90 @@ pub fn resolve_symbol_detailed(
     Err(GraphQueryError::UnknownSymbol(needle.to_string()))
 }
 
+/// Split a path-shaped symbol into (directory segments, symbol tail).
+///
+/// - `pkg/api/v1/pod/util.go::GetPodCondition` → (`pkg api v1 pod util`, `GetPodCondition`)
+/// - `k8s.io/kubernetes/pkg/api/v1/pod.GetPodCondition` → (`k8s.io kubernetes pkg api v1 pod`, `GetPodCondition`)
+/// - `example.com/m/pkg.Type.Method` → (`example.com m pkg`, `Type.Method`)
+fn split_path_symbol(needle: &str) -> Option<(Vec<String>, String)> {
+    if !needle.contains('/') {
+        return None;
+    }
+    if let Some((path, tail)) = needle
+        .rsplit_once("::")
+        .or_else(|| needle.rsplit_once(':'))
+        .filter(|(p, _)| p.contains('.') || p.contains('/'))
+    {
+        let path = path
+            .rsplit_once('.')
+            .filter(|(_, ext)| ext.len() <= 4 && !ext.contains('/'))
+            .map(|(stem, _)| stem)
+            .unwrap_or(path);
+        let segs = path
+            .split('/')
+            .filter(|s| !s.is_empty())
+            .map(str::to_string)
+            .collect();
+        return Some((segs, tail.to_string()));
+    }
+    let (dir, last) = needle.rsplit_once('/')?;
+    let (pkg, tail) = last.split_once('.')?;
+    let mut segs: Vec<String> = dir
+        .split('/')
+        .filter(|s| !s.is_empty())
+        .map(str::to_string)
+        .collect();
+    segs.push(pkg.to_string());
+    Some((segs, tail.to_string()))
+}
+
+/// Resolve a path-shaped symbol by trying ever-shorter trailing directory
+/// segments (module prefixes like `k8s.io/kubernetes` are not in FQNs) until
+/// exactly one function ends with the tail under that path.
+fn resolve_path_shaped(
+    conn: &Connection,
+    needle: &str,
+) -> Result<Option<SymbolResolution>, GraphQueryError> {
+    let Some((segs, tail)) = split_path_symbol(needle) else {
+        return Ok(None);
+    };
+    if tail.is_empty() || segs.is_empty() {
+        return Ok(None);
+    }
+    for k in (1..=segs.len()).rev() {
+        let dir = segs[segs.len() - k..].join("::");
+        let mut matches = lookup_like_fqn(conn, &format!("%{dir}::{tail}"), 25)?;
+        if matches.is_empty() {
+            // Go/TS FQNs carry the file stem between package and symbol.
+            matches = lookup_like_fqn(conn, &format!("%{dir}::%::{tail}"), 25)?;
+            matches.retain(|m| {
+                m.fqn
+                    .rsplit_once("::")
+                    .and_then(|(prefix, _)| prefix.rsplit_once("::"))
+                    .is_some_and(|(pkg, _)| pkg.ends_with(&dir))
+            });
+        }
+        match matches.len() {
+            0 => continue,
+            1 => {
+                return Ok(Some(SymbolResolution {
+                    node: matches.into_iter().next().unwrap(),
+                    method: ResolutionMethod::SuffixUnique,
+                }))
+            }
+            total => {
+                return Err(GraphQueryError::AmbiguousSymbol {
+                    symbol: needle.to_string(),
+                    candidates: matches.iter().take(10).map(|c| c.fqn.clone()).collect(),
+                    shown: 10.min(total),
+                    total,
+                })
+            }
+        }
+    }
+    Ok(None)
+}
+
 fn lookup_exact_fqn(conn: &Connection, fqn: &str) -> Result<Option<NodeRef>, GraphQueryError> {
     let mut stmt = conn.prepare("SELECT id, fqn, kind FROM nodes WHERE fqn = ?1 LIMIT 1")?;
     let mut rows = stmt.query([fqn])?;
@@ -362,6 +453,8 @@ fn lookup_exact_fqn(conn: &Connection, fqn: &str) -> Result<Option<NodeRef>, Gra
             id: row.get(0)?,
             fqn: row.get(1)?,
             kind: row.get(2)?,
+            file: None,
+            line: None,
         }));
     }
     Ok(None)
@@ -375,6 +468,8 @@ fn lookup_exact_id(conn: &Connection, id: &str) -> Result<Option<NodeRef>, Graph
             id: row.get(0)?,
             fqn: row.get(1)?,
             kind: row.get(2)?,
+            file: None,
+            line: None,
         }));
     }
     Ok(None)
@@ -397,6 +492,8 @@ fn lookup_like_fqn(
                 id: row.get(0)?,
                 fqn: row.get(1)?,
                 kind: row.get(2)?,
+                file: None,
+                line: None,
             })
         })?
         .collect::<rusqlite::Result<Vec<_>>>()?;
@@ -412,6 +509,12 @@ pub struct NodeRef {
     pub id: String,
     pub fqn: String,
     pub kind: String,
+    /// Source location, filled for caller/callee lists so an agent can open
+    /// or edit the site without reverse-engineering the FQN.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub file: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub line: Option<u32>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -577,25 +680,73 @@ fn walk_calls(
     max_depth: usize,
     cap: usize,
 ) -> Result<Vec<(usize, NodeRef, Option<String>, Option<f64>)>, GraphQueryError> {
+    walk_calls_using(conn, seed, direction, max_depth, cap, EdgeUses::All)
+}
+
+/// Which compiler-recorded uses an edge walk follows. Edges carry
+/// `provenance.via` (`call`, `dispatch`, `value`) when the scan came
+/// from a reference sweep; edges without it (heuristic tier, scans
+/// that pre-date the field) are always followed.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum EdgeUses {
+    /// Every Call edge, including function values and interface dispatch.
+    #[default]
+    All,
+    /// Direct calls plus interface / virtual dispatch.
+    Calls,
+    /// Direct static calls only: what a compiler's call graph lists.
+    Static,
+}
+
+impl EdgeUses {
+    pub fn parse(raw: &str) -> Option<Self> {
+        match raw.trim().to_ascii_lowercase().as_str() {
+            "all" | "" => Some(Self::All),
+            "calls" | "call+dispatch" => Some(Self::Calls),
+            "static" | "call" => Some(Self::Static),
+            _ => None,
+        }
+    }
+
+    fn sql(self) -> &'static str {
+        match self {
+            Self::All => "",
+            Self::Calls => " AND COALESCE(json_extract(e.provenance, '$.via'), 'call') IN ('call', 'dispatch')",
+            Self::Static => " AND COALESCE(json_extract(e.provenance, '$.via'), 'call') = 'call'",
+        }
+    }
+}
+
+pub(crate) fn walk_calls_using(
+    conn: &Connection,
+    seed: &str,
+    direction: Direction,
+    max_depth: usize,
+    cap: usize,
+    uses: EdgeUses,
+) -> Result<Vec<(usize, NodeRef, Option<String>, Option<f64>)>, GraphQueryError> {
     let mut seen = HashSet::<String>::new();
     let mut order = Vec::<(usize, NodeRef, Option<String>, Option<f64>)>::new();
     let mut queue: VecDeque<(usize, String)> = VecDeque::new();
     seen.insert(seed.to_string());
     queue.push_back((0, seed.to_string()));
 
-    let sql = match direction {
+    let base = match direction {
         Direction::Out => {
-            "SELECT n.id, n.fqn, n.kind, e.provenance FROM edges e
+            "SELECT n.id, n.fqn, n.kind, e.provenance, json_extract(n.location, '$.file'),
+                    json_extract(n.location, '$.start_line') FROM edges e
              JOIN nodes n ON n.id = e.to_id
              WHERE e.from_id = ?1 AND json_extract(e.kind, '$.kind') = 'Call'"
         }
         Direction::In => {
-            "SELECT n.id, n.fqn, n.kind, e.provenance FROM edges e
+            "SELECT n.id, n.fqn, n.kind, e.provenance, json_extract(n.location, '$.file'),
+                    json_extract(n.location, '$.start_line') FROM edges e
              JOIN nodes n ON n.id = e.from_id
              WHERE e.to_id = ?1 AND json_extract(e.kind, '$.kind') = 'Call'"
         }
     };
-    let mut stmt = conn.prepare(sql)?;
+    let sql = format!("{base}{}", uses.sql());
+    let mut stmt = conn.prepare(&sql)?;
 
     while let Some((depth, id)) = queue.pop_front() {
         if depth >= max_depth {
@@ -607,6 +758,8 @@ fn walk_calls(
                 id: row.get(0)?,
                 fqn: row.get(1)?,
                 kind: row.get(2)?,
+                file: row.get(4).ok().flatten(),
+                line: row.get(5).ok().flatten(),
             };
             // Provenance can be NULL on legacy rows; tolerate that
             // and fall through to `None` tier rather than failing
@@ -645,7 +798,7 @@ fn provenance_source_to_tier(raw: &str) -> Option<String> {
 }
 
 #[derive(Debug, Clone, Copy)]
-enum Direction {
+pub(crate) enum Direction {
     Out,
     In,
 }
@@ -893,9 +1046,43 @@ pub(crate) fn nodes_by_id(
                     id: row.get(0)?,
                     fqn: row.get(1)?,
                     kind: row.get(2)?,
+                    file: None,
+                    line: None,
                 },
             ))
         })?
         .collect::<rusqlite::Result<HashMap<_, _>>>()?;
     Ok(rows)
+}
+
+#[cfg(test)]
+mod path_symbol_tests {
+    use super::split_path_symbol;
+
+    #[test]
+    fn go_import_path_splits_package_and_name() {
+        let (segs, tail) =
+            split_path_symbol("k8s.io/kubernetes/pkg/api/v1/pod.GetPodCondition").unwrap();
+        assert_eq!(segs, ["k8s.io", "kubernetes", "pkg", "api", "v1", "pod"]);
+        assert_eq!(tail, "GetPodCondition");
+    }
+
+    #[test]
+    fn go_method_keeps_receiver() {
+        let (_, tail) = split_path_symbol("github.com/x/y/headers.HeaderOps.Provision").unwrap();
+        assert_eq!(tail, "HeaderOps.Provision");
+    }
+
+    #[test]
+    fn file_path_drops_extension() {
+        let (segs, tail) = split_path_symbol("pkg/api/v1/pod/util.go::GetPodCondition").unwrap();
+        assert_eq!(segs, ["pkg", "api", "v1", "pod", "util"]);
+        assert_eq!(tail, "GetPodCondition");
+    }
+
+    #[test]
+    fn plain_names_are_not_path_shaped() {
+        assert!(split_path_symbol("GetPodCondition").is_none());
+        assert!(split_path_symbol("pod::util::GetPodCondition").is_none());
+    }
 }

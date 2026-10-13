@@ -12,7 +12,7 @@ use rusqlite::Connection;
 use std::collections::HashMap;
 
 use super::{
-    best_tier, node_is_function, walk_calls, CoupledModuleRow, CycleRow, Direction, FanRow,
+    best_tier, node_is_function, walk_calls, walk_calls_using, CoupledModuleRow, CycleRow, Direction, EdgeUses, FanRow,
     FileBlastRadiusResult, FileBlastRadiusRow, GraphQueryError, NodeRef, SliceDirection, SliceNode,
 };
 
@@ -37,6 +37,8 @@ pub fn top_fan_in(conn: &Connection, limit: usize) -> Result<Vec<FanRow>, GraphQ
                     id: row.get(0)?,
                     fqn: row.get(1)?,
                     kind: row.get(2)?,
+                    file: None,
+                    line: None,
                 },
                 count: row.get(3)?,
             })
@@ -62,6 +64,8 @@ pub fn top_fan_out(conn: &Connection, limit: usize) -> Result<Vec<FanRow>, Graph
                     id: row.get(0)?,
                     fqn: row.get(1)?,
                     kind: row.get(2)?,
+                    file: None,
+                    line: None,
                 },
                 count: row.get(3)?,
             })
@@ -95,6 +99,8 @@ pub fn hotspots(
                     id: row.get(0)?,
                     fqn: row.get(1)?,
                     kind: row.get(2)?,
+                    file: None,
+                    line: None,
                 },
                 count: row.get(3)?,
             })
@@ -133,6 +139,8 @@ pub fn dead_code(conn: &Connection, limit: usize) -> Result<Vec<FanRow>, GraphQu
                     id: row.get(0)?,
                     fqn: row.get(1)?,
                     kind: row.get(2)?,
+                    file: None,
+                    line: None,
                 },
                 count: row.get(3)?,
             })
@@ -145,40 +153,38 @@ pub fn dead_code(conn: &Connection, limit: usize) -> Result<Vec<FanRow>, GraphQu
 // Callers / Callees (immediate neighbours)
 // ---------------------------------------------------------------------------
 
+fn located_row(row: &rusqlite::Row<'_>) -> rusqlite::Result<NodeRef> {
+    Ok(NodeRef {
+        id: row.get(0)?,
+        fqn: row.get(1)?,
+        kind: row.get(2)?,
+        file: row.get(3)?,
+        line: row.get(4)?,
+    })
+}
+
 pub fn callers(conn: &Connection, target_id: &str) -> Result<Vec<NodeRef>, GraphQueryError> {
     let mut stmt = conn.prepare(
-        "SELECT n.id, n.fqn, n.kind FROM edges e
+        "SELECT n.id, n.fqn, n.kind, json_extract(n.location, '$.file'), json_extract(n.location, '$.start_line') FROM edges e
          JOIN nodes n ON n.id = e.from_id
          WHERE e.to_id = ?1 AND json_extract(e.kind, '$.kind') = 'Call'
          ORDER BY n.fqn ASC",
     )?;
     let rows = stmt
-        .query_map([target_id], |row| {
-            Ok(NodeRef {
-                id: row.get(0)?,
-                fqn: row.get(1)?,
-                kind: row.get(2)?,
-            })
-        })?
+        .query_map([target_id], located_row)?
         .collect::<rusqlite::Result<Vec<_>>>()?;
     Ok(rows)
 }
 
 pub fn callees(conn: &Connection, source_id: &str) -> Result<Vec<NodeRef>, GraphQueryError> {
     let mut stmt = conn.prepare(
-        "SELECT n.id, n.fqn, n.kind FROM edges e
+        "SELECT n.id, n.fqn, n.kind, json_extract(n.location, '$.file'), json_extract(n.location, '$.start_line') FROM edges e
          JOIN nodes n ON n.id = e.to_id
          WHERE e.from_id = ?1 AND json_extract(e.kind, '$.kind') = 'Call'
          ORDER BY n.fqn ASC",
     )?;
     let rows = stmt
-        .query_map([source_id], |row| {
-            Ok(NodeRef {
-                id: row.get(0)?,
-                fqn: row.get(1)?,
-                kind: row.get(2)?,
-            })
-        })?
+        .query_map([source_id], located_row)?
         .collect::<rusqlite::Result<Vec<_>>>()?;
     Ok(rows)
 }
@@ -206,6 +212,17 @@ pub fn blast_radius(
     max_depth: usize,
     cap: usize,
 ) -> Result<Vec<SliceNode>, GraphQueryError> {
+    blast_radius_using(conn, seed_id, max_depth, cap, EdgeUses::All)
+}
+
+/// [`blast_radius`] restricted to edges whose recorded use matches `uses`.
+pub fn blast_radius_using(
+    conn: &Connection,
+    seed_id: &str,
+    max_depth: usize,
+    cap: usize,
+    uses: EdgeUses,
+) -> Result<Vec<SliceNode>, GraphQueryError> {
     // Refuse seeds that don't have Call edges in the graph. Without
     // this guard the BFS just returns an empty list, which callers
     // (especially LLM agents) misread as "nothing depends on this".
@@ -218,12 +235,14 @@ pub fn blast_radius(
             id: seed_id.to_string(),
             fqn: seed_fqn.clone(),
             kind: kind.clone(),
+            file: None,
+            line: None,
         };
         if !node_is_function(&dummy) {
             return Err(GraphQueryError::SeedNotAFunction { seed_fqn, kind });
         }
     }
-    let rows = walk_calls(conn, seed_id, Direction::In, max_depth, cap)?;
+    let rows = walk_calls_using(conn, seed_id, Direction::In, max_depth, cap, uses)?;
     Ok(rows
         .into_iter()
         .map(|(depth, node, edge_evidence_tier, p_true)| SliceNode {
@@ -284,6 +303,8 @@ pub fn file_blast_radius(
                 id: row.get(0)?,
                 fqn: row.get(1)?,
                 kind: row.get(2)?,
+                file: None,
+                line: None,
             })
         })?
         .collect::<rusqlite::Result<Vec<_>>>()?;
@@ -380,6 +401,8 @@ pub fn shortest_path(
                 id: row.get(0)?,
                 fqn: row.get(1)?,
                 kind: row.get(2)?,
+                file: None,
+                line: None,
             }]));
         }
         return Ok(None);
@@ -448,6 +471,8 @@ pub fn shortest_path(
             id: row.get(0)?,
             fqn: row.get(1)?,
             kind: row.get(2)?,
+            file: None,
+            line: None,
         };
         by_id.insert(n.id.clone(), n);
     }

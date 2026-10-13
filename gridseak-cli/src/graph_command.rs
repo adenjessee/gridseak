@@ -65,7 +65,7 @@ pub enum GraphSubcommand {
     Callers(SymbolArgs),
     /// Direct callees of `<symbol>`.
     Callees(SymbolArgs),
-    /// All downstream Call-graph neighbours within `--depth N` hops.
+    /// Everything that transitively calls the symbol (upstream) within `--depth N` hops.
     BlastRadius(RadiusArgs),
     /// Transitive upstream callers of every callable symbol in a file.
     FileBlastRadius(FileBlastRadiusArgs),
@@ -111,6 +111,10 @@ pub struct RadiusArgs {
     pub depth: usize,
     #[arg(long, default_value_t = DEFAULT_TRAVERSAL_CAP)]
     pub cap: usize,
+    /// Which uses to follow: `all` (calls, function values, interface
+    /// dispatch), `calls` (calls + dispatch) or `static` (direct calls only).
+    #[arg(long, default_value = "all")]
+    pub uses: String,
 }
 
 #[derive(Args, Debug, Clone)]
@@ -288,7 +292,10 @@ pub fn run_graph(store: &ProjectStore, args: GraphArgs, global_json: bool) -> Re
                 ));
             }
             let target = resolve_or_die(&conn, &a.symbol)?;
-            let rows = gq::blast_radius(&conn, &target.id, a.depth, a.cap)?;
+            let uses = gq::EdgeUses::parse(&a.uses).ok_or_else(|| {
+                anyhow::anyhow!("--uses must be `all`, `calls` or `static` (got `{}`)", a.uses)
+            })?;
+            let rows = gq::blast_radius_using(&conn, &target.id, a.depth, a.cap, uses)?;
             GraphView {
                 title: format!(
                     "Blast radius (≤{} hops, capped {}) — {}",

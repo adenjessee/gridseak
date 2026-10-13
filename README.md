@@ -64,10 +64,10 @@ Next: gridseak setup   (wires the MCP server into your IDE)
 | Language | Extensions | Tier 0 (tree-sitter) | Tier 3 (compiler / LSP / SCIP) |
 | --- | --- | --- | --- |
 | **Rust** | `.rs` | Full symbol + import/call graph | **Yes** — `rust-analyzer` |
-| **TypeScript** | `.ts`, `.tsx`, `.mts`, `.cts` | Full | Planned (`tsserver`) |
+| **TypeScript** | `.ts`, `.tsx`, `.mts`, `.cts` | Full | **Yes** — `scip-typescript`; audited against `tsc` (97.4–98.5% of functions with every caller listed) |
 | **JavaScript** | `.js`, `.jsx`, `.mjs`, `.cjs` | Full | Planned |
-| **Python** | `.py` | Skeleton — symbols + imports; thinner call graph than Rust/TS | Planned |
-| **Go** | `.go` | Parsed (import edges verified) | If `gopls` is installed |
+| **Python** | `.py` | Skeleton — symbols + imports; thinner call graph than Rust/TS | **Yes** — `scip-python` (not yet audited) |
+| **Go** | `.go` | Parsed (import edges verified) | **Yes** — `scip-go` 0.2.7, auto-provisioned; audited against `go/types` (100% of callers on chi, Caddy, Kubernetes) |
 | **Java** | `.java` | Parsed | If `jdtls` is installed |
 | **C#** | `.cs` | Parsed | If OmniSharp is installed |
 | **Apex** (Salesforce) | `.cls`, `.trigger`, `.apxc` | Full + framework resolver | Optional (`apex-jorje`) |
@@ -140,10 +140,10 @@ configs into `~/.gridseak/bin`. SHA256-verified against the public manifest.
 ```sh
 # macOS (Apple Silicon + Intel) and Linux (x86_64 + aarch64):
 # tagged GitHub release tarball → ~/.gridseak/bin/gridseak
-curl -fsSL https://raw.githubusercontent.com/adenjessee/gridseak-graphengine/main/scripts/install.sh | bash
+curl -fsSL https://gridseak.com/install.sh | sh
 
-# Optional: SHA256-verified sidecar bundle (graphengine-parsing, ge-analyze)
-# curl -fsSL https://raw.githubusercontent.com/adenjessee/gridseak-graphengine/main/scripts/install/install.sh | bash
+# Same script, straight from this repository:
+# curl -fsSL https://raw.githubusercontent.com/adenjessee/gridseak/main/scripts/install/install.sh | sh
 ```
 
 Then: `export PATH="$HOME/.gridseak/bin:$PATH"` and `gridseak --version`.

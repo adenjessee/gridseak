@@ -84,8 +84,10 @@ pub fn all_entries() -> &'static [IndexerEntry] {
             language: IndexerLanguage::Go,
             detection_globs: &["*.go", "go.mod"],
             install_method: InstallMethod::GithubRelease,
-            package_or_repo: "sourcegraph/scip-go",
-            pinned_version: "0.1.25",
+            // 0.1.x crashes on some multi-module repos ("nil module for
+            // userland package"); the project moved to scip-code/scip-go.
+            package_or_repo: "scip-code/scip-go",
+            pinned_version: "0.2.7",
             checksum_sha256: None,
             command: &["scip-go"],
             timeout: DEFAULT_TIMEOUT,

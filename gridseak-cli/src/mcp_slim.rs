@@ -118,6 +118,7 @@ impl SlimGridSeakMcp {
             symbol,
             depth: params.depth,
             cap: params.cap,
+            uses: params.uses,
         };
         let view = crate::graph_tool_blast_radius(&self.store, &mapped)?;
         crate::ok_json(&view)
@@ -183,6 +184,10 @@ struct BlastOrFileParams {
     depth: Option<usize>,
     #[serde(default)]
     cap: Option<usize>,
+    /// `all` (default), `calls` (calls + interface dispatch) or `static`
+    /// (direct calls only). Symbol mode only.
+    #[serde(default)]
+    uses: Option<String>,
 }
 
 #[tool_handler]

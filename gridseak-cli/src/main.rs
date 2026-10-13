@@ -15,6 +15,7 @@ mod judge_command;
 mod mcp_contract_tests;
 mod mcp_preflight;
 mod mcp_slim;
+mod pr_check;
 mod progress;
 mod render;
 mod route_command;
@@ -205,6 +206,8 @@ enum Commands {
     Route(RouteArgs),
     /// Structural verdict at the edit boundary (PreToolUse / beforeShell).
     Gate(GateArgs),
+    /// PR-level deletion safety: base vs head scan of the same repo.
+    PrCheck(pr_check::PrCheckArgs),
     /// Wire the GridSeak MCP server into your IDE(s). Auto-writes for
     /// Cursor + Windsurf, prints instructions for Claude Code + Codex.
     /// Also writes the Cursor rule file that teaches the agent when to
@@ -418,6 +421,12 @@ async fn main() -> Result<()> {
         Commands::Route(args) => run_route(args)?,
         Commands::Gate(args) => {
             let code = run_gate(&store, args)?;
+            if code != 0 {
+                std::process::exit(code);
+            }
+        }
+        Commands::PrCheck(args) => {
+            let code = pr_check::run(args)?;
             if code != 0 {
                 std::process::exit(code);
             }
@@ -1293,6 +1302,11 @@ pub(crate) struct GraphBlastRadiusParams {
     pub(crate) depth: Option<usize>,
     #[serde(default)]
     pub(crate) cap: Option<usize>,
+    /// Which uses to follow upstream: `all` (default: calls, function
+    /// values passed or stored, interface dispatch), `calls` (calls +
+    /// interface dispatch) or `static` (direct calls only).
+    #[serde(default)]
+    pub(crate) uses: Option<String>,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
@@ -1644,7 +1658,7 @@ impl GridSeakMcp {
     }
 
     #[tool(
-        description = "Use when the user asks 'if I change X, what breaks?', 'what's the impact of refactoring X?', 'is X safe to remove?', or 'what depends on X?'. Returns the transitive **upstream** callers of a function symbol — reverse BFS through Call edges with depth cap (default 3). Deterministic, local, 0 LLM tokens. Symbol must be a function/method FQN (e.g. `health::graph::validate_schema`) — file paths are rejected with guidance, and module/file nodes return a clear error pointing you at `gridseak_graph_callers` on a specific symbol. Each result carries the evidence tier of the call edge that linked it in; Tier 0/3 hits are 'definitely affected', Tier 1 (grep heuristic) hits are 'possibly affected' and must be reported as such. Symbol resolution: pass a fully qualified path when possible — bare generic names (`load`, `init`, `new`, `get`, …) are refused with `OverlyGenericSymbol` because a substring scan would silently include unrelated functions from other modules. If the symbol DID resolve via a substring scan, the response carries a `resolution_warning` block that you must relay to the user verbatim before quoting any downstream finding. For the opposite direction ('what does X reach when it runs') use `gridseak_graph_slice` or `gridseak_graph_callees`. For **file-level** 'if I change file X, what breaks?', call `gridseak_graph_file_blast_radius` — one tool call replaces a 50-symbol fanout."
+        description = "Use when the user asks 'if I change X, what breaks?', 'what's the impact of refactoring X?', 'is X safe to remove?', or 'what depends on X?'. Returns the transitive **upstream** callers of a function symbol — reverse BFS through Call edges with depth cap (default 3) and row cap (default 200); raise both for a full transitive closure. Every row carries file and line. The response's `certificate.complete` is true only when the whole call graph came from the compiler index, no source file changed since the scan, and the result was not cut off by depth or cap; then the list is complete for its scope and need not be re-derived by searching. When false, `certificate.reasons` says what to verify. `uses`: `all` (default) also follows interface dispatch to every implementation and functions passed as values; `calls` follows calls plus interface dispatch; `static` follows direct calls only. Deterministic, local, 0 LLM tokens. Symbol must be a function/method FQN (e.g. `health::graph::validate_schema`) — file paths are rejected with guidance, and module/file nodes return a clear error pointing you at `gridseak_graph_callers` on a specific symbol. Each result carries the evidence tier of the call edge that linked it in; Tier 0/3 hits are 'definitely affected', Tier 1 (grep heuristic) hits are 'possibly affected' and must be reported as such. Symbol resolution: pass a fully qualified path when possible — bare generic names (`load`, `init`, `new`, `get`, …) are refused with `OverlyGenericSymbol` because a substring scan would silently include unrelated functions from other modules. If the symbol DID resolve via a substring scan, the response carries a `resolution_warning` block that you must relay to the user verbatim before quoting any downstream finding. For the opposite direction ('what does X reach when it runs') use `gridseak_graph_slice` or `gridseak_graph_callees`. For **file-level** 'if I change file X, what breaks?', call `gridseak_graph_file_blast_radius` — one tool call replaces a 50-symbol fanout."
     )]
     async fn gridseak_graph_blast_radius(
         &self,
@@ -2214,24 +2228,51 @@ pub(crate) fn graph_tool_blast_radius(
     let target = resolution.node.clone();
     let depth = params.depth.unwrap_or(3);
     let cap = params.cap.unwrap_or(200);
-    let rows = graph_queries::blast_radius(&conn, &target.id, depth, cap)
+    let uses_raw = params.uses.as_deref().unwrap_or("all");
+    let uses = graph_queries::EdgeUses::parse(uses_raw).ok_or_else(|| {
+        mcp_err(format!("uses must be `all`, `calls` or `static` (got `{uses_raw}`)"))
+    })?;
+    let rows = graph_queries::blast_radius_using(&conn, &target.id, depth, cap, uses)
         .map_err(|e| mcp_err(e.to_string()))?;
     let blast_total = rows.len();
     let blast_high_confidence = rows
         .iter()
         .filter(|r| r.edge_evidence_tier.as_deref() == Some("tier_3"))
         .count();
+    let root = mcp_preflight::project_root(&project);
+    let certificate = blast_certificate(&conn, &project, root.as_deref(), &rows, depth, cap, uses)
+        .map_err(|e| mcp_err(e.to_string()))?;
+    let compact: Vec<serde_json::Value> = rows
+        .iter()
+        .map(|r| {
+            let file = r.node.file.as_deref().map(|f| {
+                root.as_deref()
+                    .and_then(|root| std::path::Path::new(f).strip_prefix(root).ok())
+                    .map(|rel| rel.to_string_lossy().into_owned())
+                    .unwrap_or_else(|| f.to_string())
+            });
+            serde_json::json!({
+                "depth": r.depth,
+                "file": file,
+                "line": r.node.line,
+                "fqn": r.node.fqn,
+                "tier": r.edge_evidence_tier,
+            })
+        })
+        .collect();
     let mut inner = serde_json::json!({
         "project": project.display_name,
         "scan_id": scan_id,
         "symbol": target.fqn,
         "symbol_id": target.id,
         "depth": depth,
+        "uses": uses_raw,
         "direction": "upstream",
         "semantic": "transitive callers — what would have to be re-validated if the seed changes",
+        "certificate": certificate,
         "blast_total": blast_total,
         "blast_high_confidence": blast_high_confidence,
-        "rows": rows,
+        "rows": compact,
     });
     attach_resolution_warning(&mut inner, &params.symbol, &resolution);
     let ctx = McpEnvelopeContext {
@@ -2249,6 +2290,84 @@ pub(crate) fn graph_tool_blast_radius(
         ],
         Some(ctx),
     ))
+}
+
+/// Whether a blast-radius answer is the complete, compiler-verified closure.
+/// `complete` is true only when every check passes; otherwise `reasons`
+/// names each failed check so the agent knows what to verify by hand.
+fn blast_certificate(
+    conn: &rusqlite::Connection,
+    project: &gridseak_local_store::ProjectDto,
+    root: Option<&str>,
+    rows: &[graph_queries::SliceNode],
+    depth: usize,
+    cap: usize,
+    uses: graph_queries::EdgeUses,
+) -> rusqlite::Result<serde_json::Value> {
+    let (call_edges, compiler_edges): (i64, i64) = conn.query_row(
+        "SELECT COUNT(*), COALESCE(SUM(json_extract(provenance, '$.source') = 'Compiler'), 0)
+         FROM edges WHERE json_extract(kind, '$.kind') = 'Call'",
+        [],
+        |r| Ok((r.get(0)?, r.get(1)?)),
+    )?;
+    let changed = match (root, project.latest_scan.as_ref().and_then(|s| s.completed_at.as_deref())) {
+        (Some(root), Some(at)) => {
+            workspace_delta::source_files_changed_since(std::path::Path::new(root), at).ok()
+        }
+        _ => None,
+    };
+    let max_depth = rows.iter().map(|r| r.depth).max().unwrap_or(0);
+    let mut reasons = Vec::<String>::new();
+    if call_edges == 0 || compiler_edges < call_edges {
+        reasons.push(format!(
+            "only {compiler_edges} of {call_edges} call edges in this scan come from the compiler index; \
+             the rest are name-matched, so callers may be missing or wrong"
+        ));
+    }
+    match &changed {
+        None => reasons.push("could not check whether source files changed since the scan".into()),
+        Some(paths) if !paths.is_empty() => reasons.push(format!(
+            "{} source file(s) changed since the scan (e.g. {}); rescan first",
+            paths.len(),
+            paths.iter().take(3).cloned().collect::<Vec<_>>().join(", ")
+        )),
+        Some(_) => {}
+    }
+    if rows.len() >= cap {
+        reasons.push(format!("result hit the row cap ({cap}); call again with a larger cap"));
+    }
+    if rows.len() > 0 && max_depth >= depth {
+        reasons.push(format!(
+            "callers were found at the depth limit ({depth}); call again with a larger depth"
+        ));
+    }
+    let complete = reasons.is_empty();
+    let scope = match uses {
+        graph_queries::EdgeUses::Static => "direct calls of named functions and methods only",
+        graph_queries::EdgeUses::Calls => "direct calls plus calls through interface methods (to every implementation)",
+        graph_queries::EdgeUses::All => {
+            "direct calls, calls through interface methods (to every implementation) and functions passed or stored as values"
+        }
+    };
+    Ok(serde_json::json!({
+        "complete": complete,
+        "scope": scope,
+        "checks": {
+            "call_edges_from_compiler": format!("{compiler_edges}/{call_edges}"),
+            "source_files_changed_since_scan": changed.as_ref().map(Vec::len),
+            "truncated_by_cap": rows.len() >= cap,
+            "depth_limit_reached": rows.len() > 0 && max_depth >= depth,
+        },
+        "reasons": reasons,
+        "guidance": if complete {
+            "This list is the complete set of transitive callers for the stated scope, resolved by the \
+             compiler's index on an up-to-date scan. Every caller is listed with its file and line. \
+             It does not need to be re-derived with grep."
+        } else {
+            "This list is NOT certified complete. Treat it as a starting point and verify the gaps \
+             named in `reasons`."
+        },
+    }))
 }
 
 pub(crate) fn graph_tool_file_blast_radius(

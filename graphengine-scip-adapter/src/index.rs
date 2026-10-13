@@ -65,6 +65,8 @@ pub struct ScipIndex {
     by_relative_path: HashMap<String, DocumentOccurrences>,
     definitions_by_symbol: HashMap<String, ScipDefinition>,
     implementations_by_symbol: HashMap<String, Vec<String>>,
+    /// Reverse of `implementations_by_symbol`: method -> interface methods it satisfies.
+    implemented_by_symbol: HashMap<String, Vec<String>>,
     references_by_symbol: HashMap<String, Vec<ScipDefinition>>,
 }
 
@@ -89,6 +91,7 @@ impl ScipIndex {
         let mut by_relative_path = HashMap::new();
         let mut definitions_by_symbol = HashMap::new();
         let mut implementations_by_symbol: HashMap<String, Vec<String>> = HashMap::new();
+        let mut implemented_by_symbol: HashMap<String, Vec<String>> = HashMap::new();
         let mut references_by_symbol: HashMap<String, Vec<ScipDefinition>> = HashMap::new();
         for doc in index.documents {
             for info in &doc.symbols {
@@ -98,6 +101,10 @@ impl ScipIndex {
                             .entry(rel.symbol.clone())
                             .or_default()
                             .push(info.symbol.clone());
+                        implemented_by_symbol
+                            .entry(info.symbol.clone())
+                            .or_default()
+                            .push(rel.symbol.clone());
                     }
                 }
             }
@@ -128,6 +135,7 @@ impl ScipIndex {
             by_relative_path,
             definitions_by_symbol,
             implementations_by_symbol,
+            implemented_by_symbol,
             references_by_symbol,
         })
     }
@@ -191,12 +199,72 @@ impl ScipIndex {
             .unwrap_or_default()
     }
 
+    /// Interface/abstract methods that `symbol` implements, in or outside the
+    /// repo. Removing such a method can break the type's contract even when
+    /// nothing calls it by name.
+    pub fn interfaces_implemented_by(&self, symbol: &str) -> Vec<String> {
+        self.implemented_by_symbol
+            .get(symbol)
+            .cloned()
+            .unwrap_or_default()
+    }
+
     /// Non-definition occurrences of `symbol` (second witness for callers).
     pub fn references_of(&self, symbol: &str) -> Vec<ScipDefinition> {
         self.references_by_symbol
             .get(symbol)
             .cloned()
             .unwrap_or_default()
+    }
+
+    /// Every non-definition occurrence paired with its in-index definition.
+    ///
+    /// This is the compiler's full use graph: calls, function values, and
+    /// method references alike. Symbols defined outside the index (stdlib,
+    /// dependencies) are omitted because they have no definition here.
+    pub fn reference_occurrences(&self) -> Vec<(ScipDefinition, ScipDefinition)> {
+        let mut out = Vec::new();
+        for (symbol, refs) in &self.references_by_symbol {
+            // `local N` monikers are document-scoped and collide across files.
+            if symbol.starts_with("local ") {
+                continue;
+            }
+            let Some(def) = self.definitions_by_symbol.get(symbol) else {
+                continue;
+            };
+            for r in refs {
+                out.push((r.clone(), def.clone()));
+            }
+        }
+        for doc in self.by_relative_path.values() {
+            let mut local_defs: HashMap<&str, ScipDefinition> = HashMap::new();
+            let mut local_refs: Vec<(&str, ScipDefinition)> = Vec::new();
+            for occ in &doc.occurrences {
+                if !occ.symbol.starts_with("local ") {
+                    continue;
+                }
+                let Some(range) = decode_occurrence_range(occ) else {
+                    continue;
+                };
+                let loc = ScipDefinition {
+                    relative_path: doc.relative_path.clone(),
+                    line: range.start_line,
+                    character: range.start_character,
+                    symbol: occ.symbol.clone(),
+                };
+                if has_definition_role(occ.symbol_roles) {
+                    local_defs.insert(occ.symbol.as_str(), loc);
+                } else {
+                    local_refs.push((occ.symbol.as_str(), loc));
+                }
+            }
+            for (symbol, r) in local_refs {
+                if let Some(def) = local_defs.get(symbol) {
+                    out.push((r, def.clone()));
+                }
+            }
+        }
+        out
     }
 
     fn relative_path_for(&self, file: &Path) -> Option<String> {

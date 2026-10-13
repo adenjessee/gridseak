@@ -134,13 +134,41 @@ fn provision_python(repo_root: &Path) -> Result<PathBuf, IndexerError> {
     let has_python_project = ["pyproject.toml", "setup.py", "requirements.txt"]
         .iter()
         .any(|f| repo_root.join(f).exists());
-    if !has_python_project {
+    // Many repos keep Python under subfolders with no root marker; scip-python
+    // indexes any tree of .py files, so only refuse when there are none.
+    if !has_python_project && !has_file_with_extension(repo_root, "py", 4) {
         return Err(IndexerError {
             exit_code: 1,
-            message: "missing Python project markers".into(),
+            message: "no Python files or project markers".into(),
         });
     }
     run_npx_indexer(repo_root, "@sourcegraph/scip-python", "scip-python")
+}
+
+/// Whether `root` holds a `*.{ext}` file within `depth` directory levels,
+/// skipping dot-directories and vendored trees.
+fn has_file_with_extension(root: &Path, ext: &str, depth: usize) -> bool {
+    let Ok(entries) = std::fs::read_dir(root) else {
+        return false;
+    };
+    for entry in entries.flatten() {
+        let path = entry.path();
+        let name = entry.file_name();
+        let name = name.to_string_lossy();
+        if path.is_dir() {
+            if depth > 0
+                && !name.starts_with('.')
+                && name != "node_modules"
+                && name != "venv"
+                && has_file_with_extension(&path, ext, depth - 1)
+            {
+                return true;
+            }
+        } else if path.extension().is_some_and(|e| e == ext) {
+            return true;
+        }
+    }
+    false
 }
 
 fn provision_go(repo_root: &Path) -> Result<PathBuf, IndexerError> {
@@ -152,19 +180,33 @@ fn provision_go(repo_root: &Path) -> Result<PathBuf, IndexerError> {
 }
 
 /// Doctor / provision path: PATH, then `~/.gridseak/bin/scip-go`, then GitHub release.
+/// `scip-go --version` output, trimmed (`0.2.7`).
+fn binary_version(bin: &Path) -> Option<String> {
+    let out = Command::new(bin).arg("--version").output().ok()?;
+    let text = String::from_utf8_lossy(&out.stdout);
+    let v = text
+        .split_whitespace()
+        .last()?
+        .trim_start_matches('v')
+        .to_string();
+    (!v.is_empty()).then_some(v)
+}
+
 fn ensure_scip_go_binary() -> Result<PathBuf, IndexerError> {
     if let Some(p) = which("scip-go") {
         return Ok(p);
     }
     let dest_dir = gridseak_bin_dir();
     let dest = dest_dir.join("scip-go");
-    if dest.is_file() {
-        return Ok(dest);
-    }
     let entry = entry_for(IndexerLanguage::Go).ok_or_else(|| IndexerError {
         exit_code: 2,
         message: "no registry entry for Go".into(),
     })?;
+    // Reuse a cached binary only when it is the pinned release; an older
+    // cached scip-go would otherwise outlive every version bump.
+    if dest.is_file() && binary_version(&dest).as_deref() == Some(entry.pinned_version) {
+        return Ok(dest);
+    }
     let (os, arch) = go_release_target();
     let ver = entry.pinned_version;
     let urls = [

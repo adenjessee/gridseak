@@ -44,4 +44,12 @@ pub trait SemanticIndex {
     fn references_of(&self, _symbol: &str) -> Vec<IndexTarget> {
         Vec::new()
     }
+
+    /// Every `(reference site, definition)` pair the index knows, or `None`
+    /// when the index cannot enumerate occurrences. When `Some`, the
+    /// resolver treats the index as the sole authority for indexed files
+    /// instead of mapping tree-sitter call sites one caret at a time.
+    fn reference_occurrences(&self) -> Option<Vec<(IndexTarget, IndexTarget)>> {
+        None
+    }
 }

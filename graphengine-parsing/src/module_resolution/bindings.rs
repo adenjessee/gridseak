@@ -34,6 +34,18 @@ impl NameBindingTable {
         let (symbols_by_file, symbols_by_module) = collect_symbols(syntax);
 
         let mut table = NameBindingTable::default();
+        // Parent path -> direct submodules, built once. Glob imports used to
+        // rescan every graph node per import (files x imports x modules).
+        let mut children: HashMap<Vec<String>, Vec<ModulePath>> = HashMap::new();
+        for node in graph.nodes_iter() {
+            let segs = node.module_path.segments();
+            if let Some((_, parent)) = segs.split_last() {
+                children
+                    .entry(parent.to_vec())
+                    .or_default()
+                    .push(node.module_path.clone());
+            }
+        }
 
         let mut file_set: HashSet<String> = symbols_by_file.keys().cloned().collect();
         for file in use_tree.files() {
@@ -67,6 +79,7 @@ impl NameBindingTable {
                     binding,
                     graph,
                     &symbols_by_module,
+                    &children,
                     &mut bindings,
                     &table,
                     syntax,
@@ -142,6 +155,7 @@ fn process_import_binding(
     binding: &ImportBinding,
     graph: &ModuleGraph,
     symbols_by_module: &HashMap<ModulePath, Vec<SymbolInfo>>,
+    children: &HashMap<Vec<String>, Vec<ModulePath>>,
     bindings: &mut FileBindings,
     table: &NameBindingTable,
     syntax: &SyntaxResults,
@@ -179,20 +193,16 @@ fn process_import_binding(
 
         // Also create module bindings for submodules that are glob-imported
         // This allows paths like `nested::nested_function` to work after `pub use re_export_source::*;`
-        // We iterate through all nodes in the graph to find submodules
-        for submodule_node in graph.nodes_iter() {
-            let submodule_path = &submodule_node.module_path;
-            if submodule_path.segments().len() == module_path.segments().len() + 1 {
-                let submodule_prefix: Vec<String> =
-                    submodule_path.segments()[..module_path.segments().len()].to_vec();
-                if submodule_prefix == module_path.segments() {
-                    let submodule_name = submodule_path.segments().last().unwrap().clone();
-                    // Create a module binding for the submodule
-                    bindings
-                        .module_bindings
-                        .entry(submodule_name.clone())
-                        .or_insert_with(|| submodule_path.clone());
-                }
+        for submodule_path in children
+            .get(module_path.segments())
+            .map(Vec::as_slice)
+            .unwrap_or_default()
+        {
+            if let Some(submodule_name) = submodule_path.segments().last() {
+                bindings
+                    .module_bindings
+                    .entry(submodule_name.clone())
+                    .or_insert_with(|| submodule_path.clone());
             }
         }
 
