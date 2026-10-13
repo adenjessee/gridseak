@@ -1,0 +1,42 @@
+{
+  "description": "Expected graph for single class fixture",
+  "nodes": [
+    {
+      "kind": "Interface",
+      "fqn": "src/user.service::User"
+    },
+    {
+      "kind": "Struct",
+      "fqn": "src/user.service::UserService"
+    },
+    {
+      "kind": "Function",
+      "fqn": "src/user.service::UserService::constructor"
+    },
+    {
+      "kind": "Function",
+      "fqn": "src/user.service::UserService::getUser"
+    },
+    {
+      "kind": "Function",
+      "fqn": "src/user.service::UserService::createUser"
+    }
+  ],
+  "edges": [
+    {
+      "kind": "Contains",
+      "from_fqn": "src/user.service::UserService",
+      "to_fqn": "src/user.service::UserService::constructor"
+    },
+    {
+      "kind": "Contains",
+      "from_fqn": "src/user.service::UserService",
+      "to_fqn": "src/user.service::UserService::getUser"
+    },
+    {
+      "kind": "Contains",
+      "from_fqn": "src/user.service::UserService",
+      "to_fqn": "src/user.service::UserService::createUser"
+    }
+  ]
+}

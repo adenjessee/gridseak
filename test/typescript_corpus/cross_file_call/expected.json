@@ -1,0 +1,34 @@
+{
+  "description": "Expected graph for cross-file call fixture",
+  "nodes": [
+    {
+      "kind": "Function",
+      "fqn": "src/math::add"
+    },
+    {
+      "kind": "Function",
+      "fqn": "src/math::multiply"
+    },
+    {
+      "kind": "Function",
+      "fqn": "src/calculator::calculate"
+    }
+  ],
+  "edges": [
+    {
+      "kind": "Call",
+      "from_fqn": "src/calculator::calculate",
+      "to_fqn": "src/math::add"
+    },
+    {
+      "kind": "Call",
+      "from_fqn": "src/calculator::calculate",
+      "to_fqn": "src/math::multiply"
+    },
+    {
+      "kind": "Import",
+      "from_fqn": "src/calculator",
+      "to_fqn": "src/math"
+    }
+  ]
+}

@@ -595,6 +595,7 @@ pub fn structural_invariants_ok() -> StructuralInvariantsView {
 }
 
 /// Seeded false-claim evaluation used by the Batch E gate.
+#[cfg_attr(not(test), allow(dead_code))]
 pub fn false_claim_suite(artifact: &Path) -> Result<FalseClaimReport, GraphQueryError> {
     let conn = open_graph(artifact)?;
     let mut stmt = conn.prepare(
@@ -666,6 +667,7 @@ pub fn false_claim_suite(artifact: &Path) -> Result<FalseClaimReport, GraphQuery
     })
 }
 
+#[cfg_attr(not(test), allow(dead_code))]
 #[derive(Debug, Clone, Serialize)]
 pub struct FalseClaimReport {
     pub false_claims: usize,

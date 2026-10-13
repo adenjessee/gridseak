@@ -39,6 +39,8 @@ impl HostFormat {
     }
 }
 
+// Exercised by gate tests; hosts pass their format explicitly at runtime.
+#[cfg_attr(not(test), allow(dead_code))]
 pub fn detect_host(hint: &str) -> HostFormat {
     HostFormat::parse(hint)
 }

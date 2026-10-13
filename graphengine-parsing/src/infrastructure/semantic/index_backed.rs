@@ -308,11 +308,7 @@ fn use_kind_at(
             .map(|s| s.lines().map(str::to_string).collect())
             .unwrap_or_default()
     });
-    let Some(line) = site
-        .line
-        .checked_sub(1)
-        .and_then(|i| lines.get(i as usize))
-    else {
+    let Some(line) = site.line.checked_sub(1).and_then(|i| lines.get(i as usize)) else {
         return UseKind::Value;
     };
     let rest: Vec<char> = line.chars().skip(site.col as usize).collect();

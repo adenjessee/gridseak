@@ -23,6 +23,8 @@ mod scan_command;
 mod scan_manifest;
 mod setup;
 #[cfg(feature = "trace-internal")]
+// The public mirror omits this file; skip it so `cargo fmt --check` passes there.
+#[rustfmt::skip]
 mod setup_trace;
 mod workspace_delta;
 
@@ -2230,7 +2232,9 @@ pub(crate) fn graph_tool_blast_radius(
     let cap = params.cap.unwrap_or(200);
     let uses_raw = params.uses.as_deref().unwrap_or("all");
     let uses = graph_queries::EdgeUses::parse(uses_raw).ok_or_else(|| {
-        mcp_err(format!("uses must be `all`, `calls` or `static` (got `{uses_raw}`)"))
+        mcp_err(format!(
+            "uses must be `all`, `calls` or `static` (got `{uses_raw}`)"
+        ))
     })?;
     let rows = graph_queries::blast_radius_using(&conn, &target.id, depth, cap, uses)
         .map_err(|e| mcp_err(e.to_string()))?;
@@ -2310,7 +2314,13 @@ fn blast_certificate(
         [],
         |r| Ok((r.get(0)?, r.get(1)?)),
     )?;
-    let changed = match (root, project.latest_scan.as_ref().and_then(|s| s.completed_at.as_deref())) {
+    let changed = match (
+        root,
+        project
+            .latest_scan
+            .as_ref()
+            .and_then(|s| s.completed_at.as_deref()),
+    ) {
         (Some(root), Some(at)) => {
             workspace_delta::source_files_changed_since(std::path::Path::new(root), at).ok()
         }
@@ -2334,9 +2344,11 @@ fn blast_certificate(
         Some(_) => {}
     }
     if rows.len() >= cap {
-        reasons.push(format!("result hit the row cap ({cap}); call again with a larger cap"));
+        reasons.push(format!(
+            "result hit the row cap ({cap}); call again with a larger cap"
+        ));
     }
-    if rows.len() > 0 && max_depth >= depth {
+    if !rows.is_empty() && max_depth >= depth {
         reasons.push(format!(
             "callers were found at the depth limit ({depth}); call again with a larger depth"
         ));
@@ -2356,7 +2368,7 @@ fn blast_certificate(
             "call_edges_from_compiler": format!("{compiler_edges}/{call_edges}"),
             "source_files_changed_since_scan": changed.as_ref().map(Vec::len),
             "truncated_by_cap": rows.len() >= cap,
-            "depth_limit_reached": rows.len() > 0 && max_depth >= depth,
+            "depth_limit_reached": !rows.is_empty() && max_depth >= depth,
         },
         "reasons": reasons,
         "guidance": if complete {

@@ -1,0 +1,44 @@
+{
+  "name": "gridseak",
+  "version": "0.1.0",
+  "description": "GridSeak slim MCP + PreToolUse structural gate.",
+  "mcpServers": {
+    "gridseak": {
+      "command": "gridseak",
+      "args": ["mcp", "--slim"]
+    }
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "gridseak gate --format claude"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "gridseak gate --format claude"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "compact|startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "gridseak gate --card"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -12,8 +12,9 @@ use rusqlite::Connection;
 use std::collections::HashMap;
 
 use super::{
-    best_tier, node_is_function, walk_calls, walk_calls_using, CoupledModuleRow, CycleRow, Direction, EdgeUses, FanRow,
-    FileBlastRadiusResult, FileBlastRadiusRow, GraphQueryError, NodeRef, SliceDirection, SliceNode,
+    best_tier, node_is_function, walk_calls, walk_calls_using, CoupledModuleRow, CycleRow,
+    Direction, EdgeUses, FanRow, FileBlastRadiusResult, FileBlastRadiusRow, GraphQueryError,
+    NodeRef, SliceDirection, SliceNode,
 };
 
 // ---------------------------------------------------------------------------
@@ -326,8 +327,9 @@ pub fn file_blast_radius(
     // Tier 3 LSP edge, the file-aggregated row is Tier 3 even if
     // another seed only reached it heuristically.
     let seed_ids: HashSet<String> = seeds.iter().map(|s| s.id.clone()).collect();
-    let mut by_id: HashMap<String, (usize, NodeRef, Vec<NodeRef>, Option<String>, Option<f64>)> =
-        HashMap::new();
+    // node id -> (min depth, node, seeds that reach it, best tier, p_true)
+    type Reached = (usize, NodeRef, Vec<NodeRef>, Option<String>, Option<f64>);
+    let mut by_id: HashMap<String, Reached> = HashMap::new();
     let mut cap_hit = false;
     for seed in &seeds {
         let rows = walk_calls(conn, &seed.id, Direction::In, max_depth, cap_per_seed)?;

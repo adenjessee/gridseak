@@ -6,6 +6,8 @@ use crate::graph_queries::agent_tools::{
     DiffImpactView, StructuralInvariantsView, VerifyClaimView,
 };
 
+// Not wired to a command yet; kept for the PR-comment surface.
+#[allow(dead_code)]
 pub fn render_pr_comment(
     impact: &DiffImpactView,
     claims: &[VerifyClaimView],

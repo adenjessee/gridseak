@@ -202,7 +202,8 @@ pub fn source_files_changed_since(
     scan_completed_at: &str,
 ) -> anyhow::Result<Vec<String>> {
     const SOURCE_EXTS: &[&str] = &[
-        "go", "ts", "tsx", "js", "jsx", "mjs", "cjs", "py", "rs", "java", "kt", "cls", "trigger", "cs",
+        "go", "ts", "tsx", "js", "jsx", "mjs", "cjs", "py", "rs", "java", "kt", "cls", "trigger",
+        "cs",
     ];
     let scan_ts = DateTime::parse_from_rfc3339(scan_completed_at)?.with_timezone(&Utc);
     Ok(mtime_dirty_paths(project_root, scan_ts)?

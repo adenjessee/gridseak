@@ -51,7 +51,9 @@ pub struct Provenance {
 /// How a caller uses a callee: invoked directly, referenced as a value
 /// (passed, stored, assigned), or reached through interface/virtual dispatch.
 /// "Who calls X" usually means `Call`; impact analysis wants all three.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize,
+)]
 #[serde(rename_all = "lowercase")]
 pub enum UseKind {
     Call,

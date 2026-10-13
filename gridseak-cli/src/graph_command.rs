@@ -293,7 +293,10 @@ pub fn run_graph(store: &ProjectStore, args: GraphArgs, global_json: bool) -> Re
             }
             let target = resolve_or_die(&conn, &a.symbol)?;
             let uses = gq::EdgeUses::parse(&a.uses).ok_or_else(|| {
-                anyhow::anyhow!("--uses must be `all`, `calls` or `static` (got `{}`)", a.uses)
+                anyhow::anyhow!(
+                    "--uses must be `all`, `calls` or `static` (got `{}`)",
+                    a.uses
+                )
             })?;
             let rows = gq::blast_radius_using(&conn, &target.id, a.depth, a.cap, uses)?;
             GraphView {

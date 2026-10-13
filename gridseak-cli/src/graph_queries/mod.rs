@@ -673,13 +673,16 @@ pub struct FileBlastRadiusResult {
 /// when narrating impact. Recomputing best/worst-tier across all
 /// parents would force a second pass and obscures the causal chain
 /// the agent is actually showing the user.
+/// One BFS hit: (depth, node, tier of the edge that reached it, p_true).
+type WalkRow = (usize, NodeRef, Option<String>, Option<f64>);
+
 fn walk_calls(
     conn: &Connection,
     seed: &str,
     direction: Direction,
     max_depth: usize,
     cap: usize,
-) -> Result<Vec<(usize, NodeRef, Option<String>, Option<f64>)>, GraphQueryError> {
+) -> Result<Vec<WalkRow>, GraphQueryError> {
     walk_calls_using(conn, seed, direction, max_depth, cap, EdgeUses::All)
 }
 
@@ -711,7 +714,9 @@ impl EdgeUses {
     fn sql(self) -> &'static str {
         match self {
             Self::All => "",
-            Self::Calls => " AND COALESCE(json_extract(e.provenance, '$.via'), 'call') IN ('call', 'dispatch')",
+            Self::Calls => {
+                " AND COALESCE(json_extract(e.provenance, '$.via'), 'call') IN ('call', 'dispatch')"
+            }
             Self::Static => " AND COALESCE(json_extract(e.provenance, '$.via'), 'call') = 'call'",
         }
     }
@@ -724,9 +729,9 @@ pub(crate) fn walk_calls_using(
     max_depth: usize,
     cap: usize,
     uses: EdgeUses,
-) -> Result<Vec<(usize, NodeRef, Option<String>, Option<f64>)>, GraphQueryError> {
+) -> Result<Vec<WalkRow>, GraphQueryError> {
     let mut seen = HashSet::<String>::new();
-    let mut order = Vec::<(usize, NodeRef, Option<String>, Option<f64>)>::new();
+    let mut order = Vec::<WalkRow>::new();
     let mut queue: VecDeque<(usize, String)> = VecDeque::new();
     seen.insert(seed.to_string());
     queue.push_back((0, seed.to_string()));

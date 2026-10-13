@@ -150,6 +150,7 @@ fn collect_symbols(
     (by_file, by_module)
 }
 
+#[allow(clippy::too_many_arguments)]
 fn process_import_binding(
     file: &str,
     binding: &ImportBinding,

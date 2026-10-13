@@ -1,0 +1,59 @@
+{
+  "name": "gridseak",
+  "displayName": "GridSeak",
+  "version": "0.1.0",
+  "description": "Unskippable structural gate: verified | refuted | unknown with a named tier at the edit boundary.",
+  "author": {
+    "name": "GridSeak"
+  },
+  "homepage": "https://github.com/adenjessee/gridseak-graphengine",
+  "keywords": [
+    "graph",
+    "callers",
+    "refactor",
+    "mcp",
+    "hooks"
+  ],
+  "mcpServers": {
+    "gridseak": {
+      "command": "gridseak",
+      "args": [
+        "mcp",
+        "--slim"
+      ]
+    }
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit|Bash",
+        "command": "${CURSOR_PLUGIN_ROOT}/hooks/gridseak-gate.sh claude"
+      }
+    ],
+    "preToolUse": [
+      {
+        "command": "${CURSOR_PLUGIN_ROOT}/hooks/gridseak-gate.sh cursor-tool",
+        "matcher": "Write|StrReplace|Delete|Shell",
+        "failClosed": true
+      }
+    ],
+    "beforeShellExecution": [
+      {
+        "command": "${CURSOR_PLUGIN_ROOT}/hooks/gridseak-gate.sh cursor",
+        "failClosed": true
+      }
+    ],
+    "SessionStart": [
+      {
+        "command": "${CURSOR_PLUGIN_ROOT}/hooks/gridseak-gate.sh card"
+      }
+    ]
+  },
+  "alwaysOnVerbs": [
+    "gridseak_route",
+    "gridseak_verify_claim",
+    "gridseak_graph_blast_radius",
+    "gridseak_diff_impact",
+    "gridseak_gate_status"
+  ]
+}
