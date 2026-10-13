@@ -12,7 +12,7 @@ Answer key: GridSeak compiler-indexed call graph (5942 edges, 100% from the comp
 | Haiku 5.5 + GridSeak | 18/18 | 100% (82–100%) | 0 | 0 | 27.6 | $15.11 | $0.84 | 7.81M |
 | Opus 5.5 alone | 18/18 | 100% (82–100%) | 0 | 0 | 40.7 | $13.63 | $0.76 | 12.70M |
 | Opus 5.5 + GridSeak | 18/18 | 100% (82–100%) | 0 | 0 | 16.9 | $5.28 | $0.29 | 2.70M |
-| Sonnet 5.5 alone | 15/18 | 83% (61–94%) | 2 | 1 | 37.0 | $7.91 | $0.53 | 11.57M |
+| Sonnet 5.5 alone | 15/18 | 83% (61–94%) | 1 | 2 | 37.0 | $7.91 | $0.53 | 11.57M |
 | Sonnet 5.5 + GridSeak | 18/18 | 100% (82–100%) | 0 | 0 | 12.1 | $2.95 | $0.16 | 2.60M |
 
 | Task | Target | True callers | Hops | Setup | Rep | Result | Recall | Precision | Min | Cost |
@@ -113,7 +113,7 @@ Answer key: GridSeak compiler-indexed call graph (5942 edges, 100% from the comp
 | t6 (callers) | `isOpenCurlyBrace` (caddyconfig/caddyfile/lexer.go:351) | 293 | 9 | Haiku 5.5 + GridSeak | 1 | PASS | 1.00 | 1.00 | 4.6 | $2.19 |
 | t6 (callers) | `isOpenCurlyBrace` (caddyconfig/caddyfile/lexer.go:351) | 293 | 9 | Haiku 5.5 alone | 2 | PASS | 1.00 | 1.00 | 5.5 | $2.83 |
 | t6 (callers) | `isOpenCurlyBrace` (caddyconfig/caddyfile/lexer.go:351) | 293 | 9 | Haiku 5.5 + GridSeak | 2 | PASS | 1.00 | 1.00 | 2.3 | $1.41 |
-| t6 (callers) | `isOpenCurlyBrace` (caddyconfig/caddyfile/lexer.go:351) | 293 | 9 | Sonnet 5.5 alone | 1 | MISS (silent) | 0.03 | 1.00 | 2.3 | $0.36 |
+| t6 (callers) | `isOpenCurlyBrace` (caddyconfig/caddyfile/lexer.go:351) | 293 | 9 | Sonnet 5.5 alone | 1 | MISS (flagged) | 0.03 | 1.00 | 2.3 | $0.36 |
 | t6 (callers) | `isOpenCurlyBrace` (caddyconfig/caddyfile/lexer.go:351) | 293 | 9 | Sonnet 5.5 + GridSeak | 1 | PASS | 1.00 | 1.00 | 1.9 | $0.50 |
 | t6 (callers) | `isOpenCurlyBrace` (caddyconfig/caddyfile/lexer.go:351) | 293 | 9 | Sonnet 5.5 alone | 1 | MISS (flagged) | 0.03 | 1.00 | 1.3 | $0.19 |
 | t6 (callers) | `isOpenCurlyBrace` (caddyconfig/caddyfile/lexer.go:351) | 293 | 9 | Sonnet 5.5 + GridSeak | 1 | PASS | 1.00 | 1.00 | 1.8 | $0.38 |

@@ -12,7 +12,7 @@ Answer key: GridSeak compiler-indexed call graph (85784 edges, 100% from the com
 | Haiku 5.5 + GridSeak | 18/18 | 100% (82–100%) | 0 | 0 | 34.5 | $16.95 | $0.94 | 9.23M |
 | Opus 5.5 alone | 18/18 | 100% (82–100%) | 0 | 0 | 44.1 | $11.49 | $0.64 | 8.44M |
 | Opus 5.5 + GridSeak | 18/18 | 100% (82–100%) | 0 | 0 | 21.0 | $5.91 | $0.33 | 2.99M |
-| Sonnet 5.5 alone | 16/18 | 89% (67–97%) | 2 | 0 | 38.7 | $9.06 | $0.57 | 13.46M |
+| Sonnet 5.5 alone | 16/18 | 89% (67–97%) | 1 | 1 | 38.7 | $9.06 | $0.57 | 13.46M |
 | Sonnet 5.5 + GridSeak | 18/18 | 100% (82–100%) | 0 | 0 | 14.9 | $2.71 | $0.15 | 2.30M |
 
 | Task | Target | True callers | Hops | Setup | Rep | Result | Recall | Precision | Min | Cost |
@@ -95,7 +95,7 @@ Answer key: GridSeak compiler-indexed call graph (85784 edges, 100% from the com
 | t5 (callers) | `GetPauseImageName` (test/utils/image/manifest.go:341) | 171 | 5 | Haiku 5.5 + GridSeak | 1 | PASS | 1.00 | 1.00 | 2.3 | $0.99 |
 | t5 (callers) | `GetPauseImageName` (test/utils/image/manifest.go:341) | 171 | 5 | Haiku 5.5 alone | 2 | ERROR | 0.00 | 0.00 | 3.3 | $1.33 |
 | t5 (callers) | `GetPauseImageName` (test/utils/image/manifest.go:341) | 171 | 5 | Haiku 5.5 + GridSeak | 2 | PASS | 1.00 | 1.00 | 2.0 | $1.04 |
-| t5 (callers) | `GetPauseImageName` (test/utils/image/manifest.go:341) | 171 | 5 | Sonnet 5.5 alone | 1 | MISS (silent) | 0.00 | 0.00 | 1.1 | $0.18 |
+| t5 (callers) | `GetPauseImageName` (test/utils/image/manifest.go:341) | 171 | 5 | Sonnet 5.5 alone | 1 | MISS (flagged) | 0.00 | 0.00 | 1.1 | $0.18 |
 | t5 (callers) | `GetPauseImageName` (test/utils/image/manifest.go:341) | 171 | 5 | Sonnet 5.5 + GridSeak | 1 | PASS | 1.00 | 1.00 | 1.2 | $0.25 |
 | t5 (callers) | `GetPauseImageName` (test/utils/image/manifest.go:341) | 171 | 5 | Sonnet 5.5 alone | 1 | PASS | 1.00 | 0.96 | 6.8 | $1.99 |
 | t5 (callers) | `GetPauseImageName` (test/utils/image/manifest.go:341) | 171 | 5 | Sonnet 5.5 + GridSeak | 1 | PASS | 1.00 | 1.00 | 1.3 | $0.26 |

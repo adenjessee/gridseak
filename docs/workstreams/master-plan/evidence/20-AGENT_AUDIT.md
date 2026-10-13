@@ -16,7 +16,10 @@ caller-question runs plus 12 edit runs.
   with GridSeak's MCP tools ("gridseak"), read-only tools plus the language
   toolchain. Grades recall and precision against the key; pass = recall ≥ 0.95
   and precision ≥ 0.9. A miss is **silent** when the reply presents the list as
-  complete.
+  complete; a reply that warns its list may be incomplete is "flagged". (The
+  first version of this detector missed plain-worded warnings such as "I
+  couldn't produce the complete list" and overcounted silent misses; every
+  miss was re-graded and reviewed by hand.)
 - Edit family (`--family edits`, Go): change an interface method's signature
   and update every implementation and caller; graded by hidden compile-time
   assertions, `go build` and `go vet` in a throwaway copy.
@@ -51,9 +54,9 @@ Go: Caddy, chi and Kubernetes, 6 tasks each, 3 repeats per cell (162 runs per ar
 | Model | Alone: exact | Alone: silent | + GridSeak: exact | + GridSeak: silent | $ per correct (alone → GridSeak) | Minutes | Tokens |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | Haiku 5.5 | 45/54 | 0 | **54/54** | 0 | 1.65 → 0.74 | 160 → 78 | 42.3M → 21.0M |
-| Sonnet 5.5 | 47/54 | 6 | **54/54** | 0 | 0.41 → 0.12 | 89 → 30 | 27.7M → 5.5M |
+| Sonnet 5.5 | 47/54 | 4 | **54/54** | 0 | 0.41 → 0.12 | 89 → 30 | 27.7M → 5.5M |
 | Opus 5.5 | 51/54 | 3 | **54/54** | 0 | 0.58 → 0.25 | 100 → 45 | 24.3M → 7.0M |
-| **All** | **143/162** | **9** | **162/162** | **0** | **0.86 → 0.37** | **349 → 153** | **94.4M → 33.5M** |
+| **All** | **143/162** | **7** | **162/162** | **0** | **0.86 → 0.37** | **349 → 153** | **94.4M → 33.5M** |
 
 Per repo (all models): Caddy 47/54 → 54/54, chi 49/54 → 54/54, Kubernetes
 47/54 → 54/54.
@@ -65,7 +68,7 @@ TypeScript: zod (3 tasks) and hono (6 tasks), one run per cell, corrected keys:
 | Haiku 5.5 | 7/9 (1 silent) | 8/9 (1 silent) | 2.98 → 1.30 |
 | Sonnet 5.5 | 5/9 (4 silent) | **9/9** | 0.71 → 0.08 |
 | Opus 5.5 | 7/9 (2 silent) | **9/9** | 0.77 → 0.24 |
-| **All** | **19/27 (7 silent)** | **26/27 (1 silent)** | **1.57 → 0.51** |
+| **All** | **19/27 (6 silent)** | **26/27 (1 silent)** | **1.57 → 0.51** |
 
 The one GridSeak-arm miss: Haiku received GridSeak's certified 51-caller list
 for hono `escapeToBuffer`, then removed 9 correct callers it judged did not
@@ -83,8 +86,9 @@ not where agents fail.
 
 - `19` found that plain agents solve a single caller question when they can
   write code. Across a spread of tasks, repos and repeats, plain agents with
-  read-only tools are wrong on about 1 in 8 Go questions, and almost half of
-  those wrong lists are presented as complete. With GridSeak, no Go answer was
+  read-only tools are wrong on about 1 in 8 Go questions, and more than a third
+  of those wrong lists are presented as complete (7 of 19; the rest were
+  flagged as incomplete or not answered). With GridSeak, no Go answer was
   wrong in 162 runs.
 - Cost per correct answer fell 2.3× (Go) and 3.1× (TS); time 2.3× and 2.6×;
   tokens 2.8× and 3.1×. Sonnet + GridSeak gave the cheapest correct answers on

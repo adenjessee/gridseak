@@ -1055,7 +1055,7 @@
     "recall": 0.9230769230769232,
     "precision": 1.0,
     "n_answer": 24,
-    "flagged_incomplete": false,
+    "flagged_incomplete": true,
     "missed": [
      "src/middleware/cache/index.test.ts:1067 request",
      "src/middleware/compress/index.test.ts:95 testCompression"
@@ -1142,7 +1142,7 @@
     "recall": 0.9523809523809524,
     "precision": 1.0,
     "n_answer": 40,
-    "flagged_incomplete": false,
+    "flagged_incomplete": true,
     "missed": [
      "src/types.test.ts:569 handler",
      "src/validator/validator.test.ts:36 zodValidator"
@@ -1733,7 +1733,7 @@
     "recall": 1.0,
     "precision": 1.0,
     "n_answer": 42,
-    "flagged_incomplete": false,
+    "flagged_incomplete": true,
     "missed": [],
     "extra": [],
     "out_of_scope": [],
