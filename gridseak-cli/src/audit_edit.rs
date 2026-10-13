@@ -956,7 +956,13 @@ fn copy_tree(src: &Path, dst: &Path) -> Result<()> {
     for entry in walkdir::WalkDir::new(src).follow_links(false) {
         let entry = entry?;
         let rel = entry.path().strip_prefix(src)?;
-        let target = dst.join(rel);
+        // `join("")` would append a trailing separator, which Linux rejects
+        // for a file ("Is a directory") when `src` is itself a file.
+        let target = if rel.as_os_str().is_empty() {
+            dst.to_path_buf()
+        } else {
+            dst.join(rel)
+        };
         let ft = entry.file_type();
         if ft.is_dir() {
             std::fs::create_dir_all(&target)?;
@@ -1094,6 +1100,17 @@ mod tests {
         assert!(!d.join(".gridseak").exists() && !d.join("reports").exists());
         let m = |p: &Path| std::fs::metadata(p).unwrap().modified().unwrap();
         assert_eq!(m(&r.join("pkg/a.go")), m(&d.join("pkg/a.go")));
+    }
+
+    #[test]
+    fn copy_tree_copies_a_single_file() {
+        let src = tempfile::tempdir().unwrap();
+        let f = src.path().join("go.mod");
+        std::fs::write(&f, "module x\n").unwrap();
+        let dst = tempfile::tempdir().unwrap();
+        let t = dst.path().join("go.mod");
+        copy_tree(&f, &t).unwrap();
+        assert_eq!(std::fs::read_to_string(&t).unwrap(), "module x\n");
     }
 
     #[test]
