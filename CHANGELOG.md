@@ -16,6 +16,22 @@ and answers that say when they are complete.
 
 ### Added
 
+- `gridseak audit`: grades a coding agent on this repository against
+  compiler truth. It plans "every transitive caller of X" questions (small to
+  large) from the call graph, runs them through headless Claude Code alone and
+  with GridSeak's MCP tools, and writes a report card (`report.html`,
+  `report.md`, `results.json`): exact answers, silent misses (wrong lists
+  presented as complete), minutes, tokens and cost per correct answer.
+  `--reps`, `--compare` (one card for several models), `--plan` (reuse a plan),
+  `--family edits` (Go interface changes graded by hidden compile-time
+  assertions, `go build` and `go vet` in a throwaway copy). Refuses to run when
+  the answer key would not be fully compiler-backed. On Caddy, chi and
+  Kubernetes, agents with GridSeak answered 90/90 exactly against 78/90 alone.
+- Claude Code plugin: `/gridseak:audit` and an `audit-my-agent` skill, so
+  "audit my agent on this repo" starts the flow (plan, cost, confirmation,
+  report). Marketplace manifest at `.claude-plugin/marketplace.json`.
+- MCP tools accept `path/to/file.ts:123` and `path/to/file.ts::name` symbols,
+  so common names (`fetch`) resolve.
 - `gridseak pr-check`: compares the call graph before and after a change
   and flags callers left pointing at a removed or renamed symbol. 0 false
   alarms on 113 merged pull requests; 46 of 46 seeded breaks caught.
@@ -50,6 +66,18 @@ and answers that say when they are complete.
 - `graph blast-radius` help text now says it walks upstream (callers).
 
 ### Fixed
+
+- A cached SCIP index is reused only when its fingerprint matches this exact
+  workspace and its sources. A copied, moved or stale index is refused (it
+  previously produced an empty graph for Kubernetes from Caddy's index), and
+  any fallback to tree-sitter edges is printed and recorded as the report
+  caveat `compiler_tier_unavailable_v1`. Existing caches are rebuilt once.
+- TypeScript: function nodes for class fields, `#private`, string-named and
+  keyword-named methods; no id collisions between identical bodies in
+  different classes; `super()`, `new X()` to an inherited constructor and
+  `this["name"]()` are calls; top-level code is no longer listed as a
+  function caller (MCP rows now carry `kind` and split out
+  `top_level_callers`).
 
 - Import resolution on Kubernetes-size Go repositories no longer scans the
   whole graph per import (children index plus a path cache).

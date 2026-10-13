@@ -184,6 +184,49 @@ Restart your IDE. From a fresh chat, ask: *"what's risky to refactor
 here?"* — your agent should call `gridseak_get_recommendations` within
 its first two tool calls. If it doesn't, run `gridseak setup --verify`.
 
+## Audit your agent
+
+From inside your coding agent, in your repo, say:
+
+> audit my agent on this repo
+
+With the Claude Code plugin installed, that sentence (or `/gridseak:audit`)
+runs the `audit-my-agent` skill:
+
+```text
+/plugin marketplace add adenjessee/gridseak
+/plugin install gridseak@gridseak
+```
+
+Other agents can follow the same steps from
+[`plugin/skills/audit-my-agent/SKILL.md`](plugin/skills/audit-my-agent/SKILL.md).
+Or run the CLI yourself:
+
+```sh
+gridseak scan .                  # the call graph must be 100% compiler-indexed
+gridseak audit --plan-only       # free: pick the tasks, write the answer keys
+gridseak audit                   # 6 tasks x 2 arms (plain, gridseak)
+```
+
+`gridseak audit` asks headless Claude Code "which functions transitively
+call X?" for targets picked from small to large caller sets, once alone
+(`plain`) and once with GridSeak's MCP tools (`gridseak`), and grades each
+answer against the compiler's call graph. It writes `report.html` (a
+shareable card), `report.md` and `results.json` under
+`.gridseak/audit/<timestamp>/`. The card shows, per arm: exact answers
+(recall >= 0.95, precision >= 0.9), **silent misses** (an incomplete list
+presented as complete), flagged misses, minutes, cost and tokens.
+
+**Cost:** it spends real money through your Claude Code login, about
+$0.25-3.50 per task run at API prices; 6 tasks x 2 arms is typically
+$8-25, capped at `--max-usd-per-task` (default $4) per run. Shrink it with
+`--tasks 3`, `--arms plain` or `--model <id>`. The skill always shows the
+plan and estimate and asks before spending.
+
+**Languages:** Go today (`scip-go`). TypeScript works when the scan is fully
+compiler-indexed. The audit refuses any scan with call edges that did not
+come from the compiler, because the answer key would be a guess.
+
 ## v0.1.0 scope (honest disclosure)
 
 Pre-1.0, solo-maintained, spare time. **Use at your own risk** — same

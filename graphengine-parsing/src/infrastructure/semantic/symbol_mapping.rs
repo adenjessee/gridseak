@@ -82,6 +82,27 @@ impl<'a> SymbolIndex<'a> {
             })
     }
 
+    /// Explicit `constructor` of the class (`Struct` node) declared at
+    /// `location`, ignoring constructors of classes nested inside it. The
+    /// class is `None` when no class spans `location`; the constructor is
+    /// `None` when the class declares none.
+    pub fn class_constructor_at(&self, location: &Range) -> Option<(&'a Node, Option<&'a Node>)> {
+        let syms = self.file_symbols_for_location(location)?;
+        let class_of = |r: &Range| {
+            syms.iter()
+                .copied()
+                .filter(|n| n.kind == NodeKind::Struct && line_encloses(r, &n.location))
+                .min_by_key(|n| range_span(&n.location))
+        };
+        let class = class_of(location)?;
+        let ctor = syms
+            .iter()
+            .copied()
+            .filter(|n| n.kind == NodeKind::Function && fqn_ends_with(&n.fqn, "constructor"))
+            .find(|n| class_of(&n.location).is_some_and(|c| c.id == class.id));
+        Some((class, ctor))
+    }
+
     fn file_symbols_for_location(&self, location: &Range) -> Option<&Vec<&'a Node>> {
         if let Some(syms) = self.by_file.get(location.file.as_str()) {
             return Some(syms);

@@ -2,7 +2,7 @@
 
 use std::path::{Path, PathBuf};
 
-use graphengine_scip_adapter::{ScipIndex, ScipIndexError};
+use graphengine_scip_adapter::{DocumentCoverage, ScipIndex, ScipIndexError};
 
 use crate::application::ports::{IndexTarget, SemanticIndex};
 use crate::domain::Confidence;
@@ -39,6 +39,11 @@ impl ScipSemanticIndex {
 
     pub fn project_root(&self) -> &Path {
         self.inner.project_root()
+    }
+
+    /// How many of the index's documents exist under `workspace` (sampled).
+    pub fn workspace_coverage(&self, workspace: &Path) -> DocumentCoverage {
+        self.inner.workspace_coverage(workspace)
     }
 }
 

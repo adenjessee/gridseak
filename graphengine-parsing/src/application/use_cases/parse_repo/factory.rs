@@ -323,7 +323,6 @@ fn build_index_backed_or_heuristic(
     use crate::infrastructure::{
         DisclosedSemanticResolver, IndexBackedSemanticResolver, ScipSemanticIndex,
     };
-    use graphengine_scip_adapter::fingerprint::{fingerprint_workspace, is_fresh, write_sidecar};
     use graphengine_scip_adapter::{provision_index, IndexerError, IndexerLanguage};
     use tracing::warn;
 
@@ -348,67 +347,79 @@ fn build_index_backed_or_heuristic(
         .unwrap_or_else(|| std::env::current_dir().unwrap_or_default());
 
     let skip_from_err = |err: &IndexerError| -> SkipReason {
-        if err.not_provisioned() {
+        if err.stale() {
+            SkipReason::IndexStale
+        } else if err.not_provisioned() {
             SkipReason::IndexerNotProvisioned
         } else {
             SkipReason::IndexerFailed
         }
     };
 
-    let heuristic = |reason: SkipReason| -> Box<dyn SemanticResolver> {
+    let heuristic = |reason: SkipReason, detail: &str| -> Box<dyn SemanticResolver> {
+        warn_compiler_tier_unavailable(language, detail);
         Box::new(DisclosedSemanticResolver::new(
             Box::new(HeuristicOnlySemanticResolver::new(language)),
             ResolutionDisclosure::layer2_fallback_to_heuristic(language, reason),
         ))
     };
 
-    let index_path = ws_path.join("index.scip");
-    let stale = index_path.is_file() && !is_fresh(&ws_path, indexer_lang);
-    if stale {
-        warn!("{language} SCIP index fingerprint mismatch (IndexStale)");
-        // Still load the file if present; disclose staleness after load fails
-        // only when we cannot reuse. Prefer cache from provision_index.
-    }
-
-    let load_result = if index_path.is_file() && !stale {
-        ScipSemanticIndex::from_file_at_workspace(&index_path, ws_path.clone(), language)
-    } else {
-        match provision_index(&ws_path, indexer_lang) {
-            Ok(generated) => {
-                if let Some(fp) = fingerprint_workspace(&ws_path, indexer_lang) {
-                    write_sidecar(&ws_path, indexer_lang, &fp);
-                }
-                ScipSemanticIndex::from_file_at_workspace(generated, ws_path.clone(), language)
-            }
-            Err(err) => {
-                warn!(
-                    "{language} SCIP indexer skipped (exit {}): {}",
-                    err.exit_code, err.message
-                );
-                let reason = if stale {
-                    SkipReason::IndexStale
-                } else {
-                    skip_from_err(&err)
-                };
-                return heuristic(reason);
-            }
+    // `provision_index` returns the cached index only when its fingerprint
+    // sidecar matches this workspace, and (re)writes the sidecar only when
+    // an indexer actually ran. Never write the sidecar here: doing so for a
+    // reused cache would bless an index copied from another checkout.
+    let index_path = match provision_index(&ws_path, indexer_lang) {
+        Ok(path) => path,
+        Err(err) => {
+            warn!(
+                "{language} SCIP indexer skipped (exit {}): {}",
+                err.exit_code, err.message
+            );
+            return heuristic(skip_from_err(&err), &err.message);
         }
     };
 
-    match load_result {
+    match ScipSemanticIndex::from_file_at_workspace(&index_path, ws_path.clone(), language) {
         Ok(index) => {
+            let coverage = index.workspace_coverage(&ws_path);
+            if coverage.looks_foreign() {
+                let detail = format!(
+                    "IndexStale(foreign_documents): only {}/{} sampled documents of {} exist under {}",
+                    coverage.present,
+                    coverage.checked,
+                    index_path.display(),
+                    ws_path.display()
+                );
+                warn!("{language} SCIP index rejected: {detail}");
+                return heuristic(SkipReason::IndexStale, &detail);
+            }
             let root = index.project_root().to_path_buf();
             info!(
-                "{language} index-backed resolver loaded SCIP at {}",
-                root.display()
+                "{language} index-backed resolver loaded SCIP at {} ({}/{} sampled documents present)",
+                root.display(),
+                coverage.present,
+                coverage.checked
             );
             Box::new(IndexBackedSemanticResolver::new(index, root, language))
         }
         Err(err) => {
             warn!("Failed to load SCIP index for {language}: {err}");
-            heuristic(SkipReason::IndexerFailed)
+            heuristic(
+                SkipReason::IndexerFailed,
+                &format!("failed to load {}: {err}", index_path.display()),
+            )
         }
     }
+}
+
+/// One stderr line whenever the compiler tier is skipped, so a scan cannot
+/// silently fall back to tree-sitter edges.
+#[cfg(feature = "scip")]
+fn warn_compiler_tier_unavailable(language: &str, detail: &str) {
+    let first_line = detail.lines().next().unwrap_or(detail);
+    eprintln!(
+        "warning: {language}: compiler-backed call resolution unavailable; using tree-sitter heuristic edges ({first_line})"
+    );
 }
 
 #[cfg(not(feature = "scip"))]
@@ -422,4 +433,125 @@ fn build_index_backed_or_heuristic(
         workspace_root.cloned(),
         build_session_options(language, workspace_root),
     ))
+}
+
+#[cfg(all(test, feature = "scip"))]
+mod scip_cache_tests {
+    use super::*;
+    use crate::application::resolution_disclosure::{ResolutionTierKind, SkipReason};
+    use graphengine_scip_adapter::fingerprint::{
+        fingerprint_workspace, read_sidecar, sidecar_path, write_sidecar,
+    };
+    use graphengine_scip_adapter::provisioning::{auto_provision_enabled, cache_dir, entry_for};
+    use graphengine_scip_adapter::IndexerLanguage;
+    use std::path::{Path, PathBuf};
+
+    fn go_fixture() -> PathBuf {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/go_scip")
+    }
+
+    /// Workspace with the given sources and the fixture's index in the cache dir.
+    fn workspace_with_cached_index(sources: &[(&str, &str)]) -> tempfile::TempDir {
+        let ws = tempfile::TempDir::new().unwrap();
+        for (name, body) in sources {
+            std::fs::write(ws.path().join(name), body).unwrap();
+        }
+        let dir = cache_dir(ws.path(), entry_for(IndexerLanguage::Go).unwrap());
+        std::fs::create_dir_all(&dir).unwrap();
+        std::fs::copy(go_fixture().join("index.scip"), dir.join("index.scip")).unwrap();
+        ws
+    }
+
+    fn fixture_sources() -> Vec<(&'static str, String)> {
+        ["go.mod", "hello.go"]
+            .iter()
+            .map(|n| (*n, std::fs::read_to_string(go_fixture().join(n)).unwrap()))
+            .collect()
+    }
+
+    fn build(ws: &Path) -> Box<dyn SemanticResolver> {
+        let url = url::Url::from_directory_path(ws).unwrap();
+        let config = crate::infrastructure::load_config("go").unwrap();
+        build_index_backed_or_heuristic("go", Some(&url), config)
+    }
+
+    #[tokio::test]
+    async fn fresh_cache_is_reused_without_rewriting_sidecar() {
+        let src = fixture_sources();
+        let refs: Vec<(&str, &str)> = src.iter().map(|(n, b)| (*n, b.as_str())).collect();
+        let ws = workspace_with_cached_index(&refs);
+        let mut fp = fingerprint_workspace(ws.path(), IndexerLanguage::Go).unwrap();
+        fp.generated_unix_secs = 12_345;
+        write_sidecar(ws.path(), IndexerLanguage::Go, &fp);
+        let sidecar = sidecar_path(ws.path(), IndexerLanguage::Go).unwrap();
+        let before = std::fs::read_to_string(&sidecar).unwrap();
+
+        let resolver = build(ws.path());
+        let d = resolver.resolution_disclosure().await.unwrap();
+        assert_eq!(d.tier_used, ResolutionTierKind::Layer2, "{d:?}");
+        assert_eq!(std::fs::read_to_string(&sidecar).unwrap(), before);
+        assert_eq!(
+            read_sidecar(ws.path(), IndexerLanguage::Go)
+                .unwrap()
+                .generated_unix_secs,
+            12_345
+        );
+    }
+
+    #[tokio::test]
+    async fn copied_foreign_cache_falls_back_and_is_not_blessed() {
+        if auto_provision_enabled() {
+            return; // would try to run scip-go
+        }
+        // Fresh cache in workspace A, then A's .gridseak/ copied into B.
+        let src = fixture_sources();
+        let refs: Vec<(&str, &str)> = src.iter().map(|(n, b)| (*n, b.as_str())).collect();
+        let a = workspace_with_cached_index(&refs);
+        let fp = fingerprint_workspace(a.path(), IndexerLanguage::Go).unwrap();
+        write_sidecar(a.path(), IndexerLanguage::Go, &fp);
+
+        let b = tempfile::TempDir::new().unwrap();
+        std::fs::write(b.path().join("other.go"), "package other\n").unwrap();
+        let dst = cache_dir(b.path(), entry_for(IndexerLanguage::Go).unwrap());
+        std::fs::create_dir_all(&dst).unwrap();
+        let src_dir = cache_dir(a.path(), entry_for(IndexerLanguage::Go).unwrap());
+        for f in ["index.scip", "fingerprint.txt"] {
+            std::fs::copy(src_dir.join(f), dst.join(f)).unwrap();
+        }
+        let before = std::fs::read_to_string(dst.join("fingerprint.txt")).unwrap();
+
+        let d = build(b.path()).resolution_disclosure().await.unwrap();
+        assert_eq!(d.tier_used, ResolutionTierKind::Heuristic);
+        assert_eq!(d.skip_reason, Some(SkipReason::IndexStale));
+        assert_eq!(
+            std::fs::read_to_string(dst.join("fingerprint.txt")).unwrap(),
+            before,
+            "a refused cache must never get a fresh sidecar"
+        );
+    }
+
+    #[tokio::test]
+    async fn index_whose_documents_are_absent_is_rejected() {
+        // Sidecar matches this workspace, but the index describes files that
+        // do not exist here.
+        let ws = workspace_with_cached_index(&[("other.go", "package other\n")]);
+        let fp = fingerprint_workspace(ws.path(), IndexerLanguage::Go).unwrap();
+        write_sidecar(ws.path(), IndexerLanguage::Go, &fp);
+
+        let d = build(ws.path()).resolution_disclosure().await.unwrap();
+        assert_eq!(d.tier_used, ResolutionTierKind::Heuristic);
+        assert_eq!(d.skip_reason, Some(SkipReason::IndexStale));
+    }
+
+    #[tokio::test]
+    async fn missing_cache_discloses_not_provisioned() {
+        if auto_provision_enabled() {
+            return;
+        }
+        let ws = tempfile::TempDir::new().unwrap();
+        std::fs::write(ws.path().join("main.go"), "package main\n").unwrap();
+        let d = build(ws.path()).resolution_disclosure().await.unwrap();
+        assert_eq!(d.tier_used, ResolutionTierKind::Heuristic);
+        assert_eq!(d.skip_reason, Some(SkipReason::IndexerNotProvisioned));
+    }
 }

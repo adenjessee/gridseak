@@ -88,6 +88,12 @@ fn resolve_or_unknown(
             witnesses: vec![format!("symbol `{needle}` not in scan artifact")],
             p_true: 0.0,
         })),
+        Err(e @ GraphQueryError::NoSymbolAtLocation { .. }) => Ok(Err(VerifyClaimView {
+            claim: needle.to_string(),
+            verdict: ClaimVerdict::Unknown,
+            witnesses: vec![e.to_string()],
+            p_true: 0.0,
+        })),
         Err(GraphQueryError::AmbiguousSymbol {
             symbol, candidates, ..
         }) => Ok(Err(VerifyClaimView {

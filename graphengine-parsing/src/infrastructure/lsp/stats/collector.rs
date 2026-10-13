@@ -76,6 +76,7 @@ impl ResolutionStats {
             heuristic_type_fallbacks: self.heuristic_type_fallbacks,
             heuristic_call_ambiguous_drops: self.heuristic_call_ambiguous_drops,
             fallback_reasons: self.fallback_reasons,
+            compiler_unindexed_files: Vec::new(),
         }
     }
 }

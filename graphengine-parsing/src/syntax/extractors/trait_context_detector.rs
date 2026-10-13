@@ -68,6 +68,9 @@ impl TraitContextDetector {
 
         for mat in matches {
             let mut name = None;
+            // A member name (`obj.default()`, `#x`, `"~v"`) may spell a
+            // reserved word; only bare identifiers cannot.
+            let mut name_is_member = false;
             let mut range = None;
             let mut trait_name = None;
             let mut impl_type = None;
@@ -83,6 +86,10 @@ impl TraitContextDetector {
                     func_node = Some(capture.node);
                 } else if capture_name == "name" {
                     name = Some(capture.node.utf8_text(content.as_bytes())?.to_string());
+                    name_is_member = matches!(
+                        capture.node.kind(),
+                        "property_identifier" | "private_property_identifier" | "string"
+                    );
                 }
             }
 
@@ -239,6 +246,19 @@ impl TraitContextDetector {
                 }
             }
 
+            // TS string-named members (`"~validate"() {}`) are named by the
+            // literal's contents, as the compiler and SCIP name them.
+            let name = name.map(|n| {
+                let quoted = n.len() >= 2
+                    && (n.starts_with('"') || n.starts_with('\''))
+                    && n.ends_with(&n[..1]);
+                if quoted {
+                    n[1..n.len() - 1].to_string()
+                } else {
+                    n
+                }
+            });
+
             // If we found a function, extract it with proper context
             if let (Some(name), Some(range)) = (name, range) {
                 // Filter out reserved keywords that shouldn't be function names
@@ -249,7 +269,8 @@ impl TraitContextDetector {
                 // methods named `match` (a Rust keyword) were silently
                 // dropped because the single-list filter applied keywords
                 // from every supported language to every extraction.
-                if is_reserved_keyword(&name, self.language_extractor.language()) {
+                if !name_is_member && is_reserved_keyword(&name, self.language_extractor.language())
+                {
                     warn!(
                         "[TRAIT_DETECT] Skipping reserved keyword as function name: '{}' in {}",
                         name, file_path

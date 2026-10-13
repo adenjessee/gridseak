@@ -901,6 +901,11 @@ pub struct ResolutionStatsSummary {
     pub heuristic_call_ambiguous_drops: usize,
     /// Per-reason counters explaining why LSP lookups fell back.
     pub fallback_reasons: FallbackReasonCounts,
+    /// Source files the compiler index does not cover (e.g. outside the
+    /// `tsconfig` project). An index-backed resolver emits no call edges
+    /// from them at all, so "every edge is compiler-sourced" holds only for
+    /// the other files. Workspace-relative, sorted.
+    pub compiler_unindexed_files: Vec<String>,
 }
 
 impl ResolutionStatsSummary {

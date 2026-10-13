@@ -236,6 +236,7 @@ mod tests {
             heuristic_type_fallbacks: 5,
             heuristic_call_ambiguous_drops: 100,
             fallback_reasons: FallbackReasonCounts::default(),
+            compiler_unindexed_files: Vec::new(),
         }
     }
 

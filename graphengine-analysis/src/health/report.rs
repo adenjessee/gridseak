@@ -163,6 +163,13 @@ pub const CAVEAT_EXTRACTION_COVERAGE_GAPS_V1: &str = "extraction_coverage_gaps_v
 /// when you need headline numbers you can treat as fresh.
 pub const CAVEAT_INCREMENTAL_ANALYSIS_REUSED_V1: &str = "incremental_analysis_reused_v1";
 
+/// Stamped when at least one language attempted the compiler (SCIP) tier
+/// but fell back to tree-sitter heuristic edges because the index was not
+/// provisioned, stale / generated for another workspace, or failed to
+/// load. Call edges for those languages are heuristic-only; see
+/// `resolution_quality.resolution_disclosure` for which languages and why.
+pub const CAVEAT_COMPILER_TIER_UNAVAILABLE_V1: &str = "compiler_tier_unavailable_v1";
+
 /// S2-γ L1: global segments reused from cache; call-graph topology unchanged.
 /// Symbols in `changed_paths` may have stale complexity/dead-code findings.
 pub const CAVEAT_INCREMENTAL_ANALYSIS_SEGMENTS_MERGED_V1: &str =
@@ -874,6 +881,23 @@ pub struct LanguageResolutionDisclosure {
     pub emitted_edges: Option<u64>,
 }
 
+impl LanguageResolutionDisclosure {
+    /// True when the compiler (SCIP) tier was attempted but the pass fell
+    /// back to heuristic edges because the index was unusable.
+    pub fn compiler_tier_unavailable(&self) -> bool {
+        self.tier_attempted == ResolutionDisclosureTier::Layer2
+            && self.tier_used == ResolutionDisclosureTier::Heuristic
+            && matches!(
+                self.skip_reason,
+                Some(
+                    ResolutionSkipReason::IndexerNotProvisioned
+                        | ResolutionSkipReason::IndexStale
+                        | ResolutionSkipReason::IndexerFailed
+                )
+            )
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum ResolutionDisclosureTier {
@@ -1077,6 +1101,31 @@ mod measured_fidelity_tests {
 #[cfg(test)]
 mod resolution_disclosure_tests {
     use super::{LanguageResolutionDisclosure, ResolutionDisclosureTier, ResolutionSkipReason};
+
+    fn row(
+        used: ResolutionDisclosureTier,
+        reason: Option<ResolutionSkipReason>,
+    ) -> LanguageResolutionDisclosure {
+        LanguageResolutionDisclosure {
+            language: "go".into(),
+            tier_attempted: ResolutionDisclosureTier::Layer2,
+            tier_used: used,
+            skip_reason: reason,
+            emitted_edges: None,
+        }
+    }
+
+    #[test]
+    fn compiler_tier_unavailable_flags_index_fallbacks_only() {
+        use ResolutionDisclosureTier::*;
+        use ResolutionSkipReason::*;
+        assert!(row(Heuristic, Some(IndexStale)).compiler_tier_unavailable());
+        assert!(row(Heuristic, Some(IndexerNotProvisioned)).compiler_tier_unavailable());
+        assert!(row(Heuristic, Some(IndexerFailed)).compiler_tier_unavailable());
+        assert!(!row(Heuristic, Some(LanguageNotRouted)).compiler_tier_unavailable());
+        assert!(!row(Layer2, None).compiler_tier_unavailable());
+        assert!(!row(SubprocessLsp, Some(AdapterInitFailed)).compiler_tier_unavailable());
+    }
 
     #[test]
     fn deserializes_indexer_failed_skip_reason() {

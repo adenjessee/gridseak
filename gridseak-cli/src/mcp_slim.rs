@@ -93,7 +93,7 @@ impl SlimGridSeakMcp {
     }
 
     #[tool(
-        description = "If I change this function, what breaks? Transitive upstream callers. Pass a file path to use file blast instead (set file=)."
+        description = "If I change this function, what breaks? Transitive upstream callers. symbol= is an FQN or a location (`path/to/file.ts:123` for the function declared on that line; use it when the name is common). `rows` are functions/methods only; code outside any function is under `top_level_callers`. Pass a file path to use file blast instead (set file=)."
     )]
     async fn gridseak_graph_blast_radius(
         &self,

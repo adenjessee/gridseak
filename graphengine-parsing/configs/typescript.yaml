@@ -46,29 +46,37 @@ queries:
       parameters: (formal_parameters) @params
     ) @func
     
-    ; Method definitions in classes
-    (method_definition 
-      name: (property_identifier) @name
+    ; Generator function declarations (`function* gen() {}`)
+    (generator_function_declaration
+      name: (identifier) @name
+    ) @func
+
+    ; Method definitions in classes (`m()`, `#m()`, `"~m"()`)
+    (method_definition
+      name: [(property_identifier) (private_property_identifier) (string)] @name
       parameters: (formal_parameters) @params
     ) @func
-    
-    ; Arrow functions assigned to variables
+
+    ; Class fields holding a function (`m = () => {}`, `static create = function () {}`)
+    (public_field_definition
+      name: [(property_identifier) (private_property_identifier) (string)] @name
+      value: [(arrow_function) (function_expression) (generator_function)]
+    ) @func
+
+    ; Arrow functions and function expressions assigned to const/let
+    ; (`x => x` has no parenthesized parameter list, so none is required)
     (lexical_declaration
       (variable_declarator
         name: (identifier) @name
-        value: (arrow_function
-          parameters: (formal_parameters) @params
-        )
+        value: [(arrow_function) (function_expression) (generator_function)]
       )
     ) @func
-    
-    ; Function expressions assigned to variables
-    (lexical_declaration
+
+    ; ... and to `var`
+    (variable_declaration
       (variable_declarator
         name: (identifier) @name
-        value: (function_expression
-          parameters: (formal_parameters) @params
-        )
+        value: [(arrow_function) (function_expression) (generator_function)]
       )
     ) @func
 

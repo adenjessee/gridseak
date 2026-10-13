@@ -7,7 +7,10 @@ pub mod fingerprint;
 pub mod index;
 pub mod provisioning;
 
-pub use index::{DecodedRange, ScipDefinition, ScipIndex, ScipIndexError};
+pub use index::{
+    DecodedRange, DocumentCoverage, ScipDefinition, ScipIndex, ScipIndexError,
+    MIN_WORKSPACE_COVERAGE,
+};
 pub use provisioning::{
     install_indexer, provision_index, IndexerError, IndexerLanguage, INDEXER_TIMEOUT,
 };

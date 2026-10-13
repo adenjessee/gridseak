@@ -63,6 +63,7 @@ pub fn find_symbols(
             Err(GraphQueryError::UnknownSymbol(_))
             | Err(GraphQueryError::AmbiguousSymbol { .. })
             | Err(GraphQueryError::OverlyGenericSymbol { .. })
+            | Err(GraphQueryError::NoSymbolAtLocation { .. })
             | Err(GraphQueryError::SeedNotAFunction { .. }) => {}
             Err(e) => return Err(e.into()),
         }

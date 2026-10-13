@@ -737,6 +737,17 @@ pub fn run(ctx: &mut AnalysisRunContext<'_>) -> Result<Option<HealthReport>> {
         primary_language: None,
         analysis_provenance: None,
     };
+    if ctx
+        .resolution_quality
+        .resolution_disclosure
+        .iter()
+        .any(|d| d.compiler_tier_unavailable())
+    {
+        report
+            .integrity_status
+            .schema_caveats
+            .push(crate::health::report::CAVEAT_COMPILER_TIER_UNAVAILABLE_V1.to_string());
+    }
 
     // A3: compute and persist canonical primary language. The parser
     // can't reliably set this on its own because the polyglot

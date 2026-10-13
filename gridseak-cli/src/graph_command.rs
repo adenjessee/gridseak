@@ -286,7 +286,8 @@ pub fn run_graph(store: &ProjectStore, args: GraphArgs, global_json: bool) -> Re
             if gq::seed_looks_like_path(&a.symbol) {
                 return Err(anyhow::anyhow!(
                     "blast-radius expects a function/method symbol, not a file or path (got `{}`).\n\
-                     Resolve a specific public symbol in that file first — try\n\
+                     Name one function by location — `path/to/file.ts:123` (the line it is\n\
+                     declared on) or `path/to/file.ts::name` — or try\n\
                      `gridseak graph callers \"<symbol>\"` or `gridseak recommendations`.",
                     a.symbol
                 ));

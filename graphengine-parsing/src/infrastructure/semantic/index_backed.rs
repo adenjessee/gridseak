@@ -143,8 +143,19 @@ impl<I: SemanticIndex + Send + Sync> IndexBackedSemanticResolver<I> {
                 short_symbol_name(&def.symbol_moniker)
             };
             let direct = symbol_index.find_definition_node(def, &name);
+            // `new C(…)` on a class that declares no constructor: SCIP names
+            // the class, not a constructor; the inherited one runs.
+            let inherited_ctor = || {
+                (direct.is_none()
+                    && def.symbol_moniker.ends_with('#')
+                    && language_matches("typescript", &self.language)
+                    && is_new_site(&mut source_cache, site)
+                    && use_kind_at(&mut source_cache, site) == UseKind::Call)
+                    .then(|| self.nearest_constructor(symbol_index, def.clone()))
+                    .flatten()
+            };
             let callees: Vec<(&crate::domain::Node, crate::domain::Confidence, UseKind)> =
-                match direct {
+                match direct.or_else(inherited_ctor) {
                     Some(node) => {
                         let via = use_kind_at(&mut source_cache, site);
                         vec![(node, def.confidence, via)]
@@ -190,6 +201,129 @@ impl<I: SemanticIndex + Send + Sync> IndexBackedSemanticResolver<I> {
         }
     }
 
+    /// `super(…)` in a TS/JS constructor calls the base class's constructor,
+    /// but SCIP records no occurrence on the `super` keyword. Resolve the
+    /// class's `extends` operand through the index and link the enclosing
+    /// function to the nearest base class that declares a constructor.
+    fn resolve_super_calls(
+        &self,
+        hints: &SyntaxResults,
+        symbol_index: &SymbolIndex<'_>,
+        seen: &mut std::collections::HashSet<(String, String)>,
+        out: &mut ResolvedEdges,
+    ) {
+        if !language_matches("typescript", &self.language) {
+            return;
+        }
+        for file in &hints.source_files {
+            let path = PathBuf::from(file);
+            if !self.index.has_file(&path) {
+                continue;
+            }
+            let Some((tree, src)) = parse_ts(&path) else {
+                continue;
+            };
+            if !src.contains("super") {
+                continue;
+            }
+            // (caller, base-class operand) per `super(…)` call.
+            let mut found = Vec::new();
+            let mut stack = vec![tree.root_node()];
+            while let Some(n) = stack.pop() {
+                let mut c = n.walk();
+                stack.extend(n.children(&mut c));
+                let is_super_call = n.kind() == "call_expression"
+                    && n.child_by_field_name("function")
+                        .is_some_and(|f| f.kind() == "super");
+                let Some(class) = is_super_call.then(|| ancestor_class(n)).flatten() else {
+                    continue;
+                };
+                let p = n.start_position();
+                let (row, col) = (p.row as u32 + 1, p.column as u32);
+                let site = Range::with_file(row, col, row, col + 5, file.clone());
+                if let Some(caller) = symbol_index.find_enclosing_function(&site) {
+                    found.push((caller, extends_operand(class).map(|o| (path.clone(), o))));
+                }
+            }
+            for (caller, operand) in found {
+                let Some((op_file, (row, col))) = operand else {
+                    continue;
+                };
+                let Some(def) = self.index.definition_at(&op_file, row, col) else {
+                    continue;
+                };
+                let def = index_target_from_semantic(&self.workspace_root, &def);
+                let Some(callee) = self.nearest_constructor(symbol_index, def) else {
+                    continue;
+                };
+                if caller.id == callee.id || !seen.insert((caller.id.clone(), callee.id.clone())) {
+                    continue;
+                }
+                out.add_call_edge(Edge::new(
+                    caller.id.clone(),
+                    callee.id.clone(),
+                    EdgeKind::Call,
+                    Provenance::new(ProvenanceSource::Compiler, crate::domain::Confidence::High)
+                        .with_via(UseKind::Call),
+                ));
+                out.stats.compiler_edges += 1;
+                self.emitted_edges
+                    .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+            }
+        }
+    }
+
+    /// Constructor that runs for `new C(…)` where `class_def` is C's SCIP
+    /// definition: C's own `constructor`, else the nearest base class's (a
+    /// class without one inherits its base's). Each `extends` operand is
+    /// resolved through the index, so the result stays compiler-sourced.
+    fn nearest_constructor<'n>(
+        &self,
+        symbol_index: &SymbolIndex<'n>,
+        class_def: IndexTarget,
+    ) -> Option<&'n crate::domain::Node> {
+        let mut def = class_def;
+        for _ in 0..16 {
+            let at = Range::with_file(
+                def.line,
+                def.col,
+                def.line,
+                def.col + 1,
+                def.file.to_string_lossy(),
+            );
+            let (class, ctor) = symbol_index.class_constructor_at(&at)?;
+            if ctor.is_some() {
+                return ctor;
+            }
+            let (row, col) = parse_ts(&def.file).and_then(|(t, _)| {
+                class_declared_at(t.root_node(), class.location.start_line, def.line)
+                    .and_then(extends_operand)
+            })?;
+            let next = self.index.definition_at(&def.file, row, col)?;
+            def = index_target_from_semantic(&self.workspace_root, &next);
+        }
+        None
+    }
+
+    /// Parsed source files the index has no document for. Calls made in them
+    /// produce no edges, so they lie outside what the call graph certifies.
+    fn unindexed_files(&self, hints: &SyntaxResults) -> Vec<String> {
+        let mut files: Vec<String> = hints
+            .source_files
+            .iter()
+            .filter(|f| !self.index.has_file(Path::new(f)))
+            .map(|f| {
+                Path::new(f)
+                    .strip_prefix(&self.workspace_root)
+                    .map(|p| p.to_string_lossy().to_string())
+                    .unwrap_or_else(|_| f.clone())
+            })
+            .collect();
+        files.sort();
+        files.dedup();
+        files
+    }
+
     fn resolve_imports_heuristic(&self, hints: &SyntaxResults, out: &mut ResolvedEdges) {
         let all_ranges: Vec<Range> = hints
             .import_specs
@@ -222,6 +356,93 @@ impl<I: SemanticIndex + Send + Sync> IndexBackedSemanticResolver<I> {
             out.add_import_edge(edge);
         }
     }
+}
+
+/// Parse a TS/JS file with the TypeScript grammar (TSX for `.tsx`/`.jsx`).
+fn parse_ts(path: &Path) -> Option<(tree_sitter::Tree, String)> {
+    let src = std::fs::read_to_string(path).ok()?;
+    let tsx = matches!(
+        path.extension().and_then(|e| e.to_str()),
+        Some("tsx") | Some("jsx")
+    );
+    let mut parser = tree_sitter::Parser::new();
+    parser
+        .set_language(if tsx {
+            tree_sitter_typescript::language_tsx()
+        } else {
+            tree_sitter_typescript::language_typescript()
+        })
+        .ok()?;
+    let tree = parser.parse(&src, None)?;
+    Some((tree, src))
+}
+
+fn is_class_kind(kind: &str) -> bool {
+    matches!(
+        kind,
+        "class_declaration" | "abstract_class_declaration" | "class"
+    )
+}
+
+fn ancestor_class(node: tree_sitter::Node<'_>) -> Option<tree_sitter::Node<'_>> {
+    let mut cur = node.parent();
+    while let Some(n) = cur {
+        if is_class_kind(n.kind()) {
+            return Some(n);
+        }
+        cur = n.parent();
+    }
+    None
+}
+
+/// 0-based (row, col) of the name in a class's `extends` operand:
+/// `Base`, `ns.Base` (the `Base`), `Base<T>`.
+fn extends_operand(class: tree_sitter::Node<'_>) -> Option<(u32, u32)> {
+    let mut c = class.walk();
+    let heritage = class
+        .children(&mut c)
+        .find(|n| n.kind() == "class_heritage")?;
+    let mut c = heritage.walk();
+    let extends = heritage
+        .children(&mut c)
+        .find(|n| n.kind() == "extends_clause")?;
+    let value = extends.child_by_field_name("value")?;
+    let name = match value.kind() {
+        "identifier" => value,
+        "member_expression" => value.child_by_field_name("property")?,
+        _ => return None,
+    };
+    let p = name.start_position();
+    Some((p.row as u32, p.column as u32))
+}
+
+/// The class node starting on `start_line` whose name sits on `name_line`
+/// (1-based), i.e. the declaration a `Struct` node and its SCIP definition
+/// point at.
+fn class_declared_at(
+    root: tree_sitter::Node<'_>,
+    start_line: u32,
+    name_line: u32,
+) -> Option<tree_sitter::Node<'_>> {
+    let mut stack = vec![root];
+    while let Some(n) = stack.pop() {
+        let (s, e) = (
+            n.start_position().row as u32 + 1,
+            n.end_position().row as u32 + 1,
+        );
+        if s > name_line || e < start_line {
+            continue;
+        }
+        if is_class_kind(n.kind())
+            && n.child_by_field_name("name")
+                .is_some_and(|nm| nm.start_position().row as u32 + 1 == name_line)
+        {
+            return Some(n);
+        }
+        let mut c = n.walk();
+        stack.extend(n.children(&mut c));
+    }
+    None
 }
 
 fn index_target_from_semantic(workspace_root: &Path, target: &IndexTarget) -> IndexTarget {
@@ -298,7 +519,10 @@ pub(crate) fn short_symbol_name(symbol: &str) -> String {
 }
 
 /// `Call` when the identifier at `site` is immediately invoked —
-/// `f(`, `x.f(`, `f[T](` (Go), `f<T>(` (TS), `f?.(` — else `Value`.
+/// `f(`, `x.f(`, `f[T](` (Go), `f<T>(` (TS), `f?.(`, `new F(`, and a TS
+/// tagged template `` f`…` `` (the tag is called with the template), and a TS
+/// string-literal element access `obj["f"](` (SCIP records the member's
+/// occurrence on the literal) — else `Value`.
 fn use_kind_at(
     cache: &mut std::collections::HashMap<PathBuf, Vec<String>>,
     site: &IndexTarget,
@@ -308,14 +532,41 @@ fn use_kind_at(
             .map(|s| s.lines().map(str::to_string).collect())
             .unwrap_or_default()
     });
-    let Some(line) = site.line.checked_sub(1).and_then(|i| lines.get(i as usize)) else {
+    let Some(first) = site.line.checked_sub(1).map(|i| i as usize) else {
         return UseKind::Value;
     };
-    let rest: Vec<char> = line.chars().skip(site.col as usize).collect();
-    let mut i = rest
-        .iter()
-        .take_while(|c| c.is_alphanumeric() || **c == '_' || **c == '$')
-        .count();
+    let Some(line) = lines.get(first) else {
+        return UseKind::Value;
+    };
+    // The site's line from the identifier on; type arguments may continue
+    // onto later lines (`f<{ a: A }>(x)` split over lines), appended on demand.
+    let mut rest: Vec<char> = line.chars().skip(site.col as usize).collect();
+    let mut i = match rest.first() {
+        // `obj["name"](…)`: SCIP puts the member's occurrence on the string
+        // literal of a TS element access; skip it and the closing `]`.
+        Some(&q) if q == '"' || q == '\'' || q == '`' => {
+            let Some(end) = string_literal_end(&rest, q) else {
+                return UseKind::Value;
+            };
+            let mut j = end;
+            while rest.get(j).is_some_and(|c| c.is_whitespace()) {
+                j += 1;
+            }
+            if rest.get(j) != Some(&']') {
+                return UseKind::Value;
+            }
+            j + 1
+        }
+        // `#name` is a TS private member; its occurrence starts at the `#`.
+        first => {
+            let mut i = usize::from(first == Some(&'#'));
+            i += rest[i..]
+                .iter()
+                .take_while(|c| c.is_alphanumeric() || **c == '_' || **c == '$')
+                .count();
+            i
+        }
+    };
     while rest.get(i).is_some_and(|c| c.is_whitespace()) {
         i += 1;
     }
@@ -325,10 +576,25 @@ fn use_kind_at(
     if let Some(open) = rest.get(i).copied().filter(|c| *c == '[' || *c == '<') {
         let close = if open == '[' { ']' } else { '>' };
         let mut depth = 0;
-        while let Some(c) = rest.get(i) {
-            if *c == open {
+        let mut next_line = first + 1;
+        loop {
+            let Some(c) = rest.get(i).copied() else {
+                // Unclosed at the end of the line: only a type argument list
+                // continues onto the next one.
+                match lines.get(next_line) {
+                    Some(l) if open == '<' && depth > 0 && next_line <= first + 40 => {
+                        rest.push('\n');
+                        rest.extend(l.chars());
+                        next_line += 1;
+                        continue;
+                    }
+                    _ => break,
+                }
+            };
+            if c == open {
                 depth += 1;
-            } else if *c == close {
+            } else if c == close && !(open == '<' && i > 0 && rest[i - 1] == '=') {
+                // The `>` of `=>` in `<(e: E) => void>` closes nothing.
                 depth -= 1;
                 if depth == 0 {
                     i += 1;
@@ -338,11 +604,46 @@ fn use_kind_at(
             i += 1;
         }
     }
-    if rest.get(i) == Some(&'(') {
+    if matches!(rest.get(i), Some('(') | Some('`')) {
         UseKind::Call
     } else {
         UseKind::Value
     }
+}
+
+/// Index just past the string literal opening with `quote` at `chars[0]`.
+fn string_literal_end(chars: &[char], quote: char) -> Option<usize> {
+    let mut i = 1;
+    while let Some(&c) = chars.get(i) {
+        match c {
+            '\\' => i += 2,
+            c if c == quote => return Some(i + 1),
+            _ => i += 1,
+        }
+    }
+    None
+}
+
+/// Whether the occurrence at `site` is the class operand of `new`:
+/// `new C(`, `new ns.C(`.
+fn is_new_site(
+    cache: &mut std::collections::HashMap<PathBuf, Vec<String>>,
+    site: &IndexTarget,
+) -> bool {
+    let lines = cache.entry(site.file.clone()).or_insert_with(|| {
+        std::fs::read_to_string(&site.file)
+            .map(|s| s.lines().map(str::to_string).collect())
+            .unwrap_or_default()
+    });
+    let Some(line) = site.line.checked_sub(1).and_then(|i| lines.get(i as usize)) else {
+        return false;
+    };
+    let ident = |c: char| c.is_alphanumeric() || c == '_' || c == '$' || c == '.';
+    let before: String = line.chars().take(site.col as usize).collect();
+    let before = before.trim_end_matches(ident).trim_end();
+    before
+        .strip_suffix("new")
+        .is_some_and(|rest| !rest.chars().next_back().is_some_and(ident))
 }
 
 /// Identifier text starting at an index target's (1-based line, 0-based UTF-16
@@ -435,6 +736,12 @@ fn last_descriptor_name(symbol: &str) -> Option<String> {
         }
     }
     let name = last?;
+    // A string-literal member name (`"~validate"() {}`) is escaped as
+    // `` `"~validate"` ``; the syntax layer names the node without quotes.
+    let name = match name.as_bytes() {
+        [q @ (b'"' | b'\''), .., e] if q == e => name[1..name.len() - 1].to_string(),
+        _ => name,
+    };
     let name = match name.as_str() {
         "<constructor>" => "constructor".to_string(),
         _ => name
@@ -472,6 +779,8 @@ impl<I: SemanticIndex + Send + Sync> SemanticResolver for IndexBackedSemanticRes
                 }
             }
             self.resolve_from_occurrences(&occurrences, &symbol_index, &mut seen, &mut out);
+            self.resolve_super_calls(hints, &symbol_index, &mut seen, &mut out);
+            out.stats.compiler_unindexed_files = self.unindexed_files(hints);
             // Heuristic import edges build a per-file name table that is
             // O(files x imported symbols) and, on Kubernetes-size Go repos,
             // runs for hours. Callers above never use it. Opt-out until the
@@ -598,6 +907,226 @@ mod tests {
         assert!(edges.resolved_call_sites.contains(&call_site.location));
     }
 
+    /// Occurrence-mode index whose definitions are keyed by 0-based position.
+    struct PositionIndex {
+        defs: Vec<((u32, u32), IndexTarget)>,
+        occurrences: Vec<(IndexTarget, IndexTarget)>,
+    }
+
+    impl SemanticIndex for PositionIndex {
+        fn definition_at(&self, _file: &Path, line: u32, col: u32) -> Option<IndexTarget> {
+            self.defs
+                .iter()
+                .find(|(at, _)| *at == (line, col))
+                .map(|(_, t)| t.clone())
+        }
+
+        fn language(&self) -> &str {
+            "typescript"
+        }
+
+        fn reference_occurrences(&self) -> Option<Vec<(IndexTarget, IndexTarget)>> {
+            Some(self.occurrences.clone())
+        }
+    }
+
+    #[tokio::test]
+    async fn new_on_class_without_constructor_links_inherited_constructor() {
+        let dir = tempfile::tempdir().unwrap();
+        let file = dir.path().join("a.ts");
+        std::fs::write(
+            &file,
+            "class Base {\n  constructor() { go() }\n}\nclass Mid extends Base {}\nfunction make() {\n  return new Mid()\n}\nfunction other() {\n  return Mid.name\n}\n",
+        )
+        .unwrap();
+        let f = file.to_string_lossy().to_string();
+        let at = |line, col, symbol: &str| IndexTarget {
+            file: file.clone(),
+            line,
+            col,
+            symbol_moniker: symbol.into(),
+            confidence: Confidence::High,
+        };
+        let mid = "scip-typescript npm a 1.0 `a.ts`/Mid#";
+        let index = PositionIndex {
+            // `Base` in `class Mid extends Base` (0-based position).
+            defs: vec![((3, 18), at(1, 6, "scip-typescript npm a 1.0 `a.ts`/Base#"))],
+            // `new Mid()` and the value use `Mid.name`, both naming the class.
+            occurrences: vec![
+                (at(6, 13, mid), at(4, 6, mid)),
+                (at(9, 9, mid), at(4, 6, mid)),
+            ],
+        };
+        let resolver =
+            IndexBackedSemanticResolver::new(index, dir.path().to_path_buf(), "typescript");
+        let strukt = |name: &str, r: Range| {
+            Node::new(
+                crate::domain::NodeKind::Struct,
+                format!("a::{name}"),
+                r,
+                Provenance::new(ProvenanceSource::TreeSitter, Confidence::Medium),
+            )
+        };
+        let base_ctor = Node::function(
+            "a::Base::constructor".into(),
+            Range::with_file(2, 2, 2, 24, &f),
+        );
+        let make = Node::function("a::make".into(), Range::with_file(5, 0, 7, 1, &f));
+        let mut hints = SyntaxResults::new();
+        hints.language = Some("typescript".into());
+        hints.source_files = vec![f.clone()];
+        hints.symbols = vec![
+            strukt("Base", Range::with_file(1, 0, 3, 1, &f)),
+            base_ctor.clone(),
+            strukt("Mid", Range::with_file(4, 0, 4, 25, &f)),
+            make.clone(),
+            Node::function("a::other".into(), Range::with_file(8, 0, 10, 1, &f)),
+        ];
+        let edges = resolver.resolve(&hints).await.unwrap();
+        assert_eq!(edges.call_edges.len(), 1, "{:?}", edges.call_edges);
+        let e = &edges.call_edges[0];
+        assert_eq!((&e.from_id, &e.to_id), (&make.id, &base_ctor.id));
+        assert_eq!(e.provenance.source, ProvenanceSource::Compiler);
+        assert_eq!(e.provenance.via, Some(UseKind::Call));
+    }
+
+    #[tokio::test]
+    async fn string_literal_element_access_call_links_the_member() {
+        let dir = tempfile::tempdir().unwrap();
+        let file = dir.path().join("a.ts");
+        std::fs::write(
+            &file,
+            "class T {\n  \"~validate\"(d) { return d }\n  constructor() {\n    this.s = { validate: (d) => this[\"~validate\"](d) }\n  }\n}\n",
+        )
+        .unwrap();
+        let f = file.to_string_lossy().to_string();
+        let validate = "scip-typescript npm a 1.0 `a.ts`/T#`\"~validate\"`().";
+        let at = |line, col| IndexTarget {
+            file: file.clone(),
+            line,
+            col,
+            symbol_moniker: validate.into(),
+            confidence: Confidence::High,
+        };
+        let index = PositionIndex {
+            defs: Vec::new(),
+            // The occurrence sits on the string literal inside `this[…]`.
+            occurrences: vec![(at(4, 37), at(2, 2))],
+        };
+        let resolver =
+            IndexBackedSemanticResolver::new(index, dir.path().to_path_buf(), "typescript");
+        let member = Node::function("a::~validate".into(), Range::with_file(2, 2, 2, 30, &f));
+        let ctor = Node::function("a::constructor".into(), Range::with_file(3, 2, 5, 3, &f));
+        let mut hints = SyntaxResults::new();
+        hints.language = Some("typescript".into());
+        hints.source_files = vec![f.clone()];
+        hints.symbols = vec![member.clone(), ctor.clone()];
+        let edges = resolver.resolve(&hints).await.unwrap();
+        assert_eq!(edges.call_edges.len(), 1, "{:?}", edges.call_edges);
+        let e = &edges.call_edges[0];
+        assert_eq!((&e.from_id, &e.to_id), (&ctor.id, &member.id));
+        assert_eq!(e.provenance.source, ProvenanceSource::Compiler);
+        assert_eq!(e.provenance.via, Some(UseKind::Call));
+    }
+
+    #[tokio::test]
+    async fn super_call_links_to_nearest_base_constructor() {
+        let dir = tempfile::tempdir().unwrap();
+        let file = dir.path().join("a.ts");
+        std::fs::write(
+            &file,
+            "class Base {\n  constructor() { go() }\n}\nclass Mid extends Base {}\nclass Sub extends Mid {\n  constructor() {\n    super()\n  }\n}\n",
+        )
+        .unwrap();
+        let f = file.to_string_lossy().to_string();
+        let class_at = |line| IndexTarget {
+            file: file.clone(),
+            line,
+            col: 6,
+            symbol_moniker: String::new(),
+            confidence: Confidence::High,
+        };
+        let index = PositionIndex {
+            // `Mid` in `class Sub extends Mid`, `Base` in `class Mid extends Base`.
+            defs: vec![((4, 18), class_at(4)), ((3, 18), class_at(1))],
+            occurrences: Vec::new(),
+        };
+        let resolver =
+            IndexBackedSemanticResolver::new(index, dir.path().to_path_buf(), "typescript");
+        let strukt = |name: &str, r: Range| {
+            Node::new(
+                crate::domain::NodeKind::Struct,
+                format!("a::{name}"),
+                r,
+                Provenance::new(ProvenanceSource::TreeSitter, Confidence::Medium),
+            )
+        };
+        let base_ctor = Node::function(
+            "a::Base::constructor".into(),
+            Range::with_file(2, 2, 2, 24, &f),
+        );
+        let sub_ctor = Node::function(
+            "a::Sub::constructor".into(),
+            Range::with_file(6, 2, 8, 3, &f),
+        );
+        let mut hints = SyntaxResults::new();
+        hints.language = Some("typescript".into());
+        hints.source_files = vec![f.clone()];
+        hints.symbols = vec![
+            strukt("Base", Range::with_file(1, 0, 3, 1, &f)),
+            base_ctor.clone(),
+            strukt("Mid", Range::with_file(4, 0, 4, 25, &f)),
+            strukt("Sub", Range::with_file(5, 0, 9, 1, &f)),
+            sub_ctor.clone(),
+        ];
+        let edges = resolver.resolve(&hints).await.unwrap();
+        assert_eq!(edges.call_edges.len(), 1, "{:?}", edges.call_edges);
+        let e = &edges.call_edges[0];
+        assert_eq!((&e.from_id, &e.to_id), (&sub_ctor.id, &base_ctor.id));
+        assert_eq!(e.provenance.via, Some(UseKind::Call));
+    }
+
+    #[test]
+    fn use_kind_classifies_typescript_use_shapes() {
+        let dir = tempfile::tempdir().unwrap();
+        let file = dir.path().join("a.ts");
+        std::fs::write(
+            &file,
+            "f(1)\nx.f<T>(a)\nf?.(1)\nnew F(1)\nhtml`<p>${v}</p>`\nfoo(f)\nf.call(t)\n<F />\nthis.#m(1)\nuse<(e: E) => void>(h)\nget<{\n  a: A\n}>(c)\nthis[\"~v\"](d)\nx = this['k'].y\nthis[ \"a\" ] (1)\n",
+        )
+        .unwrap();
+        let mut cache = std::collections::HashMap::new();
+        let kind = |cache: &mut _, line: u32, col: u32| {
+            use_kind_at(
+                cache,
+                &IndexTarget {
+                    file: file.clone(),
+                    line,
+                    col,
+                    symbol_moniker: String::new(),
+                    confidence: Confidence::High,
+                },
+            )
+        };
+        for (line, col) in [
+            (1, 0),
+            (2, 2),
+            (3, 0),
+            (4, 4),
+            (5, 0),
+            (9, 5),
+            (10, 0),
+            (11, 0),
+            (14, 5),
+            (16, 6),
+        ] {
+            assert_eq!(kind(&mut cache, line, col), UseKind::Call, "line {line}");
+        }
+        for (line, col) in [(6, 4), (7, 0), (8, 1), (15, 9)] {
+            assert_eq!(kind(&mut cache, line, col), UseKind::Value, "line {line}");
+        }
+    }
+
     #[test]
     fn short_symbol_name_reads_scip_descriptor_not_file() {
         assert_eq!(
@@ -645,6 +1174,12 @@ mod tests {
         assert_eq!(
             short_symbol_name("scip-python python pkg 1.0 `pkg.mod`/Klass#method()."),
             "method"
+        );
+        assert_eq!(
+            short_symbol_name(
+                "scip-typescript npm zod 3.24.2 src/`types.ts`/ZodType#`\"~validate\"`()."
+            ),
+            "~validate"
         );
     }
 

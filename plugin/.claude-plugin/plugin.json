@@ -1,7 +1,15 @@
 {
   "name": "gridseak",
-  "version": "0.1.0",
-  "description": "GridSeak slim MCP + PreToolUse structural gate.",
+  "version": "0.2.0",
+  "description": "GridSeak slim MCP + PreToolUse structural gate, and the audit-my-agent skill (/gridseak:audit): grade your coding agent on this repo against compiler truth.",
+  "author": {
+    "name": "GridSeak",
+    "url": "https://github.com/adenjessee/gridseak"
+  },
+  "homepage": "https://github.com/adenjessee/gridseak",
+  "repository": "https://github.com/adenjessee/gridseak",
+  "license": "MIT",
+  "keywords": ["call-graph", "callers", "refactor", "mcp", "hooks", "audit"],
   "mcpServers": {
     "gridseak": {
       "command": "gridseak",
