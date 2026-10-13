@@ -20,14 +20,31 @@ pub struct IncrementalPlan {
     pub predicted_trust_level: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub structure_fp_match: Option<bool>,
+    /// First [`MAX_REPORTED_PATHS`] paths; the count carries the total. On a
+    /// first scan every file is "changed", and echoing all of Kubernetes made
+    /// each MCP response ~2.5 MB.
     pub changed_paths_parse: Vec<String>,
+    #[serde(default)]
+    pub changed_paths_parse_count: usize,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub changed_paths_workspace: Vec<String>,
+    #[serde(default, skip_serializing_if = "is_zero")]
+    pub changed_paths_workspace_count: usize,
     pub segments_to_reuse: Vec<String>,
     pub segments_to_rerun: Vec<String>,
     pub cache_ready: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub stale_reason: Option<String>,
+}
+
+pub const MAX_REPORTED_PATHS: usize = 25;
+
+fn is_zero(n: &usize) -> bool {
+    *n == 0
+}
+
+fn capped(paths: &[String]) -> Vec<String> {
+    paths.iter().take(MAX_REPORTED_PATHS).cloned().collect()
 }
 
 pub fn predict_incremental_plan(
@@ -80,8 +97,10 @@ pub fn predict_incremental_plan(
             trust.level.as_str().into()
         },
         structure_fp_match,
-        changed_paths_parse: stats.changed_paths.clone(),
-        changed_paths_workspace: workspace_dirty,
+        changed_paths_parse: capped(&stats.changed_paths),
+        changed_paths_parse_count: stats.changed_paths.len(),
+        changed_paths_workspace_count: workspace_dirty.len(),
+        changed_paths_workspace: capped(&workspace_dirty),
         segments_to_reuse: segment_names(&trust.segments_to_reuse),
         segments_to_rerun: segment_names(&trust.segments_to_run),
         cache_ready,

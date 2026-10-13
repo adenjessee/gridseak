@@ -1,7 +1,9 @@
 //! No-LLM gate fixtures. Synthetic graph — CI does not need G1 sqlite.
 
+#[cfg(test)]
 use std::path::PathBuf;
 
+#[cfg(test)]
 use rusqlite::Connection;
 
 #[cfg(test)]

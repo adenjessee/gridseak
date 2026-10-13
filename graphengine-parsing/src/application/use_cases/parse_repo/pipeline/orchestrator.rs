@@ -580,6 +580,16 @@ impl ParsingPipeline {
                 .metadata
                 .insert("resolution_fallback_reasons_json".into(), json);
         }
+        // Files the compiler index skipped: their calls have no edges, so a
+        // consumer certifying "all edges are compiler-sourced" must scope
+        // the claim to the other files (`gridseak audit` does).
+        if !stats.compiler_unindexed_files.is_empty() {
+            if let Ok(json) = serde_json::to_string(&stats.compiler_unindexed_files) {
+                graph
+                    .metadata
+                    .insert("resolution_compiler_unindexed_files".into(), json);
+            }
+        }
 
         // Sprint D.4 completion: also persist LSP session-lifecycle
         // metrics alongside the resolution stats. The CLI's

@@ -1,0 +1,5449 @@
+{
+ "repo": "kubernetes",
+ "root": "<repo root>",
+ "date": "2026-10-12",
+ "agent": "Claude Code",
+ "model": "claude-haiku-5-5, claude-sonnet-5-5, claude-opus-5-5",
+ "mode": "read-only tools + language toolchain",
+ "answer_key": "GridSeak compiler-indexed call graph (85784 edges, 100% from the compiler index)",
+ "call_edges": 85784,
+ "tasks": [
+  {
+   "id": "t1",
+   "band": "small",
+   "target": "autoConvert_v1beta1_SubjectAccessReviewStatus_To_authorization_SubjectAccessReviewStatus",
+   "file": "pkg/apis/authorization/v1beta1/zz_generated.conversion.go",
+   "line": 480,
+   "question": "In this repository (kubernetes), list every function and method, including those in test files, that transitively calls `autoConvert_v1beta1_SubjectAccessReviewStatus_To_authorization_SubjectAccessReviewStatus` (declared at pkg/apis/authorization/v1beta1/zz_generated.conversion.go:480) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `autoConvert_v1beta1_SubjectAccessReviewStatus_To_authorization_SubjectAccessReviewStatus` itself. Consider only code the Go toolchain builds (`go build ./...` and `go test ./...`): skip directories whose names start with `_` or `.`, and `testdata`. The list must be complete.",
+   "max_depth": 3,
+   "answer": [
+    {
+     "file": "pkg/apis/authorization/v1beta1/zz_generated.conversion.go",
+     "line": 40,
+     "name": "RegisterConversions"
+    },
+    {
+     "file": "pkg/apis/authorization/v1beta1/zz_generated.conversion.go",
+     "line": 174,
+     "name": "autoConvert_v1beta1_LocalSubjectAccessReview_To_authorization_LocalSubjectAccessReview"
+    },
+    {
+     "file": "pkg/apis/authorization/v1beta1/zz_generated.conversion.go",
+     "line": 186,
+     "name": "Convert_v1beta1_LocalSubjectAccessReview_To_authorization_LocalSubjectAccessReview"
+    },
+    {
+     "file": "pkg/apis/authorization/v1beta1/zz_generated.conversion.go",
+     "line": 312,
+     "name": "autoConvert_v1beta1_SelfSubjectAccessReview_To_authorization_SelfSubjectAccessReview"
+    },
+    {
+     "file": "pkg/apis/authorization/v1beta1/zz_generated.conversion.go",
+     "line": 324,
+     "name": "Convert_v1beta1_SelfSubjectAccessReview_To_authorization_SelfSubjectAccessReview"
+    },
+    {
+     "file": "pkg/apis/authorization/v1beta1/zz_generated.conversion.go",
+     "line": 418,
+     "name": "autoConvert_v1beta1_SubjectAccessReview_To_authorization_SubjectAccessReview"
+    },
+    {
+     "file": "pkg/apis/authorization/v1beta1/zz_generated.conversion.go",
+     "line": 430,
+     "name": "Convert_v1beta1_SubjectAccessReview_To_authorization_SubjectAccessReview"
+    },
+    {
+     "file": "pkg/apis/authorization/v1beta1/zz_generated.conversion.go",
+     "line": 489,
+     "name": "Convert_v1beta1_SubjectAccessReviewStatus_To_authorization_SubjectAccessReviewStatus"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t2",
+   "band": "small",
+   "target": "DaemonSetsController.getDaemonPods",
+   "file": "pkg/controller/daemon/daemon_controller.go",
+   "line": 761,
+   "question": "In this repository (kubernetes), list every function and method, including those in test files, that transitively calls `DaemonSetsController.getDaemonPods` (declared at pkg/controller/daemon/daemon_controller.go:761) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `DaemonSetsController.getDaemonPods` itself. Consider only code the Go toolchain builds (`go build ./...` and `go test ./...`): skip directories whose names start with `_` or `.`, and `testdata`. The list must be complete.",
+   "max_depth": 5,
+   "answer": [
+    {
+     "file": "pkg/controller/daemon/daemon_controller.go",
+     "line": 793,
+     "name": "DaemonSetsController.getNodesToDaemonPods"
+    },
+    {
+     "file": "pkg/controller/daemon/daemon_controller.go",
+     "line": 968,
+     "name": "DaemonSetsController.updateDaemonSet"
+    },
+    {
+     "file": "pkg/controller/daemon/daemon_controller.go",
+     "line": 998,
+     "name": "DaemonSetsController.manage"
+    },
+    {
+     "file": "pkg/controller/daemon/daemon_controller.go",
+     "line": 1199,
+     "name": "DaemonSetsController.updateDaemonSetStatus"
+    },
+    {
+     "file": "pkg/controller/daemon/daemon_controller.go",
+     "line": 1267,
+     "name": "DaemonSetsController.syncDaemonSet"
+    },
+    {
+     "file": "pkg/controller/daemon/daemon_controller_test.go",
+     "line": 420,
+     "name": "clearExpectations"
+    },
+    {
+     "file": "pkg/controller/daemon/daemon_controller_test.go",
+     "line": 2785,
+     "name": "TestGetNodesToDaemonPods"
+    },
+    {
+     "file": "pkg/controller/daemon/daemon_controller_test.go",
+     "line": 3383,
+     "name": "TestSurgeCreatesNewPodWhenAtMaxSurgeAndOldPodDeleted"
+    },
+    {
+     "file": "pkg/controller/daemon/update.go",
+     "line": 44,
+     "name": "DaemonSetsController.rollingUpdate"
+    },
+    {
+     "file": "pkg/controller/daemon/update.go",
+     "line": 293,
+     "name": "DaemonSetsController.constructHistory"
+    },
+    {
+     "file": "pkg/controller/daemon/update.go",
+     "line": 350,
+     "name": "DaemonSetsController.cleanupHistory"
+    },
+    {
+     "file": "pkg/controller/daemon/update.go",
+     "line": 403,
+     "name": "DaemonSetsController.dedupCurHistories"
+    },
+    {
+     "file": "pkg/controller/daemon/update_test.go",
+     "line": 40,
+     "name": "TestDaemonSetUpdatesPods"
+    },
+    {
+     "file": "pkg/controller/daemon/update_test.go",
+     "line": 82,
+     "name": "TestDaemonSetUpdatesPodsWithMaxSurge"
+    },
+    {
+     "file": "pkg/controller/daemon/update_test.go",
+     "line": 124,
+     "name": "TestDaemonSetUpdatesPodsNotMatchTainstWithMaxSurge"
+    },
+    {
+     "file": "pkg/controller/daemon/update_test.go",
+     "line": 196,
+     "name": "TestDaemonSetUpdatesWhenNewPodIsNotReady"
+    },
+    {
+     "file": "pkg/controller/daemon/update_test.go",
+     "line": 233,
+     "name": "TestDaemonSetUpdatesSomeOldPodsNotReady"
+    },
+    {
+     "file": "pkg/controller/daemon/update_test.go",
+     "line": 301,
+     "name": "TestDaemonSetUpdatesSaveOldHealthyPods"
+    },
+    {
+     "file": "pkg/controller/daemon/update_test.go",
+     "line": 415,
+     "name": "TestDaemonSetUpdatesAllOldNotReadyPodsAndNewNotReadyPods"
+    },
+    {
+     "file": "pkg/controller/daemon/update_test.go",
+     "line": 512,
+     "name": "TestDaemonSetUpdatesAllOldPodsNotReady"
+    },
+    {
+     "file": "pkg/controller/daemon/update_test.go",
+     "line": 548,
+     "name": "TestDaemonSetUpdatesAllOldPodsNotReadyMaxSurge"
+    },
+    {
+     "file": "pkg/controller/daemon/update_test.go",
+     "line": 682,
+     "name": "currentDSHash"
+    },
+    {
+     "file": "pkg/controller/daemon/update_test.go",
+     "line": 692,
+     "name": "TestDaemonSetUpdatesNoTemplateChanged"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t3",
+   "band": "medium",
+   "target": "WaitForDeploymentComplete",
+   "file": "test/e2e/framework/deployment/wait.go",
+   "line": 45,
+   "question": "In this repository (kubernetes), list every function and method, including those in test files, that transitively calls `WaitForDeploymentComplete` (declared at test/e2e/framework/deployment/wait.go:45) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `WaitForDeploymentComplete` itself. Consider only code the Go toolchain builds (`go build ./...` and `go test ./...`): skip directories whose names start with `_` or `.`, and `testdata`. The list must be complete.",
+   "max_depth": 3,
+   "answer": [
+    {
+     "file": "test/e2e/apimachinery/aggregator.go",
+     "line": 144,
+     "name": "SetUpSampleAPIServer"
+    },
+    {
+     "file": "test/e2e/apimachinery/aggregator.go",
+     "line": 428,
+     "name": "TestSampleAPIServer"
+    },
+    {
+     "file": "test/e2e/apimachinery/crd_conversion_webhook.go",
+     "line": 240,
+     "name": "deployCustomResourceWebhookAndService"
+    },
+    {
+     "file": "test/e2e/apimachinery/webhook.go",
+     "line": 1058,
+     "name": "deployWebhookAndService"
+    },
+    {
+     "file": "test/e2e/apps/deployment.go",
+     "line": 712,
+     "name": "testDeleteDeployment"
+    },
+    {
+     "file": "test/e2e/apps/deployment.go",
+     "line": 740,
+     "name": "testRollingUpdateDeployment"
+    },
+    {
+     "file": "test/e2e/apps/deployment.go",
+     "line": 796,
+     "name": "testRecreateDeployment"
+    },
+    {
+     "file": "test/e2e/apps/deployment.go",
+     "line": 1025,
+     "name": "testIterativeDeployments"
+    },
+    {
+     "file": "test/e2e/apps/deployment.go",
+     "line": 1149,
+     "name": "testDeploymentsControllerRef"
+    },
+    {
+     "file": "test/e2e/apps/deployment.go",
+     "line": 1205,
+     "name": "testProportionalScalingDeployment"
+    },
+    {
+     "file": "test/e2e/apps/deployment.go",
+     "line": 1371,
+     "name": "testRollingUpdateDeploymentWithLocalTrafficLoadBalancer"
+    },
+    {
+     "file": "test/e2e/apps/deployment.go",
+     "line": 1663,
+     "name": "testDeploymentSubresources"
+    },
+    {
+     "file": "test/e2e/framework/deployment/fixtures.go",
+     "line": 75,
+     "name": "CreateDeployment"
+    },
+    {
+     "file": "test/e2e/framework/service/jig.go",
+     "line": 295,
+     "name": "TestJig.CreateOnlyLocalNodePortService"
+    },
+    {
+     "file": "test/e2e/framework/service/jig.go",
+     "line": 320,
+     "name": "TestJig.CreateOnlyLocalLoadBalancerService"
+    },
+    {
+     "file": "test/e2e/framework/service/jig.go",
+     "line": 751,
+     "name": "TestJig.Run"
+    },
+    {
+     "file": "test/e2e/framework/service/jig.go",
+     "line": 771,
+     "name": "TestJig.Scale"
+    },
+    {
+     "file": "test/e2e/framework/service/jig.go",
+     "line": 1014,
+     "name": "TestJig.CreateServicePods"
+    },
+    {
+     "file": "test/e2e/network/networking_perf.go",
+     "line": 62,
+     "name": "iperf2ServerDeployment"
+    },
+    {
+     "file": "test/e2e/network/service.go",
+     "line": 256,
+     "name": "StartServeHostnameService"
+    },
+    {
+     "file": "test/e2e/network/service.go",
+     "line": 4191,
+     "name": "execAffinityTestForSessionAffinityTimeout"
+    },
+    {
+     "file": "test/e2e/network/service.go",
+     "line": 4266,
+     "name": "execAffinityTestForNonLBServiceWithTransition"
+    },
+    {
+     "file": "test/e2e/network/service.go",
+     "line": 4270,
+     "name": "execAffinityTestForNonLBService"
+    },
+    {
+     "file": "test/e2e/network/service.go",
+     "line": 4279,
+     "name": "execAffinityTestForNonLBServiceWithOptionalTransition"
+    },
+    {
+     "file": "test/e2e/network/service.go",
+     "line": 4339,
+     "name": "execAffinityTestForLBServiceWithTransition"
+    },
+    {
+     "file": "test/e2e/network/service.go",
+     "line": 4343,
+     "name": "execAffinityTestForLBService"
+    },
+    {
+     "file": "test/e2e/network/service.go",
+     "line": 4350,
+     "name": "execAffinityTestForLBServiceWithOptionalTransition"
+    },
+    {
+     "file": "test/e2e/network/service.go",
+     "line": 4395,
+     "name": "createAndGetExternalServiceFQDN"
+    },
+    {
+     "file": "test/e2e/network/service_latency.go",
+     "line": 138,
+     "name": "runServiceLatencies"
+    },
+    {
+     "file": "test/e2e/upgrades/apps/deployments.go",
+     "line": 62,
+     "name": "DeploymentUpgradeTest.Setup"
+    },
+    {
+     "file": "test/e2e/upgrades/apps/deployments.go",
+     "line": 123,
+     "name": "DeploymentUpgradeTest.Test"
+    },
+    {
+     "file": "test/e2e/upgrades/network/services.go",
+     "line": 45,
+     "name": "ServiceUpgradeTest.Setup"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t4",
+   "band": "medium",
+   "target": "runtimeState.setPodCIDR",
+   "file": "pkg/kubelet/runtime.go",
+   "line": 110,
+   "question": "In this repository (kubernetes), list every function and method, including those in test files, that transitively calls `runtimeState.setPodCIDR` (declared at pkg/kubelet/runtime.go:110) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `runtimeState.setPodCIDR` itself. Consider only code the Go toolchain builds (`go build ./...` and `go test ./...`): skip directories whose names start with `_` or `.`, and `testdata`. The list must be complete.",
+   "max_depth": 8,
+   "answer": [
+    {
+     "file": "cmd/genkubedocs/gen_kube_docs.go",
+     "line": 37,
+     "name": "main"
+    },
+    {
+     "file": "cmd/genman/gen_kube_man.go",
+     "line": 41,
+     "name": "main"
+    },
+    {
+     "file": "cmd/kubelet/app/server.go",
+     "line": 142,
+     "name": "NewKubeletCommand"
+    },
+    {
+     "file": "cmd/kubelet/app/server.go",
+     "line": 542,
+     "name": "Run"
+    },
+    {
+     "file": "cmd/kubelet/app/server.go",
+     "line": 624,
+     "name": "run"
+    },
+    {
+     "file": "cmd/kubelet/app/server.go",
+     "line": 1234,
+     "name": "RunKubelet"
+    },
+    {
+     "file": "cmd/kubelet/app/server.go",
+     "line": 1306,
+     "name": "createAndInitKubelet"
+    },
+    {
+     "file": "cmd/kubelet/kubelet.go",
+     "line": 35,
+     "name": "main"
+    },
+    {
+     "file": "cmd/kubemark/app/hollow_node.go",
+     "line": 153,
+     "name": "NewHollowNodeCommand"
+    },
+    {
+     "file": "cmd/kubemark/app/hollow_node.go",
+     "line": 184,
+     "name": "run"
+    },
+    {
+     "file": "cmd/kubemark/app/hollow_node_test.go",
+     "line": 54,
+     "name": "TestHollowNode"
+    },
+    {
+     "file": "cmd/kubemark/hollow-node.go",
+     "line": 26,
+     "name": "main"
+    },
+    {
+     "file": "pkg/kubelet/kubelet.go",
+     "line": 425,
+     "name": "NewMainKubelet"
+    },
+    {
+     "file": "pkg/kubelet/kubelet.go",
+     "line": 1850,
+     "name": "Kubelet.Run"
+    },
+    {
+     "file": "pkg/kubelet/kubelet.go",
+     "line": 3383,
+     "name": "Kubelet.fastStatusUpdateOnce"
+    },
+    {
+     "file": "pkg/kubelet/kubelet_network.go",
+     "line": 30,
+     "name": "Kubelet.updatePodCIDR"
+    },
+    {
+     "file": "pkg/kubelet/kubelet_node_status.go",
+     "line": 374,
+     "name": "Kubelet.fastNodeStatusUpdate"
+    },
+    {
+     "file": "pkg/kubelet/kubelet_node_status.go",
+     "line": 452,
+     "name": "Kubelet.syncNodeStatus"
+    },
+    {
+     "file": "pkg/kubelet/kubelet_node_status.go",
+     "line": 471,
+     "name": "Kubelet.updateNodeStatus"
+    },
+    {
+     "file": "pkg/kubelet/kubelet_node_status.go",
+     "line": 489,
+     "name": "Kubelet.tryUpdateNodeStatus"
+    },
+    {
+     "file": "pkg/kubelet/kubelet_node_status.go",
+     "line": 550,
+     "name": "Kubelet.updateNode"
+    },
+    {
+     "file": "pkg/kubelet/kubelet_node_status_test.go",
+     "line": 191,
+     "name": "TestUpdateNewNodeStatus"
+    },
+    {
+     "file": "pkg/kubelet/kubelet_node_status_test.go",
+     "line": 347,
+     "name": "TestUpdateExistingNodeStatus"
+    },
+    {
+     "file": "pkg/kubelet/kubelet_node_status_test.go",
+     "line": 540,
+     "name": "TestUpdateExistingNodeStatusTimeout"
+    },
+    {
+     "file": "pkg/kubelet/kubelet_node_status_test.go",
+     "line": 607,
+     "name": "TestUpdateNodeStatusWithRuntimeStateError"
+    },
+    {
+     "file": "pkg/kubelet/kubelet_node_status_test.go",
+     "line": 818,
+     "name": "TestUpdateNodeStatusError"
+    },
+    {
+     "file": "pkg/kubelet/kubelet_node_status_test.go",
+     "line": 830,
+     "name": "TestUpdateNodeStatusWithLease"
+    },
+    {
+     "file": "pkg/kubelet/kubelet_node_status_test.go",
+     "line": 1073,
+     "name": "TestUpdateNodeStatusAndVolumesInUseWithNodeLease"
+    },
+    {
+     "file": "pkg/kubelet/kubelet_node_status_test.go",
+     "line": 1173,
+     "name": "TestFastStatusUpdateOnce"
+    },
+    {
+     "file": "pkg/kubelet/kubelet_node_status_test.go",
+     "line": 1587,
+     "name": "TestUpdateNewNodeStatusTooLargeReservation"
+    },
+    {
+     "file": "pkg/kubelet/kubelet_node_status_test.go",
+     "line": 2947,
+     "name": "TestUpdateNodeAddresses"
+    },
+    {
+     "file": "pkg/kubelet/kubelet_node_status_test.go",
+     "line": 3171,
+     "name": "TestSetNodeStatusDeclaredFeatures"
+    },
+    {
+     "file": "pkg/kubelet/kubelet_test.go",
+     "line": 3079,
+     "name": "TestSyncLabels"
+    },
+    {
+     "file": "pkg/kubelet/kubelet_test.go",
+     "line": 3283,
+     "name": "TestNewMainKubeletStandAlone"
+    },
+    {
+     "file": "pkg/kubelet/kubelet_test.go",
+     "line": 3435,
+     "name": "TestNewMainKubeletWithCertAndCAReloadingEnabled"
+    },
+    {
+     "file": "pkg/kubemark/hollow_kubelet.go",
+     "line": 123,
+     "name": "HollowKubelet.Run"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t5",
+   "band": "large",
+   "target": "GetPauseImageName",
+   "file": "test/utils/image/manifest.go",
+   "line": 341,
+   "question": "In this repository (kubernetes), list every function and method, including those in test files, that transitively calls `GetPauseImageName` (declared at test/utils/image/manifest.go:341) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `GetPauseImageName` itself. Consider only code the Go toolchain builds (`go build ./...` and `go test ./...`): skip directories whose names start with `_` or `.`, and `testdata`. The list must be complete.",
+   "max_depth": 5,
+   "answer": [
+    {
+     "file": "pkg/scheduler/backend/cache/cache_test.go",
+     "line": 643,
+     "name": "makePodWithEphemeralStorage"
+    },
+    {
+     "file": "pkg/scheduler/backend/cache/cache_test.go",
+     "line": 651,
+     "name": "TestEphemeralStorageResource"
+    },
+    {
+     "file": "pkg/scheduler/backend/queue/scheduling_queue_test.go",
+     "line": 2576,
+     "name": "TestPriorityQueue_AssignedPodUpdated"
+    },
+    {
+     "file": "pkg/scheduler/eventhandlers_test.go",
+     "line": 285,
+     "name": "TestPreCheckForNode"
+    },
+    {
+     "file": "pkg/scheduler/eventhandlers_test.go",
+     "line": 694,
+     "name": "TestAdmissionCheck"
+    },
+    {
+     "file": "pkg/scheduler/extender_test.go",
+     "line": 389,
+     "name": "TestIsInterested"
+    },
+    {
+     "file": "pkg/scheduler/framework/plugins/defaultpreemption/default_preemption_test.go",
+     "line": 167,
+     "name": "TestPostFilter"
+    },
+    {
+     "file": "pkg/scheduler/framework/plugins/defaultpreemption/default_preemption_test.go",
+     "line": 615,
+     "name": "TestDryRunPreemption"
+    },
+    {
+     "file": "pkg/scheduler/framework/plugins/defaultpreemption/default_preemption_test.go",
+     "line": 1375,
+     "name": "TestSelectBestCandidate"
+    },
+    {
+     "file": "pkg/scheduler/framework/plugins/defaultpreemption/default_preemption_test.go",
+     "line": 1599,
+     "name": "TestCustomSelection"
+    },
+    {
+     "file": "pkg/scheduler/framework/plugins/defaultpreemption/default_preemption_test.go",
+     "line": 1846,
+     "name": "TestCustomOrdering"
+    },
+    {
+     "file": "pkg/scheduler/framework/plugins/defaultpreemption/default_preemption_test.go",
+     "line": 2050,
+     "name": "TestPreempt"
+    },
+    {
+     "file": "pkg/scheduler/framework/plugins/dynamicresources/extendeddynamicresources_test.go",
+     "line": 31,
+     "name": "Test_createRequestsAndMappings_requests"
+    },
+    {
+     "file": "pkg/scheduler/framework/plugins/dynamicresources/extendeddynamicresources_test.go",
+     "line": 289,
+     "name": "Test_createRequestsAndMappings_mappings"
+    },
+    {
+     "file": "pkg/scheduler/framework/plugins/noderesources/balanced_allocation_test.go",
+     "line": 40,
+     "name": "TestNodeResourcesBalancedAllocation"
+    },
+    {
+     "file": "pkg/scheduler/framework/plugins/noderesources/balanced_allocation_test.go",
+     "line": 43,
+     "name": "testNodeResourcesBalancedAllocation"
+    },
+    {
+     "file": "pkg/scheduler/framework/plugins/noderesources/balanced_allocation_test.go",
+     "line": 362,
+     "name": "TestBalancedAllocationSignPod"
+    },
+    {
+     "file": "pkg/scheduler/framework/plugins/noderesources/balanced_allocation_test.go",
+     "line": 365,
+     "name": "testBalancedAllocationSignPod"
+    },
+    {
+     "file": "pkg/scheduler/framework/plugins/noderesources/fit_test.go",
+     "line": 986,
+     "name": "TestFitScore"
+    },
+    {
+     "file": "pkg/scheduler/framework/plugins/noderesources/fit_test.go",
+     "line": 989,
+     "name": "testFitScore"
+    },
+    {
+     "file": "pkg/scheduler/framework/plugins/noderesources/fit_test.go",
+     "line": 1327,
+     "name": "BenchmarkTestFitScore"
+    },
+    {
+     "file": "pkg/scheduler/framework/plugins/noderesources/fit_test.go",
+     "line": 1500,
+     "name": "Test_isSchedulableAfterPodChange"
+    },
+    {
+     "file": "pkg/scheduler/framework/plugins/noderesources/fit_test.go",
+     "line": 1896,
+     "name": "TestIsFit"
+    },
+    {
+     "file": "pkg/scheduler/framework/plugins/noderesources/fit_test.go",
+     "line": 2176,
+     "name": "TestFitSignPod"
+    },
+    {
+     "file": "pkg/scheduler/framework/plugins/noderesources/fit_test.go",
+     "line": 2179,
+     "name": "testFitSignPod"
+    },
+    {
+     "file": "pkg/scheduler/framework/plugins/noderesources/fit_test.go",
+     "line": 2310,
+     "name": "TestScorePlacement_Resources"
+    },
+    {
+     "file": "pkg/scheduler/framework/plugins/noderesources/least_allocated_test.go",
+     "line": 38,
+     "name": "TestLeastAllocatedScoringStrategy"
+    },
+    {
+     "file": "pkg/scheduler/framework/plugins/noderesources/most_allocated_test.go",
+     "line": 38,
+     "name": "TestMostAllocatedScoringStrategy"
+    },
+    {
+     "file": "pkg/scheduler/framework/plugins/noderesources/requested_to_capacity_ratio_test.go",
+     "line": 41,
+     "name": "TestRequestedToCapacityRatioScoringStrategy"
+    },
+    {
+     "file": "pkg/scheduler/framework/plugins/noderesources/requested_to_capacity_ratio_test.go",
+     "line": 224,
+     "name": "TestResourceBinPackingSingleExtended"
+    },
+    {
+     "file": "pkg/scheduler/framework/plugins/noderesources/requested_to_capacity_ratio_test.go",
+     "line": 359,
+     "name": "TestResourceBinPackingMultipleExtended"
+    },
+    {
+     "file": "pkg/scheduler/framework/preemption/preemption_test.go",
+     "line": 273,
+     "name": "TestSelectCandidate"
+    },
+    {
+     "file": "pkg/scheduler/testing/wrappers.go",
+     "line": 787,
+     "name": "PodWrapper.Res"
+    },
+    {
+     "file": "pkg/scheduler/testing/wrappers.go",
+     "line": 814,
+     "name": "PodWrapper.Req"
+    },
+    {
+     "file": "pkg/scheduler/testing/wrappers.go",
+     "line": 825,
+     "name": "PodWrapper.Lim"
+    },
+    {
+     "file": "pkg/scheduler/testing/wrappers.go",
+     "line": 836,
+     "name": "PodWrapper.InitReq"
+    },
+    {
+     "file": "pkg/scheduler/testing/wrappers.go",
+     "line": 847,
+     "name": "PodWrapper.SidecarReq"
+    },
+    {
+     "file": "test/e2e/apimachinery/namespace.go",
+     "line": 96,
+     "name": "ensurePodsAreRemovedWhenNamespaceIsDeleted"
+    },
+    {
+     "file": "test/e2e/apimachinery/namespace.go",
+     "line": 497,
+     "name": "ensurePodsAreRemovedFirstInOrderedNamespaceDeletion"
+    },
+    {
+     "file": "test/e2e/apimachinery/resource_quota.go",
+     "line": 2188,
+     "name": "newTestPodForQuota"
+    },
+    {
+     "file": "test/e2e/apimachinery/resource_quota.go",
+     "line": 2214,
+     "name": "newTestPodForQuotaWithPriority"
+    },
+    {
+     "file": "test/e2e/apimachinery/resource_quota.go",
+     "line": 2241,
+     "name": "newTestPodWithAffinityForQuota"
+    },
+    {
+     "file": "test/e2e/apimachinery/webhook.go",
+     "line": 1339,
+     "name": "testMutatingPodWebhook"
+    },
+    {
+     "file": "test/e2e/apimachinery/webhook.go",
+     "line": 1356,
+     "name": "toBeMutatedPod"
+    },
+    {
+     "file": "test/e2e/apimachinery/webhook.go",
+     "line": 1372,
+     "name": "testWebhook"
+    },
+    {
+     "file": "test/e2e/apimachinery/webhook.go",
+     "line": 1466,
+     "name": "testAttachingPodWebhook"
+    },
+    {
+     "file": "test/e2e/apimachinery/webhook.go",
+     "line": 1816,
+     "name": "nonCompliantPod"
+    },
+    {
+     "file": "test/e2e/apimachinery/webhook.go",
+     "line": 1835,
+     "name": "hangingPod"
+    },
+    {
+     "file": "test/e2e/apimachinery/webhook.go",
+     "line": 1854,
+     "name": "toBeAttachedPod"
+    },
+    {
+     "file": "test/e2e/apps/disruption.go",
+     "line": 650,
+     "name": "createPodsOrDie"
+    },
+    {
+     "file": "test/e2e/apps/disruption.go",
+     "line": 704,
+     "name": "createReplicaSetOrDie"
+    },
+    {
+     "file": "test/e2e/apps/ttl_after_finished.go",
+     "line": 70,
+     "name": "testFinishedJob"
+    },
+    {
+     "file": "test/e2e/autoscaling/cluster_size_autoscaling.go",
+     "line": 448,
+     "name": "runDrainTest"
+    },
+    {
+     "file": "test/e2e/autoscaling/cluster_size_autoscaling.go",
+     "line": 487,
+     "name": "reserveMemory"
+    },
+    {
+     "file": "test/e2e/autoscaling/cluster_size_autoscaling.go",
+     "line": 522,
+     "name": "ReserveMemoryWithPriority"
+    },
+    {
+     "file": "test/e2e/autoscaling/cluster_size_autoscaling.go",
+     "line": 528,
+     "name": "ReserveMemoryWithSchedulerName"
+    },
+    {
+     "file": "test/e2e/autoscaling/cluster_size_autoscaling.go",
+     "line": 534,
+     "name": "ReserveMemory"
+    },
+    {
+     "file": "test/e2e/autoscaling/cluster_size_autoscaling.go",
+     "line": 683,
+     "name": "runAntiAffinityPods"
+    },
+    {
+     "file": "test/e2e/autoscaling/cluster_size_autoscaling.go",
+     "line": 705,
+     "name": "runVolumeAntiAffinityPods"
+    },
+    {
+     "file": "test/e2e/autoscaling/cluster_size_autoscaling.go",
+     "line": 762,
+     "name": "runReplicatedPodOnEachNode"
+    },
+    {
+     "file": "test/e2e/autoscaling/cluster_size_autoscaling.go",
+     "line": 847,
+     "name": "increaseClusterSizeWithTimeout"
+    },
+    {
+     "file": "test/e2e/autoscaling/cluster_size_autoscaling.go",
+     "line": 869,
+     "name": "increaseClusterSize"
+    },
+    {
+     "file": "test/e2e/common/node/lifecycle_hook.go",
+     "line": 547,
+     "name": "getSidecarPodWithHook"
+    },
+    {
+     "file": "test/e2e/framework/job/fixtures.go",
+     "line": 35,
+     "name": "NewTestJob"
+    },
+    {
+     "file": "test/e2e/framework/job/fixtures.go",
+     "line": 42,
+     "name": "NewTestJobOnNode"
+    },
+    {
+     "file": "test/e2e/network/service_latency.go",
+     "line": 138,
+     "name": "runServiceLatencies"
+    },
+    {
+     "file": "test/e2e/node/gpu.go",
+     "line": 434,
+     "name": "StartJob"
+    },
+    {
+     "file": "test/e2e/node/kubelet_perf.go",
+     "line": 69,
+     "name": "runResourceTrackingTest"
+    },
+    {
+     "file": "test/e2e/scheduling/limit_range.go",
+     "line": 426,
+     "name": "newTestPod"
+    },
+    {
+     "file": "test/e2e/scheduling/predicates.go",
+     "line": 966,
+     "name": "initPausePod"
+    },
+    {
+     "file": "test/e2e/scheduling/predicates.go",
+     "line": 1029,
+     "name": "createPausePod"
+    },
+    {
+     "file": "test/e2e/scheduling/predicates.go",
+     "line": 1039,
+     "name": "runPausePod"
+    },
+    {
+     "file": "test/e2e/scheduling/predicates.go",
+     "line": 1047,
+     "name": "runPodAndGetNodeName"
+    },
+    {
+     "file": "test/e2e/scheduling/predicates.go",
+     "line": 1087,
+     "name": "createPausePodAction"
+    },
+    {
+     "file": "test/e2e/scheduling/predicates.go",
+     "line": 1122,
+     "name": "GetNodeThatCanRunPod"
+    },
+    {
+     "file": "test/e2e/scheduling/predicates.go",
+     "line": 1128,
+     "name": "Get2NodesThatCanRunPod"
+    },
+    {
+     "file": "test/e2e/scheduling/predicates.go",
+     "line": 1151,
+     "name": "getNodeThatCanRunPodWithoutToleration"
+    },
+    {
+     "file": "test/e2e/scheduling/predicates.go",
+     "line": 1157,
+     "name": "CreateHostPortPods"
+    },
+    {
+     "file": "test/e2e/scheduling/predicates.go",
+     "line": 1175,
+     "name": "CreateNodeSelectorPods"
+    },
+    {
+     "file": "test/e2e/scheduling/preemption.go",
+     "line": 1011,
+     "name": "initPauseRS"
+    },
+    {
+     "file": "test/e2e/scheduling/preemption.go",
+     "line": 1032,
+     "name": "createPauseRS"
+    },
+    {
+     "file": "test/e2e/scheduling/preemption.go",
+     "line": 1042,
+     "name": "runPauseRS"
+    },
+    {
+     "file": "test/e2e/scheduling/preemption.go",
+     "line": 1048,
+     "name": "createPod"
+    },
+    {
+     "file": "test/e2e/scheduling/priorities.go",
+     "line": 355,
+     "name": "createBalancedPodForNodes"
+    },
+    {
+     "file": "test/e2e/upgrades/apps/job.go",
+     "line": 46,
+     "name": "JobUpgradeTest.Setup"
+    },
+    {
+     "file": "test/e2e/windows/density.go",
+     "line": 93,
+     "name": "runDensityBatchTest"
+    },
+    {
+     "file": "test/e2e/windows/gmsa_full.go",
+     "line": 246,
+     "name": "retrieveCRDManifestFileContents"
+    },
+    {
+     "file": "test/e2e/windows/memory_limits.go",
+     "line": 102,
+     "name": "overrideAllocatableMemoryTest"
+    },
+    {
+     "file": "test/e2e_node/critical_pod_test.go",
+     "line": 230,
+     "name": "getTestPod"
+    },
+    {
+     "file": "test/e2e_node/critical_pod_test.go",
+     "line": 266,
+     "name": "getTestPodWithPodLevelResources"
+    },
+    {
+     "file": "test/e2e_node/eviction_test.go",
+     "line": 758,
+     "name": "runEvictionTest"
+    },
+    {
+     "file": "test/e2e_node/pids_test.go",
+     "line": 90,
+     "name": "runPodPidsLimitTests"
+    },
+    {
+     "file": "test/e2e_node/quota_lsci_test.go",
+     "line": 46,
+     "name": "runOneQuotaTest"
+    },
+    {
+     "file": "test/e2e_node/split_disk_test.go",
+     "line": 116,
+     "name": "runImageFsPressureTest"
+    },
+    {
+     "file": "test/integration/client/client_test.go",
+     "line": 789,
+     "name": "TestMultiWatch"
+    },
+    {
+     "file": "test/integration/disruption/disruption_test.go",
+     "line": 638,
+     "name": "TestStalePodDisruption"
+    },
+    {
+     "file": "test/integration/node/lifecycle_test.go",
+     "line": 50,
+     "name": "TestEvictionForNoExecuteTaintAddedByUser"
+    },
+    {
+     "file": "test/integration/node/lifecycle_test.go",
+     "line": 207,
+     "name": "TestTaintBasedEvictions"
+    },
+    {
+     "file": "test/integration/scheduler/batch/batch_test.go",
+     "line": 69,
+     "name": "TestBatchScenarios"
+    },
+    {
+     "file": "test/integration/scheduler/batch/batch_test.go",
+     "line": 377,
+     "name": "newPod"
+    },
+    {
+     "file": "test/integration/scheduler/batch/batch_test.go",
+     "line": 498,
+     "name": "runScenario"
+    },
+    {
+     "file": "test/integration/scheduler/bind/bind_test.go",
+     "line": 35,
+     "name": "TestDefaultBinder"
+    },
+    {
+     "file": "test/integration/scheduler/eventhandler/eventhandler_test.go",
+     "line": 84,
+     "name": "TestUpdateNodeEvent"
+    },
+    {
+     "file": "test/integration/scheduler/eventhandler/eventhandler_test.go",
+     "line": 151,
+     "name": "TestUpdateNominatedNodeName"
+    },
+    {
+     "file": "test/integration/scheduler/extender/extender_test.go",
+     "line": 288,
+     "name": "TestSchedulerExtender"
+    },
+    {
+     "file": "test/integration/scheduler/extender/extender_test.go",
+     "line": 363,
+     "name": "DoTestPodScheduling"
+    },
+    {
+     "file": "test/integration/scheduler/filters/filters_test.go",
+     "line": 75,
+     "name": "TestInterPodAffinity"
+    },
+    {
+     "file": "test/integration/scheduler/filters/filters_test.go",
+     "line": 1173,
+     "name": "TestInterPodAffinityWithNamespaceSelector"
+    },
+    {
+     "file": "test/integration/scheduler/filters/filters_test.go",
+     "line": 1356,
+     "name": "TestTaintTolerationFilter"
+    },
+    {
+     "file": "test/integration/scheduler/filters/filters_test.go",
+     "line": 1765,
+     "name": "TestPodTopologySpreadFilter"
+    },
+    {
+     "file": "test/integration/scheduler/filters/filters_test.go",
+     "line": 2242,
+     "name": "TestNodePortsFilter"
+    },
+    {
+     "file": "test/integration/scheduler/filters/filters_test.go",
+     "line": 2722,
+     "name": "TestPodAffinityMatchLabelKeyEnablement"
+    },
+    {
+     "file": "test/integration/scheduler/filters/filters_test.go",
+     "line": 2859,
+     "name": "TestNodeResourcesFilter"
+    },
+    {
+     "file": "test/integration/scheduler/filters/filters_test.go",
+     "line": 2958,
+     "name": "TestNodeAffinityFilter"
+    },
+    {
+     "file": "test/integration/scheduler/filters/filters_test.go",
+     "line": 3169,
+     "name": "TestNodeDeclaredFeaturesFilter"
+    },
+    {
+     "file": "test/integration/scheduler/nominated_node_name/nominated_node_name_test.go",
+     "line": 110,
+     "name": "TestNominatedNodeNameIsSetBeforePreBindAndWaitOnPermit"
+    },
+    {
+     "file": "test/integration/scheduler/nominated_node_name/nominated_node_name_test.go",
+     "line": 206,
+     "name": "TestPreemptionAndNominatedNodeNameScenarios"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 724,
+     "name": "TestPreFilterPlugin"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 806,
+     "name": "TestQueueSortPlugin"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 885,
+     "name": "TestPostFilterPlugin"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 1072,
+     "name": "TestScorePlugin"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 1134,
+     "name": "TestNormalizeScorePlugin"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 1164,
+     "name": "TestReservePluginReserve"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 1219,
+     "name": "TestPrebindPlugin"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 1363,
+     "name": "TestUnReserveReservePlugins"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 1511,
+     "name": "TestUnReservePermitPlugins"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 1593,
+     "name": "TestUnReservePreBindPlugins"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 1666,
+     "name": "TestUnReserveBindPlugins"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 1742,
+     "name": "TestBindPlugin"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 1939,
+     "name": "TestPostBindPlugin"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 2007,
+     "name": "TestPermitPlugin"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 2104,
+     "name": "TestMultiplePermitPlugins"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 2156,
+     "name": "TestPermitPluginsCancelled"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 2199,
+     "name": "TestCoSchedulingWithPermitPlugin"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 2285,
+     "name": "TestFilterPlugin"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 2342,
+     "name": "TestPreScorePlugin"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 2465,
+     "name": "TestPreemptWithPermitPlugin"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 2709,
+     "name": "TestActivatePods"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 2839,
+     "name": "TestPreEnqueuePluginEventsToRegister"
+    },
+    {
+     "file": "test/integration/scheduler/podgroup/podgroup_test.go",
+     "line": 59,
+     "name": "TestPodGroupScheduling"
+    },
+    {
+     "file": "test/integration/scheduler/podgroup/podgroup_test.go",
+     "line": 791,
+     "name": "TestWorkloadAwarePreemptionInvocation"
+    },
+    {
+     "file": "test/integration/scheduler/podgroup/podgroup_test.go",
+     "line": 902,
+     "name": "TestPostFilterInvocationCount"
+    },
+    {
+     "file": "test/integration/scheduler/podgroup/topology_aware_scheduling/tas_test.go",
+     "line": 52,
+     "name": "makePod"
+    },
+    {
+     "file": "test/integration/scheduler/podgroup/topology_aware_scheduling/tas_test.go",
+     "line": 58,
+     "name": "makeAssignedPod"
+    },
+    {
+     "file": "test/integration/scheduler/podgroup/topology_aware_scheduling/tas_test.go",
+     "line": 63,
+     "name": "makeLargePod"
+    },
+    {
+     "file": "test/integration/scheduler/podgroup/topology_aware_scheduling/tas_test.go",
+     "line": 69,
+     "name": "makeUnfittablePod"
+    },
+    {
+     "file": "test/integration/scheduler/podgroup/topology_aware_scheduling/tas_test.go",
+     "line": 102,
+     "name": "TestTopologyAwareSchedulingWithGangPolicy"
+    },
+    {
+     "file": "test/integration/scheduler/podgroup/topology_aware_scheduling/tas_test.go",
+     "line": 697,
+     "name": "TestTopologyAwareSchedulingWithBasicPolicy"
+    },
+    {
+     "file": "test/integration/scheduler/preemption/nominatednodename/nominatednodename_test.go",
+     "line": 89,
+     "name": "TestNominatedNode"
+    },
+    {
+     "file": "test/integration/scheduler/preemption/podgrouppreemption_test.go",
+     "line": 42,
+     "name": "TestPodGroupPreemption"
+    },
+    {
+     "file": "test/integration/scheduler/preemption/preemption_test.go",
+     "line": 486,
+     "name": "TestAsyncPreemption"
+    },
+    {
+     "file": "test/integration/scheduler/preemption/preemption_test.go",
+     "line": 1656,
+     "name": "TestPreemptionRespectsWaitingPod"
+    },
+    {
+     "file": "test/integration/scheduler/preemption/preemption_test.go",
+     "line": 1859,
+     "name": "TestPreemptionRespectsBindingPod"
+    },
+    {
+     "file": "test/integration/scheduler/queueing/queue_test.go",
+     "line": 212,
+     "name": "TestCustomResourceEnqueue"
+    },
+    {
+     "file": "test/integration/scheduler/queueing/queue_test.go",
+     "line": 370,
+     "name": "TestRequeueByBindFailure"
+    },
+    {
+     "file": "test/integration/scheduler/queueing/queue_test.go",
+     "line": 461,
+     "name": "TestRequeueByPermitRejection"
+    },
+    {
+     "file": "test/integration/scheduler/queueing/queue_test.go",
+     "line": 589,
+     "name": "TestPopFromBackoffQWhenActiveQEmpty"
+    },
+    {
+     "file": "test/integration/scheduler/rescheduling_test.go",
+     "line": 135,
+     "name": "TestReScheduling"
+    },
+    {
+     "file": "test/integration/scheduler/scheduler_test.go",
+     "line": 55,
+     "name": "TestUnschedulableNodes"
+    },
+    {
+     "file": "test/integration/scheduler/scheduler_test.go",
+     "line": 180,
+     "name": "TestMultipleSchedulers"
+    },
+    {
+     "file": "test/integration/scheduler/scheduler_test.go",
+     "line": 280,
+     "name": "TestMultipleSchedulingProfiles"
+    },
+    {
+     "file": "test/integration/scheduler/scheduler_test.go",
+     "line": 350,
+     "name": "TestAllocatable"
+    },
+    {
+     "file": "test/integration/scheduler/scheduler_test.go",
+     "line": 422,
+     "name": "TestSchedulerInformers"
+    },
+    {
+     "file": "test/integration/scheduler/scheduler_test.go",
+     "line": 549,
+     "name": "TestNodeEvents"
+    },
+    {
+     "file": "test/integration/scheduler/scheduler_test.go",
+     "line": 644,
+     "name": "TestHostPorts"
+    },
+    {
+     "file": "test/integration/scheduler/scheduler_test.go",
+     "line": 1040,
+     "name": "TestTaintTolerationGtLtIntegration"
+    },
+    {
+     "file": "test/integration/scheduler/scoring/priorities_test.go",
+     "line": 155,
+     "name": "TestNodeResourcesScoring"
+    },
+    {
+     "file": "test/integration/scheduler/scoring/priorities_test.go",
+     "line": 948,
+     "name": "TestPodTopologySpreadScoring"
+    },
+    {
+     "file": "test/integration/scheduler/scoring/priorities_test.go",
+     "line": 1183,
+     "name": "TestDefaultPodTopologySpreadScoring"
+    },
+    {
+     "file": "test/integration/util/util.go",
+     "line": 831,
+     "name": "InitPausePod"
+    },
+    {
+     "file": "test/integration/util/util.go",
+     "line": 893,
+     "name": "CreatePausePodWithResource"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t6",
+   "band": "large",
+   "target": "CreateNamespaceOrDie",
+   "file": "test/integration/framework/util.go",
+   "line": 34,
+   "question": "In this repository (kubernetes), list every function and method, including those in test files, that transitively calls `CreateNamespaceOrDie` (declared at test/integration/framework/util.go:34) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `CreateNamespaceOrDie` itself. Consider only code the Go toolchain builds (`go build ./...` and `go test ./...`): skip directories whose names start with `_` or `.`, and `testdata`. The list must be complete.",
+   "max_depth": 4,
+   "answer": [
+    {
+     "file": "test/integration/apimachinery/watch_restart_test.go",
+     "line": 66,
+     "name": "TestWatchRestartsIfTimeoutNotReached"
+    },
+    {
+     "file": "test/integration/apimachinery/watchlist_test.go",
+     "line": 43,
+     "name": "TestReflectorWatchListFallback"
+    },
+    {
+     "file": "test/integration/apiserver/apiserver_test.go",
+     "line": 329,
+     "name": "Test202StatusCode"
+    },
+    {
+     "file": "test/integration/apiserver/apiserver_test.go",
+     "line": 633,
+     "name": "TestListResourceVersion0"
+    },
+    {
+     "file": "test/integration/apiserver/apiserver_test.go",
+     "line": 707,
+     "name": "TestAPIListChunking"
+    },
+    {
+     "file": "test/integration/apiserver/apiserver_test.go",
+     "line": 774,
+     "name": "TestAPIListChunkingWithLabelSelector"
+    },
+    {
+     "file": "test/integration/apiserver/apiserver_test.go",
+     "line": 847,
+     "name": "TestNameInFieldSelector"
+    },
+    {
+     "file": "test/integration/apiserver/apiserver_test.go",
+     "line": 932,
+     "name": "TestMetadataClient"
+    },
+    {
+     "file": "test/integration/apiserver/apiserver_test.go",
+     "line": 1479,
+     "name": "TestGetSubresourcesAsTables"
+    },
+    {
+     "file": "test/integration/apiserver/apiserver_test.go",
+     "line": 1701,
+     "name": "TestGetScaleSubresourceAsTableForAllBuiltins"
+    },
+    {
+     "file": "test/integration/apiserver/apiserver_test.go",
+     "line": 1902,
+     "name": "TestTransform"
+    },
+    {
+     "file": "test/integration/apiserver/apiserver_test.go",
+     "line": 2539,
+     "name": "TestWatchTransformCaching"
+    },
+    {
+     "file": "test/integration/apiserver/cve_2021_29923_test.go",
+     "line": 43,
+     "name": "TestCanaryCVE_2021_29923"
+    },
+    {
+     "file": "test/integration/apiserver/patch_test.go",
+     "line": 38,
+     "name": "TestPatchConflicts"
+    },
+    {
+     "file": "test/integration/apiserver/print_test.go",
+     "line": 122,
+     "name": "TestServerSidePrint"
+    },
+    {
+     "file": "test/integration/apiserver/sharding_test.go",
+     "line": 79,
+     "name": "TestShardedList"
+    },
+    {
+     "file": "test/integration/apiserver/sharding_test.go",
+     "line": 142,
+     "name": "TestShardedWatch"
+    },
+    {
+     "file": "test/integration/apiserver/sharding_test.go",
+     "line": 280,
+     "name": "TestShardedListFeatureGateDisabled"
+    },
+    {
+     "file": "test/integration/apiserver/sharding_test.go",
+     "line": 314,
+     "name": "TestShardedListComplete"
+    },
+    {
+     "file": "test/integration/apiserver/sharding_test.go",
+     "line": 350,
+     "name": "TestShardedListByNamespace"
+    },
+    {
+     "file": "test/integration/auth/auth_test.go",
+     "line": 467,
+     "name": "TestAuthModeAlwaysAllow"
+    },
+    {
+     "file": "test/integration/auth/auth_test.go",
+     "line": 572,
+     "name": "TestAuthModeAlwaysDeny"
+    },
+    {
+     "file": "test/integration/auth/auth_test.go",
+     "line": 617,
+     "name": "TestAliceNotForbiddenOrUnauthorized"
+    },
+    {
+     "file": "test/integration/auth/auth_test.go",
+     "line": 694,
+     "name": "TestBobIsForbidden"
+    },
+    {
+     "file": "test/integration/auth/auth_test.go",
+     "line": 744,
+     "name": "TestUnknownUserIsUnauthorized"
+    },
+    {
+     "file": "test/integration/auth/auth_test.go",
+     "line": 817,
+     "name": "TestImpersonateIsForbidden"
+    },
+    {
+     "file": "test/integration/auth/auth_test.go",
+     "line": 1836,
+     "name": "TestAuthorizationAttributeDetermination"
+    },
+    {
+     "file": "test/integration/auth/auth_test.go",
+     "line": 1910,
+     "name": "TestNamespaceAuthorization"
+    },
+    {
+     "file": "test/integration/auth/auth_test.go",
+     "line": 2013,
+     "name": "TestKindAuthorization"
+    },
+    {
+     "file": "test/integration/auth/auth_test.go",
+     "line": 2098,
+     "name": "TestReadOnlyAuthorization"
+    },
+    {
+     "file": "test/integration/auth/auth_test.go",
+     "line": 2153,
+     "name": "TestWebhookTokenAuthenticator"
+    },
+    {
+     "file": "test/integration/auth/auth_test.go",
+     "line": 2159,
+     "name": "TestWebhookTokenAuthenticatorCustomDial"
+    },
+    {
+     "file": "test/integration/auth/auth_test.go",
+     "line": 2163,
+     "name": "testWebhookTokenAuthenticator"
+    },
+    {
+     "file": "test/integration/auth/bootstraptoken_test.go",
+     "line": 53,
+     "name": "TestBootstrapTokenAuth"
+    },
+    {
+     "file": "test/integration/auth/svcaccttoken_test.go",
+     "line": 75,
+     "name": "TestServiceAccountAnnotationDeprecation"
+    },
+    {
+     "file": "test/integration/auth/svcaccttoken_test.go",
+     "line": 127,
+     "name": "TestServiceAccountTokenCreate"
+    },
+    {
+     "file": "test/integration/cloudprovider/ccm_test.go",
+     "line": 46,
+     "name": "Test_RemoveExternalCloudProviderTaint"
+    },
+    {
+     "file": "test/integration/cloudprovider/ccm_test.go",
+     "line": 148,
+     "name": "Test_ExternalCloudProviderNodeAddresses"
+    },
+    {
+     "file": "test/integration/configmap/configmap_test.go",
+     "line": 34,
+     "name": "TestConfigMap"
+    },
+    {
+     "file": "test/integration/cronjob/cronjob_test.go",
+     "line": 150,
+     "name": "TestCronJobLaunchesPodAndCleansUp"
+    },
+    {
+     "file": "test/integration/daemonset/daemonset_test.go",
+     "line": 533,
+     "name": "TestOneNodeDaemonLaunchesPod"
+    },
+    {
+     "file": "test/integration/daemonset/daemonset_test.go",
+     "line": 566,
+     "name": "TestSimpleDaemonSetLaunchesPods"
+    },
+    {
+     "file": "test/integration/daemonset/daemonset_test.go",
+     "line": 596,
+     "name": "TestSimpleDaemonSetRestartsPodsOnTerminalPhase"
+    },
+    {
+     "file": "test/integration/daemonset/daemonset_test.go",
+     "line": 658,
+     "name": "TestDaemonSetWithNodeSelectorLaunchesPods"
+    },
+    {
+     "file": "test/integration/daemonset/daemonset_test.go",
+     "line": 721,
+     "name": "TestNotReadyNodeDaemonDoesLaunchPod"
+    },
+    {
+     "file": "test/integration/daemonset/daemonset_test.go",
+     "line": 762,
+     "name": "TestInsufficientCapacityNode"
+    },
+    {
+     "file": "test/integration/daemonset/daemonset_test.go",
+     "line": 821,
+     "name": "TestLaunchWithHashCollision"
+    },
+    {
+     "file": "test/integration/daemonset/daemonset_test.go",
+     "line": 926,
+     "name": "TestDSCUpdatesPodLabelAfterDedupCurHistories"
+    },
+    {
+     "file": "test/integration/daemonset/daemonset_test.go",
+     "line": 1054,
+     "name": "TestTaintedNode"
+    },
+    {
+     "file": "test/integration/daemonset/daemonset_test.go",
+     "line": 1113,
+     "name": "TestUnschedulableNodeDaemonDoesLaunchPod"
+    },
+    {
+     "file": "test/integration/daemonset/daemonset_test.go",
+     "line": 1176,
+     "name": "TestUpdateStatusDespitePodCreationFailure"
+    },
+    {
+     "file": "test/integration/daemonset/daemonset_test.go",
+     "line": 1213,
+     "name": "TestDaemonSetRollingUpdateWithTolerations"
+    },
+    {
+     "file": "test/integration/defaulttolerationseconds/defaulttolerationseconds_test.go",
+     "line": 33,
+     "name": "TestAdmission"
+    },
+    {
+     "file": "test/integration/deployment/deployment_test.go",
+     "line": 46,
+     "name": "TestNewDeployment"
+    },
+    {
+     "file": "test/integration/deployment/deployment_test.go",
+     "line": 124,
+     "name": "TestDeploymentRollingUpdate"
+    },
+    {
+     "file": "test/integration/deployment/deployment_test.go",
+     "line": 223,
+     "name": "TestDeploymentSelectorImmutability"
+    },
+    {
+     "file": "test/integration/deployment/deployment_test.go",
+     "line": 258,
+     "name": "TestPausedDeployment"
+    },
+    {
+     "file": "test/integration/deployment/deployment_test.go",
+     "line": 362,
+     "name": "TestScalePausedDeployment"
+    },
+    {
+     "file": "test/integration/deployment/deployment_test.go",
+     "line": 447,
+     "name": "TestDeploymentHashCollision"
+    },
+    {
+     "file": "test/integration/deployment/deployment_test.go",
+     "line": 550,
+     "name": "TestFailedDeployment"
+    },
+    {
+     "file": "test/integration/deployment/deployment_test.go",
+     "line": 598,
+     "name": "TestOverlappingDeployments"
+    },
+    {
+     "file": "test/integration/deployment/deployment_test.go",
+     "line": 683,
+     "name": "TestScaledRolloutDeployment"
+    },
+    {
+     "file": "test/integration/deployment/deployment_test.go",
+     "line": 877,
+     "name": "TestSpecReplicasChange"
+    },
+    {
+     "file": "test/integration/deployment/deployment_test.go",
+     "line": 935,
+     "name": "TestDeploymentAvailableCondition"
+    },
+    {
+     "file": "test/integration/deployment/deployment_test.go",
+     "line": 1060,
+     "name": "TestGeneralReplicaSetAdoption"
+    },
+    {
+     "file": "test/integration/deployment/deployment_test.go",
+     "line": 1154,
+     "name": "TestDeploymentScaleSubresource"
+    },
+    {
+     "file": "test/integration/deployment/deployment_test.go",
+     "line": 1200,
+     "name": "TestReplicaSetOrphaningAndAdoptionWhenLabelsChange"
+    },
+    {
+     "file": "test/integration/deployment/deployment_test.go",
+     "line": 1316,
+     "name": "TestTerminatingReplicasDeploymentStatus"
+    },
+    {
+     "file": "test/integration/deployment/deployment_test.go",
+     "line": 1411,
+     "name": "TestRecreateDeploymentForPodReplacement"
+    },
+    {
+     "file": "test/integration/deployment/deployment_test.go",
+     "line": 1628,
+     "name": "TestRollingUpdateAndProportionalScalingForDeploymentPodReplacement"
+    },
+    {
+     "file": "test/integration/dualstack/dualstack_endpoints_test.go",
+     "line": 38,
+     "name": "TestDualStackEndpoints"
+    },
+    {
+     "file": "test/integration/dualstack/dualstack_test.go",
+     "line": 1764,
+     "name": "Test_ServiceChangeTypeHeadlessToExternalNameWithPatch"
+    },
+    {
+     "file": "test/integration/endpoints/endpoints_test.go",
+     "line": 42,
+     "name": "TestEndpointUpdates"
+    },
+    {
+     "file": "test/integration/endpoints/endpoints_test.go",
+     "line": 166,
+     "name": "TestEndpointWithMultiplePodUpdates"
+    },
+    {
+     "file": "test/integration/endpoints/endpoints_test.go",
+     "line": 309,
+     "name": "TestExternalNameToClusterIPTransition"
+    },
+    {
+     "file": "test/integration/endpoints/endpoints_test.go",
+     "line": 418,
+     "name": "TestEndpointWithTerminatingPod"
+    },
+    {
+     "file": "test/integration/endpoints/endpoints_test.go",
+     "line": 611,
+     "name": "TestEndpointTruncate"
+    },
+    {
+     "file": "test/integration/endpointslice/endpointslice_test.go",
+     "line": 43,
+     "name": "TestEndpointsControllersLabelSemantics"
+    },
+    {
+     "file": "test/integration/endpointslice/endpointslice_test.go",
+     "line": 127,
+     "name": "TestEndpointsHeadlessLabel"
+    },
+    {
+     "file": "test/integration/endpointslice/endpointslicemirroring_test.go",
+     "line": 41,
+     "name": "TestEndpointSliceMirroring"
+    },
+    {
+     "file": "test/integration/endpointslice/endpointslicemirroring_test.go",
+     "line": 314,
+     "name": "TestEndpointSliceMirroringUpdates"
+    },
+    {
+     "file": "test/integration/endpointslice/endpointslicemirroring_test.go",
+     "line": 489,
+     "name": "TestEndpointSliceMirroringSelectorTransition"
+    },
+    {
+     "file": "test/integration/endpointslice/endpointsliceterminating_test.go",
+     "line": 41,
+     "name": "TestEndpointSliceTerminating"
+    },
+    {
+     "file": "test/integration/evictions/evictions_test.go",
+     "line": 66,
+     "name": "TestConcurrentEvictionRequests"
+    },
+    {
+     "file": "test/integration/evictions/evictions_test.go",
+     "line": 181,
+     "name": "TestTerminalPodEviction"
+    },
+    {
+     "file": "test/integration/evictions/evictions_test.go",
+     "line": 344,
+     "name": "TestEvictionWithFinalizers"
+    },
+    {
+     "file": "test/integration/evictions/evictions_test.go",
+     "line": 417,
+     "name": "TestEvictionWithUnhealthyPodEvictionPolicy"
+    },
+    {
+     "file": "test/integration/evictions/evictions_test.go",
+     "line": 503,
+     "name": "TestEvictionWithPrecondition"
+    },
+    {
+     "file": "test/integration/job/job_admission_test.go",
+     "line": 32,
+     "name": "TestJobAdmissionParallelismUpdate"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 129,
+     "name": "TestJobPodFailurePolicyWithFailedPodDeletedDuringControllerRestart"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 265,
+     "name": "TestJobPodFailurePolicy"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 550,
+     "name": "TestSuccessPolicy"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 883,
+     "name": "TestSuccessPolicy_ReEnabling"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 966,
+     "name": "TestBackoffLimitPerIndex_DelayedPodDeletion"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 1042,
+     "name": "TestBackoffLimitPerIndex_Reenabling"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 1133,
+     "name": "TestBackoffLimitPerIndex_JobPodsCreatedWithExponentialBackoff"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 1249,
+     "name": "TestDelayTerminalPhaseCondition"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 1647,
+     "name": "TestBackoffLimitPerIndex"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 2058,
+     "name": "TestManagedBy"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 2208,
+     "name": "TestManagedBy_Reenabling"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 2307,
+     "name": "TestImmediateJobRecreation"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 2410,
+     "name": "TestManagedBy_RecreatedJob"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 2491,
+     "name": "TestManagedBy_UsingReservedJobFinalizers"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 2622,
+     "name": "TestNonParallelJob"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 2687,
+     "name": "TestParallelJob"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 2779,
+     "name": "TestParallelJobChangingParallelism"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 2837,
+     "name": "TestParallelJobWithCompletions"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 2921,
+     "name": "TestIndexedJob"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 3017,
+     "name": "TestJobPodReplacementPolicy"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 3285,
+     "name": "TestJobPodReplacementPolicyFeatureToggling"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 3353,
+     "name": "TestElasticIndexedJob"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 3522,
+     "name": "BenchmarkLargeIndexedJob"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 3609,
+     "name": "BenchmarkLargeFailureHandling"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 3740,
+     "name": "TestOrphanPodsFinalizersClearedWithGC"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 3787,
+     "name": "TestFinalizersClearedWhenBackoffLimitExceeded"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 3832,
+     "name": "TestJobPodsCreatedWithExponentialBackoff"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 3922,
+     "name": "TestJobFailedWithInterrupts"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 3993,
+     "name": "TestOrphanPodsFinalizersClearedOnRestart"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 4030,
+     "name": "TestSuspendJob"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 4110,
+     "name": "TestStartTimeUpdateOnResume"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 4189,
+     "name": "TestSuspendJobWithZeroCompletions"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 4210,
+     "name": "TestSuspendJobControllerRestart"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 4233,
+     "name": "TestNodeSelectorUpdate"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 4301,
+     "name": "TestUpdateJobPodResources"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 4483,
+     "name": "TestDelayedJobUpdateEvent"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 4619,
+     "name": "TestMutableSchedulingDirectivesForSuspendedJobs"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 5127,
+     "name": "setup"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 5379,
+     "name": "TestMutablePodResourcesWithPodReplacementPolicyFailed"
+    },
+    {
+     "file": "test/integration/job/job_test.go",
+     "line": 5567,
+     "name": "TestJobGangScheduling"
+    },
+    {
+     "file": "test/integration/network/services_test.go",
+     "line": 136,
+     "name": "TestServicesFinalizersPatchStatus"
+    },
+    {
+     "file": "test/integration/network/services_test.go",
+     "line": 241,
+     "name": "TestServiceCIDR28bits"
+    },
+    {
+     "file": "test/integration/node/lifecycle_test.go",
+     "line": 50,
+     "name": "TestEvictionForNoExecuteTaintAddedByUser"
+    },
+    {
+     "file": "test/integration/node/lifecycle_test.go",
+     "line": 207,
+     "name": "TestTaintBasedEvictions"
+    },
+    {
+     "file": "test/integration/podgc/podgc_test.go",
+     "line": 42,
+     "name": "TestPodGcOrphanedPodsWithFinalizer"
+    },
+    {
+     "file": "test/integration/podgc/podgc_test.go",
+     "line": 143,
+     "name": "TestTerminatingOnOutOfServiceNode"
+    },
+    {
+     "file": "test/integration/podgc/podgc_test.go",
+     "line": 274,
+     "name": "TestPodGcForPodsWithDuplicatedFieldKeys"
+    },
+    {
+     "file": "test/integration/podgc/podgc_test.go",
+     "line": 385,
+     "name": "setup"
+    },
+    {
+     "file": "test/integration/pods/pods_test.go",
+     "line": 50,
+     "name": "TestPodTopologyLabels"
+    },
+    {
+     "file": "test/integration/pods/pods_test.go",
+     "line": 111,
+     "name": "TestPodTopologyLabels_FeatureDisabled"
+    },
+    {
+     "file": "test/integration/pods/pods_test.go",
+     "line": 141,
+     "name": "testPodTopologyLabels"
+    },
+    {
+     "file": "test/integration/pods/pods_test.go",
+     "line": 212,
+     "name": "TestPodUpdateActiveDeadlineSeconds"
+    },
+    {
+     "file": "test/integration/pods/pods_test.go",
+     "line": 330,
+     "name": "TestPodReadOnlyFilesystem"
+    },
+    {
+     "file": "test/integration/pods/pods_test.go",
+     "line": 365,
+     "name": "TestPodCreateEphemeralContainers"
+    },
+    {
+     "file": "test/integration/pods/pods_test.go",
+     "line": 434,
+     "name": "TestPodPatchEphemeralContainers"
+    },
+    {
+     "file": "test/integration/pods/pods_test.go",
+     "line": 665,
+     "name": "TestPodUpdateEphemeralContainers"
+    },
+    {
+     "file": "test/integration/pods/pods_test.go",
+     "line": 855,
+     "name": "TestPodResizeRBAC"
+    },
+    {
+     "file": "test/integration/pods/pods_test.go",
+     "line": 959,
+     "name": "TestPodResize"
+    },
+    {
+     "file": "test/integration/pods/pods_test.go",
+     "line": 1206,
+     "name": "TestMutablePodSchedulingDirectives"
+    },
+    {
+     "file": "test/integration/pods/pods_test.go",
+     "line": 1405,
+     "name": "TestRelaxedDNSSearchValidation"
+    },
+    {
+     "file": "test/integration/pods/pods_test.go",
+     "line": 1506,
+     "name": "TestNodeDeclaredFeatureAdmission"
+    },
+    {
+     "file": "test/integration/pods/pods_test.go",
+     "line": 1644,
+     "name": "TestPodResizeValidation"
+    },
+    {
+     "file": "test/integration/quota/quota_test.go",
+     "line": 62,
+     "name": "TestQuota"
+    },
+    {
+     "file": "test/integration/quota/quota_test.go",
+     "line": 272,
+     "name": "TestQuotaLimitedResourceDenial"
+    },
+    {
+     "file": "test/integration/quota/quota_test.go",
+     "line": 401,
+     "name": "TestQuotaLimitService"
+    },
+    {
+     "file": "test/integration/replicaset/replicaset_test.go",
+     "line": 396,
+     "name": "TestAdoption"
+    },
+    {
+     "file": "test/integration/replicaset/replicaset_test.go",
+     "line": 491,
+     "name": "TestRSSelectorImmutability"
+    },
+    {
+     "file": "test/integration/replicaset/replicaset_test.go",
+     "line": 518,
+     "name": "TestSpecReplicasChange"
+    },
+    {
+     "file": "test/integration/replicaset/replicaset_test.go",
+     "line": 560,
+     "name": "TestDeletingAndFailedPods"
+    },
+    {
+     "file": "test/integration/replicaset/replicaset_test.go",
+     "line": 626,
+     "name": "TestPodDeletionCost"
+    },
+    {
+     "file": "test/integration/replicaset/replicaset_test.go",
+     "line": 723,
+     "name": "TestOverlappingRSs"
+    },
+    {
+     "file": "test/integration/replicaset/replicaset_test.go",
+     "line": 758,
+     "name": "TestPodOrphaningAndAdoptionWhenLabelsChange"
+    },
+    {
+     "file": "test/integration/replicaset/replicaset_test.go",
+     "line": 836,
+     "name": "TestGeneralPodAdoption"
+    },
+    {
+     "file": "test/integration/replicaset/replicaset_test.go",
+     "line": 868,
+     "name": "TestReadyAndAvailableReplicas"
+    },
+    {
+     "file": "test/integration/replicaset/replicaset_test.go",
+     "line": 920,
+     "name": "TestRSScaleSubresource"
+    },
+    {
+     "file": "test/integration/replicaset/replicaset_test.go",
+     "line": 939,
+     "name": "TestExtraPodsAdoptionAndDeletion"
+    },
+    {
+     "file": "test/integration/replicaset/replicaset_test.go",
+     "line": 971,
+     "name": "TestFullyLabeledReplicas"
+    },
+    {
+     "file": "test/integration/replicaset/replicaset_test.go",
+     "line": 1014,
+     "name": "TestReplicaSetsAppsV1DefaultGCPolicy"
+    },
+    {
+     "file": "test/integration/replicaset/replicaset_test.go",
+     "line": 1073,
+     "name": "TestTerminatingReplicas"
+    },
+    {
+     "file": "test/integration/replicationcontroller/replicationcontroller_test.go",
+     "line": 370,
+     "name": "TestAdoption"
+    },
+    {
+     "file": "test/integration/replicationcontroller/replicationcontroller_test.go",
+     "line": 463,
+     "name": "TestSpecReplicasChange"
+    },
+    {
+     "file": "test/integration/replicationcontroller/replicationcontroller_test.go",
+     "line": 505,
+     "name": "TestLogarithmicScaleDown"
+    },
+    {
+     "file": "test/integration/replicationcontroller/replicationcontroller_test.go",
+     "line": 543,
+     "name": "TestDeletingAndFailedPods"
+    },
+    {
+     "file": "test/integration/replicationcontroller/replicationcontroller_test.go",
+     "line": 608,
+     "name": "TestOverlappingRCs"
+    },
+    {
+     "file": "test/integration/replicationcontroller/replicationcontroller_test.go",
+     "line": 643,
+     "name": "TestPodOrphaningAndAdoptionWhenLabelsChange"
+    },
+    {
+     "file": "test/integration/replicationcontroller/replicationcontroller_test.go",
+     "line": 721,
+     "name": "TestGeneralPodAdoption"
+    },
+    {
+     "file": "test/integration/replicationcontroller/replicationcontroller_test.go",
+     "line": 753,
+     "name": "TestReadyAndAvailableReplicas"
+    },
+    {
+     "file": "test/integration/replicationcontroller/replicationcontroller_test.go",
+     "line": 805,
+     "name": "TestRCScaleSubresource"
+    },
+    {
+     "file": "test/integration/replicationcontroller/replicationcontroller_test.go",
+     "line": 824,
+     "name": "TestExtraPodsAdoptionAndDeletion"
+    },
+    {
+     "file": "test/integration/replicationcontroller/replicationcontroller_test.go",
+     "line": 856,
+     "name": "TestFullyLabeledReplicas"
+    },
+    {
+     "file": "test/integration/scheduler/bind/bind_test.go",
+     "line": 35,
+     "name": "TestDefaultBinder"
+    },
+    {
+     "file": "test/integration/scheduler/eventhandler/eventhandler_test.go",
+     "line": 84,
+     "name": "TestUpdateNodeEvent"
+    },
+    {
+     "file": "test/integration/scheduler/eventhandler/eventhandler_test.go",
+     "line": 151,
+     "name": "TestUpdateNominatedNodeName"
+    },
+    {
+     "file": "test/integration/scheduler/extender/extender_test.go",
+     "line": 288,
+     "name": "TestSchedulerExtender"
+    },
+    {
+     "file": "test/integration/scheduler/filters/filters_test.go",
+     "line": 3169,
+     "name": "TestNodeDeclaredFeaturesFilter"
+    },
+    {
+     "file": "test/integration/scheduler/nominated_node_name/nominated_node_name_test.go",
+     "line": 110,
+     "name": "TestNominatedNodeNameIsSetBeforePreBindAndWaitOnPermit"
+    },
+    {
+     "file": "test/integration/scheduler/nominated_node_name/nominated_node_name_test.go",
+     "line": 206,
+     "name": "TestPreemptionAndNominatedNodeNameScenarios"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 724,
+     "name": "TestPreFilterPlugin"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 806,
+     "name": "TestQueueSortPlugin"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 885,
+     "name": "TestPostFilterPlugin"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 1072,
+     "name": "TestScorePlugin"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 1134,
+     "name": "TestNormalizeScorePlugin"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 1164,
+     "name": "TestReservePluginReserve"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 1219,
+     "name": "TestPrebindPlugin"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 1363,
+     "name": "TestUnReserveReservePlugins"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 1511,
+     "name": "TestUnReservePermitPlugins"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 1593,
+     "name": "TestUnReservePreBindPlugins"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 1666,
+     "name": "TestUnReserveBindPlugins"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 1742,
+     "name": "TestBindPlugin"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 1939,
+     "name": "TestPostBindPlugin"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 2007,
+     "name": "TestPermitPlugin"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 2104,
+     "name": "TestMultiplePermitPlugins"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 2156,
+     "name": "TestPermitPluginsCancelled"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 2199,
+     "name": "TestCoSchedulingWithPermitPlugin"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 2285,
+     "name": "TestFilterPlugin"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 2342,
+     "name": "TestPreScorePlugin"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 2397,
+     "name": "TestPreEnqueuePlugin"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 2465,
+     "name": "TestPreemptWithPermitPlugin"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 2709,
+     "name": "TestActivatePods"
+    },
+    {
+     "file": "test/integration/scheduler/plugins/plugins_test.go",
+     "line": 2839,
+     "name": "TestPreEnqueuePluginEventsToRegister"
+    },
+    {
+     "file": "test/integration/scheduler/podgroup/admission/admission_test.go",
+     "line": 33,
+     "name": "TestPodGroupAdmission"
+    },
+    {
+     "file": "test/integration/scheduler/podgroup/podgroup_test.go",
+     "line": 59,
+     "name": "TestPodGroupScheduling"
+    },
+    {
+     "file": "test/integration/scheduler/podgroup/podgroup_test.go",
+     "line": 791,
+     "name": "TestWorkloadAwarePreemptionInvocation"
+    },
+    {
+     "file": "test/integration/scheduler/podgroup/podgroup_test.go",
+     "line": 902,
+     "name": "TestPostFilterInvocationCount"
+    },
+    {
+     "file": "test/integration/scheduler/podgroup/topology_aware_scheduling/tas_test.go",
+     "line": 102,
+     "name": "TestTopologyAwareSchedulingWithGangPolicy"
+    },
+    {
+     "file": "test/integration/scheduler/podgroup/topology_aware_scheduling/tas_test.go",
+     "line": 697,
+     "name": "TestTopologyAwareSchedulingWithBasicPolicy"
+    },
+    {
+     "file": "test/integration/scheduler/podgroup/topology_aware_scheduling/tas_test.go",
+     "line": 1361,
+     "name": "runTestScenario"
+    },
+    {
+     "file": "test/integration/scheduler/preemption/misc/miscpreemption_test.go",
+     "line": 237,
+     "name": "TestPodPriorityResolution"
+    },
+    {
+     "file": "test/integration/scheduler/preemption/misc/miscpreemption_test.go",
+     "line": 891,
+     "name": "TestReadWriteOncePodPreemption"
+    },
+    {
+     "file": "test/integration/scheduler/preemption/nominatednodename/nominatednodename_test.go",
+     "line": 324,
+     "name": "initTestPreferNominatedNode"
+    },
+    {
+     "file": "test/integration/scheduler/preemption/nominatednodename/nominatednodename_test.go",
+     "line": 343,
+     "name": "TestPreferNominatedNode"
+    },
+    {
+     "file": "test/integration/scheduler/preemption/podgrouppreemption_test.go",
+     "line": 42,
+     "name": "TestPodGroupPreemption"
+    },
+    {
+     "file": "test/integration/scheduler/preemption/preemption_test.go",
+     "line": 130,
+     "name": "TestPreemption"
+    },
+    {
+     "file": "test/integration/scheduler/preemption/preemption_test.go",
+     "line": 486,
+     "name": "TestAsyncPreemption"
+    },
+    {
+     "file": "test/integration/scheduler/preemption/preemption_test.go",
+     "line": 1656,
+     "name": "TestPreemptionRespectsWaitingPod"
+    },
+    {
+     "file": "test/integration/scheduler/preemption/preemption_test.go",
+     "line": 1859,
+     "name": "TestPreemptionRespectsBindingPod"
+    },
+    {
+     "file": "test/integration/scheduler/queueing/former/queue_test.go",
+     "line": 33,
+     "name": "TestCoreResourceEnqueueWithoutQueueingHints"
+    },
+    {
+     "file": "test/integration/scheduler/queueing/queue.go",
+     "line": 2711,
+     "name": "RunTestCoreResourceEnqueue"
+    },
+    {
+     "file": "test/integration/scheduler/queueing/queue_test.go",
+     "line": 56,
+     "name": "TestSchedulingGates"
+    },
+    {
+     "file": "test/integration/scheduler/queueing/queue_test.go",
+     "line": 370,
+     "name": "TestRequeueByBindFailure"
+    },
+    {
+     "file": "test/integration/scheduler/queueing/queue_test.go",
+     "line": 461,
+     "name": "TestRequeueByPermitRejection"
+    },
+    {
+     "file": "test/integration/scheduler/queueing/queue_test.go",
+     "line": 589,
+     "name": "TestPopFromBackoffQWhenActiveQEmpty"
+    },
+    {
+     "file": "test/integration/scheduler/queueing/queueinghint/queue_test.go",
+     "line": 32,
+     "name": "TestCoreResourceEnqueue"
+    },
+    {
+     "file": "test/integration/scheduler/rescheduling_test.go",
+     "line": 135,
+     "name": "TestReScheduling"
+    },
+    {
+     "file": "test/integration/scheduler/scheduler_test.go",
+     "line": 55,
+     "name": "TestUnschedulableNodes"
+    },
+    {
+     "file": "test/integration/scheduler/scheduler_test.go",
+     "line": 180,
+     "name": "TestMultipleSchedulers"
+    },
+    {
+     "file": "test/integration/scheduler/scheduler_test.go",
+     "line": 280,
+     "name": "TestMultipleSchedulingProfiles"
+    },
+    {
+     "file": "test/integration/scheduler/scheduler_test.go",
+     "line": 350,
+     "name": "TestAllocatable"
+    },
+    {
+     "file": "test/integration/scheduler/scheduler_test.go",
+     "line": 422,
+     "name": "TestSchedulerInformers"
+    },
+    {
+     "file": "test/integration/scheduler/scheduler_test.go",
+     "line": 549,
+     "name": "TestNodeEvents"
+    },
+    {
+     "file": "test/integration/scheduler/scheduler_test.go",
+     "line": 644,
+     "name": "TestHostPorts"
+    },
+    {
+     "file": "test/integration/scheduler/scheduler_test.go",
+     "line": 1040,
+     "name": "TestTaintTolerationGtLtIntegration"
+    },
+    {
+     "file": "test/integration/scheduler/scoring/priorities_test.go",
+     "line": 84,
+     "name": "initTestSchedulerForScoringTests"
+    },
+    {
+     "file": "test/integration/scheduler/scoring/priorities_test.go",
+     "line": 120,
+     "name": "initTestSchedulerForNodeResourcesTest"
+    },
+    {
+     "file": "test/integration/scheduler/scoring/priorities_test.go",
+     "line": 155,
+     "name": "TestNodeResourcesScoring"
+    },
+    {
+     "file": "test/integration/scheduler/scoring/priorities_test.go",
+     "line": 300,
+     "name": "TestNodeAffinityScoring"
+    },
+    {
+     "file": "test/integration/scheduler/scoring/priorities_test.go",
+     "line": 354,
+     "name": "TestPodAffinityScoring"
+    },
+    {
+     "file": "test/integration/scheduler/scoring/priorities_test.go",
+     "line": 776,
+     "name": "TestTaintTolerationScoring"
+    },
+    {
+     "file": "test/integration/scheduler/scoring/priorities_test.go",
+     "line": 891,
+     "name": "TestImageLocalityScoring"
+    },
+    {
+     "file": "test/integration/scheduler/scoring/priorities_test.go",
+     "line": 948,
+     "name": "TestPodTopologySpreadScoring"
+    },
+    {
+     "file": "test/integration/scheduler/scoring/priorities_test.go",
+     "line": 1183,
+     "name": "TestDefaultPodTopologySpreadScoring"
+    },
+    {
+     "file": "test/integration/scheduler/taint/taint_test.go",
+     "line": 63,
+     "name": "TestTaintNodeByCondition"
+    },
+    {
+     "file": "test/integration/secrets/secrets_test.go",
+     "line": 43,
+     "name": "TestSecrets"
+    },
+    {
+     "file": "test/integration/service/loadbalancer_test.go",
+     "line": 45,
+     "name": "Test_ServiceLoadBalancerDisableAllocateNodePorts"
+    },
+    {
+     "file": "test/integration/service/loadbalancer_test.go",
+     "line": 85,
+     "name": "Test_ServiceUpdateLoadBalancerDisableAllocateNodePorts"
+    },
+    {
+     "file": "test/integration/service/loadbalancer_test.go",
+     "line": 135,
+     "name": "Test_ServiceLoadBalancerEnableThenDisableAllocatedNodePorts"
+    },
+    {
+     "file": "test/integration/service/loadbalancer_test.go",
+     "line": 185,
+     "name": "Test_ServiceLoadBalancerDisableAllocatedNodePort"
+    },
+    {
+     "file": "test/integration/service/loadbalancer_test.go",
+     "line": 236,
+     "name": "Test_ServiceLoadBalancerDisableAllocatedNodePorts"
+    },
+    {
+     "file": "test/integration/service/loadbalancer_test.go",
+     "line": 294,
+     "name": "Test_ServiceLoadBalancerDisableAllocatedNodePortsByPatch"
+    },
+    {
+     "file": "test/integration/service/loadbalancer_test.go",
+     "line": 367,
+     "name": "Test_ServiceLoadBalancerDisableThenEnableAllocatedNodePorts"
+    },
+    {
+     "file": "test/integration/service/loadbalancer_test.go",
+     "line": 427,
+     "name": "Test_ServiceLoadBalancerEnableLoadBalancerClass"
+    },
+    {
+     "file": "test/integration/service/loadbalancer_test.go",
+     "line": 473,
+     "name": "Test_SetLoadBalancerClassThenUpdateLoadBalancerClass"
+    },
+    {
+     "file": "test/integration/service/loadbalancer_test.go",
+     "line": 524,
+     "name": "Test_UpdateLoadBalancerWithLoadBalancerClass"
+    },
+    {
+     "file": "test/integration/service/loadbalancer_test.go",
+     "line": 574,
+     "name": "Test_ServiceLoadBalancerMixedProtocolSetup"
+    },
+    {
+     "file": "test/integration/service/loadbalancer_test.go",
+     "line": 645,
+     "name": "Test_ServiceLoadBalancerIPMode"
+    },
+    {
+     "file": "test/integration/service/service_test.go",
+     "line": 58,
+     "name": "Test_ExternalNameServiceStopsDefaultingInternalTrafficPolicy"
+    },
+    {
+     "file": "test/integration/service/service_test.go",
+     "line": 102,
+     "name": "Test_ExternalNameServiceDropsInternalTrafficPolicy"
+    },
+    {
+     "file": "test/integration/service/service_test.go",
+     "line": 149,
+     "name": "Test_ConvertingToExternalNameServiceDropsInternalTrafficPolicy"
+    },
+    {
+     "file": "test/integration/service/service_test.go",
+     "line": 210,
+     "name": "Test_RemovingExternalIPsFromClusterIPServiceDropsExternalTrafficPolicy"
+    },
+    {
+     "file": "test/integration/service/service_test.go",
+     "line": 358,
+     "name": "Test_TransitionsForTrafficDistribution"
+    },
+    {
+     "file": "test/integration/service/service_test.go",
+     "line": 619,
+     "name": "Test_ServiceClusterIPSelector"
+    },
+    {
+     "file": "test/integration/service/service_test.go",
+     "line": 756,
+     "name": "Test_ServiceWatchUntil"
+    },
+    {
+     "file": "test/integration/service/service_test.go",
+     "line": 998,
+     "name": "Test_ServiceValidation_FeatureGateEnableDisable"
+    },
+    {
+     "file": "test/integration/servicecidr/allocator_test.go",
+     "line": 228,
+     "name": "TestMigrateService"
+    },
+    {
+     "file": "test/integration/servicecidr/allocator_test.go",
+     "line": 387,
+     "name": "TestSkewAllocatorsRollout"
+    },
+    {
+     "file": "test/integration/servicecidr/feature_enable_disable_test.go",
+     "line": 33,
+     "name": "TestEnableDisableServiceCIDR"
+    },
+    {
+     "file": "test/integration/servicecidr/migration_test.go",
+     "line": 51,
+     "name": "TestMigrateServiceCIDR"
+    },
+    {
+     "file": "test/integration/servicecidr/migration_test.go",
+     "line": 297,
+     "name": "TestServiceCIDRMigrationScenarios"
+    },
+    {
+     "file": "test/integration/servicecidr/servicecidr_test.go",
+     "line": 136,
+     "name": "TestServiceCIDRDeletion"
+    },
+    {
+     "file": "test/integration/statefulset/statefulset_test.go",
+     "line": 126,
+     "name": "TestSpecReplicasChange"
+    },
+    {
+     "file": "test/integration/statefulset/statefulset_test.go",
+     "line": 169,
+     "name": "TestDeletingAndTerminatingPods"
+    },
+    {
+     "file": "test/integration/statefulset/statefulset_test.go",
+     "line": 272,
+     "name": "TestStatefulSetAvailable"
+    },
+    {
+     "file": "test/integration/statefulset/statefulset_test.go",
+     "line": 377,
+     "name": "TestStatefulSetStatusWithPodFail"
+    },
+    {
+     "file": "test/integration/statefulset/statefulset_test.go",
+     "line": 426,
+     "name": "TestAutodeleteOwnerRefs"
+    },
+    {
+     "file": "test/integration/statefulset/statefulset_test.go",
+     "line": 513,
+     "name": "TestDeletingPodForRollingUpdatePartition"
+    },
+    {
+     "file": "test/integration/statefulset/statefulset_test.go",
+     "line": 652,
+     "name": "TestStatefulSetStartOrdinal"
+    },
+    {
+     "file": "test/integration/statefulset/statefulset_test.go",
+     "line": 766,
+     "name": "TestStatefulSetPodSubdomain"
+    },
+    {
+     "file": "test/integration/storageclasses/storage_classes_test.go",
+     "line": 37,
+     "name": "TestStorageClasses"
+    },
+    {
+     "file": "test/integration/util/util.go",
+     "line": 506,
+     "name": "InitTestAPIServer"
+    },
+    {
+     "file": "test/integration/util/util.go",
+     "line": 706,
+     "name": "InitTestSchedulerWithNS"
+    },
+    {
+     "file": "test/integration/util/util.go",
+     "line": 715,
+     "name": "InitTestDisablePreemption"
+    },
+    {
+     "file": "test/integration/volume/attach_detach_test.go",
+     "line": 148,
+     "name": "TestPodTerminationWithNodeOOSDetach"
+    },
+    {
+     "file": "test/integration/volume/attach_detach_test.go",
+     "line": 240,
+     "name": "TestPodDeletionWithDswp"
+    },
+    {
+     "file": "test/integration/volume/attach_detach_test.go",
+     "line": 315,
+     "name": "TestPodUpdateWithADC"
+    },
+    {
+     "file": "test/integration/volume/attach_detach_test.go",
+     "line": 504,
+     "name": "TestPodAddedByDswp"
+    },
+    {
+     "file": "test/integration/volume/attach_detach_test.go",
+     "line": 582,
+     "name": "TestPVCBoundWithADC"
+    },
+    {
+     "file": "test/integration/volume/persistent_volumes_test.go",
+     "line": 116,
+     "name": "TestPersistentVolumeRecycler"
+    },
+    {
+     "file": "test/integration/volume/persistent_volumes_test.go",
+     "line": 173,
+     "name": "TestPersistentVolumeDeleter"
+    },
+    {
+     "file": "test/integration/volume/persistent_volumes_test.go",
+     "line": 232,
+     "name": "TestPersistentVolumeBindRace"
+    },
+    {
+     "file": "test/integration/volume/persistent_volumes_test.go",
+     "line": 308,
+     "name": "TestPersistentVolumeClaimLabelSelector"
+    },
+    {
+     "file": "test/integration/volume/persistent_volumes_test.go",
+     "line": 390,
+     "name": "TestPersistentVolumeClaimLabelSelectorMatchExpressions"
+    },
+    {
+     "file": "test/integration/volume/persistent_volumes_test.go",
+     "line": 491,
+     "name": "TestPersistentVolumeMultiPVs"
+    },
+    {
+     "file": "test/integration/volume/persistent_volumes_test.go",
+     "line": 582,
+     "name": "TestPersistentVolumeClaimVolumeAttirbutesClassName"
+    },
+    {
+     "file": "test/integration/volume/persistent_volumes_test.go",
+     "line": 759,
+     "name": "TestPersistentVolumeMultiPVsPVCs"
+    },
+    {
+     "file": "test/integration/volume/persistent_volumes_test.go",
+     "line": 921,
+     "name": "TestPersistentVolumeControllerStartup"
+    },
+    {
+     "file": "test/integration/volume/persistent_volumes_test.go",
+     "line": 1053,
+     "name": "TestPersistentVolumeProvisionMultiPVCs"
+    },
+    {
+     "file": "test/integration/volume/persistent_volumes_test.go",
+     "line": 1149,
+     "name": "TestPersistentVolumeMultiPVsDiffAccessModes"
+    },
+    {
+     "file": "test/integration/volume/persistent_volumes_test.go",
+     "line": 1232,
+     "name": "TestRetroactiveStorageClassAssignment"
+    },
+    {
+     "file": "test/integration/volumescheduling/storage_capacity_scoring_test.go",
+     "line": 49,
+     "name": "setupClusterForStorageCapacityScoring"
+    },
+    {
+     "file": "test/integration/volumescheduling/storage_capacity_scoring_test.go",
+     "line": 78,
+     "name": "TestStorageCapacityScoring"
+    },
+    {
+     "file": "test/integration/volumescheduling/volume_binding_test.go",
+     "line": 96,
+     "name": "TestVolumeBinding"
+    },
+    {
+     "file": "test/integration/volumescheduling/volume_binding_test.go",
+     "line": 279,
+     "name": "TestVolumeBindingRescheduling"
+    },
+    {
+     "file": "test/integration/volumescheduling/volume_binding_test.go",
+     "line": 399,
+     "name": "TestVolumeBindingStress"
+    },
+    {
+     "file": "test/integration/volumescheduling/volume_binding_test.go",
+     "line": 407,
+     "name": "TestVolumeBindingStressWithSchedulerResync"
+    },
+    {
+     "file": "test/integration/volumescheduling/volume_binding_test.go",
+     "line": 412,
+     "name": "TestVolumeBindingDynamicStressFast"
+    },
+    {
+     "file": "test/integration/volumescheduling/volume_binding_test.go",
+     "line": 417,
+     "name": "TestVolumeBindingDynamicStressSlow"
+    },
+    {
+     "file": "test/integration/volumescheduling/volume_binding_test.go",
+     "line": 421,
+     "name": "testVolumeBindingStress"
+    },
+    {
+     "file": "test/integration/volumescheduling/volume_binding_test.go",
+     "line": 517,
+     "name": "testVolumeBindingWithAffinity"
+    },
+    {
+     "file": "test/integration/volumescheduling/volume_binding_test.go",
+     "line": 619,
+     "name": "TestVolumeBindingWithAntiAffinity"
+    },
+    {
+     "file": "test/integration/volumescheduling/volume_binding_test.go",
+     "line": 629,
+     "name": "TestVolumeBindingWithAffinity"
+    },
+    {
+     "file": "test/integration/volumescheduling/volume_binding_test.go",
+     "line": 639,
+     "name": "TestPVAffinityConflict"
+    },
+    {
+     "file": "test/integration/volumescheduling/volume_binding_test.go",
+     "line": 698,
+     "name": "TestVolumeProvision"
+    },
+    {
+     "file": "test/integration/volumescheduling/volume_binding_test.go",
+     "line": 846,
+     "name": "TestCapacity"
+    },
+    {
+     "file": "test/integration/volumescheduling/volume_binding_test.go",
+     "line": 988,
+     "name": "TestRescheduleProvisioning"
+    },
+    {
+     "file": "test/integration/volumescheduling/volume_binding_test.go",
+     "line": 1041,
+     "name": "setupCluster"
+    }
+   ],
+   "kind": "callers"
+  }
+ ],
+ "runs": [
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 71.990256541,
+   "cost_usd": 0.6137556,
+   "turns": 17,
+   "tokens": 308577,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 8,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 42.049063084,
+   "cost_usd": 0.3328948,
+   "turns": 6,
+   "tokens": 164491,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 8,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 65.9509815,
+   "cost_usd": 0.5471458,
+   "turns": 15,
+   "tokens": 296814,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 23,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 146.553620208,
+   "cost_usd": 1.262091,
+   "turns": 29,
+   "tokens": 705317,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 23,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 351.870165667,
+   "cost_usd": 2.3467966,
+   "turns": 50,
+   "tokens": 1031126,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 32,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 137.242560334,
+   "cost_usd": 1.0714304,
+   "turns": 15,
+   "tokens": 396051,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 32,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 190.956296,
+   "cost_usd": 1.7078202000000002,
+   "turns": 37,
+   "tokens": 1008066,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 36,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 76.564904583,
+   "cost_usd": 0.5855698,
+   "turns": 11,
+   "tokens": 348916,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 36,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 289.415215042,
+   "cost_usd": 2.1353221999999996,
+   "turns": 37,
+   "tokens": 1974542,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 171,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 379.716492417,
+   "cost_usd": 3.115631399999999,
+   "turns": 38,
+   "tokens": 2187661,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 0.9606741573033708,
+    "n_answer": 178,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [
+     "test/e2e_node/resource_usage_test.go:142 runResourceUsageTest",
+     "test/e2e_node/density_test.go:335 runDensityBatchTest",
+     "test/e2e_node/density_test.go:422 runDensitySeqTest",
+     "test/e2e_node/criproxy_test.go:456 newPullImageAlwaysPod",
+     "test/e2e_node/criproxy_test.go:475 newPausePodWithContainers",
+     "test/e2e_node/pod_conditions_criproxy_linux_test.go:76 newPullImageAlwaysPodWithInitContainer",
+     "test/e2e_node/pod_conditions_criproxy_linux_test.go:103 runPodReadyToStartContainersTimingTest"
+    ],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 361.150665625,
+   "cost_usd": 2.385485,
+   "turns": 23,
+   "tokens": 1198814,
+   "score": {
+    "pass": false,
+    "recall": 0.0,
+    "precision": 0.0,
+    "n_answer": 0,
+    "flagged_incomplete": true,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": "no parsable JSON answer"
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 177.437366792,
+   "cost_usd": 1.7756614000000002,
+   "turns": 21,
+   "tokens": 1093884,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 324,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 89.193190708,
+   "cost_usd": 0.5287428000000001,
+   "turns": 13,
+   "tokens": 221783,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 8,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 56.931350708,
+   "cost_usd": 0.4494184,
+   "turns": 10,
+   "tokens": 259680,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 8,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 76.566332083,
+   "cost_usd": 0.6263452,
+   "turns": 12,
+   "tokens": 330306,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 23,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 35.804500291,
+   "cost_usd": 0.2335586,
+   "turns": 7,
+   "tokens": 184615,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 23,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 168.189686417,
+   "cost_usd": 1.5027765999999998,
+   "turns": 23,
+   "tokens": 609117,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 32,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 104.777830542,
+   "cost_usd": 0.7927454,
+   "turns": 20,
+   "tokens": 328145,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 32,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 192.462289084,
+   "cost_usd": 1.658541,
+   "turns": 36,
+   "tokens": 1106696,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 36,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 94.201699042,
+   "cost_usd": 0.7005018000000001,
+   "turns": 9,
+   "tokens": 345242,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 36,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 242.318896917,
+   "cost_usd": 1.5133240000000003,
+   "turns": 17,
+   "tokens": 594156,
+   "score": {
+    "pass": false,
+    "recall": 0.0,
+    "precision": 0.0,
+    "n_answer": 0,
+    "flagged_incomplete": true,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": "no parsable JSON answer"
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 139.055189583,
+   "cost_usd": 0.9926834,
+   "turns": 15,
+   "tokens": 493728,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 171,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 261.484202542,
+   "cost_usd": 2.246116,
+   "turns": 29,
+   "tokens": 1386384,
+   "score": {
+    "pass": false,
+    "recall": 0.6944444444444444,
+    "precision": 1.0,
+    "n_answer": 225,
+    "flagged_incomplete": true,
+    "missed": [
+     "test/integration/job/job_test.go:3522 BenchmarkLargeIndexedJob",
+     "test/integration/job/job_test.go:3609 BenchmarkLargeFailureHandling",
+     "test/integration/node/lifecycle_test.go:50 TestEvictionForNoExecuteTaintAddedByUser",
+     "test/integration/node/lifecycle_test.go:207 TestTaintBasedEvictions",
+     "test/integration/podgc/podgc_test.go:42 TestPodGcOrphanedPodsWithFinalizer",
+     "test/integration/podgc/podgc_test.go:143 TestTerminatingOnOutOfServiceNode",
+     "test/integration/podgc/podgc_test.go:274 TestPodGcForPodsWithDuplicatedFieldKeys",
+     "test/integration/podgc/podgc_test.go:385 setup",
+     "test/integration/scheduler/bind/bind_test.go:35 TestDefaultBinder",
+     "test/integration/scheduler/eventhandler/eventhandler_test.go:84 TestUpdateNodeEvent",
+     "test/integration/scheduler/eventhandler/eventhandler_test.go:151 TestUpdateNominatedNodeName",
+     "test/integration/scheduler/extender/extender_test.go:288 TestSchedulerExtender",
+     "test/integration/scheduler/filters/filters_test.go:3169 TestNodeDeclaredFeaturesFilter",
+     "test/integration/scheduler/nominated_node_name/nominated_node_name_test.go:110 TestNominatedNodeNameIsSetBeforePreBindAndWaitOnPermit",
+     "test/integration/scheduler/nominated_node_name/nominated_node_name_test.go:206 TestPreemptionAndNominatedNodeNameScenarios",
+     "test/integration/scheduler/plugins/plugins_test.go:724 TestPreFilterPlugin",
+     "test/integration/scheduler/plugins/plugins_test.go:806 TestQueueSortPlugin",
+     "test/integration/scheduler/plugins/plugins_test.go:885 TestPostFilterPlugin",
+     "test/integration/scheduler/plugins/plugins_test.go:1072 TestScorePlugin",
+     "test/integration/scheduler/plugins/plugins_test.go:1134 TestNormalizeScorePlugin",
+     "test/integration/scheduler/plugins/plugins_test.go:1164 TestReservePluginReserve",
+     "test/integration/scheduler/plugins/plugins_test.go:1219 TestPrebindPlugin",
+     "test/integration/scheduler/plugins/plugins_test.go:1363 TestUnReserveReservePlugins",
+     "test/integration/scheduler/plugins/plugins_test.go:1511 TestUnReservePermitPlugins",
+     "test/integration/scheduler/plugins/plugins_test.go:1593 TestUnReservePreBindPlugins"
+    ],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 172.302526416,
+   "cost_usd": 1.4939996,
+   "turns": 16,
+   "tokens": 475830,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 324,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 67.993732916,
+   "cost_usd": 0.4846011999999999,
+   "turns": 14,
+   "tokens": 303549,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 8,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 50.370845083,
+   "cost_usd": 0.379383,
+   "turns": 8,
+   "tokens": 217155,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 8,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 187.325245458,
+   "cost_usd": 1.3191862,
+   "turns": 17,
+   "tokens": 718139,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 23,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 57.388198792,
+   "cost_usd": 0.33674519999999997,
+   "turns": 6,
+   "tokens": 136507,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 23,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 264.270443083,
+   "cost_usd": 2.0497002,
+   "turns": 38,
+   "tokens": 965488,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 32,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 34.759079875,
+   "cost_usd": 0.2319852,
+   "turns": 3,
+   "tokens": 94647,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 32,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 207.204442875,
+   "cost_usd": 1.5124462,
+   "turns": 36,
+   "tokens": 866705,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 36,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 79.544456459,
+   "cost_usd": 0.6364926,
+   "turns": 11,
+   "tokens": 290503,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 36,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 199.689722417,
+   "cost_usd": 1.3282832000000002,
+   "turns": 16,
+   "tokens": 669611,
+   "score": {
+    "pass": false,
+    "recall": 0.0,
+    "precision": 0.0,
+    "n_answer": 0,
+    "flagged_incomplete": true,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": "no parsable JSON answer"
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 119.311503583,
+   "cost_usd": 1.0401546000000002,
+   "turns": 14,
+   "tokens": 602326,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 171,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 145.127581917,
+   "cost_usd": 0.9280588,
+   "turns": 18,
+   "tokens": 596786,
+   "score": {
+    "pass": false,
+    "recall": 0.0,
+    "precision": 0.0,
+    "n_answer": 0,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": "no parsable JSON answer"
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 167.253441125,
+   "cost_usd": 1.515826,
+   "turns": 17,
+   "tokens": 900753,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 324,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 25.868870459,
+   "cost_usd": 0.08940179999999999,
+   "turns": 8,
+   "tokens": 74517,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 8,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 23.806085667,
+   "cost_usd": 0.0677796,
+   "turns": 4,
+   "tokens": 72615,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 8,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 37.570646,
+   "cost_usd": 0.0959616,
+   "turns": 12,
+   "tokens": 103056,
+   "score": {
+    "pass": false,
+    "recall": 0.4782608695652174,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [
+     "pkg/controller/daemon/daemon_controller_test.go:420 clearExpectations",
+     "pkg/controller/daemon/daemon_controller_test.go:3383 TestSurgeCreatesNewPodWhenAtMaxSurgeAndOldPodDeleted",
+     "pkg/controller/daemon/update_test.go:40 TestDaemonSetUpdatesPods",
+     "pkg/controller/daemon/update_test.go:82 TestDaemonSetUpdatesPodsWithMaxSurge",
+     "pkg/controller/daemon/update_test.go:124 TestDaemonSetUpdatesPodsNotMatchTainstWithMaxSurge",
+     "pkg/controller/daemon/update_test.go:196 TestDaemonSetUpdatesWhenNewPodIsNotReady",
+     "pkg/controller/daemon/update_test.go:233 TestDaemonSetUpdatesSomeOldPodsNotReady",
+     "pkg/controller/daemon/update_test.go:301 TestDaemonSetUpdatesSaveOldHealthyPods",
+     "pkg/controller/daemon/update_test.go:415 TestDaemonSetUpdatesAllOldNotReadyPodsAndNewNotReadyPods",
+     "pkg/controller/daemon/update_test.go:512 TestDaemonSetUpdatesAllOldPodsNotReady",
+     "pkg/controller/daemon/update_test.go:682 currentDSHash",
+     "pkg/controller/daemon/update_test.go:692 TestDaemonSetUpdatesNoTemplateChanged"
+    ],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 23.840819708,
+   "cost_usd": 0.0772718,
+   "turns": 4,
+   "tokens": 76444,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 23,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 74.982841834,
+   "cost_usd": 0.28626660000000004,
+   "turns": 22,
+   "tokens": 244374,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 32,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 27.882338875,
+   "cost_usd": 0.0964428,
+   "turns": 4,
+   "tokens": 83437,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 32,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 82.122785125,
+   "cost_usd": 0.2763478,
+   "turns": 28,
+   "tokens": 313627,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 36,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 23.331031625,
+   "cost_usd": 0.0697788,
+   "turns": 3,
+   "tokens": 54434,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 36,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 64.902736833,
+   "cost_usd": 0.1803016,
+   "turns": 13,
+   "tokens": 183351,
+   "score": {
+    "pass": false,
+    "recall": 0.0,
+    "precision": 0.0,
+    "n_answer": 0,
+    "flagged_incomplete": false,
+    "missed": [
+     "pkg/scheduler/backend/cache/cache_test.go:643 makePodWithEphemeralStorage",
+     "pkg/scheduler/backend/cache/cache_test.go:651 TestEphemeralStorageResource",
+     "pkg/scheduler/backend/queue/scheduling_queue_test.go:2576 TestPriorityQueue_AssignedPodUpdated",
+     "pkg/scheduler/eventhandlers_test.go:285 TestPreCheckForNode",
+     "pkg/scheduler/eventhandlers_test.go:694 TestAdmissionCheck",
+     "pkg/scheduler/extender_test.go:389 TestIsInterested",
+     "pkg/scheduler/framework/plugins/defaultpreemption/default_preemption_test.go:167 TestPostFilter",
+     "pkg/scheduler/framework/plugins/defaultpreemption/default_preemption_test.go:615 TestDryRunPreemption",
+     "pkg/scheduler/framework/plugins/defaultpreemption/default_preemption_test.go:1375 TestSelectBestCandidate",
+     "pkg/scheduler/framework/plugins/defaultpreemption/default_preemption_test.go:1599 TestCustomSelection",
+     "pkg/scheduler/framework/plugins/defaultpreemption/default_preemption_test.go:1846 TestCustomOrdering",
+     "pkg/scheduler/framework/plugins/defaultpreemption/default_preemption_test.go:2050 TestPreempt",
+     "pkg/scheduler/framework/plugins/dynamicresources/extendeddynamicresources_test.go:31 Test_createRequestsAndMappings_requests",
+     "pkg/scheduler/framework/plugins/dynamicresources/extendeddynamicresources_test.go:289 Test_createRequestsAndMappings_mappings",
+     "pkg/scheduler/framework/plugins/noderesources/balanced_allocation_test.go:40 TestNodeResourcesBalancedAllocation",
+     "pkg/scheduler/framework/plugins/noderesources/balanced_allocation_test.go:43 testNodeResourcesBalancedAllocation",
+     "pkg/scheduler/framework/plugins/noderesources/balanced_allocation_test.go:362 TestBalancedAllocationSignPod",
+     "pkg/scheduler/framework/plugins/noderesources/balanced_allocation_test.go:365 testBalancedAllocationSignPod",
+     "pkg/scheduler/framework/plugins/noderesources/fit_test.go:986 TestFitScore",
+     "pkg/scheduler/framework/plugins/noderesources/fit_test.go:989 testFitScore",
+     "pkg/scheduler/framework/plugins/noderesources/fit_test.go:1327 BenchmarkTestFitScore",
+     "pkg/scheduler/framework/plugins/noderesources/fit_test.go:1500 Test_isSchedulableAfterPodChange",
+     "pkg/scheduler/framework/plugins/noderesources/fit_test.go:1896 TestIsFit",
+     "pkg/scheduler/framework/plugins/noderesources/fit_test.go:2176 TestFitSignPod",
+     "pkg/scheduler/framework/plugins/noderesources/fit_test.go:2179 testFitSignPod"
+    ],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 73.934990041,
+   "cost_usd": 0.2481384,
+   "turns": 9,
+   "tokens": 188322,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 171,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 245.91593375,
+   "cost_usd": 1.0229004000000002,
+   "turns": 33,
+   "tokens": 1240418,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 324,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 122.893219375,
+   "cost_usd": 0.4086318,
+   "turns": 13,
+   "tokens": 344016,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 324,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 27.191213542,
+   "cost_usd": 0.1033132,
+   "turns": 8,
+   "tokens": 79413,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 8,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 21.142193,
+   "cost_usd": 0.056091600000000005,
+   "turns": 3,
+   "tokens": 52681,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 8,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 50.914006916,
+   "cost_usd": 0.1686012,
+   "turns": 14,
+   "tokens": 182726,
+   "score": {
+    "pass": true,
+    "recall": 0.9565217391304348,
+    "precision": 1.0,
+    "n_answer": 22,
+    "flagged_incomplete": false,
+    "missed": [
+     "pkg/controller/daemon/daemon_controller.go:1267 DaemonSetsController.syncDaemonSet"
+    ],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 39.35633825,
+   "cost_usd": 0.06094880000000001,
+   "turns": 3,
+   "tokens": 54487,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 23,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 76.548796709,
+   "cost_usd": 0.2555936,
+   "turns": 16,
+   "tokens": 202784,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 32,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 26.207321041,
+   "cost_usd": 0.0757404,
+   "turns": 3,
+   "tokens": 57771,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 32,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 84.633488916,
+   "cost_usd": 0.3083754000000001,
+   "turns": 27,
+   "tokens": 407689,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 36,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 22.157210958,
+   "cost_usd": 0.0709868,
+   "turns": 3,
+   "tokens": 56249,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 36,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 406.035228875,
+   "cost_usd": 1.9864818,
+   "turns": 53,
+   "tokens": 3791331,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 0.9606741573033708,
+    "n_answer": 178,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [
+     "test/e2e_node/criproxy_test.go:456 newPullImageAlwaysPod",
+     "test/e2e_node/criproxy_test.go:475 newPausePodWithContainers",
+     "test/e2e_node/density_test.go:335 runDensityBatchTest",
+     "test/e2e_node/density_test.go:422 runDensitySeqTest",
+     "test/e2e_node/pod_conditions_criproxy_linux_test.go:76 newPullImageAlwaysPodWithInitContainer",
+     "test/e2e_node/pod_conditions_criproxy_linux_test.go:103 runPodReadyToStartContainersTimingTest",
+     "test/e2e_node/resource_usage_test.go:142 runResourceUsageTest"
+    ],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 75.587001084,
+   "cost_usd": 0.26160300000000003,
+   "turns": 11,
+   "tokens": 220673,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 171,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 235.838451875,
+   "cost_usd": 0.8354148,
+   "turns": 34,
+   "tokens": 998791,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 324,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 112.896360792,
+   "cost_usd": 0.3253884,
+   "turns": 12,
+   "tokens": 243970,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 324,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 27.198338083,
+   "cost_usd": 0.0989174,
+   "turns": 8,
+   "tokens": 79749,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 8,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 20.154464709,
+   "cost_usd": 0.0535206,
+   "turns": 4,
+   "tokens": 69658,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 8,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 41.880006166,
+   "cost_usd": 0.1244566,
+   "turns": 12,
+   "tokens": 123463,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 23,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 22.161267084,
+   "cost_usd": 0.0556686,
+   "turns": 3,
+   "tokens": 54318,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 23,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 65.488154375,
+   "cost_usd": 0.23910560000000003,
+   "turns": 12,
+   "tokens": 223140,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 32,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 28.776650917,
+   "cost_usd": 0.094363,
+   "turns": 4,
+   "tokens": 86124,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 32,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 66.996127833,
+   "cost_usd": 0.22918880000000005,
+   "turns": 23,
+   "tokens": 241983,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 36,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 21.139131916,
+   "cost_usd": 0.06597460000000001,
+   "turns": 3,
+   "tokens": 56098,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 36,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 425.626325375,
+   "cost_usd": 2.0808518,
+   "turns": 62,
+   "tokens": 4251274,
+   "score": {
+    "pass": true,
+    "recall": 0.9707602339181286,
+    "precision": 0.9595375722543352,
+    "n_answer": 173,
+    "flagged_incomplete": false,
+    "missed": [
+     "pkg/scheduler/framework/plugins/dynamicresources/extendeddynamicresources_test.go:31 Test_createRequestsAndMappings_requests",
+     "pkg/scheduler/framework/plugins/dynamicresources/extendeddynamicresources_test.go:289 Test_createRequestsAndMappings_mappings",
+     "test/e2e_node/quota_lsci_test.go:46 runOneQuotaTest",
+     "test/integration/scheduler/scheduler_test.go:1040 TestTaintTolerationGtLtIntegration",
+     "test/integration/scheduler/scoring/priorities_test.go:155 TestNodeResourcesScoring"
+    ],
+    "extra": [
+     "test/e2e_node/pod_conditions_criproxy_linux_test.go:76 newPullImageAlwaysPodWithInitContainer",
+     "test/e2e_node/pod_conditions_criproxy_linux_test.go:103 runPodReadyToStartContainersTimingTest",
+     "test/e2e_node/density_test.go:335 runDensityBatchTest",
+     "test/e2e_node/density_test.go:422 runDensitySeqTest",
+     "test/e2e_node/resource_usage_test.go:142 runResourceUsageTest",
+     "test/e2e_node/criproxy_test.go:456 newPullImageAlwaysPod",
+     "test/e2e_node/criproxy_test.go:475 newPausePodWithContainers"
+    ],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 86.121142333,
+   "cost_usd": 0.2706128,
+   "turns": 13,
+   "tokens": 264488,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 171,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 282.944074375,
+   "cost_usd": 0.6786794000000002,
+   "turns": 28,
+   "tokens": 722988,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 324,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 124.987946708,
+   "cost_usd": 0.35189000000000004,
+   "turns": 14,
+   "tokens": 266726,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 324,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 32.984302666,
+   "cost_usd": 0.134505,
+   "turns": 7,
+   "tokens": 57602,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 8,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 27.886956375,
+   "cost_usd": 0.1452522,
+   "turns": 4,
+   "tokens": 75250,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 8,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 60.334311,
+   "cost_usd": 0.3126604,
+   "turns": 15,
+   "tokens": 205164,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 23,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 46.681981416,
+   "cost_usd": 0.24585,
+   "turns": 9,
+   "tokens": 202377,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 23,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 83.288400583,
+   "cost_usd": 0.5387804,
+   "turns": 16,
+   "tokens": 318977,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 32,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 51.713199333,
+   "cost_usd": 0.240174,
+   "turns": 9,
+   "tokens": 181187,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 32,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 87.2101235,
+   "cost_usd": 0.433134,
+   "turns": 24,
+   "tokens": 346070,
+   "score": {
+    "pass": true,
+    "recall": 0.9722222222222222,
+    "precision": 1.0,
+    "n_answer": 35,
+    "flagged_incomplete": false,
+    "missed": [
+     "cmd/kubemark/app/hollow_node_test.go:54 TestHollowNode"
+    ],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 32.419584292,
+   "cost_usd": 0.1522118,
+   "turns": 5,
+   "tokens": 94020,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 36,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 231.192902791,
+   "cost_usd": 0.727983,
+   "turns": 27,
+   "tokens": 454159,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 0.9606741573033708,
+    "n_answer": 178,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [
+     "test/e2e_node/criproxy_test.go:456 newPullImageAlwaysPod",
+     "test/e2e_node/criproxy_test.go:475 newPausePodWithContainers",
+     "test/e2e_node/density_test.go:335 runDensityBatchTest",
+     "test/e2e_node/density_test.go:422 runDensitySeqTest",
+     "test/e2e_node/pod_conditions_criproxy_linux_test.go:103 runPodReadyToStartContainersTimingTest",
+     "test/e2e_node/pod_conditions_criproxy_linux_test.go:76 newPullImageAlwaysPodWithInitContainer",
+     "test/e2e_node/resource_usage_test.go:142 runResourceUsageTest"
+    ],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 101.887876625,
+   "cost_usd": 0.5152624,
+   "turns": 12,
+   "tokens": 234565,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 171,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 298.267961208,
+   "cost_usd": 1.6903480000000004,
+   "turns": 29,
+   "tokens": 1436289,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 324,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 166.819151458,
+   "cost_usd": 0.877847,
+   "turns": 16,
+   "tokens": 421645,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 324,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 30.739362292,
+   "cost_usd": 0.1727942,
+   "turns": 6,
+   "tokens": 78925,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 8,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 27.213897209,
+   "cost_usd": 0.1481924,
+   "turns": 4,
+   "tokens": 77288,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 8,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 45.889673459,
+   "cost_usd": 0.2703222,
+   "turns": 11,
+   "tokens": 137193,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 23,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 48.859273708,
+   "cost_usd": 0.172763,
+   "turns": 4,
+   "tokens": 82223,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 23,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 73.565484167,
+   "cost_usd": 0.4573007999999999,
+   "turns": 15,
+   "tokens": 197208,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 32,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 51.897240708,
+   "cost_usd": 0.2016064,
+   "turns": 6,
+   "tokens": 129110,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 32,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 114.309503625,
+   "cost_usd": 0.5016996,
+   "turns": 26,
+   "tokens": 449103,
+   "score": {
+    "pass": true,
+    "recall": 0.9722222222222222,
+    "precision": 1.0,
+    "n_answer": 35,
+    "flagged_incomplete": false,
+    "missed": [
+     "cmd/kubemark/app/hollow_node_test.go:54 TestHollowNode"
+    ],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 36.258379792,
+   "cost_usd": 0.1858748,
+   "turns": 4,
+   "tokens": 84239,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 36,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 335.99274075,
+   "cost_usd": 1.1817186000000002,
+   "turns": 45,
+   "tokens": 976898,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 0.9606741573033708,
+    "n_answer": 178,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [
+     "test/e2e_node/criproxy_test.go:456 newPullImageAlwaysPod",
+     "test/e2e_node/criproxy_test.go:475 newPausePodWithContainers",
+     "test/e2e_node/density_test.go:335 runDensityBatchTest",
+     "test/e2e_node/density_test.go:422 runDensitySeqTest",
+     "test/e2e_node/pod_conditions_criproxy_linux_test.go:103 runPodReadyToStartContainersTimingTest",
+     "test/e2e_node/pod_conditions_criproxy_linux_test.go:76 newPullImageAlwaysPodWithInitContainer",
+     "test/e2e_node/resource_usage_test.go:142 runResourceUsageTest"
+    ],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 99.260638959,
+   "cost_usd": 0.4886676,
+   "turns": 9,
+   "tokens": 195102,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 171,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 245.909598667,
+   "cost_usd": 1.3757312000000002,
+   "turns": 24,
+   "tokens": 1053764,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 324,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 159.785013,
+   "cost_usd": 0.7417178,
+   "turns": 11,
+   "tokens": 261623,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 324,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 32.25459925,
+   "cost_usd": 0.1679872,
+   "turns": 5,
+   "tokens": 76300,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 8,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 28.721234375,
+   "cost_usd": 0.12511519999999998,
+   "turns": 4,
+   "tokens": 77204,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 8,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 47.382111208,
+   "cost_usd": 0.2235336,
+   "turns": 12,
+   "tokens": 139000,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 23,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 34.307925209,
+   "cost_usd": 0.1657624,
+   "turns": 4,
+   "tokens": 82203,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 23,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 90.650632,
+   "cost_usd": 0.5386462,
+   "turns": 20,
+   "tokens": 389892,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 32,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 35.268570083,
+   "cost_usd": 0.173058,
+   "turns": 5,
+   "tokens": 110936,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 32,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 86.142008375,
+   "cost_usd": 0.4577804,
+   "turns": 23,
+   "tokens": 384341,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 36,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 31.7565535,
+   "cost_usd": 0.1369226,
+   "turns": 3,
+   "tokens": 57061,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 36,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 455.18396675,
+   "cost_usd": 1.3213344,
+   "turns": 48,
+   "tokens": 1325214,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 0.9606741573033708,
+    "n_answer": 178,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [
+     "test/e2e_node/criproxy_test.go:456 newPullImageAlwaysPod",
+     "test/e2e_node/criproxy_test.go:475 newPausePodWithContainers",
+     "test/e2e_node/density_test.go:335 runDensityBatchTest",
+     "test/e2e_node/density_test.go:422 runDensitySeqTest",
+     "test/e2e_node/pod_conditions_criproxy_linux_test.go:103 runPodReadyToStartContainersTimingTest",
+     "test/e2e_node/pod_conditions_criproxy_linux_test.go:76 newPullImageAlwaysPodWithInitContainer",
+     "test/e2e_node/resource_usage_test.go:142 runResourceUsageTest"
+    ],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 100.112939958,
+   "cost_usd": 0.4762522,
+   "turns": 11,
+   "tokens": 215451,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 171,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 292.815678042,
+   "cost_usd": 0.9799886,
+   "turns": 22,
+   "tokens": 409953,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 324,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 178.910096625,
+   "cost_usd": 0.7204378000000001,
+   "turns": 17,
+   "tokens": 408577,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 324,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  }
+ ]
+}

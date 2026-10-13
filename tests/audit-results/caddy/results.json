@@ -1,0 +1,5201 @@
+{
+ "repo": "caddy",
+ "root": "<repo root>",
+ "date": "2026-10-12",
+ "agent": "Claude Code",
+ "model": "claude-haiku-5-5, claude-sonnet-5-5, claude-opus-5-5",
+ "mode": "read-only tools + language toolchain",
+ "answer_key": "GridSeak compiler-indexed call graph (5942 edges, 100% from the compiler index)",
+ "call_edges": 5942,
+ "tasks": [
+  {
+   "id": "t1",
+   "band": "small",
+   "target": "Encode.Provision",
+   "file": "modules/caddyhttp/encode/encode.go",
+   "line": 71,
+   "question": "In this repository (caddy), list every function and method, including those in test files, that transitively calls `Encode.Provision` (declared at modules/caddyhttp/encode/encode.go:71) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `Encode.Provision` itself. The list must be complete.",
+   "max_depth": 3,
+   "answer": [
+    {
+     "file": "modules/caddyhttp/encode/encode_bench_test.go",
+     "line": 30,
+     "name": "BenchmarkEncodeHandlerCorpus"
+    },
+    {
+     "file": "modules/caddyhttp/encode/encode_conformance_test.go",
+     "line": 39,
+     "name": "TestEncodeCorpusResponse"
+    },
+    {
+     "file": "modules/caddyhttp/encode/encode_conformance_test.go",
+     "line": 217,
+     "name": "TestEncodeResponseSemantics"
+    },
+    {
+     "file": "modules/caddyhttp/encode/encode_conformance_test.go",
+     "line": 229,
+     "name": "runEncodeScenario"
+    },
+    {
+     "file": "modules/caddyhttp/encode/encode_harness_test.go",
+     "line": 147,
+     "name": "newEncodeHandler"
+    },
+    {
+     "file": "modules/caddyhttp/encode/encode_test.go",
+     "line": 37,
+     "name": "BenchmarkResponseWriterWriteHeader"
+    },
+    {
+     "file": "modules/caddyhttp/encode/encode_test.go",
+     "line": 398,
+     "name": "TestServeHTTPDefaultEncodingPreference"
+    },
+    {
+     "file": "modules/caddyhttp/encode/sse_test.go",
+     "line": 62,
+     "name": "newSSEEncodeHandler"
+    },
+    {
+     "file": "modules/caddyhttp/encode/sse_test.go",
+     "line": 89,
+     "name": "TestSSEHeadersFlushedBeforeBody"
+    },
+    {
+     "file": "modules/caddyhttp/encode/sse_test.go",
+     "line": 126,
+     "name": "TestNonSSESmallResponseStillBuffersHeader"
+    },
+    {
+     "file": "modules/caddyhttp/encode/sse_test.go",
+     "line": 150,
+     "name": "TestIncrementalHeadersFlushedBeforeBody"
+    },
+    {
+     "file": "modules/caddyhttp/encode/sse_test.go",
+     "line": 179,
+     "name": "TestIncrementalImplicitWriteFlushes"
+    },
+    {
+     "file": "modules/caddyhttp/encode/sse_test.go",
+     "line": 203,
+     "name": "TestIncrementalReadFromFlushes"
+    },
+    {
+     "file": "modules/caddyhttp/encode/sse_test.go",
+     "line": 227,
+     "name": "TestIncrementalInformationalResponseDoesNotAffectFinalResponse"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t2",
+   "band": "small",
+   "target": "newBufferedResponseWriter",
+   "file": "modules/caddyhttp/caddyauth/caddyauth.go",
+   "line": 223,
+   "question": "In this repository (caddy), list every function and method, including those in test files, that transitively calls `newBufferedResponseWriter` (declared at modules/caddyhttp/caddyauth/caddyauth.go:223) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `newBufferedResponseWriter` itself. The list must be complete.",
+   "max_depth": 3,
+   "answer": [
+    {
+     "file": "modules/caddyhttp/caddyauth/caddyauth.go",
+     "line": 89,
+     "name": "Authentication.ServeHTTP"
+    },
+    {
+     "file": "modules/caddyhttp/caddyauth/caddyauth_test.go",
+     "line": 34,
+     "name": "TestAuthenticationRejectedUserSetsCandidatePlaceholders"
+    },
+    {
+     "file": "modules/caddyhttp/caddyauth/caddyauth_test.go",
+     "line": 75,
+     "name": "TestAuthenticationSuccessfulUserSetsUserPlaceholdersOnly"
+    },
+    {
+     "file": "modules/caddyhttp/caddyauth/caddyauth_test.go",
+     "line": 110,
+     "name": "TestAuthenticationSuccessfulProviderDoesNotExposeEarlierCandidate"
+    },
+    {
+     "file": "modules/caddyhttp/caddyauth/caddyauth_test.go",
+     "line": 148,
+     "name": "TestAuthenticationRejectedEmptyUserDoesNotSetCandidatePlaceholders"
+    },
+    {
+     "file": "modules/caddyhttp/caddyauth/caddyauth_test.go",
+     "line": 220,
+     "name": "serveAuth"
+    },
+    {
+     "file": "modules/caddyhttp/caddyauth/caddyauth_test.go",
+     "line": 231,
+     "name": "TestFailingProviderDoesNotClobberSuccess"
+    },
+    {
+     "file": "modules/caddyhttp/caddyauth/caddyauth_test.go",
+     "line": 261,
+     "name": "TestSuccessfulProviderHeadersPreserved"
+    },
+    {
+     "file": "modules/caddyhttp/caddyauth/caddyauth_test.go",
+     "line": 280,
+     "name": "TestAllFailReplaysRedirect"
+    },
+    {
+     "file": "modules/caddyhttp/caddyauth/caddyauth_test.go",
+     "line": 305,
+     "name": "TestHeaderOnlyChallengeStillReturns401"
+    },
+    {
+     "file": "modules/caddyhttp/caddyauth/caddyauth_test.go",
+     "line": 358,
+     "name": "TestSingleProviderGetsRealWriter"
+    },
+    {
+     "file": "modules/caddyhttp/caddyauth/caddyauth_test.go",
+     "line": 387,
+     "name": "TestBufferedWriterPreservesCapabilities"
+    },
+    {
+     "file": "modules/caddyhttp/caddyauth/caddyauth_test.go",
+     "line": 444,
+     "name": "TestBufferedResponseIsSizeCapped"
+    },
+    {
+     "file": "modules/caddyhttp/caddyauth/caddyauth_test.go",
+     "line": 468,
+     "name": "TestBufferedWriterReadFromReportsTotalAndDrainError"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t3",
+   "band": "medium",
+   "target": "adminHandler.getOrigin",
+   "file": "admin.go",
+   "line": 978,
+   "question": "In this repository (caddy), list every function and method, including those in test files, that transitively calls `adminHandler.getOrigin` (declared at admin.go:978) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `adminHandler.getOrigin` itself. The list must be complete.",
+   "max_depth": 12,
+   "answer": [
+    {
+     "file": "admin.go",
+     "line": 222,
+     "name": "AdminConfig.newAdminHandler"
+    },
+    {
+     "file": "admin.go",
+     "line": 375,
+     "name": "replaceLocalAdminServer"
+    },
+    {
+     "file": "admin.go",
+     "line": 511,
+     "name": "replaceRemoteAdminServer"
+    },
+    {
+     "file": "admin.go",
+     "line": 798,
+     "name": "adminHandler.ServeHTTP"
+    },
+    {
+     "file": "admin.go",
+     "line": 829,
+     "name": "adminHandler.serveHTTP"
+    },
+    {
+     "file": "admin.go",
+     "line": 902,
+     "name": "adminHandler.handleError"
+    },
+    {
+     "file": "admin.go",
+     "line": 961,
+     "name": "adminHandler.checkOrigin"
+    },
+    {
+     "file": "admin.go",
+     "line": 1027,
+     "name": "handleConfig"
+    },
+    {
+     "file": "admin_test.go",
+     "line": 163,
+     "name": "TestLoadConcurrent"
+    },
+    {
+     "file": "admin_test.go",
+     "line": 188,
+     "name": "TestETags"
+    },
+    {
+     "file": "admin_test.go",
+     "line": 222,
+     "name": "BenchmarkLoad"
+    },
+    {
+     "file": "admin_test.go",
+     "line": 228,
+     "name": "TestAdminHandlerErrorHandling"
+    },
+    {
+     "file": "admin_test.go",
+     "line": 258,
+     "name": "TestAdminHandlerServeHTTPRedactsSensitiveHeadersInLogs"
+    },
+    {
+     "file": "admin_test.go",
+     "line": 331,
+     "name": "TestAdminHandlerBuiltinRouteErrors"
+    },
+    {
+     "file": "admin_test.go",
+     "line": 439,
+     "name": "TestNewAdminHandlerRouterRegistration"
+    },
+    {
+     "file": "admin_test.go",
+     "line": 516,
+     "name": "TestAdminRouterProvisioning"
+    },
+    {
+     "file": "admin_test.go",
+     "line": 808,
+     "name": "TestReplaceRemoteAdminServer"
+    },
+    {
+     "file": "caddy.go",
+     "line": 104,
+     "name": "Run"
+    },
+    {
+     "file": "caddy.go",
+     "line": 115,
+     "name": "Load"
+    },
+    {
+     "file": "caddy.go",
+     "line": 158,
+     "name": "changeConfig"
+    },
+    {
+     "file": "caddy.go",
+     "line": 337,
+     "name": "unsyncedDecodeAndRun"
+    },
+    {
+     "file": "caddy.go",
+     "line": 419,
+     "name": "run"
+    },
+    {
+     "file": "caddy.go",
+     "line": 484,
+     "name": "provisionContext"
+    },
+    {
+     "file": "caddy.go",
+     "line": 589,
+     "name": "ProvisionContext"
+    },
+    {
+     "file": "caddy.go",
+     "line": 594,
+     "name": "finishSettingUp"
+    },
+    {
+     "file": "caddy.go",
+     "line": 744,
+     "name": "Validate"
+    },
+    {
+     "file": "caddyconfig/load.go",
+     "line": 73,
+     "name": "adminLoad.handleLoad"
+    },
+    {
+     "file": "caddytest/integration/panic_test.go",
+     "line": 133,
+     "name": "TestHandlerPanicLogsAtError"
+    },
+    {
+     "file": "cmd/commandfuncs.go",
+     "line": 188,
+     "name": "cmdRun"
+    },
+    {
+     "file": "cmd/commandfuncs.go",
+     "line": 552,
+     "name": "cmdAdaptConfig"
+    },
+    {
+     "file": "cmd/commandfuncs.go",
+     "line": 643,
+     "name": "cmdValidateConfig"
+    },
+    {
+     "file": "cmd/main.go",
+     "line": 250,
+     "name": "watchConfigFile"
+    },
+    {
+     "file": "modules/caddyhttp/fileserver/command.go",
+     "line": 86,
+     "name": "cmdFileServer"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/command.go",
+     "line": 87,
+     "name": "cmdReverseProxy"
+    },
+    {
+     "file": "modules/caddyhttp/staticresp.go",
+     "line": 316,
+     "name": "cmdRespond"
+    },
+    {
+     "file": "modules/caddytls/storage_clean_test.go",
+     "line": 54,
+     "name": "newTestContextWithStorage"
+    },
+    {
+     "file": "modules/caddytls/storage_clean_test.go",
+     "line": 214,
+     "name": "TestTLSStorageCleanBlockingStorageStopSynchronization"
+    },
+    {
+     "file": "modules/caddytls/storage_clean_test.go",
+     "line": 266,
+     "name": "TestTLSECHPublishBlockingStorageStopSynchronization"
+    },
+    {
+     "file": "modules/caddytls/storage_clean_test.go",
+     "line": 320,
+     "name": "TestTLSECHPublishBlockingPublisherStopSynchronization"
+    },
+    {
+     "file": "modules/caddytls/storage_clean_test.go",
+     "line": 406,
+     "name": "TestTLSECHRotateBlockingStorageStopSynchronization"
+    },
+    {
+     "file": "modules/caddytls/tls_wildcard_test.go",
+     "line": 24,
+     "name": "TestAvoidDuplicateAutomation"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t4",
+   "band": "medium",
+   "target": "Upstream.healthy",
+   "file": "modules/caddyhttp/reverseproxy/hosts.go",
+   "line": 259,
+   "question": "In this repository (caddy), list every function and method, including those in test files, that transitively calls `Upstream.healthy` (declared at modules/caddyhttp/reverseproxy/hosts.go:259) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `Upstream.healthy` itself. The list must be complete.",
+   "max_depth": 5,
+   "answer": [
+    {
+     "file": "modules/caddyhttp/reverseproxy/active_health_test.go",
+     "line": 105,
+     "name": "TestActiveHealthChecksSameAddressDifferentChecksAreIndependent"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/dynamic_upstreams_test.go",
+     "line": 224,
+     "name": "TestDynamicHostHealthyConsultsFails"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/hosts.go",
+     "line": 86,
+     "name": "Upstream.Available"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/hosts.go",
+     "line": 93,
+     "name": "Upstream.Healthy"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/metrics.go",
+     "line": 60,
+     "name": "metricsUpstreamsHealthyUpdater.init"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/metrics.go",
+     "line": 88,
+     "name": "metricsUpstreamsHealthyUpdater.update"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/passive_health_test.go",
+     "line": 166,
+     "name": "TestStaticUpstreamHealthyWithNoFailures"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/passive_health_test.go",
+     "line": 181,
+     "name": "TestStaticUpstreamUnhealthyAtMaxFails"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/passive_health_test.go",
+     "line": 202,
+     "name": "TestStaticUpstreamRecoversAfterFailDuration"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/passive_health_test.go",
+     "line": 226,
+     "name": "TestStaticUpstreamHealthPersistedAcrossReprovisioning"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/passive_health_test.go",
+     "line": 254,
+     "name": "TestDynamicUpstreamHealthyWithNoFailures"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/passive_health_test.go",
+     "line": 269,
+     "name": "TestDynamicUpstreamUnhealthyAtMaxFails"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/passive_health_test.go",
+     "line": 292,
+     "name": "TestDynamicUpstreamFailCountPersistedBetweenRequests"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/passive_health_test.go",
+     "line": 334,
+     "name": "TestDynamicUpstreamRecoveryAfterFailDuration"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/reverseproxy.go",
+     "line": 280,
+     "name": "Handler.Provision"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies.go",
+     "line": 67,
+     "name": "RandomSelection.Select"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies.go",
+     "line": 144,
+     "name": "WeightedRoundRobinSelection.Select"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies.go",
+     "line": 234,
+     "name": "RandomChoiceSelection.Select"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies.go",
+     "line": 282,
+     "name": "LeastConnSelection.Select"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies.go",
+     "line": 334,
+     "name": "RoundRobinSelection.Select"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies.go",
+     "line": 371,
+     "name": "FirstSelection.Select"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies.go",
+     "line": 402,
+     "name": "IPHashSelection.Select"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies.go",
+     "line": 433,
+     "name": "ClientIPHashSelection.Select"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies.go",
+     "line": 464,
+     "name": "URIHashSelection.Select"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies.go",
+     "line": 513,
+     "name": "QueryHashSelection.Select"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies.go",
+     "line": 594,
+     "name": "HeaderHashSelection.Select"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies.go",
+     "line": 678,
+     "name": "CookieHashSelection.Select"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies.go",
+     "line": 804,
+     "name": "selectRandomHost"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies.go",
+     "line": 860,
+     "name": "hostByHashing"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies_test.go",
+     "line": 36,
+     "name": "TestRoundRobinPolicy"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies_test.go",
+     "line": 77,
+     "name": "TestWeightedRoundRobinPolicy"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies_test.go",
+     "line": 176,
+     "name": "TestWeightedRoundRobinPolicyWithZeroWeight"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies_test.go",
+     "line": 228,
+     "name": "TestLeastConnPolicy"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies_test.go",
+     "line": 246,
+     "name": "TestIPHashPolicy"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies_test.go",
+     "line": 388,
+     "name": "TestClientIPHashPolicy"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies_test.go",
+     "line": 531,
+     "name": "TestFirstPolicy"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies_test.go",
+     "line": 548,
+     "name": "TestQueryHashPolicy"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies_test.go",
+     "line": 624,
+     "name": "TestURIHashPolicy"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies_test.go",
+     "line": 702,
+     "name": "TestRandomChoicePolicy"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies_test.go",
+     "line": 728,
+     "name": "TestRandomChoicePolicyLeastLoaded"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies_test.go",
+     "line": 755,
+     "name": "TestCookieHashPolicy"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies_test.go",
+     "line": 814,
+     "name": "TestCookieHashPolicyWithSecureRequest"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies_test.go",
+     "line": 865,
+     "name": "TestCookieHashPolicyWithFirstFallback"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies_test.go",
+     "line": 921,
+     "name": "TestCookieHashPolicyWithSecret"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t5",
+   "band": "large",
+   "target": "GetVar",
+   "file": "modules/caddyhttp/vars.go",
+   "line": 452,
+   "question": "In this repository (caddy), list every function and method, including those in test files, that transitively calls `GetVar` (declared at modules/caddyhttp/vars.go:452) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `GetVar` itself. The list must be complete.",
+   "max_depth": 5,
+   "answer": [
+    {
+     "file": "modules/caddyhttp/app.go",
+     "line": 188,
+     "name": "App.Provision"
+    },
+    {
+     "file": "modules/caddyhttp/celmatcher_test.go",
+     "line": 482,
+     "name": "TestMatchExpressionMatch"
+    },
+    {
+     "file": "modules/caddyhttp/celmatcher_test.go",
+     "line": 535,
+     "name": "BenchmarkMatchExpressionMatch"
+    },
+    {
+     "file": "modules/caddyhttp/fileserver/matcher_test.go",
+     "line": 41,
+     "name": "TestFileMatcher"
+    },
+    {
+     "file": "modules/caddyhttp/fileserver/matcher_test.go",
+     "line": 128,
+     "name": "TestFileMatcherNonWindows"
+    },
+    {
+     "file": "modules/caddyhttp/fileserver/matcher_test.go",
+     "line": 151,
+     "name": "fileMatcherTest"
+    },
+    {
+     "file": "modules/caddyhttp/fileserver/matcher_test.go",
+     "line": 192,
+     "name": "TestTryFilesRewriteEscapesMatchedPath"
+    },
+    {
+     "file": "modules/caddyhttp/fileserver/matcher_test.go",
+     "line": 291,
+     "name": "TestPHPFileMatcher"
+    },
+    {
+     "file": "modules/caddyhttp/fileserver/matcher_test.go",
+     "line": 506,
+     "name": "TestMatchExpressionMatch"
+    },
+    {
+     "file": "modules/caddyhttp/intercept/intercept.go",
+     "line": 115,
+     "name": "Intercept.ServeHTTP"
+    },
+    {
+     "file": "modules/caddyhttp/invoke.go",
+     "line": 45,
+     "name": "Invoke.ServeHTTP"
+    },
+    {
+     "file": "modules/caddyhttp/ip_matchers.go",
+     "line": 253,
+     "name": "MatchClientIP.Match"
+    },
+    {
+     "file": "modules/caddyhttp/ip_matchers.go",
+     "line": 262,
+     "name": "MatchClientIP.MatchWithError"
+    },
+    {
+     "file": "modules/caddyhttp/logging.go",
+     "line": 93,
+     "name": "ServerLogConfig.wrapLogger"
+    },
+    {
+     "file": "modules/caddyhttp/map/map_test.go",
+     "line": 92,
+     "name": "TestHandler"
+    },
+    {
+     "file": "modules/caddyhttp/marshalers.go",
+     "line": 35,
+     "name": "LoggableHTTPRequest.MarshalLogObject"
+    },
+    {
+     "file": "modules/caddyhttp/matchers.go",
+     "line": 1545,
+     "name": "MatchNot.Match"
+    },
+    {
+     "file": "modules/caddyhttp/matchers.go",
+     "line": 1553,
+     "name": "MatchNot.MatchWithError"
+    },
+    {
+     "file": "modules/caddyhttp/matchers_test.go",
+     "line": 637,
+     "name": "TestPathREMatcher"
+    },
+    {
+     "file": "modules/caddyhttp/matchers_test.go",
+     "line": 1015,
+     "name": "TestHeaderREMatcher"
+    },
+    {
+     "file": "modules/caddyhttp/matchers_test.go",
+     "line": 1098,
+     "name": "BenchmarkHeaderREMatcher"
+    },
+    {
+     "file": "modules/caddyhttp/matchers_test.go",
+     "line": 1123,
+     "name": "TestVarREMatcher"
+    },
+    {
+     "file": "modules/caddyhttp/matchers_test.go",
+     "line": 1220,
+     "name": "TestNotMatcher"
+    },
+    {
+     "file": "modules/caddyhttp/push/handler.go",
+     "line": 212,
+     "name": "linkPusher.WriteHeader"
+    },
+    {
+     "file": "modules/caddyhttp/replacer.go",
+     "line": 51,
+     "name": "NewTestReplacer"
+    },
+    {
+     "file": "modules/caddyhttp/replacer.go",
+     "line": 59,
+     "name": "addHTTPVarsToReplacer"
+    },
+    {
+     "file": "modules/caddyhttp/replacer_test.go",
+     "line": 31,
+     "name": "TestMissingCookiePlaceholder"
+    },
+    {
+     "file": "modules/caddyhttp/replacer_test.go",
+     "line": 45,
+     "name": "TestTLSPlaceholdersWithoutTLS"
+    },
+    {
+     "file": "modules/caddyhttp/replacer_test.go",
+     "line": 69,
+     "name": "TestUnknownTLSPlaceholdersRemainLiteral"
+    },
+    {
+     "file": "modules/caddyhttp/replacer_test.go",
+     "line": 87,
+     "name": "TestHTTPVarReplacement"
+    },
+    {
+     "file": "modules/caddyhttp/replacer_test.go",
+     "line": 327,
+     "name": "TestHTTPProtoNameNormalization"
+    },
+    {
+     "file": "modules/caddyhttp/replacer_test.go",
+     "line": 359,
+     "name": "BenchmarkAddHTTPVarsToReplacer"
+    },
+    {
+     "file": "modules/caddyhttp/replacer_test.go",
+     "line": 375,
+     "name": "TestHTTPVarReplacementUUID"
+    },
+    {
+     "file": "modules/caddyhttp/requestbody/requestbody_test.go",
+     "line": 102,
+     "name": "TestRequestBodySetHeaderPlaceholders"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/client_disconnect_test.go",
+     "line": 17,
+     "name": "TestClientDisconnectRecordsStatus"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/copyresponse.go",
+     "line": 58,
+     "name": "CopyResponseHandler.ServeHTTP"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/fastcgi/incremental_test.go",
+     "line": 34,
+     "name": "fcgiRoundTrip"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/fastcgi/incremental_test.go",
+     "line": 59,
+     "name": "TestIncrementalUnbufferedRequestWithKnownLength"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/fastcgi/incremental_test.go",
+     "line": 89,
+     "name": "TestIncrementalUnbufferedRequestWithUnknownLength"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/headers_test.go",
+     "line": 11,
+     "name": "TestAddForwardedHeadersNonIP"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/headers_test.go",
+     "line": 36,
+     "name": "TestAddForwardedHeaders_UnixSocketTrusted"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/headers_test.go",
+     "line": 68,
+     "name": "TestAddForwardedHeaders_UnixSocketUntrusted"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/headers_test.go",
+     "line": 100,
+     "name": "TestAddForwardedHeaders_UnixSocketTrustedNoExistingHeaders"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/hopheaders_test.go",
+     "line": 17,
+     "name": "TestFinalizeResponse_101_StripsHopByHopHeaders"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/hopheaders_test.go",
+     "line": 67,
+     "name": "TestFinalizeResponse_101_StripsConnectionNamedHeaders"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/hopheaders_test.go",
+     "line": 113,
+     "name": "TestFinalizeResponse_200_StillStripsHopByHop"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/hopheaders_test.go",
+     "line": 149,
+     "name": "TestFinalizeResponse_101_NoUpgradeRequest"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/httptransport.go",
+     "line": 184,
+     "name": "HTTPTransport.Provision"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/httptransport.go",
+     "line": 207,
+     "name": "HTTPTransport.NewTransport"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/httptransport_test.go",
+     "line": 134,
+     "name": "TestHTTPTransport_DialTLSContext_ProxyProtocol"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/httptransport_test.go",
+     "line": 205,
+     "name": "TestHTTPTransport_DialContext_ProxyProtocolClosesConnectionOnError"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/httptransport_test.go",
+     "line": 280,
+     "name": "TestHTTPTransport_DialContext_DialInfoOverride"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/httptransport_test.go",
+     "line": 366,
+     "name": "TestHTTPTransportH3UsesConfiguredTrustPool"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/incremental_test.go",
+     "line": 57,
+     "name": "incrementalRequest"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/incremental_test.go",
+     "line": 106,
+     "name": "TestIncrementalProxiedWhenRequestLengthUnknown"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/incremental_test.go",
+     "line": 140,
+     "name": "TestIncrementalRefusedWhenTransportRequiresContentLength"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/incremental_test.go",
+     "line": 168,
+     "name": "TestIncrementalRefusedWhenRequestBufferUnlimited"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/incremental_test.go",
+     "line": 191,
+     "name": "TestIncrementalRefusedWhenRequestBufferConfigured"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/incremental_test.go",
+     "line": 203,
+     "name": "TestIncrementalKnownLengthRequestBypassesTransportDefault"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/incremental_test.go",
+     "line": 246,
+     "name": "TestIncrementalProxiedWhenRequestNotBuffered"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/incremental_test.go",
+     "line": 270,
+     "name": "TestIncrementalProxiedWhenRequestHasNoBody"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/incremental_test.go",
+     "line": 298,
+     "name": "TestIncrementalRewriteRemovesRequestContentBeforeRefusal"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/incremental_test.go",
+     "line": 320,
+     "name": "TestIncrementalAddedByHeaderUpAfterBufferingIsRefused"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/incremental_test.go",
+     "line": 338,
+     "name": "serveIncremental"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/incremental_test.go",
+     "line": 360,
+     "name": "TestIncrementalRefusedWhenResponseBufferConfigured"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/incremental_test.go",
+     "line": 371,
+     "name": "TestIncrementalRefusedWhenResponseBufferUnlimited"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/incremental_test.go",
+     "line": 381,
+     "name": "TestIncrementalProxiedWhenResponseHasNoBody"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/incremental_test.go",
+     "line": 396,
+     "name": "TestIncrementalProxiedWhenResponseNotBuffered"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/incremental_test.go",
+     "line": 420,
+     "name": "TestIncrementalResponseCanBeReplaced"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/incremental_test.go",
+     "line": 444,
+     "name": "TestIncrementalAddedByHeaderDownAfterBufferingIsRefused"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/incremental_test.go",
+     "line": 466,
+     "name": "TestProxyStatusOmittedWhenUnnamed"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/incremental_test.go",
+     "line": 490,
+     "name": "TestProxyStatusPreservesUpstreamMembers"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/incremental_test.go",
+     "line": 525,
+     "name": "TestProxyStatusNameNeedingQuotes"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/incremental_test.go",
+     "line": 546,
+     "name": "TestIncrementalProxiedWhenBodylessRequestHasUnknownLength"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/incremental_test.go",
+     "line": 576,
+     "name": "TestIncrementalAddedByHeaderUpWhenBodylessRequestHasUnknownLength"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/incremental_test.go",
+     "line": 612,
+     "name": "TestIncrementalBodylessUnknownLengthIsNormalised"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/incremental_test.go",
+     "line": 633,
+     "name": "TestIncrementalProxiedWhenHeadResponseAdvertisesLength"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/prepare_request_bench_test.go",
+     "line": 27,
+     "name": "BenchmarkPrepareRequest"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/retries_test.go",
+     "line": 28,
+     "name": "prepareTestRequest"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/retries_test.go",
+     "line": 140,
+     "name": "TestDialErrorBodyRetry"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/retries_test.go",
+     "line": 285,
+     "name": "TestResponseRetryStatusCode"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/retries_test.go",
+     "line": 335,
+     "name": "TestResponseRetryHeader"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/retries_test.go",
+     "line": 386,
+     "name": "TestResponseRetryNoMatchNoRetry"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/retries_test.go",
+     "line": 426,
+     "name": "TestResponseRetryExhaustedPreservesStatusCode"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/retries_test.go",
+     "line": 471,
+     "name": "TestResponseRetryHeaderCleanup"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/retries_test.go",
+     "line": 523,
+     "name": "TestRequestOnlyMatcherDoesNotRetryResponses"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/retries_test.go",
+     "line": 593,
+     "name": "TestTransportErrorPlaceholder"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/retries_test.go",
+     "line": 640,
+     "name": "TestTransportErrorPlaceholderNotSetForResponses"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/retries_test.go",
+     "line": 736,
+     "name": "TestSubrouteErrorFallbackWithBody"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/reverseproxy.go",
+     "line": 280,
+     "name": "Handler.Provision"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/reverseproxy.go",
+     "line": 504,
+     "name": "Handler.ServeHTTP"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/reverseproxy.go",
+     "line": 626,
+     "name": "Handler.proxyLoopIteration"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/reverseproxy.go",
+     "line": 796,
+     "name": "Handler.prepareRequest"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/reverseproxy.go",
+     "line": 929,
+     "name": "Handler.addForwardedHeaders"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/reverseproxy.go",
+     "line": 1031,
+     "name": "Handler.reverseProxy"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/reverseproxy.go",
+     "line": 1258,
+     "name": "Handler.finalizeResponse"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/reverseproxy.go",
+     "line": 1393,
+     "name": "LoadBalancing.tryAgain"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/reverseproxy.go",
+     "line": 1471,
+     "name": "Handler.directRequest"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies.go",
+     "line": 433,
+     "name": "ClientIPHashSelection.Select"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies.go",
+     "line": 678,
+     "name": "CookieHashSelection.Select"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies_test.go",
+     "line": 388,
+     "name": "TestClientIPHashPolicy"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies_test.go",
+     "line": 755,
+     "name": "TestCookieHashPolicy"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies_test.go",
+     "line": 814,
+     "name": "TestCookieHashPolicyWithSecureRequest"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies_test.go",
+     "line": 865,
+     "name": "TestCookieHashPolicyWithFirstFallback"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies_test.go",
+     "line": 921,
+     "name": "TestCookieHashPolicyWithSecret"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/streaming.go",
+     "line": 60,
+     "name": "Handler.handleUpgradeResponse"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/streaming_test.go",
+     "line": 205,
+     "name": "TestHandlerUpgradedStreamHalfClose"
+    },
+    {
+     "file": "modules/caddyhttp/routes.go",
+     "line": 190,
+     "name": "Route.Compile"
+    },
+    {
+     "file": "modules/caddyhttp/routes.go",
+     "line": 239,
+     "name": "RouteList.Compile"
+    },
+    {
+     "file": "modules/caddyhttp/routes.go",
+     "line": 256,
+     "name": "wrapRoute"
+    },
+    {
+     "file": "modules/caddyhttp/routes.go",
+     "line": 371,
+     "name": "MatcherSet.MatchWithError"
+    },
+    {
+     "file": "modules/caddyhttp/routes.go",
+     "line": 412,
+     "name": "MatcherSets.AnyMatch"
+    },
+    {
+     "file": "modules/caddyhttp/routes.go",
+     "line": 430,
+     "name": "MatcherSets.AnyMatchWithError"
+    },
+    {
+     "file": "modules/caddyhttp/server.go",
+     "line": 551,
+     "name": "Server.ServeHTTP"
+    },
+    {
+     "file": "modules/caddyhttp/server.go",
+     "line": 1224,
+     "name": "Server.logRequest"
+    },
+    {
+     "file": "modules/caddyhttp/server.go",
+     "line": 1372,
+     "name": "PrepareRequest"
+    },
+    {
+     "file": "modules/caddyhttp/server_test.go",
+     "line": 72,
+     "name": "TestServer_LogRequest"
+    },
+    {
+     "file": "modules/caddyhttp/server_test.go",
+     "line": 97,
+     "name": "TestServer_LogRequest_WithTrace"
+    },
+    {
+     "file": "modules/caddyhttp/server_test.go",
+     "line": 127,
+     "name": "BenchmarkServer_LogRequest"
+    },
+    {
+     "file": "modules/caddyhttp/server_test.go",
+     "line": 149,
+     "name": "BenchmarkServer_LogRequest_NopLogger"
+    },
+    {
+     "file": "modules/caddyhttp/server_test.go",
+     "line": 170,
+     "name": "BenchmarkServer_LogRequest_WithTrace"
+    },
+    {
+     "file": "modules/caddyhttp/server_test.go",
+     "line": 1390,
+     "name": "TestServer_LogRequest_WithWriteError"
+    },
+    {
+     "file": "modules/caddyhttp/staticresp_test.go",
+     "line": 68,
+     "name": "TestStaticResponseHeadersWithAbsentRequestData"
+    },
+    {
+     "file": "modules/caddyhttp/subroute.go",
+     "line": 72,
+     "name": "Subroute.ServeHTTP"
+    },
+    {
+     "file": "modules/caddyhttp/templates/tplcontext.go",
+     "line": 305,
+     "name": "TemplateContext.ClientIP"
+    },
+    {
+     "file": "modules/caddyhttp/vars_test.go",
+     "line": 27,
+     "name": "newVarsTestRequest"
+    },
+    {
+     "file": "modules/caddyhttp/vars_test.go",
+     "line": 52,
+     "name": "TestVarsMatcherDoesNotExpandResolvedValues"
+    },
+    {
+     "file": "modules/caddyhttp/vars_test.go",
+     "line": 105,
+     "name": "TestMatchVarsREDoesNotExpandResolvedValues"
+    },
+    {
+     "file": "modules/caddyhttp/vars_test.go",
+     "line": 164,
+     "name": "TestVarsMatchersTreatErrorsByType"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t6",
+   "band": "large",
+   "target": "isOpenCurlyBrace",
+   "file": "caddyconfig/caddyfile/lexer.go",
+   "line": 351,
+   "question": "In this repository (caddy), list every function and method, including those in test files, that transitively calls `isOpenCurlyBrace` (declared at caddyconfig/caddyfile/lexer.go:351) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `isOpenCurlyBrace` itself. The list must be complete.",
+   "max_depth": 9,
+   "answer": [
+    {
+     "file": "caddyconfig/caddyfile/adapter.go",
+     "line": 32,
+     "name": "Adapter.Adapt"
+    },
+    {
+     "file": "caddyconfig/caddyfile/adapter.go",
+     "line": 127,
+     "name": "UnmarshalModule"
+    },
+    {
+     "file": "caddyconfig/caddyfile/dispenser.go",
+     "line": 90,
+     "name": "Dispenser.NextArg"
+    },
+    {
+     "file": "caddyconfig/caddyfile/dispenser.go",
+     "line": 168,
+     "name": "Dispenser.NextBlock"
+    },
+    {
+     "file": "caddyconfig/caddyfile/dispenser.go",
+     "line": 273,
+     "name": "Dispenser.Args"
+    },
+    {
+     "file": "caddyconfig/caddyfile/dispenser.go",
+     "line": 287,
+     "name": "Dispenser.AllArgs"
+    },
+    {
+     "file": "caddyconfig/caddyfile/dispenser.go",
+     "line": 300,
+     "name": "Dispenser.CountRemainingArgs"
+    },
+    {
+     "file": "caddyconfig/caddyfile/dispenser.go",
+     "line": 316,
+     "name": "Dispenser.RemainingArgs"
+    },
+    {
+     "file": "caddyconfig/caddyfile/dispenser.go",
+     "line": 329,
+     "name": "Dispenser.RemainingArgsRaw"
+    },
+    {
+     "file": "caddyconfig/caddyfile/dispenser.go",
+     "line": 342,
+     "name": "Dispenser.RemainingArgsAsTokens"
+    },
+    {
+     "file": "caddyconfig/caddyfile/dispenser.go",
+     "line": 355,
+     "name": "Dispenser.NewFromNextSegment"
+    },
+    {
+     "file": "caddyconfig/caddyfile/dispenser.go",
+     "line": 362,
+     "name": "Dispenser.NextSegment"
+    },
+    {
+     "file": "caddyconfig/caddyfile/dispenser.go",
+     "line": 413,
+     "name": "Dispenser.ArgErr"
+    },
+    {
+     "file": "caddyconfig/caddyfile/dispenser_test.go",
+     "line": 63,
+     "name": "TestDispenser_NextArg"
+    },
+    {
+     "file": "caddyconfig/caddyfile/dispenser_test.go",
+     "line": 140,
+     "name": "TestDispenser_NextBlock"
+    },
+    {
+     "file": "caddyconfig/caddyfile/dispenser_test.go",
+     "line": 171,
+     "name": "TestDispenser_QuotedBracesAreArguments"
+    },
+    {
+     "file": "caddyconfig/caddyfile/dispenser_test.go",
+     "line": 201,
+     "name": "TestDispenser_Args"
+    },
+    {
+     "file": "caddyconfig/caddyfile/dispenser_test.go",
+     "line": 269,
+     "name": "TestDispenser_RemainingArgs"
+    },
+    {
+     "file": "caddyconfig/caddyfile/dispenser_test.go",
+     "line": 307,
+     "name": "TestDispenser_RemainingArgsAsTokens"
+    },
+    {
+     "file": "caddyconfig/caddyfile/dispenser_test.go",
+     "line": 367,
+     "name": "TestDispenser_ArgErr_Err"
+    },
+    {
+     "file": "caddyconfig/caddyfile/parse.go",
+     "line": 39,
+     "name": "Parse"
+    },
+    {
+     "file": "caddyconfig/caddyfile/parse.go",
+     "line": 122,
+     "name": "parser.parseAll"
+    },
+    {
+     "file": "caddyconfig/caddyfile/parse.go",
+     "line": 141,
+     "name": "parser.parseOne"
+    },
+    {
+     "file": "caddyconfig/caddyfile/parse.go",
+     "line": 146,
+     "name": "parser.begin"
+    },
+    {
+     "file": "caddyconfig/caddyfile/parse.go",
+     "line": 217,
+     "name": "parser.addresses"
+    },
+    {
+     "file": "caddyconfig/caddyfile/parse.go",
+     "line": 300,
+     "name": "parser.blockContents"
+    },
+    {
+     "file": "caddyconfig/caddyfile/parse.go",
+     "line": 327,
+     "name": "parser.directives"
+    },
+    {
+     "file": "caddyconfig/caddyfile/parse.go",
+     "line": 363,
+     "name": "parser.doImport"
+    },
+    {
+     "file": "caddyconfig/caddyfile/parse.go",
+     "line": 599,
+     "name": "parser.expandImportsInBlock"
+    },
+    {
+     "file": "caddyconfig/caddyfile/parse.go",
+     "line": 678,
+     "name": "parser.directive"
+    },
+    {
+     "file": "caddyconfig/caddyfile/parse.go",
+     "line": 729,
+     "name": "parser.openCurlyBrace"
+    },
+    {
+     "file": "caddyconfig/caddyfile/parse.go",
+     "line": 783,
+     "name": "parser.blockTokens"
+    },
+    {
+     "file": "caddyconfig/caddyfile/parse_test.go",
+     "line": 129,
+     "name": "TestParseOneAndImport"
+    },
+    {
+     "file": "caddyconfig/caddyfile/parse_test.go",
+     "line": 386,
+     "name": "TestRecursiveImport"
+    },
+    {
+     "file": "caddyconfig/caddyfile/parse_test.go",
+     "line": 482,
+     "name": "TestDirectiveImport"
+    },
+    {
+     "file": "caddyconfig/caddyfile/parse_test.go",
+     "line": 545,
+     "name": "TestParseAll"
+    },
+    {
+     "file": "caddyconfig/caddyfile/parse_test.go",
+     "line": 774,
+     "name": "TestSnippets"
+    },
+    {
+     "file": "caddyconfig/caddyfile/parse_test.go",
+     "line": 805,
+     "name": "TestSnippetWithQuotedBraces"
+    },
+    {
+     "file": "caddyconfig/caddyfile/parse_test.go",
+     "line": 848,
+     "name": "TestImportedFilesIgnoreNonDirectiveImportTokens"
+    },
+    {
+     "file": "caddyconfig/caddyfile/parse_test.go",
+     "line": 872,
+     "name": "TestSnippetAcrossMultipleFiles"
+    },
+    {
+     "file": "caddyconfig/caddyfile/parse_test.go",
+     "line": 906,
+     "name": "TestRejectsGlobalMatcher"
+    },
+    {
+     "file": "caddyconfig/caddyfile/parse_test.go",
+     "line": 929,
+     "name": "TestRejectAnonymousImportBlock"
+    },
+    {
+     "file": "caddyconfig/caddyfile/parse_test.go",
+     "line": 954,
+     "name": "TestAcceptSiteImportWithBraces"
+    },
+    {
+     "file": "caddyconfig/caddyfile/parse_test.go",
+     "line": 974,
+     "name": "TestGlobalOptionsAfterImportedSnippetsGivesHelpfulError"
+    },
+    {
+     "file": "caddyconfig/caddyfile/parse_test.go",
+     "line": 1004,
+     "name": "TestImportedSnippetDefinitionRetainsBlockPlaceholder"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/builtins.go",
+     "line": 38,
+     "name": "init"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/builtins.go",
+     "line": 63,
+     "name": "parseBind"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/builtins.go",
+     "line": 118,
+     "name": "parseTLS"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/builtins.go",
+     "line": 639,
+     "name": "parseRoot"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/builtins.go",
+     "line": 683,
+     "name": "parseFilesystem"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/builtins.go",
+     "line": 695,
+     "name": "parseVars"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/builtins.go",
+     "line": 710,
+     "name": "parseRedir"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/builtins.go",
+     "line": 784,
+     "name": "parseRespond"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/builtins.go",
+     "line": 791,
+     "name": "parseAbort"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/builtins.go",
+     "line": 800,
+     "name": "parseError"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/builtins.go",
+     "line": 807,
+     "name": "parseRoute"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/builtins.go",
+     "line": 824,
+     "name": "parseHandle"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/builtins.go",
+     "line": 828,
+     "name": "parseHandleErrors"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/builtins.go",
+     "line": 904,
+     "name": "parseInvoke"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/builtins.go",
+     "line": 933,
+     "name": "parseLog"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/builtins.go",
+     "line": 941,
+     "name": "parseLogHelper"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/builtins.go",
+     "line": 1228,
+     "name": "parseLogSkip"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/builtins.go",
+     "line": 1250,
+     "name": "parseLogName"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/builtins_test.go",
+     "line": 11,
+     "name": "TestLogDirectiveSyntax"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/builtins_test.go",
+     "line": 140,
+     "name": "TestRedirDirectiveSyntax"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/builtins_test.go",
+     "line": 277,
+     "name": "TestImportErrorLine"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/builtins_test.go",
+     "line": 340,
+     "name": "TestNestedImport"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/directives.go",
+     "line": 135,
+     "name": "RegisterHandlerDirective"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/directives.go",
+     "line": 259,
+     "name": "Helper.MatcherToken"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/directives.go",
+     "line": 271,
+     "name": "Helper.ExtractMatcherSet"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/directives.go",
+     "line": 353,
+     "name": "ParseSegmentAsSubroute"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/directives.go",
+     "line": 365,
+     "name": "parseSegmentAsConfig"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/directives_test.go",
+     "line": 108,
+     "name": "init"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/directives_test.go",
+     "line": 146,
+     "name": "adaptCaddyfile"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/directives_test.go",
+     "line": 152,
+     "name": "adaptWithOptions"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/directives_test.go",
+     "line": 165,
+     "name": "adaptConcurrently"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/directives_test.go",
+     "line": 195,
+     "name": "TestAdaptDirectiveOrderIsolation"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/directives_test.go",
+     "line": 211,
+     "name": "TestAdaptDirectiveOrderAfterError"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/directives_test.go",
+     "line": 234,
+     "name": "TestAdaptDirectiveOrderWithReusedOptions"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/directives_test.go",
+     "line": 266,
+     "name": "TestConcurrentAdaptDirectiveOrder"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/directives_test.go",
+     "line": 282,
+     "name": "TestConcurrentAdaptDirectiveOrderWithReusedOptions"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/directives_test.go",
+     "line": 303,
+     "name": "TestRegisterDirectiveOrderWithOrderOption"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/httptype.go",
+     "line": 59,
+     "name": "ServerType.Setup"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/httptype.go",
+     "line": 475,
+     "name": "ServerType.extractNamedRoutes"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/httptype.go",
+     "line": 1686,
+     "name": "parseMatcherDefinitions"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/httptype_test.go",
+     "line": 12,
+     "name": "TestMatcherSyntax"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/httptype_test.go",
+     "line": 146,
+     "name": "TestGlobalOptions"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/httptype_test.go",
+     "line": 252,
+     "name": "TestDefaultSNIWithoutHTTPS"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/options.go",
+     "line": 75,
+     "name": "parseOptHTTPPort"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/options.go",
+     "line": 90,
+     "name": "parseOptHTTPSPort"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/options.go",
+     "line": 105,
+     "name": "parseOptOrder"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/options.go",
+     "line": 184,
+     "name": "parseOptStorage"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/options.go",
+     "line": 203,
+     "name": "parseStorageCheck"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/options.go",
+     "line": 218,
+     "name": "parseStorageCleanInterval"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/options.go",
+     "line": 237,
+     "name": "parseOptDuration"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/options.go",
+     "line": 251,
+     "name": "parseOptACMEEAB"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/options.go",
+     "line": 278,
+     "name": "parseOptCertIssuer"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/options.go",
+     "line": 303,
+     "name": "parseOptSingleString"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/options.go",
+     "line": 315,
+     "name": "parseOptTLSResolvers"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/options.go",
+     "line": 328,
+     "name": "parseOptAutomateNames"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/options.go",
+     "line": 340,
+     "name": "parseOptDefaultBind"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/options.go",
+     "line": 368,
+     "name": "parseOptAdmin"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/options.go",
+     "line": 404,
+     "name": "parseOptOnDemand"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/options.go",
+     "line": 465,
+     "name": "parseOptPersistConfig"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/options.go",
+     "line": 480,
+     "name": "parseOptAutoHTTPS"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/options.go",
+     "line": 499,
+     "name": "unmarshalCaddyfileMetricsOptions"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/options.go",
+     "line": 517,
+     "name": "parseMetricsOptions"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/options.go",
+     "line": 521,
+     "name": "parseServerOptions"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/options.go",
+     "line": 525,
+     "name": "parseOCSPStaplingOptions"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/options.go",
+     "line": 551,
+     "name": "parseLogOptions"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/options.go",
+     "line": 586,
+     "name": "parseOptPreferredChains"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/options.go",
+     "line": 591,
+     "name": "parseOptDNS"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/options.go",
+     "line": 619,
+     "name": "parseOptECH"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/options.go",
+     "line": 662,
+     "name": "parseOptRenewalWindowRatio"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/options_test.go",
+     "line": 14,
+     "name": "TestGlobalLogOptionSyntax"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/options_test.go",
+     "line": 70,
+     "name": "TestGlobalResolversOption"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/options_test.go",
+     "line": 172,
+     "name": "TestGlobalCertIssuerAppliesToImplicitACMEIssuer"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/pkiapp.go",
+     "line": 56,
+     "name": "parsePKIApp"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/pkiapp_test.go",
+     "line": 25,
+     "name": "TestParsePKIApp_maintenanceIntervalAndRenewalWindowRatio"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/pkiapp_test.go",
+     "line": 74,
+     "name": "adaptedPKIConfig"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/pkiapp_test.go",
+     "line": 100,
+     "name": "TestParsePKIApp_skipInstallTrustHonoredForInternalTLSDefaultCA"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/pkiapp_test.go",
+     "line": 120,
+     "name": "TestParsePKIApp_skipInstallTrustHonoredForInternalTLSCustomCA"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/pkiapp_test.go",
+     "line": 144,
+     "name": "TestParsePKIApp_noPKIAppWhenNoInternalIssuerConfigured"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/pkiapp_test.go",
+     "line": 160,
+     "name": "TestParsePKIApp_renewalWindowRatioInvalid"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/serveroptions.go",
+     "line": 72,
+     "name": "unmarshalCaddyfileServerOptions"
+    },
+    {
+     "file": "caddyconfig/httpcaddyfile/tlsapp_test.go",
+     "line": 59,
+     "name": "TestAutomationPoliciesAllowSameHostOnDifferentPorts"
+    },
+    {
+     "file": "caddytest/integration/mockdns_test.go",
+     "line": 36,
+     "name": "MockDNSProvider.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyevents/eventsconfig/caddyfile.go",
+     "line": 42,
+     "name": "parseApp"
+    },
+    {
+     "file": "modules/caddyfs/filesystem.go",
+     "line": 34,
+     "name": "parseFilesystems"
+    },
+    {
+     "file": "modules/caddyfs/filesystem.go",
+     "line": 89,
+     "name": "moduleEntry.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/caddyauth/caddyfile.go",
+     "line": 24,
+     "name": "init"
+    },
+    {
+     "file": "modules/caddyhttp/caddyauth/caddyfile.go",
+     "line": 37,
+     "name": "parseCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/celmatcher.go",
+     "line": 227,
+     "name": "MatchExpression.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/encode/caddyfile.go",
+     "line": 27,
+     "name": "init"
+    },
+    {
+     "file": "modules/caddyhttp/encode/caddyfile.go",
+     "line": 31,
+     "name": "parseCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/encode/caddyfile.go",
+     "line": 59,
+     "name": "Encode.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/encode/gzip/gzip.go",
+     "line": 46,
+     "name": "Gzip.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/encode/zstd/zstd.go",
+     "line": 53,
+     "name": "Zstd.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/fileserver/caddyfile.go",
+     "line": 31,
+     "name": "init"
+    },
+    {
+     "file": "modules/caddyhttp/fileserver/caddyfile.go",
+     "line": 38,
+     "name": "parseCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/fileserver/caddyfile.go",
+     "line": 67,
+     "name": "FileServer.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/fileserver/caddyfile.go",
+     "line": 262,
+     "name": "parseTryFiles"
+    },
+    {
+     "file": "modules/caddyhttp/fileserver/matcher.go",
+     "line": 132,
+     "name": "MatchFile.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/headers/caddyfile.go",
+     "line": 49,
+     "name": "parseCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/headers/caddyfile.go",
+     "line": 163,
+     "name": "parseReqHdrCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/intercept/intercept.go",
+     "line": 35,
+     "name": "init"
+    },
+    {
+     "file": "modules/caddyhttp/intercept/intercept.go",
+     "line": 232,
+     "name": "Intercept.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/intercept/intercept.go",
+     "line": 300,
+     "name": "Intercept.FinalizeUnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/intercept/intercept.go",
+     "line": 366,
+     "name": "parseCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/ip_matchers.go",
+     "line": 75,
+     "name": "MatchRemoteIP.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/ip_matchers.go",
+     "line": 191,
+     "name": "MatchClientIP.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/ip_range.go",
+     "line": 90,
+     "name": "StaticIPRange.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/logging/caddyfile.go",
+     "line": 25,
+     "name": "init"
+    },
+    {
+     "file": "modules/caddyhttp/logging/caddyfile.go",
+     "line": 32,
+     "name": "parseCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/logging/caddyfile.go",
+     "line": 39,
+     "name": "LogAppend.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/map/caddyfile.go",
+     "line": 24,
+     "name": "init"
+    },
+    {
+     "file": "modules/caddyhttp/map/caddyfile.go",
+     "line": 44,
+     "name": "parseCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/matchers.go",
+     "line": 244,
+     "name": "MatchHost.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/matchers.go",
+     "line": 786,
+     "name": "MatchPath.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/matchers.go",
+     "line": 898,
+     "name": "MatchMethod.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/matchers.go",
+     "line": 951,
+     "name": "MatchQuery.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/matchers.go",
+     "line": 1057,
+     "name": "MatchHeader.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/matchers.go",
+     "line": 1202,
+     "name": "MatchHeaderRE.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/matchers.go",
+     "line": 1397,
+     "name": "MatchProtocol.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/matchers.go",
+     "line": 1463,
+     "name": "MatchTLS.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/matchers.go",
+     "line": 1494,
+     "name": "MatchNot.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/matchers.go",
+     "line": 1643,
+     "name": "MatchRegexp.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/matchers.go",
+     "line": 1678,
+     "name": "ParseCaddyfileNestedMatcherSet"
+    },
+    {
+     "file": "modules/caddyhttp/proxyprotocol/module.go",
+     "line": 41,
+     "name": "ListenerWrapper.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/push/caddyfile.go",
+     "line": 23,
+     "name": "init"
+    },
+    {
+     "file": "modules/caddyhttp/push/caddyfile.go",
+     "line": 46,
+     "name": "parseCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/requestbody/caddyfile.go",
+     "line": 24,
+     "name": "init"
+    },
+    {
+     "file": "modules/caddyhttp/requestbody/caddyfile.go",
+     "line": 28,
+     "name": "parseCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/responsematchers.go",
+     "line": 69,
+     "name": "ParseNamedResponseMatcher"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/caddyfile.go",
+     "line": 39,
+     "name": "init"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/caddyfile.go",
+     "line": 45,
+     "name": "parseCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/caddyfile.go",
+     "line": 146,
+     "name": "Handler.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/caddyfile.go",
+     "line": 932,
+     "name": "Handler.FinalizeUnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/caddyfile.go",
+     "line": 1030,
+     "name": "HTTPTransport.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/caddyfile.go",
+     "line": 1379,
+     "name": "parseCopyResponseCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/caddyfile.go",
+     "line": 1393,
+     "name": "CopyResponseHandler.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/caddyfile.go",
+     "line": 1418,
+     "name": "parseCopyResponseHeadersCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/caddyfile.go",
+     "line": 1433,
+     "name": "CopyResponseHeadersHandler.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/caddyfile.go",
+     "line": 1468,
+     "name": "SRVUpstreams.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/caddyfile.go",
+     "line": 1574,
+     "name": "AUpstreams.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/caddyfile.go",
+     "line": 1681,
+     "name": "MultiUpstreams.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/fastcgi/caddyfile.go",
+     "line": 50,
+     "name": "Transport.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/fastcgi/caddyfile.go",
+     "line": 172,
+     "name": "parsePHPFastCGI"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/forwardauth/caddyfile.go",
+     "line": 64,
+     "name": "parseCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/httptransport_test.go",
+     "line": 21,
+     "name": "TestHTTPTransportUnmarshalCaddyFileWithCaPools"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/retries_test.go",
+     "line": 681,
+     "name": "TestRetryMatchAllowsExpressionMixedWithOtherMatchers"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies.go",
+     "line": 72,
+     "name": "RandomSelection.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies.go",
+     "line": 101,
+     "name": "WeightedRoundRobinSelection.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies.go",
+     "line": 202,
+     "name": "RandomChoiceSelection.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies.go",
+     "line": 311,
+     "name": "LeastConnSelection.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies.go",
+     "line": 350,
+     "name": "RoundRobinSelection.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies.go",
+     "line": 381,
+     "name": "FirstSelection.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies.go",
+     "line": 411,
+     "name": "IPHashSelection.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies.go",
+     "line": 443,
+     "name": "ClientIPHashSelection.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies.go",
+     "line": 469,
+     "name": "URIHashSelection.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies.go",
+     "line": 529,
+     "name": "QueryHashSelection.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies.go",
+     "line": 609,
+     "name": "HeaderHashSelection.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies.go",
+     "line": 742,
+     "name": "CookieHashSelection.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/reverseproxy/selectionpolicies.go",
+     "line": 888,
+     "name": "loadFallbackPolicy"
+    },
+    {
+     "file": "modules/caddyhttp/rewrite/caddyfile.go",
+     "line": 28,
+     "name": "init"
+    },
+    {
+     "file": "modules/caddyhttp/rewrite/caddyfile.go",
+     "line": 41,
+     "name": "parseCaddyfileRewrite"
+    },
+    {
+     "file": "modules/caddyhttp/rewrite/caddyfile.go",
+     "line": 75,
+     "name": "parseCaddyfileMethod"
+    },
+    {
+     "file": "modules/caddyhttp/rewrite/caddyfile.go",
+     "line": 97,
+     "name": "parseCaddyfileURI"
+    },
+    {
+     "file": "modules/caddyhttp/rewrite/caddyfile.go",
+     "line": 191,
+     "name": "applyQueryOps"
+    },
+    {
+     "file": "modules/caddyhttp/rewrite/caddyfile.go",
+     "line": 234,
+     "name": "parseCaddyfileHandlePath"
+    },
+    {
+     "file": "modules/caddyhttp/staticerror.go",
+     "line": 62,
+     "name": "StaticError.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/staticresp.go",
+     "line": 141,
+     "name": "StaticResponse.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/templates/caddyfile.go",
+     "line": 25,
+     "name": "init"
+    },
+    {
+     "file": "modules/caddyhttp/templates/caddyfile.go",
+     "line": 36,
+     "name": "parseCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/timeouts/caddyfile.go",
+     "line": 27,
+     "name": "init"
+    },
+    {
+     "file": "modules/caddyhttp/timeouts/caddyfile.go",
+     "line": 31,
+     "name": "parseCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/tracing/module.go",
+     "line": 15,
+     "name": "init"
+    },
+    {
+     "file": "modules/caddyhttp/tracing/module.go",
+     "line": 80,
+     "name": "Tracing.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/tracing/module.go",
+     "line": 133,
+     "name": "parseCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/tracing/module_test.go",
+     "line": 20,
+     "name": "TestTracing_UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/tracing/module_test.go",
+     "line": 105,
+     "name": "TestTracing_UnmarshalCaddyfile_Error"
+    },
+    {
+     "file": "modules/caddyhttp/urlpatternmatcher.go",
+     "line": 207,
+     "name": "MatchURLPattern.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/urlpatternmatcher_test.go",
+     "line": 200,
+     "name": "TestURLPatternMatcherUnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/vars.go",
+     "line": 83,
+     "name": "VarsMiddleware.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/vars.go",
+     "line": 147,
+     "name": "VarsMatcher.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddyhttp/vars.go",
+     "line": 274,
+     "name": "MatchVarsRE.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddypki/acmeserver/caddyfile.go",
+     "line": 45,
+     "name": "parseACMEServer"
+    },
+    {
+     "file": "modules/caddytls/acmeissuer.go",
+     "line": 448,
+     "name": "ACMEIssuer.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/acmeissuer.go",
+     "line": 699,
+     "name": "ParseCaddyfilePreferredChainsOptions"
+    },
+    {
+     "file": "modules/caddytls/capools.go",
+     "line": 95,
+     "name": "InlineCAPool.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/capools.go",
+     "line": 185,
+     "name": "FileCAPool.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/capools.go",
+     "line": 269,
+     "name": "PKIRootCAPool.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/capools.go",
+     "line": 354,
+     "name": "PKIIntermediateCAPool.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/capools.go",
+     "line": 465,
+     "name": "StoragePool.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/capools.go",
+     "line": 539,
+     "name": "TLSConfig.unmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/capools.go",
+     "line": 735,
+     "name": "HTTPCertPool.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/capools.go",
+     "line": 808,
+     "name": "SystemCAPool.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/capools.go",
+     "line": 905,
+     "name": "CombinedCAPool.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/capools_test.go",
+     "line": 21,
+     "name": "TestInlineCAPoolUnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/capools_test.go",
+     "line": 106,
+     "name": "TestFileCAPoolUnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/capools_test.go",
+     "line": 207,
+     "name": "TestPKIRootCAPoolUnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/capools_test.go",
+     "line": 301,
+     "name": "TestPKIIntermediateCAPoolUnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/capools_test.go",
+     "line": 390,
+     "name": "TestStoragePoolUnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/capools_test.go",
+     "line": 481,
+     "name": "TestTLSConfig_unmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/capools_test.go",
+     "line": 658,
+     "name": "TestHTTPCertPoolUnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/capools_test.go",
+     "line": 781,
+     "name": "TestSystemCAPoolUnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/capools_test.go",
+     "line": 824,
+     "name": "TestCombinedCAPoolUnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/certmanagers.go",
+     "line": 78,
+     "name": "Tailscale.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/certmanagers.go",
+     "line": 187,
+     "name": "HTTPCertGetter.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/certselection.go",
+     "line": 125,
+     "name": "CustomCertSelectionPolicy.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/connpolicy.go",
+     "line": 481,
+     "name": "ConnectionPolicy.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/connpolicy.go",
+     "line": 654,
+     "name": "ClientAuthentication.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/connpolicy.go",
+     "line": 990,
+     "name": "LeafCertClientAuth.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/connpolicy.go",
+     "line": 1097,
+     "name": "ParseCaddyfileNestedMatcherSet"
+    },
+    {
+     "file": "modules/caddytls/connpolicy_test.go",
+     "line": 63,
+     "name": "TestClientAuthenticationUnmarshalCaddyfileWithDirectiveName"
+    },
+    {
+     "file": "modules/caddytls/internalissuer.go",
+     "line": 158,
+     "name": "InternalIssuer.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/leaffileloader.go",
+     "line": 57,
+     "name": "LeafFileLoader.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/leaffolderloader.go",
+     "line": 60,
+     "name": "LeafFolderLoader.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/leafpemloader.go",
+     "line": 57,
+     "name": "LeafPEMLoader.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/matchers.go",
+     "line": 132,
+     "name": "MatchServerName.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/matchers.go",
+     "line": 232,
+     "name": "MatchRegexp.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/matchers.go",
+     "line": 401,
+     "name": "MatchRemoteIP.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/matchers.go",
+     "line": 514,
+     "name": "MatchLocalIP.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/ondemand.go",
+     "line": 103,
+     "name": "PermissionByHTTP.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/caddytls/zerosslissuer.go",
+     "line": 138,
+     "name": "ZeroSSLIssuer.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/filestorage/filestorage.go",
+     "line": 48,
+     "name": "FileStorage.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/logging/appendencoder.go",
+     "line": 130,
+     "name": "AppendEncoder.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/logging/encoders.go",
+     "line": 67,
+     "name": "ConsoleEncoder.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/logging/encoders.go",
+     "line": 107,
+     "name": "JSONEncoder.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/logging/encoders.go",
+     "line": 158,
+     "name": "LogEncoderConfig.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/logging/filewriter.go",
+     "line": 387,
+     "name": "FileWriter.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/logging/filewriter_test.go",
+     "line": 219,
+     "name": "TestFileModeConfig"
+    },
+    {
+     "file": "modules/logging/filewriter_test.go",
+     "line": 592,
+     "name": "TestCaddyfile_DirMode_Inherit"
+    },
+    {
+     "file": "modules/logging/filewriter_test.go",
+     "line": 610,
+     "name": "TestCaddyfile_DirMode_FromFile"
+    },
+    {
+     "file": "modules/logging/filewriter_test.go",
+     "line": 628,
+     "name": "TestCaddyfile_DirMode_Octal"
+    },
+    {
+     "file": "modules/logging/filewriter_test.go",
+     "line": 642,
+     "name": "TestCaddyfile_DirMode_Invalid"
+    },
+    {
+     "file": "modules/logging/filewriter_test.go",
+     "line": 653,
+     "name": "TestCaddyfile_RollInterval"
+    },
+    {
+     "file": "modules/logging/filterencoder.go",
+     "line": 152,
+     "name": "FilterEncoder.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/logging/filters.go",
+     "line": 133,
+     "name": "ReplaceFilter.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/logging/filters.go",
+     "line": 173,
+     "name": "IPMaskFilter.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/logging/filters.go",
+     "line": 352,
+     "name": "QueryFilter.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/logging/filters.go",
+     "line": 483,
+     "name": "CookieFilter.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/logging/filters.go",
+     "line": 606,
+     "name": "SetCookieFilter.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/logging/filters.go",
+     "line": 764,
+     "name": "RegexpFilter.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/logging/filters.go",
+     "line": 856,
+     "name": "MultiRegexpFilter.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/logging/filters.go",
+     "line": 1033,
+     "name": "RenameFilter.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/logging/journaldencoder.go",
+     "line": 127,
+     "name": "JournaldEncoder.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/logging/journaldencoder_test.go",
+     "line": 70,
+     "name": "TestJournaldEncoderUnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/logging/netwriter.go",
+     "line": 119,
+     "name": "NetWriter.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/metrics/metrics.go",
+     "line": 31,
+     "name": "init"
+    },
+    {
+     "file": "modules/metrics/metrics.go",
+     "line": 74,
+     "name": "parseCaddyfile"
+    },
+    {
+     "file": "modules/metrics/metrics.go",
+     "line": 85,
+     "name": "Metrics.UnmarshalCaddyfile"
+    },
+    {
+     "file": "modules/metrics/metrics_test.go",
+     "line": 9,
+     "name": "TestMetricsUnmarshalCaddyfile"
+    }
+   ],
+   "kind": "callers"
+  }
+ ],
+ "runs": [
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 49.383215416,
+   "cost_usd": 0.6055336,
+   "turns": 10,
+   "tokens": 209219,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 31.250185334,
+   "cost_usd": 0.5363247999999999,
+   "turns": 7,
+   "tokens": 163749,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 41.308838709,
+   "cost_usd": 0.439733,
+   "turns": 11,
+   "tokens": 281019,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 31.24547075,
+   "cost_usd": 0.32598679999999997,
+   "turns": 5,
+   "tokens": 149213,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 182.392183375,
+   "cost_usd": 1.480213,
+   "turns": 26,
+   "tokens": 799133,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 41,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 68.518815791,
+   "cost_usd": 0.5797272,
+   "turns": 9,
+   "tokens": 308020,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 41,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 135.029749917,
+   "cost_usd": 1.212805,
+   "turns": 25,
+   "tokens": 495463,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 44,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 85.671930166,
+   "cost_usd": 0.8053414,
+   "turns": 13,
+   "tokens": 495066,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 44,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 460.501077959,
+   "cost_usd": 4.1261204,
+   "turns": 56,
+   "tokens": 1655657,
+   "score": {
+    "pass": false,
+    "recall": 0.0,
+    "precision": 0.0,
+    "n_answer": 0,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": "no parsable JSON answer"
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 244.331649833,
+   "cost_usd": 2.2986412,
+   "turns": 31,
+   "tokens": 1328024,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 129,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 182.490090167,
+   "cost_usd": 1.2870196,
+   "turns": 20,
+   "tokens": 661528,
+   "score": {
+    "pass": false,
+    "recall": 0.15017064846416384,
+    "precision": 1.0,
+    "n_answer": 44,
+    "flagged_incomplete": true,
+    "missed": [
+     "caddyconfig/caddyfile/parse_test.go:974 TestGlobalOptionsAfterImportedSnippetsGivesHelpfulError",
+     "caddyconfig/httpcaddyfile/builtins.go:38 init",
+     "caddyconfig/httpcaddyfile/builtins.go:63 parseBind",
+     "caddyconfig/httpcaddyfile/builtins.go:118 parseTLS",
+     "caddyconfig/httpcaddyfile/builtins.go:639 parseRoot",
+     "caddyconfig/httpcaddyfile/builtins.go:683 parseFilesystem",
+     "caddyconfig/httpcaddyfile/builtins.go:695 parseVars",
+     "caddyconfig/httpcaddyfile/builtins.go:710 parseRedir",
+     "caddyconfig/httpcaddyfile/builtins.go:784 parseRespond",
+     "caddyconfig/httpcaddyfile/builtins.go:791 parseAbort",
+     "caddyconfig/httpcaddyfile/builtins.go:800 parseError",
+     "caddyconfig/httpcaddyfile/builtins.go:807 parseRoute",
+     "caddyconfig/httpcaddyfile/builtins.go:824 parseHandle",
+     "caddyconfig/httpcaddyfile/builtins.go:828 parseHandleErrors",
+     "caddyconfig/httpcaddyfile/builtins.go:904 parseInvoke",
+     "caddyconfig/httpcaddyfile/builtins.go:933 parseLog",
+     "caddyconfig/httpcaddyfile/builtins.go:941 parseLogHelper",
+     "caddyconfig/httpcaddyfile/builtins.go:1228 parseLogSkip",
+     "caddyconfig/httpcaddyfile/builtins.go:1250 parseLogName",
+     "caddyconfig/httpcaddyfile/builtins_test.go:11 TestLogDirectiveSyntax",
+     "caddyconfig/httpcaddyfile/builtins_test.go:140 TestRedirDirectiveSyntax",
+     "caddyconfig/httpcaddyfile/builtins_test.go:277 TestImportErrorLine",
+     "caddyconfig/httpcaddyfile/builtins_test.go:340 TestNestedImport",
+     "caddyconfig/httpcaddyfile/directives.go:135 RegisterHandlerDirective",
+     "caddyconfig/httpcaddyfile/directives.go:259 Helper.MatcherToken"
+    ],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 160.975432541,
+   "cost_usd": 1.5491906000000002,
+   "turns": 17,
+   "tokens": 1038354,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 293,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 93.76232675,
+   "cost_usd": 0.8144962,
+   "turns": 19,
+   "tokens": 523879,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 33.472996333,
+   "cost_usd": 0.30998699999999996,
+   "turns": 9,
+   "tokens": 221793,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 46.596201208,
+   "cost_usd": 0.3500778,
+   "turns": 9,
+   "tokens": 169380,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 38.447820708,
+   "cost_usd": 0.3638162,
+   "turns": 8,
+   "tokens": 158774,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 405.939271,
+   "cost_usd": 3.1924697999999996,
+   "turns": 46,
+   "tokens": 2576485,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 41,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 58.849581375,
+   "cost_usd": 0.4645652,
+   "turns": 9,
+   "tokens": 205860,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 41,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 145.464479958,
+   "cost_usd": 1.2380868,
+   "turns": 20,
+   "tokens": 661619,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 44,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 118.19804275,
+   "cost_usd": 0.9043568,
+   "turns": 10,
+   "tokens": 457951,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 44,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 406.721502958,
+   "cost_usd": 3.0154212000000005,
+   "turns": 43,
+   "tokens": 1753669,
+   "score": {
+    "pass": false,
+    "recall": 0.4186046511627907,
+    "precision": 1.0,
+    "n_answer": 54,
+    "flagged_incomplete": true,
+    "missed": [
+     "modules/caddyhttp/app.go:188 App.Provision",
+     "modules/caddyhttp/fileserver/matcher_test.go:41 TestFileMatcher",
+     "modules/caddyhttp/fileserver/matcher_test.go:128 TestFileMatcherNonWindows",
+     "modules/caddyhttp/fileserver/matcher_test.go:151 fileMatcherTest",
+     "modules/caddyhttp/fileserver/matcher_test.go:192 TestTryFilesRewriteEscapesMatchedPath",
+     "modules/caddyhttp/fileserver/matcher_test.go:291 TestPHPFileMatcher",
+     "modules/caddyhttp/fileserver/matcher_test.go:506 TestMatchExpressionMatch",
+     "modules/caddyhttp/intercept/intercept.go:115 Intercept.ServeHTTP",
+     "modules/caddyhttp/invoke.go:45 Invoke.ServeHTTP",
+     "modules/caddyhttp/ip_matchers.go:253 MatchClientIP.Match",
+     "modules/caddyhttp/map/map_test.go:92 TestHandler",
+     "modules/caddyhttp/matchers.go:1545 MatchNot.Match",
+     "modules/caddyhttp/matchers.go:1553 MatchNot.MatchWithError",
+     "modules/caddyhttp/matchers_test.go:1220 TestNotMatcher",
+     "modules/caddyhttp/requestbody/requestbody_test.go:102 TestRequestBodySetHeaderPlaceholders",
+     "modules/caddyhttp/reverseproxy/client_disconnect_test.go:17 TestClientDisconnectRecordsStatus",
+     "modules/caddyhttp/reverseproxy/copyresponse.go:58 CopyResponseHandler.ServeHTTP",
+     "modules/caddyhttp/reverseproxy/fastcgi/incremental_test.go:59 TestIncrementalUnbufferedRequestWithKnownLength",
+     "modules/caddyhttp/reverseproxy/fastcgi/incremental_test.go:89 TestIncrementalUnbufferedRequestWithUnknownLength",
+     "modules/caddyhttp/reverseproxy/hopheaders_test.go:17 TestFinalizeResponse_101_StripsHopByHopHeaders",
+     "modules/caddyhttp/reverseproxy/hopheaders_test.go:67 TestFinalizeResponse_101_StripsConnectionNamedHeaders",
+     "modules/caddyhttp/reverseproxy/hopheaders_test.go:113 TestFinalizeResponse_200_StillStripsHopByHop",
+     "modules/caddyhttp/reverseproxy/hopheaders_test.go:149 TestFinalizeResponse_101_NoUpgradeRequest",
+     "modules/caddyhttp/reverseproxy/incremental_test.go:57 incrementalRequest",
+     "modules/caddyhttp/reverseproxy/incremental_test.go:106 TestIncrementalProxiedWhenRequestLengthUnknown"
+    ],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 58.347036292,
+   "cost_usd": 0.5862362,
+   "turns": 6,
+   "tokens": 212184,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 129,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 481.321487042,
+   "cost_usd": 3.4886742000000006,
+   "turns": 35,
+   "tokens": 3260605,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 293,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 274.764117083,
+   "cost_usd": 2.1897292000000004,
+   "turns": 24,
+   "tokens": 945621,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 293,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 60.33996025,
+   "cost_usd": 0.5116462,
+   "turns": 11,
+   "tokens": 228812,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 28.892446333,
+   "cost_usd": 0.24444580000000005,
+   "turns": 8,
+   "tokens": 255882,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 32.928133833,
+   "cost_usd": 0.3704922,
+   "turns": 7,
+   "tokens": 239770,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 26.3545455,
+   "cost_usd": 0.3115994,
+   "turns": 7,
+   "tokens": 164045,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 274.295773125,
+   "cost_usd": 2.1454694000000005,
+   "turns": 36,
+   "tokens": 1380976,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 41,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 49.760449125,
+   "cost_usd": 0.4269786,
+   "turns": 8,
+   "tokens": 286858,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 41,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 211.371352625,
+   "cost_usd": 1.6405382000000004,
+   "turns": 26,
+   "tokens": 974001,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 44,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 108.489912833,
+   "cost_usd": 0.9853004,
+   "turns": 21,
+   "tokens": 447981,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 44,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 296.687779792,
+   "cost_usd": 2.0660773999999997,
+   "turns": 16,
+   "tokens": 916315,
+   "score": {
+    "pass": false,
+    "recall": 0.1937984496124031,
+    "precision": 1.0,
+    "n_answer": 25,
+    "flagged_incomplete": true,
+    "missed": [
+     "modules/caddyhttp/app.go:188 App.Provision",
+     "modules/caddyhttp/celmatcher_test.go:482 TestMatchExpressionMatch",
+     "modules/caddyhttp/celmatcher_test.go:535 BenchmarkMatchExpressionMatch",
+     "modules/caddyhttp/fileserver/matcher_test.go:41 TestFileMatcher",
+     "modules/caddyhttp/fileserver/matcher_test.go:128 TestFileMatcherNonWindows",
+     "modules/caddyhttp/fileserver/matcher_test.go:151 fileMatcherTest",
+     "modules/caddyhttp/fileserver/matcher_test.go:192 TestTryFilesRewriteEscapesMatchedPath",
+     "modules/caddyhttp/fileserver/matcher_test.go:291 TestPHPFileMatcher",
+     "modules/caddyhttp/fileserver/matcher_test.go:506 TestMatchExpressionMatch",
+     "modules/caddyhttp/intercept/intercept.go:115 Intercept.ServeHTTP",
+     "modules/caddyhttp/invoke.go:45 Invoke.ServeHTTP",
+     "modules/caddyhttp/map/map_test.go:92 TestHandler",
+     "modules/caddyhttp/matchers.go:1545 MatchNot.Match",
+     "modules/caddyhttp/matchers.go:1553 MatchNot.MatchWithError",
+     "modules/caddyhttp/matchers_test.go:637 TestPathREMatcher",
+     "modules/caddyhttp/matchers_test.go:1015 TestHeaderREMatcher",
+     "modules/caddyhttp/matchers_test.go:1098 BenchmarkHeaderREMatcher",
+     "modules/caddyhttp/matchers_test.go:1123 TestVarREMatcher",
+     "modules/caddyhttp/matchers_test.go:1220 TestNotMatcher",
+     "modules/caddyhttp/replacer_test.go:31 TestMissingCookiePlaceholder",
+     "modules/caddyhttp/replacer_test.go:45 TestTLSPlaceholdersWithoutTLS",
+     "modules/caddyhttp/replacer_test.go:69 TestUnknownTLSPlaceholdersRemainLiteral",
+     "modules/caddyhttp/replacer_test.go:87 TestHTTPVarReplacement",
+     "modules/caddyhttp/replacer_test.go:327 TestHTTPProtoNameNormalization",
+     "modules/caddyhttp/replacer_test.go:359 BenchmarkAddHTTPVarsToReplacer"
+    ],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 97.866287583,
+   "cost_usd": 0.8236192,
+   "turns": 9,
+   "tokens": 344484,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 129,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 330.224356083,
+   "cost_usd": 2.8310196,
+   "turns": 36,
+   "tokens": 2472339,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 293,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 138.964405125,
+   "cost_usd": 1.4085488,
+   "turns": 20,
+   "tokens": 621770,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 293,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 22.672991,
+   "cost_usd": 0.0958818,
+   "turns": 6,
+   "tokens": 75860,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 16.630933958,
+   "cost_usd": 0.1187658,
+   "turns": 3,
+   "tokens": 64994,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 20.648137834,
+   "cost_usd": 0.08665160000000001,
+   "turns": 8,
+   "tokens": 90013,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 17.636490167,
+   "cost_usd": 0.075543,
+   "turns": 4,
+   "tokens": 66788,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 30.750950416,
+   "cost_usd": 0.1038748,
+   "turns": 13,
+   "tokens": 139521,
+   "score": {
+    "pass": false,
+    "recall": 0.17073170731707318,
+    "precision": 1.0,
+    "n_answer": 7,
+    "flagged_incomplete": false,
+    "missed": [
+     "admin.go:222 AdminConfig.newAdminHandler",
+     "admin.go:375 replaceLocalAdminServer",
+     "admin.go:511 replaceRemoteAdminServer",
+     "admin.go:902 adminHandler.handleError",
+     "admin.go:1027 handleConfig",
+     "admin_test.go:163 TestLoadConcurrent",
+     "admin_test.go:188 TestETags",
+     "admin_test.go:222 BenchmarkLoad",
+     "admin_test.go:516 TestAdminRouterProvisioning",
+     "admin_test.go:808 TestReplaceRemoteAdminServer",
+     "caddy.go:104 Run",
+     "caddy.go:115 Load",
+     "caddy.go:158 changeConfig",
+     "caddy.go:337 unsyncedDecodeAndRun",
+     "caddy.go:419 run",
+     "caddy.go:484 provisionContext",
+     "caddy.go:589 ProvisionContext",
+     "caddy.go:594 finishSettingUp",
+     "caddy.go:744 Validate",
+     "caddyconfig/load.go:73 adminLoad.handleLoad",
+     "caddytest/integration/panic_test.go:133 TestHandlerPanicLogsAtError",
+     "cmd/commandfuncs.go:188 cmdRun",
+     "cmd/commandfuncs.go:552 cmdAdaptConfig",
+     "cmd/commandfuncs.go:643 cmdValidateConfig",
+     "cmd/main.go:250 watchConfigFile"
+    ],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 17.638315125,
+   "cost_usd": 0.0935504,
+   "turns": 3,
+   "tokens": 71610,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 41,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 55.909695875,
+   "cost_usd": 0.249734,
+   "turns": 17,
+   "tokens": 205928,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 44,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 34.263560083,
+   "cost_usd": 0.1405416,
+   "turns": 8,
+   "tokens": 156754,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 44,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 303.824268917,
+   "cost_usd": 1.2391028,
+   "turns": 48,
+   "tokens": 1962770,
+   "score": {
+    "pass": true,
+    "recall": 0.992248062015504,
+    "precision": 1.0,
+    "n_answer": 128,
+    "flagged_incomplete": false,
+    "missed": [
+     "modules/caddyhttp/reverseproxy/reverseproxy.go:280 Handler.Provision"
+    ],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 46.858660125,
+   "cost_usd": 0.2043096,
+   "turns": 5,
+   "tokens": 125627,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 129,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 136.581037417,
+   "cost_usd": 0.35675599999999996,
+   "turns": 17,
+   "tokens": 323785,
+   "score": {
+    "pass": false,
+    "recall": 0.027303754266211604,
+    "precision": 1.0,
+    "n_answer": 8,
+    "flagged_incomplete": false,
+    "missed": [
+     "caddyconfig/caddyfile/adapter.go:32 Adapter.Adapt",
+     "caddyconfig/caddyfile/adapter.go:127 UnmarshalModule",
+     "caddyconfig/caddyfile/dispenser.go:273 Dispenser.Args",
+     "caddyconfig/caddyfile/dispenser.go:287 Dispenser.AllArgs",
+     "caddyconfig/caddyfile/dispenser.go:300 Dispenser.CountRemainingArgs",
+     "caddyconfig/caddyfile/dispenser.go:316 Dispenser.RemainingArgs",
+     "caddyconfig/caddyfile/dispenser.go:329 Dispenser.RemainingArgsRaw",
+     "caddyconfig/caddyfile/dispenser.go:342 Dispenser.RemainingArgsAsTokens",
+     "caddyconfig/caddyfile/dispenser.go:355 Dispenser.NewFromNextSegment",
+     "caddyconfig/caddyfile/dispenser.go:362 Dispenser.NextSegment",
+     "caddyconfig/caddyfile/dispenser_test.go:63 TestDispenser_NextArg",
+     "caddyconfig/caddyfile/dispenser_test.go:140 TestDispenser_NextBlock",
+     "caddyconfig/caddyfile/dispenser_test.go:171 TestDispenser_QuotedBracesAreArguments",
+     "caddyconfig/caddyfile/dispenser_test.go:201 TestDispenser_Args",
+     "caddyconfig/caddyfile/dispenser_test.go:269 TestDispenser_RemainingArgs",
+     "caddyconfig/caddyfile/dispenser_test.go:307 TestDispenser_RemainingArgsAsTokens",
+     "caddyconfig/caddyfile/dispenser_test.go:367 TestDispenser_ArgErr_Err",
+     "caddyconfig/caddyfile/parse.go:39 Parse",
+     "caddyconfig/caddyfile/parse.go:122 parser.parseAll",
+     "caddyconfig/caddyfile/parse.go:141 parser.parseOne",
+     "caddyconfig/caddyfile/parse.go:146 parser.begin",
+     "caddyconfig/caddyfile/parse.go:300 parser.blockContents",
+     "caddyconfig/caddyfile/parse.go:327 parser.directives",
+     "caddyconfig/caddyfile/parse.go:599 parser.expandImportsInBlock",
+     "caddyconfig/caddyfile/parse_test.go:129 TestParseOneAndImport"
+    ],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 114.887951583,
+   "cost_usd": 0.4990264,
+   "turns": 11,
+   "tokens": 464138,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 293,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 23.297165041,
+   "cost_usd": 0.07040640000000001,
+   "turns": 5,
+   "tokens": 55540,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 13.186398042,
+   "cost_usd": 0.06561339999999999,
+   "turns": 3,
+   "tokens": 64792,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 24.332272042,
+   "cost_usd": 0.0954562,
+   "turns": 8,
+   "tokens": 92087,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 14.695991375,
+   "cost_usd": 0.0607972,
+   "turns": 3,
+   "tokens": 42387,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 90.171896875,
+   "cost_usd": 0.3382582,
+   "turns": 32,
+   "tokens": 514724,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 41,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 25.338064417,
+   "cost_usd": 0.1196142,
+   "turns": 5,
+   "tokens": 104497,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 41,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 68.366948041,
+   "cost_usd": 0.2522484,
+   "turns": 18,
+   "tokens": 333528,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 0.9565217391304348,
+    "n_answer": 46,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [
+     "modules/caddyhttp/reverseproxy/selectionpolicies.go:829 leastRequests",
+     "modules/caddyhttp/reverseproxy/selectionpolicies_test.go:679 TestLeastRequests"
+    ],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 31.414508666,
+   "cost_usd": 0.1251298,
+   "turns": 5,
+   "tokens": 124564,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 44,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 288.817156125,
+   "cost_usd": 1.0929306,
+   "turns": 45,
+   "tokens": 1426944,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 129,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 51.204490125,
+   "cost_usd": 0.2273638,
+   "turns": 7,
+   "tokens": 207096,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 129,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 76.563366125,
+   "cost_usd": 0.1927028,
+   "turns": 11,
+   "tokens": 151031,
+   "score": {
+    "pass": false,
+    "recall": 0.027303754266211604,
+    "precision": 1.0,
+    "n_answer": 8,
+    "flagged_incomplete": true,
+    "missed": [
+     "caddyconfig/caddyfile/adapter.go:32 Adapter.Adapt",
+     "caddyconfig/caddyfile/adapter.go:127 UnmarshalModule",
+     "caddyconfig/caddyfile/dispenser.go:273 Dispenser.Args",
+     "caddyconfig/caddyfile/dispenser.go:287 Dispenser.AllArgs",
+     "caddyconfig/caddyfile/dispenser.go:300 Dispenser.CountRemainingArgs",
+     "caddyconfig/caddyfile/dispenser.go:316 Dispenser.RemainingArgs",
+     "caddyconfig/caddyfile/dispenser.go:329 Dispenser.RemainingArgsRaw",
+     "caddyconfig/caddyfile/dispenser.go:342 Dispenser.RemainingArgsAsTokens",
+     "caddyconfig/caddyfile/dispenser.go:355 Dispenser.NewFromNextSegment",
+     "caddyconfig/caddyfile/dispenser.go:362 Dispenser.NextSegment",
+     "caddyconfig/caddyfile/dispenser_test.go:63 TestDispenser_NextArg",
+     "caddyconfig/caddyfile/dispenser_test.go:140 TestDispenser_NextBlock",
+     "caddyconfig/caddyfile/dispenser_test.go:171 TestDispenser_QuotedBracesAreArguments",
+     "caddyconfig/caddyfile/dispenser_test.go:201 TestDispenser_Args",
+     "caddyconfig/caddyfile/dispenser_test.go:269 TestDispenser_RemainingArgs",
+     "caddyconfig/caddyfile/dispenser_test.go:307 TestDispenser_RemainingArgsAsTokens",
+     "caddyconfig/caddyfile/dispenser_test.go:367 TestDispenser_ArgErr_Err",
+     "caddyconfig/caddyfile/parse.go:39 Parse",
+     "caddyconfig/caddyfile/parse.go:122 parser.parseAll",
+     "caddyconfig/caddyfile/parse.go:141 parser.parseOne",
+     "caddyconfig/caddyfile/parse.go:146 parser.begin",
+     "caddyconfig/caddyfile/parse.go:300 parser.blockContents",
+     "caddyconfig/caddyfile/parse.go:327 parser.directives",
+     "caddyconfig/caddyfile/parse.go:599 parser.expandImportsInBlock",
+     "caddyconfig/caddyfile/parse_test.go:129 TestParseOneAndImport"
+    ],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 105.007624375,
+   "cost_usd": 0.38485479999999994,
+   "turns": 13,
+   "tokens": 299340,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 293,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 24.858697958,
+   "cost_usd": 0.075656,
+   "turns": 6,
+   "tokens": 81337,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 10.152754542,
+   "cost_usd": 0.035925,
+   "turns": 2,
+   "tokens": 41163,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 25.362715958,
+   "cost_usd": 0.077268,
+   "turns": 8,
+   "tokens": 73828,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 14.200213625,
+   "cost_usd": 0.0459226,
+   "turns": 3,
+   "tokens": 42549,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 106.552684041,
+   "cost_usd": 0.31751579999999996,
+   "turns": 38,
+   "tokens": 564367,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 41,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 21.79083025,
+   "cost_usd": 0.0902034,
+   "turns": 4,
+   "tokens": 101452,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 41,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 62.895312042,
+   "cost_usd": 0.2065758,
+   "turns": 14,
+   "tokens": 256398,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 44,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 30.941821209,
+   "cost_usd": 0.1244584,
+   "turns": 7,
+   "tokens": 136475,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 44,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 274.830015,
+   "cost_usd": 1.1011776,
+   "turns": 72,
+   "tokens": 1827473,
+   "score": {
+    "pass": true,
+    "recall": 0.992248062015504,
+    "precision": 0.9770992366412212,
+    "n_answer": 131,
+    "flagged_incomplete": false,
+    "missed": [
+     "modules/caddyhttp/reverseproxy/reverseproxy.go:280 Handler.Provision"
+    ],
+    "extra": [
+     "modules/caddyhttp/staticresp_test.go:28 TestStaticResponseHandler",
+     "modules/caddyhttp/staticresp_test.go:92 TestStaticResponseHeadersKeepUnknownPlaceholders",
+     "modules/caddyhttp/staticresp_test.go:119 TestStaticResponseHeadersStillReplaceKnownPlaceholders"
+    ],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 53.286470083,
+   "cost_usd": 0.2035888,
+   "turns": 6,
+   "tokens": 166874,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 129,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 584.743181,
+   "cost_usd": 1.9601477999999992,
+   "turns": 50,
+   "tokens": 3395693,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 293,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 106.006852959,
+   "cost_usd": 0.3304876,
+   "turns": 15,
+   "tokens": 319954,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 293,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 30.714986958,
+   "cost_usd": 0.1844684,
+   "turns": 8,
+   "tokens": 107519,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 18.638184,
+   "cost_usd": 0.2363192,
+   "turns": 4,
+   "tokens": 84329,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 27.196546542,
+   "cost_usd": 0.13648280000000002,
+   "turns": 5,
+   "tokens": 66192,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 18.15463075,
+   "cost_usd": 0.1150904,
+   "turns": 2,
+   "tokens": 42222,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 78.62017675,
+   "cost_usd": 0.4611626,
+   "turns": 19,
+   "tokens": 411391,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 41,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 26.704487792,
+   "cost_usd": 0.1717326,
+   "turns": 4,
+   "tokens": 94960,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 41,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 74.595769541,
+   "cost_usd": 0.4771622,
+   "turns": 19,
+   "tokens": 321884,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 44,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 36.28277,
+   "cost_usd": 0.1873502,
+   "turns": 4,
+   "tokens": 84800,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 44,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 210.663271333,
+   "cost_usd": 1.3151625999999998,
+   "turns": 23,
+   "tokens": 1061687,
+   "score": {
+    "pass": true,
+    "recall": 0.992248062015504,
+    "precision": 1.0,
+    "n_answer": 128,
+    "flagged_incomplete": false,
+    "missed": [
+     "modules/caddyhttp/reverseproxy/reverseproxy.go:280 Handler.Provision"
+    ],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 65.008512667,
+   "cost_usd": 0.39680080000000006,
+   "turns": 5,
+   "tokens": 126469,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 129,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 299.79327625,
+   "cost_usd": 1.141238,
+   "turns": 31,
+   "tokens": 741895,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 293,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 151.496014334,
+   "cost_usd": 0.6430848,
+   "turns": 13,
+   "tokens": 288092,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 293,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 31.91221425,
+   "cost_usd": 0.1747466,
+   "turns": 7,
+   "tokens": 92869,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 21.235947125,
+   "cost_usd": 0.14105659999999998,
+   "turns": 4,
+   "tokens": 84950,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 28.351722042,
+   "cost_usd": 0.1297234,
+   "turns": 5,
+   "tokens": 66337,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 27.85335875,
+   "cost_usd": 0.1495092,
+   "turns": 5,
+   "tokens": 104138,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 76.439500459,
+   "cost_usd": 0.5828232,
+   "turns": 16,
+   "tokens": 442451,
+   "score": {
+    "pass": true,
+    "recall": 0.951219512195122,
+    "precision": 1.0,
+    "n_answer": 39,
+    "flagged_incomplete": false,
+    "missed": [
+     "admin.go:1027 handleConfig",
+     "caddyconfig/load.go:73 adminLoad.handleLoad"
+    ],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 25.308578542,
+   "cost_usd": 0.1763722,
+   "turns": 4,
+   "tokens": 97389,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 41,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 67.828696083,
+   "cost_usd": 0.41002420000000006,
+   "turns": 14,
+   "tokens": 210900,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 44,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 45.62352,
+   "cost_usd": 0.2430868,
+   "turns": 7,
+   "tokens": 162174,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 44,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 279.325910125,
+   "cost_usd": 1.7289524,
+   "turns": 39,
+   "tokens": 1896343,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 129,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 68.989209041,
+   "cost_usd": 0.3983184,
+   "turns": 5,
+   "tokens": 126779,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 129,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 475.715601292,
+   "cost_usd": 3.2051806,
+   "turns": 56,
+   "tokens": 4247280,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 293,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 132.782537167,
+   "cost_usd": 0.5883914000000001,
+   "turns": 11,
+   "tokens": 236986,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 293,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 28.398002541,
+   "cost_usd": 0.1327154,
+   "turns": 6,
+   "tokens": 71133,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 21.811569666,
+   "cost_usd": 0.133073,
+   "turns": 6,
+   "tokens": 130564,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 25.817417042,
+   "cost_usd": 0.095589,
+   "turns": 5,
+   "tokens": 65435,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 35.931168541,
+   "cost_usd": 0.12798179999999998,
+   "turns": 6,
+   "tokens": 108407,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 97.826582583,
+   "cost_usd": 0.5624426000000001,
+   "turns": 26,
+   "tokens": 598512,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 41,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 63.940544917,
+   "cost_usd": 0.4052728,
+   "turns": 15,
+   "tokens": 318573,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 41,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 79.039073209,
+   "cost_usd": 0.4311608,
+   "turns": 14,
+   "tokens": 303731,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 44,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 39.516709125,
+   "cost_usd": 0.190424,
+   "turns": 6,
+   "tokens": 140557,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 44,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 266.85496425,
+   "cost_usd": 1.4952666,
+   "turns": 26,
+   "tokens": 1356484,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 129,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 76.598307708,
+   "cost_usd": 0.408042,
+   "turns": 6,
+   "tokens": 189174,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 129,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 259.910623917,
+   "cost_usd": 0.9646178,
+   "turns": 29,
+   "tokens": 633474,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 293,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 139.99257025,
+   "cost_usd": 0.5714734,
+   "turns": 10,
+   "tokens": 274662,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 293,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  }
+ ]
+}

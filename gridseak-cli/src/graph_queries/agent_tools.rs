@@ -88,6 +88,12 @@ fn resolve_or_unknown(
             witnesses: vec![format!("symbol `{needle}` not in scan artifact")],
             p_true: 0.0,
         })),
+        Err(e @ GraphQueryError::NoSymbolAtLocation { .. }) => Ok(Err(VerifyClaimView {
+            claim: needle.to_string(),
+            verdict: ClaimVerdict::Unknown,
+            witnesses: vec![e.to_string()],
+            p_true: 0.0,
+        })),
         Err(GraphQueryError::AmbiguousSymbol {
             symbol, candidates, ..
         }) => Ok(Err(VerifyClaimView {
@@ -377,6 +383,8 @@ fn functions_in_file(conn: &Connection, file: &str) -> Result<Vec<NodeRef>, Grap
                 id: row.get(0)?,
                 fqn: row.get(1)?,
                 kind: row.get(2)?,
+                file: None,
+                line: None,
             })
         })?
         .collect::<rusqlite::Result<Vec<_>>>()?;
@@ -438,6 +446,8 @@ pub fn diff_impact(
                     id: row.get(0)?,
                     fqn: row.get(1)?,
                     kind: row.get(2)?,
+                    file: None,
+                    line: None,
                 })
             })
             .ok()
@@ -591,6 +601,7 @@ pub fn structural_invariants_ok() -> StructuralInvariantsView {
 }
 
 /// Seeded false-claim evaluation used by the Batch E gate.
+#[cfg_attr(not(test), allow(dead_code))]
 pub fn false_claim_suite(artifact: &Path) -> Result<FalseClaimReport, GraphQueryError> {
     let conn = open_graph(artifact)?;
     let mut stmt = conn.prepare(
@@ -662,6 +673,7 @@ pub fn false_claim_suite(artifact: &Path) -> Result<FalseClaimReport, GraphQuery
     })
 }
 
+#[cfg_attr(not(test), allow(dead_code))]
 #[derive(Debug, Clone, Serialize)]
 pub struct FalseClaimReport {
     pub false_claims: usize,

@@ -1,0 +1,40 @@
+{
+  "name": "gridseak",
+  "version": "0.1.0",
+  "description": "GridSeak slim MCP + Cursor preToolUse (Write/StrReplace/Delete/Shell) and beforeShellExecution gate. Install gridseak first (scripts/install.sh).",
+  "mcpServers": {
+    "gridseak": {
+      "command": "gridseak",
+      "args": [
+        "mcp",
+        "--slim"
+      ]
+    }
+  },
+  "hooks": {
+    "version": 1,
+    "hooks": {
+      "preToolUse": [
+        {
+          "command": "${CURSOR_PLUGIN_ROOT}/hooks/gridseak-gate.sh cursor-tool",
+          "matcher": "Write|StrReplace|Delete|Shell",
+          "failClosed": true
+        }
+      ],
+      "beforeShellExecution": [
+        {
+          "command": "${CURSOR_PLUGIN_ROOT}/hooks/gridseak-gate.sh cursor",
+          "failClosed": true
+        }
+      ],
+      "sessionStart": [
+        {
+          "command": "${CURSOR_PLUGIN_ROOT}/hooks/gridseak-gate.sh card"
+        }
+      ]
+    }
+  },
+  "rules": [
+    "rules/gate.mdc"
+  ]
+}

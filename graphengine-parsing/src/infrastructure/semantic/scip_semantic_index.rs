@@ -2,7 +2,7 @@
 
 use std::path::{Path, PathBuf};
 
-use graphengine_scip_adapter::{ScipIndex, ScipIndexError};
+use graphengine_scip_adapter::{DocumentCoverage, ScipIndex, ScipIndexError};
 
 use crate::application::ports::{IndexTarget, SemanticIndex};
 use crate::domain::Confidence;
@@ -39,6 +39,11 @@ impl ScipSemanticIndex {
 
     pub fn project_root(&self) -> &Path {
         self.inner.project_root()
+    }
+
+    /// How many of the index's documents exist under `workspace` (sampled).
+    pub fn workspace_coverage(&self, workspace: &Path) -> DocumentCoverage {
+        self.inner.workspace_coverage(workspace)
     }
 }
 
@@ -92,6 +97,24 @@ impl SemanticIndex for ScipSemanticIndex {
                 }
             })
             .collect()
+    }
+
+    fn reference_occurrences(&self) -> Option<Vec<(IndexTarget, IndexTarget)>> {
+        let root = self.inner.project_root();
+        let to_target = |d: graphengine_scip_adapter::ScipDefinition| IndexTarget {
+            file: root.join(&d.relative_path),
+            line: d.line.saturating_add(1),
+            col: d.character,
+            symbol_moniker: d.symbol,
+            confidence: Confidence::High,
+        };
+        Some(
+            self.inner
+                .reference_occurrences()
+                .into_iter()
+                .map(|(r, d)| (to_target(r), to_target(d)))
+                .collect(),
+        )
     }
 
     fn references_of(&self, symbol: &str) -> Vec<IndexTarget> {

@@ -122,6 +122,7 @@ pub fn check_stale_snapshot(
         .unwrap_or_else(|_| WorkspaceDelta {
             since_scan_seconds: 0,
             dirty_paths: Vec::new(),
+            dirty_count: 0,
             buckets: Default::default(),
             intersects_query: None,
             agent_directive: None,

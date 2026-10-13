@@ -9,6 +9,79 @@ will call those out explicitly here when they happen.
 
 ## [Unreleased]
 
+## [0.1.2] — 2026-10-12
+
+Compiler-grade call graph, measured against the compilers themselves,
+and answers that say when they are complete.
+
+### Added
+
+- `gridseak audit`: grades a coding agent on this repository against
+  compiler truth. It plans "every transitive caller of X" questions (small to
+  large) from the call graph, runs them through headless Claude Code alone and
+  with GridSeak's MCP tools, and writes a report card (`report.html`,
+  `report.md`, `results.json`): exact answers, silent misses (wrong lists
+  presented as complete), minutes, tokens and cost per correct answer.
+  `--reps`, `--compare` (one card for several models), `--plan` (reuse a plan),
+  `--family edits` (Go interface changes graded by hidden compile-time
+  assertions, `go build` and `go vet` in a throwaway copy). Refuses to run when
+  the answer key would not be fully compiler-backed. On Caddy, chi and
+  Kubernetes, agents with GridSeak answered 90/90 exactly against 78/90 alone.
+- Claude Code plugin: `/gridseak:audit` and an `audit-my-agent` skill, so
+  "audit my agent on this repo" starts the flow (plan, cost, confirmation,
+  report). Marketplace manifest at `.claude-plugin/marketplace.json`.
+- MCP tools accept `path/to/file.ts:123` and `path/to/file.ts::name` symbols,
+  so common names (`fetch`) resolve.
+- `gridseak pr-check`: compares the call graph before and after a change
+  and flags callers left pointing at a removed or renamed symbol. 0 false
+  alarms on 113 merged pull requests; 46 of 46 seeded breaks caught.
+- Blast-radius certificate (MCP): `certificate.complete` is true only when
+  every call edge came from the compiler index, no source file changed
+  since the scan, and the walk hit neither the depth limit nor the row
+  cap. Otherwise `reasons` names each failed check.
+- Call edges record how the callee is used (`call`, `dispatch` through an
+  interface, `value` passed or stored). `blast-radius --uses` and the MCP
+  `uses` parameter take `all` (default), `calls` or `static`.
+- `GRIDSEAK_SKIP_IMPORT_HEURISTICS` opts out of the heuristic import pass
+  on very large repositories.
+- Evidence docs 13–19 under `docs/workstreams/master-plan/evidence/` and
+  the recall-audit and graph-benchmark harnesses under `tests/`.
+
+### Changed
+
+- The compiler tier reads every SCIP reference occurrence instead of
+  mapping call sites one at a time. Caller recall against `go/types` is
+  100% on chi, Caddy and Kubernetes (3.5M lines, indexed in 11.5 min);
+  97.4–98.5% of TypeScript functions have every caller listed against
+  `tsc` (zod, hono).
+- Go methods are named `Receiver.Method`, so methods and functions with
+  the same name no longer collide.
+- Top-level uses (Go `var x = f()`, TypeScript module scope) are credited
+  to the enclosing declaration, so those callees no longer look unused.
+- scip-go pinned to 0.2.7 (0.1.25 crashed on Caddy). Python repositories
+  index without a root marker file.
+- MCP: caller, callee and blast-radius rows carry file and line; symbols
+  resolve from Go import paths and `file::Name`; stale-snapshot responses
+  cap the listed paths instead of listing every changed file.
+- `graph blast-radius` help text now says it walks upstream (callers).
+
+### Fixed
+
+- A cached SCIP index is reused only when its fingerprint matches this exact
+  workspace and its sources. A copied, moved or stale index is refused (it
+  previously produced an empty graph for Kubernetes from Caddy's index), and
+  any fallback to tree-sitter edges is printed and recorded as the report
+  caveat `compiler_tier_unavailable_v1`. Existing caches are rebuilt once.
+- TypeScript: function nodes for class fields, `#private`, string-named and
+  keyword-named methods; no id collisions between identical bodies in
+  different classes; `super()`, `new X()` to an inherited constructor and
+  `this["name"]()` are calls; top-level code is no longer listed as a
+  function caller (MCP rows now carry `kind` and split out
+  `top_level_callers`).
+
+- Import resolution on Kubernetes-size Go repositories no longer scans the
+  whole graph per import (children index plus a path cache).
+
 ## [0.1.1] — 2026-09-16
 
 Cursor edit-boundary gate and stranger-proof setup. This is the first

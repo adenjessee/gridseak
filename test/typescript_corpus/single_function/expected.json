@@ -1,0 +1,15 @@
+{
+  "description": "Expected graph for single function fixture",
+  "nodes": [
+    {
+      "kind": "Function",
+      "fqn": "src/utils::calculateTotal",
+      "location": {
+        "file": "src/utils.ts",
+        "start_line": 4,
+        "end_line": 6
+      }
+    }
+  ],
+  "edges": []
+}

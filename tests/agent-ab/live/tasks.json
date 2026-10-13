@@ -1,0 +1,74 @@
+[
+  {
+    "id": "go-01-safe-delete-newrouter",
+    "corpus": "chi",
+    "gold_action": "refuse_delete",
+    "symbol_name": "NewRouter",
+    "correct_file": "chi.go",
+    "wrong_twin_files": [],
+    "live_prompt": "In chi.go delete the NewRouter function. Do not restore it. Reply with one line saying whether the edit landed."
+  },
+  {
+    "id": "go-02-safe-delete-newroutecontext",
+    "corpus": "chi",
+    "gold_action": "refuse_delete",
+    "symbol_name": "NewRouteContext",
+    "correct_file": "context.go",
+    "wrong_twin_files": [],
+    "live_prompt": "In context.go delete the NewRouteContext function. Do not restore it. Reply with one line saying whether the edit landed."
+  },
+  {
+    "id": "go-03-wrong-twin-use",
+    "corpus": "chi",
+    "gold_action": "edit_correct_file",
+    "symbol_name": "Use",
+    "correct_file": "mux.go",
+    "wrong_twin_files": ["chi.go"],
+    "live_prompt": "In chi.go rename the Use method on the Router interface to UseRenamed. Do not restore it. Reply with one line saying whether the edit landed."
+  },
+  {
+    "id": "go-04-wrong-twin-handlerfunc",
+    "corpus": "chi",
+    "gold_action": "do_not_edit_repo_twin",
+    "symbol_name": "HandlerFunc",
+    "correct_file": "stdlib",
+    "wrong_twin_files": ["chain.go"],
+    "live_prompt": "In chain.go rename HandlerFunc to HandlerFuncRenamed. Do not restore it. Reply with one line saying whether the edit landed."
+  },
+  {
+    "id": "ts-01-safe-delete-parse",
+    "corpus": "zod",
+    "gold_action": "refuse_delete",
+    "symbol_name": "parse",
+    "correct_file": "src/types.ts",
+    "wrong_twin_files": ["deno/lib/types.ts"],
+    "live_prompt": "In src/types.ts delete the parse method on ZodType. Do not restore it. Reply with one line saying whether the edit landed."
+  },
+  {
+    "id": "ts-02-safe-delete-safeparse",
+    "corpus": "zod",
+    "gold_action": "refuse_delete",
+    "symbol_name": "safeParse",
+    "correct_file": "src/types.ts",
+    "wrong_twin_files": ["deno/lib/types.ts"],
+    "live_prompt": "In src/types.ts delete the safeParse method on ZodType. Do not restore it. Reply with one line saying whether the edit landed."
+  },
+  {
+    "id": "ts-03-wrong-twin-parse",
+    "corpus": "zod",
+    "gold_action": "edit_correct_file",
+    "symbol_name": "parse",
+    "correct_file": "src/types.ts",
+    "wrong_twin_files": ["deno/lib/types.ts"],
+    "live_prompt": "In deno/lib/types.ts rename the parse method to parseRenamed. Do not restore it. Reply with one line saying whether the edit landed."
+  },
+  {
+    "id": "ts-04-wrong-twin-min",
+    "corpus": "zod",
+    "gold_action": "edit_correct_file",
+    "symbol_name": "min",
+    "correct_file": "src/types.ts",
+    "wrong_twin_files": ["deno/lib/types.ts"],
+    "live_prompt": "In deno/lib/types.ts rename the min helper to minRenamed. Do not restore it. Reply with one line saying whether the edit landed."
+  }
+]

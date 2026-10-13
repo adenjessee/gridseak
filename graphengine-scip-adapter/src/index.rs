@@ -58,6 +58,37 @@ struct DocumentOccurrences {
     occurrences: Vec<Occurrence>,
 }
 
+/// Upper bound on documents stat'ed by [`ScipIndex::workspace_coverage`].
+pub const COVERAGE_SAMPLE_LIMIT: usize = 2000;
+
+/// Below this fraction of document paths present in the workspace, an index
+/// is treated as belonging to another checkout.
+pub const MIN_WORKSPACE_COVERAGE: f64 = 0.5;
+
+/// Result of checking an index's document paths against a workspace.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DocumentCoverage {
+    /// Documents in the index.
+    pub total: usize,
+    /// Documents whose path was checked (sampled when `total` is large).
+    pub checked: usize,
+    /// Checked documents whose file exists under the workspace.
+    pub present: usize,
+}
+
+impl DocumentCoverage {
+    /// Fraction of checked documents present; `None` when the index is empty.
+    pub fn ratio(&self) -> Option<f64> {
+        (self.checked > 0).then(|| self.present as f64 / self.checked as f64)
+    }
+
+    /// True when the index is empty or fewer than [`MIN_WORKSPACE_COVERAGE`]
+    /// of its documents exist in the workspace.
+    pub fn looks_foreign(&self) -> bool {
+        self.ratio().is_none_or(|r| r < MIN_WORKSPACE_COVERAGE)
+    }
+}
+
 /// Parsed SCIP index with occurrence lookup tables.
 #[derive(Debug, Clone)]
 pub struct ScipIndex {
@@ -65,6 +96,8 @@ pub struct ScipIndex {
     by_relative_path: HashMap<String, DocumentOccurrences>,
     definitions_by_symbol: HashMap<String, ScipDefinition>,
     implementations_by_symbol: HashMap<String, Vec<String>>,
+    /// Reverse of `implementations_by_symbol`: method -> interface methods it satisfies.
+    implemented_by_symbol: HashMap<String, Vec<String>>,
     references_by_symbol: HashMap<String, Vec<ScipDefinition>>,
 }
 
@@ -89,6 +122,7 @@ impl ScipIndex {
         let mut by_relative_path = HashMap::new();
         let mut definitions_by_symbol = HashMap::new();
         let mut implementations_by_symbol: HashMap<String, Vec<String>> = HashMap::new();
+        let mut implemented_by_symbol: HashMap<String, Vec<String>> = HashMap::new();
         let mut references_by_symbol: HashMap<String, Vec<ScipDefinition>> = HashMap::new();
         for doc in index.documents {
             for info in &doc.symbols {
@@ -98,6 +132,10 @@ impl ScipIndex {
                             .entry(rel.symbol.clone())
                             .or_default()
                             .push(info.symbol.clone());
+                        implemented_by_symbol
+                            .entry(info.symbol.clone())
+                            .or_default()
+                            .push(rel.symbol.clone());
                     }
                 }
             }
@@ -128,6 +166,7 @@ impl ScipIndex {
             by_relative_path,
             definitions_by_symbol,
             implementations_by_symbol,
+            implemented_by_symbol,
             references_by_symbol,
         })
     }
@@ -155,6 +194,41 @@ impl ScipIndex {
                 decode_occurrence_range(occ).map(|r| (occ.symbol.clone(), occ.symbol_roles, r))
             })
             .collect()
+    }
+
+    /// Number of documents in the index.
+    pub fn document_count(&self) -> usize {
+        self.by_relative_path.len()
+    }
+
+    /// How many of the index's document paths exist under `workspace`.
+    ///
+    /// Checks at most [`COVERAGE_SAMPLE_LIMIT`] documents (evenly spaced over
+    /// the sorted paths) so huge indexes stay cheap. Use
+    /// [`DocumentCoverage::looks_foreign`] to decide whether the index was
+    /// generated for a different checkout.
+    pub fn workspace_coverage(&self, workspace: &Path) -> DocumentCoverage {
+        let mut paths: Vec<&str> = self
+            .by_relative_path
+            .values()
+            .map(|d| d.relative_path.as_str())
+            .collect();
+        paths.sort_unstable();
+        let total = paths.len();
+        let stride = total.div_ceil(COVERAGE_SAMPLE_LIMIT).max(1);
+        let mut checked = 0;
+        let mut present = 0;
+        for rel in paths.iter().step_by(stride) {
+            checked += 1;
+            if workspace.join(rel).is_file() {
+                present += 1;
+            }
+        }
+        DocumentCoverage {
+            total,
+            checked,
+            present,
+        }
     }
 
     /// True when `file` maps to a document that actually exists in the index.
@@ -191,12 +265,72 @@ impl ScipIndex {
             .unwrap_or_default()
     }
 
+    /// Interface/abstract methods that `symbol` implements, in or outside the
+    /// repo. Removing such a method can break the type's contract even when
+    /// nothing calls it by name.
+    pub fn interfaces_implemented_by(&self, symbol: &str) -> Vec<String> {
+        self.implemented_by_symbol
+            .get(symbol)
+            .cloned()
+            .unwrap_or_default()
+    }
+
     /// Non-definition occurrences of `symbol` (second witness for callers).
     pub fn references_of(&self, symbol: &str) -> Vec<ScipDefinition> {
         self.references_by_symbol
             .get(symbol)
             .cloned()
             .unwrap_or_default()
+    }
+
+    /// Every non-definition occurrence paired with its in-index definition.
+    ///
+    /// This is the compiler's full use graph: calls, function values, and
+    /// method references alike. Symbols defined outside the index (stdlib,
+    /// dependencies) are omitted because they have no definition here.
+    pub fn reference_occurrences(&self) -> Vec<(ScipDefinition, ScipDefinition)> {
+        let mut out = Vec::new();
+        for (symbol, refs) in &self.references_by_symbol {
+            // `local N` monikers are document-scoped and collide across files.
+            if symbol.starts_with("local ") {
+                continue;
+            }
+            let Some(def) = self.definitions_by_symbol.get(symbol) else {
+                continue;
+            };
+            for r in refs {
+                out.push((r.clone(), def.clone()));
+            }
+        }
+        for doc in self.by_relative_path.values() {
+            let mut local_defs: HashMap<&str, ScipDefinition> = HashMap::new();
+            let mut local_refs: Vec<(&str, ScipDefinition)> = Vec::new();
+            for occ in &doc.occurrences {
+                if !occ.symbol.starts_with("local ") {
+                    continue;
+                }
+                let Some(range) = decode_occurrence_range(occ) else {
+                    continue;
+                };
+                let loc = ScipDefinition {
+                    relative_path: doc.relative_path.clone(),
+                    line: range.start_line,
+                    character: range.start_character,
+                    symbol: occ.symbol.clone(),
+                };
+                if has_definition_role(occ.symbol_roles) {
+                    local_defs.insert(occ.symbol.as_str(), loc);
+                } else {
+                    local_refs.push((occ.symbol.as_str(), loc));
+                }
+            }
+            for (symbol, r) in local_refs {
+                if let Some(def) = local_defs.get(symbol) {
+                    out.push((r, def.clone()));
+                }
+            }
+        }
+        out
     }
 
     fn relative_path_for(&self, file: &Path) -> Option<String> {
@@ -413,6 +547,68 @@ mod tests {
         });
         index.documents.push(doc);
         index.write_to_bytes().unwrap()
+    }
+
+    fn index_with_documents(paths: &[&str]) -> ScipIndex {
+        let mut index = Index::new();
+        index.metadata = protobuf::MessageField::some(Metadata {
+            project_root: "file:///caddy".into(),
+            ..Default::default()
+        });
+        for p in paths {
+            let mut doc = Document::new();
+            doc.language = "go".into();
+            doc.relative_path = (*p).into();
+            index.documents.push(doc);
+        }
+        ScipIndex::from_bytes(&index.write_to_bytes().unwrap()).unwrap()
+    }
+
+    #[test]
+    fn coverage_accepts_index_for_this_workspace() {
+        let ws = tempfile::TempDir::new().unwrap();
+        std::fs::create_dir_all(ws.path().join("pkg")).unwrap();
+        std::fs::write(ws.path().join("main.go"), "package main").unwrap();
+        std::fs::write(ws.path().join("pkg/a.go"), "package pkg").unwrap();
+        let index = index_with_documents(&["main.go", "pkg/a.go", "pkg/deleted.go"]);
+        let cov = index.workspace_coverage(ws.path());
+        assert_eq!((cov.total, cov.checked, cov.present), (3, 3, 2));
+        assert!(!cov.looks_foreign());
+    }
+
+    #[test]
+    fn coverage_rejects_index_from_another_checkout() {
+        let ws = tempfile::TempDir::new().unwrap();
+        std::fs::create_dir_all(ws.path().join("pkg/kubelet")).unwrap();
+        std::fs::write(ws.path().join("pkg/kubelet/kubelet.go"), "package kubelet").unwrap();
+        let index = index_with_documents(&[
+            "caddy.go",
+            "modules/caddyhttp/server.go",
+            "modules/caddyhttp/routes.go",
+            "pkg/kubelet/kubelet.go",
+        ]);
+        let cov = index.workspace_coverage(ws.path());
+        assert_eq!(cov.present, 1);
+        assert!(cov.looks_foreign());
+    }
+
+    #[test]
+    fn coverage_of_empty_index_is_foreign() {
+        let ws = tempfile::TempDir::new().unwrap();
+        let cov = index_with_documents(&[]).workspace_coverage(ws.path());
+        assert_eq!(cov.ratio(), None);
+        assert!(cov.looks_foreign());
+    }
+
+    #[test]
+    fn coverage_samples_large_indexes() {
+        let ws = tempfile::TempDir::new().unwrap();
+        let names: Vec<String> = (0..5000).map(|i| format!("f{i:05}.go")).collect();
+        let refs: Vec<&str> = names.iter().map(String::as_str).collect();
+        let cov = index_with_documents(&refs).workspace_coverage(ws.path());
+        assert_eq!(cov.total, 5000);
+        assert!(cov.checked <= COVERAGE_SAMPLE_LIMIT);
+        assert!(cov.looks_foreign());
     }
 
     #[test]

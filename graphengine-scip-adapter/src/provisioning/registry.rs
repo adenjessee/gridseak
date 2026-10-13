@@ -10,6 +10,7 @@ use std::path::Path;
 use std::time::Duration;
 
 use super::{IndexerError, IndexerLanguage};
+use crate::fingerprint::{cache_status, CacheStatus};
 
 /// How the indexer binary is obtained.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -84,8 +85,10 @@ pub fn all_entries() -> &'static [IndexerEntry] {
             language: IndexerLanguage::Go,
             detection_globs: &["*.go", "go.mod"],
             install_method: InstallMethod::GithubRelease,
-            package_or_repo: "sourcegraph/scip-go",
-            pinned_version: "0.1.25",
+            // 0.1.x crashes on some multi-module repos ("nil module for
+            // userland package"); the project moved to scip-code/scip-go.
+            package_or_repo: "scip-code/scip-go",
+            pinned_version: "0.2.7",
             checksum_sha256: None,
             command: &["scip-go"],
             timeout: DEFAULT_TIMEOUT,
@@ -208,8 +211,14 @@ fn walk_has_ext(root: &Path, ext: &str) -> bool {
     false
 }
 
-/// Scan-time: never spawn `npx`. Return a structured skip if the cache
-/// is empty and auto-provision is off.
+/// Exit code carried by [`IndexerError`] when a cached index exists but
+/// must not be reused (see [`crate::fingerprint::cache_status`]).
+pub const EXIT_INDEX_STALE: i32 = 4;
+
+/// Scan-time: never spawn `npx`. Return the cached index only when its
+/// fingerprint sidecar matches this workspace; otherwise a structured skip
+/// (`IndexerNotProvisioned` when there is no cache, `IndexStale` when the
+/// cache is stale, foreign, or unverifiable).
 pub fn require_cached_or_skip(
     workspace: &Path,
     language: IndexerLanguage,
@@ -228,25 +237,32 @@ pub fn require_cached_or_skip(
         });
     }
     let cached = cache_dir(workspace, entry).join("index.scip");
-    if cached.is_file() {
-        return Ok(cached);
-    }
-    if !auto_provision_enabled() {
-        return Err(IndexerError {
+    match cache_status(workspace, language) {
+        CacheStatus::Fresh(path) => Ok(path),
+        CacheStatus::Stale(reason) => Err(IndexerError {
+            exit_code: EXIT_INDEX_STALE,
+            message: format!(
+                "IndexStale({reason}): {} at {}; refusing to reuse it. Run `gridseak doctor --provision {}` in this workspace (or set GRIDSEAK_AUTO_PROVISION=1)",
+                reason.describe(),
+                cached.display(),
+                language.as_str()
+            ),
+        }),
+        CacheStatus::Missing if !auto_provision_enabled() => Err(IndexerError {
             exit_code: 3,
             message: format!(
-                "IndexerNotProvisioned: run `gridseak doctor --provision {:?}` (or set GRIDSEAK_AUTO_PROVISION=1)",
-                language
+                "IndexerNotProvisioned: run `gridseak doctor --provision {}` (or set GRIDSEAK_AUTO_PROVISION=1)",
+                language.as_str()
             ),
-        });
+        }),
+        CacheStatus::Missing => Err(IndexerError {
+            exit_code: 3,
+            message: format!(
+                "IndexerNotProvisioned: cache miss at {} and auto-provision is on but install was not invoked",
+                cached.display()
+            ),
+        }),
     }
-    Err(IndexerError {
-        exit_code: 3,
-        message: format!(
-            "IndexerNotProvisioned: cache miss at {} and auto-provision is on but install was not invoked",
-            cached.display()
-        ),
-    })
 }
 
 #[cfg(test)]
@@ -278,5 +294,57 @@ mod tests {
         // INDEXER_TIMEOUT may or may not be set in the environment; the
         // helper must always return a positive duration.
         assert!(indexer_timeout(e) > Duration::from_secs(0));
+    }
+
+    fn seed(ws: &Path, with_sidecar: bool) -> std::path::PathBuf {
+        std::fs::write(ws.join("main.go"), "package main").unwrap();
+        let dir = cache_dir(ws, entry_for(IndexerLanguage::Go).unwrap());
+        std::fs::create_dir_all(&dir).unwrap();
+        std::fs::write(dir.join("index.scip"), b"x").unwrap();
+        if with_sidecar {
+            let fp = crate::fingerprint::fingerprint_workspace(ws, IndexerLanguage::Go).unwrap();
+            crate::fingerprint::write_sidecar(ws, IndexerLanguage::Go, &fp);
+        }
+        dir
+    }
+
+    #[test]
+    fn require_cached_returns_fresh_cache() {
+        let ws = tempfile::TempDir::new().unwrap();
+        let dir = seed(ws.path(), true);
+        let got = require_cached_or_skip(ws.path(), IndexerLanguage::Go).unwrap();
+        assert_eq!(got, dir.join("index.scip"));
+    }
+
+    #[test]
+    fn require_cached_refuses_cache_without_sidecar() {
+        let ws = tempfile::TempDir::new().unwrap();
+        seed(ws.path(), false);
+        let err = require_cached_or_skip(ws.path(), IndexerLanguage::Go).unwrap_err();
+        assert!(err.stale(), "{err:?}");
+        assert!(!err.not_provisioned());
+        assert!(err.message.contains("IndexStale(no_sidecar)"));
+    }
+
+    #[test]
+    fn require_cached_refuses_cache_copied_from_another_workspace() {
+        let original = tempfile::TempDir::new().unwrap();
+        seed(original.path(), true);
+        let other = tempfile::TempDir::new().unwrap();
+        let ws = other.path();
+        // Different sources (like Caddy's cache landing in Kubernetes).
+        std::fs::write(ws.join("k8s.go"), "package k8s").unwrap();
+        let src = original.path().join(".gridseak/scip/scip-go");
+        let dst = ws.join(".gridseak/scip/scip-go");
+        std::fs::create_dir_all(&dst).unwrap();
+        for f in ["index.scip", "fingerprint.txt"] {
+            std::fs::copy(src.join(f), dst.join(f)).unwrap();
+        }
+        let before = std::fs::read_to_string(dst.join("fingerprint.txt")).unwrap();
+        let err = require_cached_or_skip(ws, IndexerLanguage::Go).unwrap_err();
+        assert!(err.message.contains("IndexStale(foreign_root)"), "{err:?}");
+        // The refusal must not bless the foreign cache.
+        let after = std::fs::read_to_string(dst.join("fingerprint.txt")).unwrap();
+        assert_eq!(before, after);
     }
 }

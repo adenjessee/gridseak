@@ -41,6 +41,7 @@ pub fn adjudicate(witnesses: &[ProvenanceSource]) -> Provenance {
         source: winner,
         confidence,
         corroborating,
+        via: None,
     }
 }
 

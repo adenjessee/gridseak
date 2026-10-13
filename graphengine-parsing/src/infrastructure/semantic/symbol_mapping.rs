@@ -16,6 +16,10 @@ pub struct SymbolIndex<'a> {
     pub(crate) by_file: std::collections::HashMap<&'a str, Vec<&'a Node>>,
     /// Flat symbol list for workspace-wide fallbacks.
     pub(crate) all_functions: Vec<&'a Node>,
+    /// Memoized fuzzy path lookups (`query path -> by_file key`, `None` for
+    /// files with no symbols). Without it every miss scanned every file and
+    /// canonicalized paths per comparison: minutes on Kubernetes.
+    path_cache: std::cell::RefCell<std::collections::HashMap<String, Option<&'a str>>>,
 }
 
 impl<'a> SymbolIndex<'a> {
@@ -38,6 +42,7 @@ impl<'a> SymbolIndex<'a> {
         Self {
             by_file,
             all_functions,
+            path_cache: std::cell::RefCell::new(std::collections::HashMap::new()),
         }
     }
 
@@ -54,14 +59,66 @@ impl<'a> SymbolIndex<'a> {
             .min_by_key(|n| range_span(&n.location))
     }
 
+    /// Owner of top-level code at `location`: the tightest enclosing
+    /// declaration, else the tightest enclosing module (Go's per-file
+    /// module node), never the project or crate.
+    pub fn find_enclosing_declaration(&self, location: &Range) -> Option<&'a Node> {
+        let enclosing: Vec<&'a Node> = self
+            .file_symbols_for_location(location)?
+            .iter()
+            .copied()
+            .filter(|n| !matches!(n.kind, NodeKind::Project | NodeKind::Crate))
+            .filter(|n| contains(&n.location, location))
+            .collect();
+        enclosing
+            .iter()
+            .copied()
+            .filter(|n| n.kind != NodeKind::Module)
+            .min_by_key(|n| range_span(&n.location))
+            .or_else(|| {
+                enclosing
+                    .into_iter()
+                    .min_by_key(|n| range_span(&n.location))
+            })
+    }
+
+    /// Explicit `constructor` of the class (`Struct` node) declared at
+    /// `location`, ignoring constructors of classes nested inside it. The
+    /// class is `None` when no class spans `location`; the constructor is
+    /// `None` when the class declares none.
+    pub fn class_constructor_at(&self, location: &Range) -> Option<(&'a Node, Option<&'a Node>)> {
+        let syms = self.file_symbols_for_location(location)?;
+        let class_of = |r: &Range| {
+            syms.iter()
+                .copied()
+                .filter(|n| n.kind == NodeKind::Struct && line_encloses(r, &n.location))
+                .min_by_key(|n| range_span(&n.location))
+        };
+        let class = class_of(location)?;
+        let ctor = syms
+            .iter()
+            .copied()
+            .filter(|n| n.kind == NodeKind::Function && fqn_ends_with(&n.fqn, "constructor"))
+            .find(|n| class_of(&n.location).is_some_and(|c| c.id == class.id));
+        Some((class, ctor))
+    }
+
     fn file_symbols_for_location(&self, location: &Range) -> Option<&Vec<&'a Node>> {
         if let Some(syms) = self.by_file.get(location.file.as_str()) {
             return Some(syms);
         }
-        self.by_file
-            .iter()
-            .find(|(k, _)| path_matches(k, &location.file))
-            .map(|(_, v)| v)
+        let key = self.resolve_path_key(&location.file)?;
+        self.by_file.get(key)
+    }
+
+    /// `by_file` key that `path` refers to, via a memoized fuzzy match.
+    fn resolve_path_key(&self, path: &str) -> Option<&'a str> {
+        if let Some(hit) = self.path_cache.borrow().get(path) {
+            return *hit;
+        }
+        let found = self.by_file.keys().copied().find(|k| path_matches(k, path));
+        self.path_cache.borrow_mut().insert(path.to_string(), found);
+        found
     }
 
     fn tightest_enclosing_function(
@@ -130,6 +187,27 @@ impl<'a> SymbolIndex<'a> {
                 .into_iter()
                 .min_by_key(|n| line_distance_to_target(n, target.line)),
         }
+    }
+
+    /// Strict definition lookup: the tightest `Function` node in the target
+    /// file whose line span contains the definition *and* whose FQN ends with
+    /// the symbol's short name. Never falls back to a nearby or same-named
+    /// function elsewhere — a miss means "no node for this symbol".
+    pub fn find_definition_node(&self, target: &IndexTarget, name: &str) -> Option<&'a Node> {
+        let target_path = target.file.to_string_lossy();
+        let file_symbols = self.by_file.get(target_path.as_ref()).or_else(|| {
+            self.by_file
+                .iter()
+                .find(|(k, _)| path_matches(k, target_path.as_ref()))
+                .map(|(_, v)| v)
+        })?;
+        file_symbols
+            .iter()
+            .copied()
+            .filter(|n| n.kind == NodeKind::Function)
+            .filter(|n| n.location.start_line <= target.line && target.line <= n.location.end_line)
+            .filter(|n| fqn_ends_with(&n.fqn, name))
+            .min_by_key(|n| range_span(&n.location))
     }
 
     fn nearest_function_on_file(

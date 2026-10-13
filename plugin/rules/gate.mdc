@@ -1,0 +1,14 @@
+---
+description: GridSeak gate is the authority at the edit boundary. Never flatten tiers.
+alwaysApply: true
+---
+
+The harness hook — not this rule — is the authority.
+
+Claude `PreToolUse` covers Edit/Write/MultiEdit and Bash. Cursor
+`preToolUse` covers Write/StrReplace/Delete/Shell (`failClosed`)
+plus `beforeShellExecution` for `rm` / `git rm`. Cursor `preToolUse`
+does not enforce ask — tree-sitter-only is deny-with-reason.
+
+Compiler/LSP callers → deny. Dirty ∩ stale → ask (rescan) on Claude;
+deny-with-reason on Cursor preToolUse. After compact: `gridseak gate --card`.

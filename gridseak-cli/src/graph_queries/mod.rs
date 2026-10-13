@@ -35,7 +35,7 @@ pub enum GraphQueryError {
     ArtifactMissing(String),
     #[error("symbol `{0}` did not match any function node (tried exact, suffix, then substring)")]
     UnknownSymbol(String),
-    #[error("symbol `{symbol}` matches multiple candidates; specify more of the FQN (showing {shown}/{total}): {candidates:?}")]
+    #[error("symbol `{symbol}` matches multiple candidates; specify more of the FQN or name it by location (`path/to/file.ts:123`) (showing {shown}/{total}): {candidates:?}")]
     AmbiguousSymbol {
         symbol: String,
         candidates: Vec<String>,
@@ -69,10 +69,16 @@ pub enum GraphQueryError {
         "symbol `{symbol}` is too generic for substring resolution \
          (matches names like `*{symbol}*` across the codebase). \
          Pass a qualified path instead — e.g. `module::{symbol}` or \
-         the full FQN. Use `gridseak_resolve_symbol` (if available) \
+         the full FQN — or name it by location: `path/to/file.ts:123` \
+         (the line it is declared on) or `path/to/file.ts::{symbol}`. \
+         Use `gridseak_resolve_symbol` (if available) \
          or `gridseak_get_recommendations` to find the canonical FQN."
     )]
     OverlyGenericSymbol { symbol: String },
+    /// A location-shaped seed (`src/a.ts:120`, `src/a.ts::name`) named a
+    /// scanned file, but no function or method there matches.
+    #[error("no function or method matches `{location}`: {detail}")]
+    NoSymbolAtLocation { location: String, detail: String },
     #[error("sqlite error: {0}")]
     Sql(#[from] rusqlite::Error),
 }
@@ -97,6 +103,10 @@ pub enum ResolutionMethod {
     /// rather than a structural identifier. Returned only when the
     /// seed was not on the overly-generic blocklist.
     SubstringUnique,
+    /// Location-shaped seed: `file:line` (the function or method declared
+    /// on, or enclosing, that line) or `file::name` (the one function of
+    /// that name in the file). Exact — no caveat needed.
+    Location,
 }
 
 /// Result of [`resolve_symbol_detailed`]. Wraps a [`NodeRef`] with
@@ -115,7 +125,13 @@ pub struct SymbolResolution {
 /// known source extensions. Centralised here so the CLI and MCP
 /// reject path-shaped seeds identically, before resolve_symbol
 /// wastes a substring scan looking for them.
+///
+/// Location-shaped seeds (`src/a.ts:120`, `src/a.ts::name`) name a single
+/// declaration and are not paths in this sense.
 pub fn seed_looks_like_path(seed: &str) -> bool {
+    if parse_location_seed(seed).is_some() {
+        return false;
+    }
     if seed.contains('/') || seed.contains('\\') {
         return true;
     }
@@ -289,6 +305,9 @@ pub fn resolve_symbol_detailed(
     conn: &Connection,
     needle: &str,
 ) -> Result<SymbolResolution, GraphQueryError> {
+    if let Some(resolution) = resolve_location_shaped(conn, needle)? {
+        return Ok(resolution);
+    }
     if let Some(node) = lookup_exact_fqn(conn, needle)? {
         return Ok(SymbolResolution {
             node,
@@ -322,6 +341,13 @@ pub fn resolve_symbol_detailed(
             total,
         });
     }
+    // Path-shaped names agents write naturally: Go import paths
+    // (`k8s.io/kubernetes/pkg/api/v1/pod.GetPodCondition`) and file paths
+    // (`pkg/api/v1/pod/util.go::GetPodCondition`). Without this the lookup
+    // failed and agents fell back to grep (P3 scale-test calibration).
+    if let Some(resolution) = resolve_path_shaped(conn, needle)? {
+        return Ok(resolution);
+    }
     // Substring fallback. Gate it on the generic-name blocklist so
     // a bare `load` doesn't silently match `lazy_load` from another
     // module. See P2 dogfood evidence in V0_1_0_RC1_FOLLOWUP_ISSUES.
@@ -354,6 +380,298 @@ pub fn resolve_symbol_detailed(
     Err(GraphQueryError::UnknownSymbol(needle.to_string()))
 }
 
+/// A seed that names a declaration by where it lives in the source.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum LocationSeed {
+    /// `path/to/file.ts:123` (optionally `:col`): the function or method
+    /// declared on, or enclosing, line 123.
+    Line { file: String, line: u32 },
+    /// `path/to/file.ts::name` (or `::Class.name`): the function or method
+    /// called `name` in that file.
+    Name { file: String, name: String },
+}
+
+/// Parse `file:line[:col]` or `file::name` where `file` ends in a source
+/// extension. Anything else (FQNs, Go import paths) is `None`.
+pub fn parse_location_seed(needle: &str) -> Option<LocationSeed> {
+    let needle = needle.trim();
+    let clean = |f: &str| f.trim().trim_start_matches("./").to_string();
+    if let Some((file, name)) = needle.split_once("::") {
+        let name = name.trim();
+        if has_source_ext(file) && !name.is_empty() {
+            return Some(LocationSeed::Name {
+                file: clean(file),
+                name: name.to_string(),
+            });
+        }
+        return None;
+    }
+    let (rest, last) = needle.rsplit_once(':')?;
+    let last: u32 = last.trim().parse().ok()?;
+    // `file:line:col` — drop the column.
+    let (file, line) = match rest.rsplit_once(':') {
+        Some((file, line)) if line.trim().parse::<u32>().is_ok() => {
+            (file, line.trim().parse().ok()?)
+        }
+        _ => (rest, last),
+    };
+    (has_source_ext(file) && line > 0).then(|| LocationSeed::Line {
+        file: clean(file),
+        line,
+    })
+}
+
+fn has_source_ext(path: &str) -> bool {
+    const EXTS: &[&str] = &[
+        "rs", "ts", "tsx", "mts", "cts", "js", "jsx", "mjs", "cjs", "py", "go", "java", "kt",
+        "swift", "cls", "trigger", "cs", "rb", "php", "c", "cc", "cpp", "h", "hpp",
+    ];
+    path.rsplit_once('.')
+        .is_some_and(|(stem, ext)| !stem.is_empty() && EXTS.contains(&ext))
+}
+
+/// True for the synthetic nodes that stand for a file's or module's
+/// top-level code rather than a declared function.
+pub fn is_top_level_scope_fqn(fqn: &str) -> bool {
+    fqn.ends_with("__file_scope__") || fqn.ends_with("__file_module__")
+}
+
+/// What kind of caller a node is, as agents see it: `function`, `method`
+/// or `constructor` (callable), or — for code that runs outside any
+/// declared function — `file_scope` (a file's top-level statements),
+/// `module`, `file`, or `synthetic` (a parser-made wrapper). The bool is
+/// whether the node is a callable function or method.
+pub fn caller_kind(conn: &Connection, node: &NodeRef) -> Result<(String, bool), GraphQueryError> {
+    if is_top_level_scope_fqn(&node.fqn) {
+        return Ok(("file_scope".into(), false));
+    }
+    if !node_is_function(node) {
+        return Ok((node.kind.to_ascii_lowercase(), false));
+    }
+    let synthetic: bool = conn
+        .query_row(
+            "SELECT COALESCE(json_extract(properties, '$.synthetic'), 0) FROM nodes WHERE id = ?1",
+            [&node.id],
+            |r| r.get::<_, i64>(0),
+        )
+        .map(|v| v != 0)
+        .unwrap_or(false);
+    if synthetic {
+        return Ok(("synthetic".into(), false));
+    }
+    let short = node.fqn.rsplit("::").next().unwrap_or(&node.fqn);
+    let kind = if short == "constructor" || node.kind.eq_ignore_ascii_case("Constructor") {
+        "constructor"
+    } else if node.kind.eq_ignore_ascii_case("Method") {
+        "method"
+    } else {
+        "function"
+    };
+    Ok((kind.into(), true))
+}
+
+/// Resolve `file:line` / `file::name` against node locations. `Ok(None)`
+/// when the seed is not location-shaped or no scanned file matches `file`
+/// (so path-shaped FQN resolution can still try it); an error when the file
+/// matches but no single function there does.
+fn resolve_location_shaped(
+    conn: &Connection,
+    needle: &str,
+) -> Result<Option<SymbolResolution>, GraphQueryError> {
+    let Some(seed) = parse_location_seed(needle) else {
+        return Ok(None);
+    };
+    let file = match &seed {
+        LocationSeed::Line { file, .. } | LocationSeed::Name { file, .. } => file.clone(),
+    };
+    // Stored paths are usually absolute; match `file` as a whole-segment suffix.
+    let mut stmt = conn.prepare(
+        "SELECT id, fqn, kind, f, json_extract(location, '$.start_line'),
+                json_extract(location, '$.end_line')
+         FROM (SELECT *, json_extract(location, '$.file') AS f FROM nodes
+               WHERE kind IN ('Function', 'Method', 'Constructor'))
+         WHERE f = ?1 OR substr(f, -length(?1) - 1) = '/' || ?1",
+    )?;
+    let rows = stmt
+        .query_map([&file], |r| {
+            Ok((
+                NodeRef {
+                    id: r.get(0)?,
+                    fqn: r.get(1)?,
+                    kind: r.get(2)?,
+                    file: r.get(3)?,
+                    line: r.get(4)?,
+                },
+                r.get::<_, Option<u32>>(5)?,
+            ))
+        })?
+        .collect::<rusqlite::Result<Vec<_>>>()?;
+    if rows.is_empty() {
+        return Ok(None);
+    }
+    let mut files: Vec<&str> = rows.iter().filter_map(|(n, _)| n.file.as_deref()).collect();
+    files.sort_unstable();
+    files.dedup();
+    if files.len() > 1 {
+        return Err(GraphQueryError::AmbiguousSymbol {
+            symbol: needle.to_string(),
+            candidates: files.iter().take(10).map(|f| f.to_string()).collect(),
+            shown: files.len().min(10),
+            total: files.len(),
+        });
+    }
+    let candidates: Vec<(NodeRef, u32, u32)> = rows
+        .into_iter()
+        .filter(|(n, _)| !is_top_level_scope_fqn(&n.fqn))
+        .map(|(n, end)| {
+            let start = n.line.unwrap_or(0);
+            (n, start, end.unwrap_or(start))
+        })
+        .collect();
+    let located = |n: &NodeRef| format!("{} ({}:{})", n.fqn, file, n.line.unwrap_or(0));
+    let picked = match &seed {
+        LocationSeed::Line { line, .. } => {
+            let line = *line;
+            let on_line = candidates
+                .iter()
+                .filter(|(_, s, _)| *s == line)
+                .min_by_key(|(_, s, e)| e - s);
+            let enclosing = || {
+                candidates
+                    .iter()
+                    .filter(|(_, s, e)| *s <= line && line <= *e)
+                    .min_by_key(|(_, s, e)| (e - s, u32::MAX - s))
+            };
+            match on_line.or_else(enclosing) {
+                Some((n, _, _)) => n.clone(),
+                None => {
+                    return Err(GraphQueryError::NoSymbolAtLocation {
+                        location: needle.to_string(),
+                        detail: format!(
+                            "line {line} of `{file}` is not inside any function or method \
+                             (top-level code, a type, or a field that is not a function). \
+                             Pass the line of the declaration itself."
+                        ),
+                    })
+                }
+            }
+        }
+        LocationSeed::Name { name, .. } => {
+            let short = name.rsplit(['.', ':']).next().unwrap_or(name);
+            let hits: Vec<&NodeRef> = candidates
+                .iter()
+                .map(|(n, _, _)| n)
+                .filter(|n| n.fqn.rsplit("::").next() == Some(short))
+                .collect();
+            match hits.as_slice() {
+                [one] => (*one).clone(),
+                [] => {
+                    return Err(GraphQueryError::NoSymbolAtLocation {
+                        location: needle.to_string(),
+                        detail: format!("`{file}` declares no function or method named `{short}`"),
+                    })
+                }
+                many => {
+                    return Err(GraphQueryError::AmbiguousSymbol {
+                        symbol: needle.to_string(),
+                        candidates: many.iter().take(10).map(|n| located(n)).collect(),
+                        shown: many.len().min(10),
+                        total: many.len(),
+                    })
+                }
+            }
+        }
+    };
+    Ok(Some(SymbolResolution {
+        node: picked,
+        method: ResolutionMethod::Location,
+    }))
+}
+
+/// Split a path-shaped symbol into (directory segments, symbol tail).
+///
+/// - `pkg/api/v1/pod/util.go::GetPodCondition` → (`pkg api v1 pod util`, `GetPodCondition`)
+/// - `k8s.io/kubernetes/pkg/api/v1/pod.GetPodCondition` → (`k8s.io kubernetes pkg api v1 pod`, `GetPodCondition`)
+/// - `example.com/m/pkg.Type.Method` → (`example.com m pkg`, `Type.Method`)
+fn split_path_symbol(needle: &str) -> Option<(Vec<String>, String)> {
+    if !needle.contains('/') {
+        return None;
+    }
+    if let Some((path, tail)) = needle
+        .rsplit_once("::")
+        .or_else(|| needle.rsplit_once(':'))
+        .filter(|(p, _)| p.contains('.') || p.contains('/'))
+    {
+        let path = path
+            .rsplit_once('.')
+            .filter(|(_, ext)| ext.len() <= 4 && !ext.contains('/'))
+            .map(|(stem, _)| stem)
+            .unwrap_or(path);
+        let segs = path
+            .split('/')
+            .filter(|s| !s.is_empty())
+            .map(str::to_string)
+            .collect();
+        return Some((segs, tail.to_string()));
+    }
+    let (dir, last) = needle.rsplit_once('/')?;
+    let (pkg, tail) = last.split_once('.')?;
+    let mut segs: Vec<String> = dir
+        .split('/')
+        .filter(|s| !s.is_empty())
+        .map(str::to_string)
+        .collect();
+    segs.push(pkg.to_string());
+    Some((segs, tail.to_string()))
+}
+
+/// Resolve a path-shaped symbol by trying ever-shorter trailing directory
+/// segments (module prefixes like `k8s.io/kubernetes` are not in FQNs) until
+/// exactly one function ends with the tail under that path.
+fn resolve_path_shaped(
+    conn: &Connection,
+    needle: &str,
+) -> Result<Option<SymbolResolution>, GraphQueryError> {
+    let Some((segs, tail)) = split_path_symbol(needle) else {
+        return Ok(None);
+    };
+    if tail.is_empty() || segs.is_empty() {
+        return Ok(None);
+    }
+    for k in (1..=segs.len()).rev() {
+        let dir = segs[segs.len() - k..].join("::");
+        let mut matches = lookup_like_fqn(conn, &format!("%{dir}::{tail}"), 25)?;
+        if matches.is_empty() {
+            // Go/TS FQNs carry the file stem between package and symbol.
+            matches = lookup_like_fqn(conn, &format!("%{dir}::%::{tail}"), 25)?;
+            matches.retain(|m| {
+                m.fqn
+                    .rsplit_once("::")
+                    .and_then(|(prefix, _)| prefix.rsplit_once("::"))
+                    .is_some_and(|(pkg, _)| pkg.ends_with(&dir))
+            });
+        }
+        match matches.len() {
+            0 => continue,
+            1 => {
+                return Ok(Some(SymbolResolution {
+                    node: matches.into_iter().next().unwrap(),
+                    method: ResolutionMethod::SuffixUnique,
+                }))
+            }
+            total => {
+                return Err(GraphQueryError::AmbiguousSymbol {
+                    symbol: needle.to_string(),
+                    candidates: matches.iter().take(10).map(|c| c.fqn.clone()).collect(),
+                    shown: 10.min(total),
+                    total,
+                })
+            }
+        }
+    }
+    Ok(None)
+}
+
 fn lookup_exact_fqn(conn: &Connection, fqn: &str) -> Result<Option<NodeRef>, GraphQueryError> {
     let mut stmt = conn.prepare("SELECT id, fqn, kind FROM nodes WHERE fqn = ?1 LIMIT 1")?;
     let mut rows = stmt.query([fqn])?;
@@ -362,6 +680,8 @@ fn lookup_exact_fqn(conn: &Connection, fqn: &str) -> Result<Option<NodeRef>, Gra
             id: row.get(0)?,
             fqn: row.get(1)?,
             kind: row.get(2)?,
+            file: None,
+            line: None,
         }));
     }
     Ok(None)
@@ -375,6 +695,8 @@ fn lookup_exact_id(conn: &Connection, id: &str) -> Result<Option<NodeRef>, Graph
             id: row.get(0)?,
             fqn: row.get(1)?,
             kind: row.get(2)?,
+            file: None,
+            line: None,
         }));
     }
     Ok(None)
@@ -397,6 +719,8 @@ fn lookup_like_fqn(
                 id: row.get(0)?,
                 fqn: row.get(1)?,
                 kind: row.get(2)?,
+                file: None,
+                line: None,
             })
         })?
         .collect::<rusqlite::Result<Vec<_>>>()?;
@@ -412,6 +736,12 @@ pub struct NodeRef {
     pub id: String,
     pub fqn: String,
     pub kind: String,
+    /// Source location, filled for caller/callee lists so an agent can open
+    /// or edit the site without reverse-engineering the FQN.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub file: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub line: Option<u32>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -570,32 +900,85 @@ pub struct FileBlastRadiusResult {
 /// when narrating impact. Recomputing best/worst-tier across all
 /// parents would force a second pass and obscures the causal chain
 /// the agent is actually showing the user.
+/// One BFS hit: (depth, node, tier of the edge that reached it, p_true).
+type WalkRow = (usize, NodeRef, Option<String>, Option<f64>);
+
 fn walk_calls(
     conn: &Connection,
     seed: &str,
     direction: Direction,
     max_depth: usize,
     cap: usize,
-) -> Result<Vec<(usize, NodeRef, Option<String>, Option<f64>)>, GraphQueryError> {
+) -> Result<Vec<WalkRow>, GraphQueryError> {
+    walk_calls_using(conn, seed, direction, max_depth, cap, EdgeUses::All)
+}
+
+/// Which compiler-recorded uses an edge walk follows. Edges carry
+/// `provenance.via` (`call`, `dispatch`, `value`) when the scan came
+/// from a reference sweep; edges without it (heuristic tier, scans
+/// that pre-date the field) are always followed.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum EdgeUses {
+    /// Every Call edge, including function values and interface dispatch.
+    #[default]
+    All,
+    /// Direct calls plus interface / virtual dispatch.
+    Calls,
+    /// Direct static calls only: what a compiler's call graph lists.
+    Static,
+}
+
+impl EdgeUses {
+    pub fn parse(raw: &str) -> Option<Self> {
+        match raw.trim().to_ascii_lowercase().as_str() {
+            "all" | "" => Some(Self::All),
+            "calls" | "call+dispatch" => Some(Self::Calls),
+            "static" | "call" => Some(Self::Static),
+            _ => None,
+        }
+    }
+
+    fn sql(self) -> &'static str {
+        match self {
+            Self::All => "",
+            Self::Calls => {
+                " AND COALESCE(json_extract(e.provenance, '$.via'), 'call') IN ('call', 'dispatch')"
+            }
+            Self::Static => " AND COALESCE(json_extract(e.provenance, '$.via'), 'call') = 'call'",
+        }
+    }
+}
+
+pub(crate) fn walk_calls_using(
+    conn: &Connection,
+    seed: &str,
+    direction: Direction,
+    max_depth: usize,
+    cap: usize,
+    uses: EdgeUses,
+) -> Result<Vec<WalkRow>, GraphQueryError> {
     let mut seen = HashSet::<String>::new();
-    let mut order = Vec::<(usize, NodeRef, Option<String>, Option<f64>)>::new();
+    let mut order = Vec::<WalkRow>::new();
     let mut queue: VecDeque<(usize, String)> = VecDeque::new();
     seen.insert(seed.to_string());
     queue.push_back((0, seed.to_string()));
 
-    let sql = match direction {
+    let base = match direction {
         Direction::Out => {
-            "SELECT n.id, n.fqn, n.kind, e.provenance FROM edges e
+            "SELECT n.id, n.fqn, n.kind, e.provenance, json_extract(n.location, '$.file'),
+                    json_extract(n.location, '$.start_line') FROM edges e
              JOIN nodes n ON n.id = e.to_id
              WHERE e.from_id = ?1 AND json_extract(e.kind, '$.kind') = 'Call'"
         }
         Direction::In => {
-            "SELECT n.id, n.fqn, n.kind, e.provenance FROM edges e
+            "SELECT n.id, n.fqn, n.kind, e.provenance, json_extract(n.location, '$.file'),
+                    json_extract(n.location, '$.start_line') FROM edges e
              JOIN nodes n ON n.id = e.from_id
              WHERE e.to_id = ?1 AND json_extract(e.kind, '$.kind') = 'Call'"
         }
     };
-    let mut stmt = conn.prepare(sql)?;
+    let sql = format!("{base}{}", uses.sql());
+    let mut stmt = conn.prepare(&sql)?;
 
     while let Some((depth, id)) = queue.pop_front() {
         if depth >= max_depth {
@@ -607,6 +990,8 @@ fn walk_calls(
                 id: row.get(0)?,
                 fqn: row.get(1)?,
                 kind: row.get(2)?,
+                file: row.get(4).ok().flatten(),
+                line: row.get(5).ok().flatten(),
             };
             // Provenance can be NULL on legacy rows; tolerate that
             // and fall through to `None` tier rather than failing
@@ -645,7 +1030,7 @@ fn provenance_source_to_tier(raw: &str) -> Option<String> {
 }
 
 #[derive(Debug, Clone, Copy)]
-enum Direction {
+pub(crate) enum Direction {
     Out,
     In,
 }
@@ -893,9 +1278,209 @@ pub(crate) fn nodes_by_id(
                     id: row.get(0)?,
                     fqn: row.get(1)?,
                     kind: row.get(2)?,
+                    file: None,
+                    line: None,
                 },
             ))
         })?
         .collect::<rusqlite::Result<HashMap<_, _>>>()?;
     Ok(rows)
+}
+
+#[cfg(test)]
+mod path_symbol_tests {
+    use super::split_path_symbol;
+
+    #[test]
+    fn go_import_path_splits_package_and_name() {
+        let (segs, tail) =
+            split_path_symbol("k8s.io/kubernetes/pkg/api/v1/pod.GetPodCondition").unwrap();
+        assert_eq!(segs, ["k8s.io", "kubernetes", "pkg", "api", "v1", "pod"]);
+        assert_eq!(tail, "GetPodCondition");
+    }
+
+    #[test]
+    fn go_method_keeps_receiver() {
+        let (_, tail) = split_path_symbol("github.com/x/y/headers.HeaderOps.Provision").unwrap();
+        assert_eq!(tail, "HeaderOps.Provision");
+    }
+
+    #[test]
+    fn file_path_drops_extension() {
+        let (segs, tail) = split_path_symbol("pkg/api/v1/pod/util.go::GetPodCondition").unwrap();
+        assert_eq!(segs, ["pkg", "api", "v1", "pod", "util"]);
+        assert_eq!(tail, "GetPodCondition");
+    }
+
+    #[test]
+    fn plain_names_are_not_path_shaped() {
+        assert!(split_path_symbol("GetPodCondition").is_none());
+        assert!(split_path_symbol("pod::util::GetPodCondition").is_none());
+    }
+}
+
+#[cfg(test)]
+mod location_seed_tests {
+    use super::*;
+
+    /// hono-shaped graph: `fetch` / `request` are class-field arrows in
+    /// `src/hono-base.ts`, another `fetch` lives in `src/client/client.ts`,
+    /// and zod-shaped `_addCheck` is declared twice in one file.
+    fn graph() -> Connection {
+        let conn = Connection::open_in_memory().unwrap();
+        conn.execute_batch(
+            r#"
+            CREATE TABLE nodes (
+                id TEXT PRIMARY KEY, kind TEXT NOT NULL, fqn TEXT NOT NULL,
+                location TEXT NOT NULL DEFAULT '{}', provenance TEXT NOT NULL DEFAULT '{}',
+                properties TEXT NOT NULL DEFAULT '{}', trait_metadata TEXT
+            );
+            CREATE TABLE edges (
+                from_id TEXT, to_id TEXT, kind TEXT NOT NULL,
+                provenance TEXT NOT NULL DEFAULT '{}', PRIMARY KEY (from_id, to_id, kind)
+            );
+            INSERT INTO nodes (id, kind, fqn, location, properties) VALUES
+                ('fs', 'Function', 'p::hono_base::__file_scope__',
+                 '{"file":"/r/src/hono-base.ts","start_line":1,"end_line":540}', '{}'),
+                ('hfetch', 'Function', 'p::hono_base::fetch',
+                 '{"file":"/r/src/hono-base.ts","start_line":483,"end_line":489}', '{}'),
+                ('request', 'Function', 'p::hono_base::request',
+                 '{"file":"/r/src/hono-base.ts","start_line":503,"end_line":521}', '{}'),
+                ('cfetch', 'Function', 'p::client::client::fetch',
+                 '{"file":"/r/src/client/client.ts","start_line":40,"end_line":60}', '{}'),
+                ('add1', 'Function', 'p::types::_addCheck',
+                 '{"file":"/r/src/types.ts","start_line":1095,"end_line":1100}', '{}'),
+                ('add2', 'Function', 'p::types::_addCheck',
+                 '{"file":"/r/src/types.ts","start_line":1555,"end_line":1560}', '{}'),
+                ('dadd', 'Function', 'p::deno::lib::types::_addCheck',
+                 '{"file":"/r/deno/lib/types.ts","start_line":1095,"end_line":1100}', '{}'),
+                ('mod', 'Module', 'p::types',
+                 '{"file":"/r/src/types.ts","start_line":1,"end_line":5000}', '{}'),
+                ('syn', 'Function', 'p::x::field.__init__',
+                 '{"file":"/r/src/x.ts","start_line":3,"end_line":3}', '{"synthetic":true}');
+            "#,
+        )
+        .unwrap();
+        conn
+    }
+
+    #[test]
+    fn parses_location_shapes() {
+        assert_eq!(
+            parse_location_seed("src/hono-base.ts:483"),
+            Some(LocationSeed::Line {
+                file: "src/hono-base.ts".into(),
+                line: 483
+            })
+        );
+        assert_eq!(
+            parse_location_seed("./src/hono-base.ts:483:3"),
+            Some(LocationSeed::Line {
+                file: "src/hono-base.ts".into(),
+                line: 483
+            })
+        );
+        assert_eq!(
+            parse_location_seed("src/hono-base.ts::Hono.fetch"),
+            Some(LocationSeed::Name {
+                file: "src/hono-base.ts".into(),
+                name: "Hono.fetch".into()
+            })
+        );
+        assert_eq!(parse_location_seed("hono_base::fetch"), None);
+        assert_eq!(parse_location_seed("fetch"), None);
+        assert_eq!(parse_location_seed("src/hono-base.ts"), None);
+        assert_eq!(parse_location_seed("k8s.io/x/pod.GetPodCondition"), None);
+        assert!(!seed_looks_like_path("src/hono-base.ts:483"));
+        assert!(seed_looks_like_path("src/hono-base.ts"));
+    }
+
+    #[test]
+    fn file_line_resolves_common_and_class_field_names() {
+        let conn = graph();
+        // Bare `fetch` is refused as too generic; the location is not.
+        assert!(resolve_symbol_detailed(&conn, "fetch").is_err());
+        let r = resolve_symbol_detailed(&conn, "src/hono-base.ts:483").unwrap();
+        assert_eq!(
+            (r.node.id.as_str(), r.method),
+            ("hfetch", ResolutionMethod::Location)
+        );
+        // A line inside the body resolves to the enclosing function, not
+        // the file scope that also spans it.
+        let r = resolve_symbol_detailed(&conn, "src/hono-base.ts:510").unwrap();
+        assert_eq!(r.node.id, "request");
+        // Same name declared twice in one file: the line picks one.
+        let r = resolve_symbol_detailed(&conn, "src/types.ts:1555").unwrap();
+        assert_eq!(r.node.id, "add2");
+        // An absolute path works too.
+        let r = resolve_symbol_detailed(&conn, "/r/deno/lib/types.ts:1095").unwrap();
+        assert_eq!(r.node.id, "dadd");
+    }
+
+    #[test]
+    fn file_name_resolves_or_reports_ambiguity() {
+        let conn = graph();
+        let r = resolve_symbol_detailed(&conn, "src/hono-base.ts::fetch").unwrap();
+        assert_eq!(r.node.id, "hfetch");
+        let r = resolve_symbol_detailed(&conn, "src/hono-base.ts::Hono.request").unwrap();
+        assert_eq!(r.node.id, "request");
+        let err = resolve_symbol_detailed(&conn, "src/types.ts::_addCheck").unwrap_err();
+        assert!(
+            matches!(err, GraphQueryError::AmbiguousSymbol { total: 2, .. }),
+            "{err:?}"
+        );
+    }
+
+    #[test]
+    fn location_errors_are_specific() {
+        let conn = graph();
+        // Top-level line of a known file: no function there.
+        let err = resolve_symbol_detailed(&conn, "src/hono-base.ts:2").unwrap_err();
+        assert!(
+            matches!(err, GraphQueryError::NoSymbolAtLocation { .. }),
+            "{err:?}"
+        );
+        let err = resolve_symbol_detailed(&conn, "src/hono-base.ts::nope").unwrap_err();
+        assert!(
+            matches!(err, GraphQueryError::NoSymbolAtLocation { .. }),
+            "{err:?}"
+        );
+        // `types.ts` alone is a suffix of two scanned files.
+        let err = resolve_symbol_detailed(&conn, "types.ts:1095").unwrap_err();
+        assert!(
+            matches!(err, GraphQueryError::AmbiguousSymbol { .. }),
+            "{err:?}"
+        );
+        // A file the scan never saw is not location-resolvable.
+        assert!(resolve_symbol_detailed(&conn, "src/missing.ts:3").is_err());
+    }
+
+    #[test]
+    fn caller_kind_separates_top_level_code() {
+        let conn = graph();
+        let node = |id: &str, kind: &str, fqn: &str| NodeRef {
+            id: id.into(),
+            fqn: fqn.into(),
+            kind: kind.into(),
+            file: None,
+            line: None,
+        };
+        let k = |n: NodeRef| caller_kind(&conn, &n).unwrap();
+        assert_eq!(
+            k(node("fs", "Function", "p::hono_base::__file_scope__")),
+            ("file_scope".into(), false)
+        );
+        assert_eq!(
+            k(node("mod", "Module", "p::types")),
+            ("module".into(), false)
+        );
+        assert_eq!(
+            k(node("syn", "Function", "p::x::field.__init__")),
+            ("synthetic".into(), false)
+        );
+        assert_eq!(
+            k(node("hfetch", "Function", "p::hono_base::fetch")),
+            ("function".into(), true)
+        );
+    }
 }

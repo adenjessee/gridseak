@@ -1,0 +1,3222 @@
+{
+ "repo": "chi",
+ "root": "<repo root>",
+ "date": "2026-10-12",
+ "agent": "Claude Code",
+ "model": "claude-haiku-5-5, claude-sonnet-5-5, claude-opus-5-5",
+ "mode": "read-only tools + language toolchain",
+ "answer_key": "GridSeak compiler-indexed call graph (554 edges, 100% from the compiler index)",
+ "call_edges": 554,
+ "tasks": [
+  {
+   "id": "t1",
+   "band": "small",
+   "target": "cW",
+   "file": "middleware/terminal.go",
+   "line": 55,
+   "question": "In this repository (chi), list every function and method, including those in test files, that transitively calls `cW` (declared at middleware/terminal.go:55) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `cW` itself. The list must be complete.",
+   "max_depth": 3,
+   "answer": [
+    {
+     "file": "middleware/logger.go",
+     "line": 98,
+     "name": "DefaultLogFormatter.NewLogEntry"
+    },
+    {
+     "file": "middleware/logger.go",
+     "line": 134,
+     "name": "defaultLogEntry.Write"
+    },
+    {
+     "file": "middleware/logger.go",
+     "line": 162,
+     "name": "defaultLogEntry.Panic"
+    },
+    {
+     "file": "middleware/recoverer.go",
+     "line": 22,
+     "name": "Recoverer"
+    },
+    {
+     "file": "middleware/recoverer.go",
+     "line": 54,
+     "name": "PrintPrettyStack"
+    },
+    {
+     "file": "middleware/recoverer.go",
+     "line": 69,
+     "name": "prettyStack.parse"
+    },
+    {
+     "file": "middleware/recoverer.go",
+     "line": 112,
+     "name": "prettyStack.decorateLine"
+    },
+    {
+     "file": "middleware/recoverer.go",
+     "line": 126,
+     "name": "prettyStack.decorateFuncCallLine"
+    },
+    {
+     "file": "middleware/recoverer.go",
+     "line": 166,
+     "name": "prettyStack.decorateSourceLine"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t2",
+   "band": "small",
+   "target": "Mux.With",
+   "file": "mux.go",
+   "line": 242,
+   "question": "In this repository (chi), list every function and method, including those in test files, that transitively calls `Mux.With` (declared at mux.go:242) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `Mux.With` itself. The list must be complete.",
+   "max_depth": 3,
+   "answer": [
+    {
+     "file": "mux.go",
+     "line": 268,
+     "name": "Mux.Group"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 317,
+     "name": "TestMuxNestedNotFound"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 498,
+     "name": "TestMuxComplicatedNotFound"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 590,
+     "name": "TestMuxWith"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 726,
+     "name": "TestRouterFromMuxWith"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 746,
+     "name": "TestMuxMiddlewareStack"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 821,
+     "name": "TestMuxRouteGroups"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 877,
+     "name": "TestMuxBig"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 948,
+     "name": "bigMux"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 1384,
+     "name": "TestNestedGroups"
+    },
+    {
+     "file": "tree_test.go",
+     "line": 512,
+     "name": "TestWalker"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t3",
+   "band": "small",
+   "target": "nodes.findEdge",
+   "file": "tree.go",
+   "line": 821,
+   "question": "In this repository (chi), list every function and method, including those in test files, that transitively calls `nodes.findEdge` (declared at tree.go:821) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `nodes.findEdge` itself. The list must be complete.",
+   "max_depth": 5,
+   "answer": [
+    {
+     "file": "mux.go",
+     "line": 365,
+     "name": "Mux.Match"
+    },
+    {
+     "file": "mux.go",
+     "line": 374,
+     "name": "Mux.Find"
+    },
+    {
+     "file": "mux.go",
+     "line": 447,
+     "name": "Mux.routeHTTP"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 1779,
+     "name": "TestMuxMatch"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 1817,
+     "name": "TestMuxMatch_HasBasePath"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 1832,
+     "name": "TestMuxMatch_DoesNotHaveBasePath"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 1843,
+     "name": "TestMuxFind"
+    },
+    {
+     "file": "tree.go",
+     "line": 372,
+     "name": "node.FindRoute"
+    },
+    {
+     "file": "tree.go",
+     "line": 399,
+     "name": "node.findRoute"
+    },
+    {
+     "file": "tree_test.go",
+     "line": 10,
+     "name": "TestTree"
+    },
+    {
+     "file": "tree_test.go",
+     "line": 154,
+     "name": "TestTreeMoar"
+    },
+    {
+     "file": "tree_test.go",
+     "line": 270,
+     "name": "TestTreeRegexp"
+    },
+    {
+     "file": "tree_test.go",
+     "line": 336,
+     "name": "TestTreeRegexpRecursive"
+    },
+    {
+     "file": "tree_test.go",
+     "line": 387,
+     "name": "TestTreeRegexMatchWholeParam"
+    },
+    {
+     "file": "tree_test.go",
+     "line": 487,
+     "name": "BenchmarkTreeGet"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t4",
+   "band": "small",
+   "target": "Context.Reset",
+   "file": "context.go",
+   "line": 82,
+   "question": "In this repository (chi), list every function and method, including those in test files, that transitively calls `Context.Reset` (declared at context.go:82) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `Context.Reset` itself. The list must be complete.",
+   "max_depth": 2,
+   "answer": [
+    {
+     "file": "middleware/content_charset_test.go",
+     "line": 11,
+     "name": "TestContentCharset"
+    },
+    {
+     "file": "middleware/content_encoding_test.go",
+     "line": 12,
+     "name": "TestContentEncodingMiddleware"
+    },
+    {
+     "file": "middleware/content_type_test.go",
+     "line": 12,
+     "name": "TestContentType"
+    },
+    {
+     "file": "middleware/realip_test.go",
+     "line": 11,
+     "name": "TestXRealIP"
+    },
+    {
+     "file": "middleware/realip_test.go",
+     "line": 35,
+     "name": "TestXForwardForIP"
+    },
+    {
+     "file": "middleware/realip_test.go",
+     "line": 68,
+     "name": "TestXForwardForXRealIPPrecedence"
+    },
+    {
+     "file": "middleware/realip_test.go",
+     "line": 93,
+     "name": "TestInvalidIP"
+    },
+    {
+     "file": "middleware/recoverer_test.go",
+     "line": 44,
+     "name": "TestRecovererAbortHandler"
+    },
+    {
+     "file": "middleware/request_id_test.go",
+     "line": 20,
+     "name": "TestRequestID"
+    },
+    {
+     "file": "middleware/sunset_test.go",
+     "line": 12,
+     "name": "TestSunset"
+    },
+    {
+     "file": "mux.go",
+     "line": 63,
+     "name": "Mux.ServeHTTP"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 1169,
+     "name": "TestMuxSubroutes"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 1328,
+     "name": "TestServeHTTPExistingContext"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 1677,
+     "name": "TestMuxContextIsThreadSafe"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 1779,
+     "name": "TestMuxMatch"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 1817,
+     "name": "TestMuxMatch_HasBasePath"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 1832,
+     "name": "TestMuxMatch_DoesNotHaveBasePath"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 1843,
+     "name": "TestMuxFind"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 1993,
+     "name": "BenchmarkMux"
+    },
+    {
+     "file": "tree_test.go",
+     "line": 487,
+     "name": "BenchmarkTreeGet"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t5",
+   "band": "small",
+   "target": "Mux.Use",
+   "file": "mux.go",
+   "line": 100,
+   "question": "In this repository (chi), list every function and method, including those in test files, that transitively calls `Mux.Use` (declared at mux.go:100) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `Mux.Use` itself. The list must be complete.",
+   "max_depth": 2,
+   "answer": [
+    {
+     "file": "middleware/compress_test.go",
+     "line": 17,
+     "name": "TestCompressor"
+    },
+    {
+     "file": "middleware/content_charset_test.go",
+     "line": 11,
+     "name": "TestContentCharset"
+    },
+    {
+     "file": "middleware/content_encoding_test.go",
+     "line": 12,
+     "name": "TestContentEncodingMiddleware"
+    },
+    {
+     "file": "middleware/content_type_test.go",
+     "line": 12,
+     "name": "TestContentType"
+    },
+    {
+     "file": "middleware/get_head_test.go",
+     "line": 11,
+     "name": "TestGetHead"
+    },
+    {
+     "file": "middleware/profiler.go",
+     "line": 20,
+     "name": "Profiler"
+    },
+    {
+     "file": "middleware/realip_test.go",
+     "line": 11,
+     "name": "TestXRealIP"
+    },
+    {
+     "file": "middleware/realip_test.go",
+     "line": 35,
+     "name": "TestXForwardForIP"
+    },
+    {
+     "file": "middleware/realip_test.go",
+     "line": 68,
+     "name": "TestXForwardForXRealIPPrecedence"
+    },
+    {
+     "file": "middleware/realip_test.go",
+     "line": 93,
+     "name": "TestInvalidIP"
+    },
+    {
+     "file": "middleware/recoverer_test.go",
+     "line": 15,
+     "name": "TestRecoverer"
+    },
+    {
+     "file": "middleware/recoverer_test.go",
+     "line": 44,
+     "name": "TestRecovererAbortHandler"
+    },
+    {
+     "file": "middleware/request_id_test.go",
+     "line": 20,
+     "name": "TestRequestID"
+    },
+    {
+     "file": "middleware/strip_test.go",
+     "line": 13,
+     "name": "TestStripSlashes"
+    },
+    {
+     "file": "middleware/strip_test.go",
+     "line": 102,
+     "name": "TestRedirectSlashes"
+    },
+    {
+     "file": "middleware/strip_test.go",
+     "line": 241,
+     "name": "TestStripPrefix"
+    },
+    {
+     "file": "middleware/sunset_test.go",
+     "line": 12,
+     "name": "TestSunset"
+    },
+    {
+     "file": "middleware/throttle_test.go",
+     "line": 17,
+     "name": "TestThrottleBacklog"
+    },
+    {
+     "file": "middleware/throttle_test.go",
+     "line": 58,
+     "name": "TestThrottleClientTimeout"
+    },
+    {
+     "file": "middleware/throttle_test.go",
+     "line": 90,
+     "name": "TestThrottleTriggerGatewayTimeout"
+    },
+    {
+     "file": "middleware/throttle_test.go",
+     "line": 144,
+     "name": "TestThrottleMaximum"
+    },
+    {
+     "file": "middleware/throttle_test.go",
+     "line": 252,
+     "name": "TestThrottleCustomStatusCode"
+    },
+    {
+     "file": "middleware/url_format_test.go",
+     "line": 11,
+     "name": "TestURLFormat"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 17,
+     "name": "TestMuxBasic"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 317,
+     "name": "TestMuxNestedNotFound"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 746,
+     "name": "TestMuxMiddlewareStack"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 877,
+     "name": "TestMuxBig"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 948,
+     "name": "bigMux"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 1440,
+     "name": "TestMiddlewarePanicOnLateUse"
+    },
+    {
+     "file": "tree_test.go",
+     "line": 512,
+     "name": "TestWalker"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t6",
+   "band": "medium",
+   "target": "node.walk",
+   "file": "tree.go",
+   "line": 670,
+   "question": "In this repository (chi), list every function and method, including those in test files, that transitively calls `node.walk` (declared at tree.go:670) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `node.walk` itself. The list must be complete.",
+   "max_depth": 7,
+   "answer": [
+    {
+     "file": "middleware/get_head_test.go",
+     "line": 11,
+     "name": "TestGetHead"
+    },
+    {
+     "file": "middleware/strip_test.go",
+     "line": 13,
+     "name": "TestStripSlashes"
+    },
+    {
+     "file": "middleware/strip_test.go",
+     "line": 56,
+     "name": "TestStripSlashesInRoute"
+    },
+    {
+     "file": "middleware/strip_test.go",
+     "line": 102,
+     "name": "TestRedirectSlashes"
+    },
+    {
+     "file": "middleware/url_format_test.go",
+     "line": 11,
+     "name": "TestURLFormat"
+    },
+    {
+     "file": "middleware/url_format_test.go",
+     "line": 52,
+     "name": "TestURLFormatInSubRouter"
+    },
+    {
+     "file": "mux.go",
+     "line": 203,
+     "name": "Mux.NotFound"
+    },
+    {
+     "file": "mux.go",
+     "line": 223,
+     "name": "Mux.MethodNotAllowed"
+    },
+    {
+     "file": "mux.go",
+     "line": 278,
+     "name": "Mux.Route"
+    },
+    {
+     "file": "mux.go",
+     "line": 295,
+     "name": "Mux.Mount"
+    },
+    {
+     "file": "mux.go",
+     "line": 350,
+     "name": "Mux.Routes"
+    },
+    {
+     "file": "mux.go",
+     "line": 500,
+     "name": "Mux.updateSubRoutes"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 209,
+     "name": "TestMuxMounts"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 246,
+     "name": "TestMuxPlain"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 286,
+     "name": "TestMuxTrailingSlash"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 317,
+     "name": "TestMuxNestedNotFound"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 432,
+     "name": "TestMuxNestedMethodNotAllowed"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 498,
+     "name": "TestMuxComplicatedNotFound"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 877,
+     "name": "TestMuxBig"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 948,
+     "name": "bigMux"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 1088,
+     "name": "TestMuxSubroutesBasic"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 1169,
+     "name": "TestMuxSubroutes"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 1328,
+     "name": "TestServeHTTPExistingContext"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 1462,
+     "name": "TestMountingExistingPath"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 1477,
+     "name": "TestMountingSimilarPattern"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 1524,
+     "name": "TestMuxMissingParams"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 1572,
+     "name": "TestMuxRegexp"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 1604,
+     "name": "TestMuxRegexp3"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 1645,
+     "name": "TestMuxSubrouterWildcardParam"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 1779,
+     "name": "TestMuxMatch"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 1843,
+     "name": "TestMuxFind"
+    },
+    {
+     "file": "mux_test.go",
+     "line": 1993,
+     "name": "BenchmarkMux"
+    },
+    {
+     "file": "tree.go",
+     "line": 620,
+     "name": "node.routes"
+    },
+    {
+     "file": "tree_test.go",
+     "line": 512,
+     "name": "TestWalker"
+    }
+   ],
+   "kind": "callers"
+  }
+ ],
+ "runs": [
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 54.918910459,
+   "cost_usd": 0.5601246,
+   "turns": 10,
+   "tokens": 225235,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 9,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 41.791118417,
+   "cost_usd": 0.4436158,
+   "turns": 7,
+   "tokens": 182350,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 9,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 65.046633834,
+   "cost_usd": 0.531596,
+   "turns": 14,
+   "tokens": 238650,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/limits/main.go:21 main"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 61.952119125,
+   "cost_usd": 0.4892254,
+   "turns": 9,
+   "tokens": 275859,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/limits/main.go:21 main"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 55.390541375,
+   "cost_usd": 0.4861156,
+   "turns": 13,
+   "tokens": 295662,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 15,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 40.819607458,
+   "cost_usd": 0.39197820000000005,
+   "turns": 10,
+   "tokens": 223233,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 15,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 109.843785458,
+   "cost_usd": 0.9103054,
+   "turns": 25,
+   "tokens": 471052,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 20,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 64.465828167,
+   "cost_usd": 0.5655998,
+   "turns": 15,
+   "tokens": 256213,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 20,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 289.682832916,
+   "cost_usd": 2.1365818,
+   "turns": 28,
+   "tokens": 852751,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 30,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/custom-method/main.go:16 main",
+     "_examples/fileserver/main.go:28 main",
+     "_examples/graceful/main.go:17 main",
+     "_examples/graceful/main.go:58 service",
+     "_examples/hello-world/main.go:10 main",
+     "_examples/limits/main.go:21 main",
+     "_examples/rest/main.go:55 main",
+     "_examples/rest/main.go:219 adminRouter",
+     "_examples/todos-resource/main.go:14 main",
+     "_examples/versions/main.go:22 main"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 103.880878,
+   "cost_usd": 0.7944441999999999,
+   "turns": 21,
+   "tokens": 387328,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 30,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/rest/main.go:55 main",
+     "_examples/rest/main.go:219 adminRouter",
+     "_examples/versions/main.go:22 main",
+     "_examples/limits/main.go:21 main",
+     "_examples/graceful/main.go:58 service",
+     "_examples/graceful/main.go:17 main",
+     "_examples/custom-method/main.go:16 main",
+     "_examples/hello-world/main.go:10 main",
+     "_examples/todos-resource/main.go:14 main",
+     "_examples/fileserver/main.go:28 main"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 184.454514542,
+   "cost_usd": 1.3897015999999995,
+   "turns": 25,
+   "tokens": 883152,
+   "score": {
+    "pass": true,
+    "recall": 0.9705882352941176,
+    "precision": 1.0,
+    "n_answer": 33,
+    "flagged_incomplete": false,
+    "missed": [
+     "tree_test.go:512 TestWalker"
+    ],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/router-walk/main.go:11 main",
+     "_examples/rest/main.go:55 main",
+     "_examples/todos-resource/main.go:14 main",
+     "_examples/todos-resource/users.go:12 usersResource.Routes",
+     "_examples/todos-resource/todos.go:12 todosResource.Routes",
+     "_examples/versions/main.go:22 main",
+     "_examples/versions/main.go:60 articleRouter"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 137.032336833,
+   "cost_usd": 1.0412298,
+   "turns": 14,
+   "tokens": 447666,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 34,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/rest/main.go:55 main",
+     "_examples/router-walk/main.go:11 main",
+     "_examples/versions/main.go:22 main",
+     "_examples/versions/main.go:60 articleRouter",
+     "_examples/todos-resource/main.go:14 main",
+     "_examples/todos-resource/todos.go:12 todosResource.Routes",
+     "_examples/todos-resource/users.go:12 usersResource.Routes"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 39.785548875,
+   "cost_usd": 0.3740976,
+   "turns": 6,
+   "tokens": 108079,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 9,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 23.699167625,
+   "cost_usd": 0.3938658,
+   "turns": 4,
+   "tokens": 97869,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 9,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 67.020433375,
+   "cost_usd": 0.6482064000000001,
+   "turns": 19,
+   "tokens": 318923,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/limits/main.go:21 main"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 72.570587417,
+   "cost_usd": 0.5858327999999999,
+   "turns": 16,
+   "tokens": 387441,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/limits/main.go:21 main"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 65.515190084,
+   "cost_usd": 0.4351652,
+   "turns": 18,
+   "tokens": 263066,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 15,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 24.185239042,
+   "cost_usd": 0.21538340000000003,
+   "turns": 6,
+   "tokens": 170568,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 15,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 149.601592625,
+   "cost_usd": 1.1365986,
+   "turns": 28,
+   "tokens": 656859,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 20,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 22.149834333,
+   "cost_usd": 0.15159399999999998,
+   "turns": 3,
+   "tokens": 61522,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 20,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 130.485687916,
+   "cost_usd": 1.1365158000000002,
+   "turns": 21,
+   "tokens": 543741,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 30,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/rest/main.go:55 main",
+     "_examples/rest/main.go:219 adminRouter",
+     "_examples/todos-resource/main.go:14 main",
+     "_examples/fileserver/main.go:28 main",
+     "_examples/custom-method/main.go:16 main",
+     "_examples/hello-world/main.go:10 main",
+     "_examples/limits/main.go:21 main",
+     "_examples/versions/main.go:22 main",
+     "_examples/graceful/main.go:58 service",
+     "_examples/graceful/main.go:17 main"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 87.656878,
+   "cost_usd": 0.7080514,
+   "turns": 17,
+   "tokens": 317790,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 30,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/rest/main.go:55 main",
+     "_examples/rest/main.go:219 adminRouter",
+     "_examples/graceful/main.go:17 main",
+     "_examples/graceful/main.go:58 service",
+     "_examples/versions/main.go:22 main",
+     "_examples/hello-world/main.go:10 main",
+     "_examples/todos-resource/main.go:14 main",
+     "_examples/limits/main.go:21 main",
+     "_examples/custom-method/main.go:16 main",
+     "_examples/fileserver/main.go:28 main"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 297.77435625,
+   "cost_usd": 2.1403362,
+   "turns": 31,
+   "tokens": 930192,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 34,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/todos-resource/main.go:14 main",
+     "_examples/todos-resource/todos.go:12 todosResource.Routes",
+     "_examples/todos-resource/users.go:12 usersResource.Routes",
+     "_examples/rest/main.go:55 main",
+     "_examples/router-walk/main.go:11 main",
+     "_examples/versions/main.go:22 main",
+     "_examples/versions/main.go:60 articleRouter"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 35.741773833,
+   "cost_usd": 0.3137646,
+   "turns": 7,
+   "tokens": 211383,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 34,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 52.884680042,
+   "cost_usd": 0.43991,
+   "turns": 8,
+   "tokens": 152526,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 9,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 24.188020875,
+   "cost_usd": 0.17140099999999997,
+   "turns": 5,
+   "tokens": 93826,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 9,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 197.071893125,
+   "cost_usd": 1.4383476000000004,
+   "turns": 27,
+   "tokens": 703296,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/limits/main.go:21 main"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 69.49122775,
+   "cost_usd": 0.4930152,
+   "turns": 12,
+   "tokens": 244017,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/limits/main.go:21 main"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 54.93767625,
+   "cost_usd": 0.4446778,
+   "turns": 17,
+   "tokens": 323195,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 15,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 34.770680541,
+   "cost_usd": 0.2292664,
+   "turns": 5,
+   "tokens": 98195,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 15,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 96.202659459,
+   "cost_usd": 0.8291214,
+   "turns": 23,
+   "tokens": 486244,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 20,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 41.32854125,
+   "cost_usd": 0.32727439999999997,
+   "turns": 8,
+   "tokens": 146408,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 20,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 224.183649375,
+   "cost_usd": 1.7678834,
+   "turns": 25,
+   "tokens": 723985,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 30,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/custom-method/main.go:16 main",
+     "_examples/versions/main.go:22 main",
+     "_examples/hello-world/main.go:10 main",
+     "_examples/rest/main.go:55 main",
+     "_examples/rest/main.go:219 adminRouter",
+     "_examples/limits/main.go:21 main",
+     "_examples/graceful/main.go:17 main",
+     "_examples/graceful/main.go:58 service",
+     "_examples/todos-resource/main.go:14 main",
+     "_examples/fileserver/main.go:28 main"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 17.129533875,
+   "cost_usd": 0.1323462,
+   "turns": 2,
+   "tokens": 61229,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 30,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 175.162610792,
+   "cost_usd": 1.4075525999999998,
+   "turns": 26,
+   "tokens": 672520,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 34,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/rest/main.go:55 main",
+     "_examples/todos-resource/main.go:14 main",
+     "_examples/todos-resource/users.go:12 usersResource.Routes",
+     "_examples/todos-resource/todos.go:12 todosResource.Routes",
+     "_examples/router-walk/main.go:11 main",
+     "_examples/versions/main.go:22 main",
+     "_examples/versions/main.go:60 articleRouter"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 2,
+   "wall_s": 61.002318208,
+   "cost_usd": 0.4563624,
+   "turns": 8,
+   "tokens": 267448,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 34,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 26.196107875,
+   "cost_usd": 0.11050200000000002,
+   "turns": 10,
+   "tokens": 92749,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 9,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 10.58618375,
+   "cost_usd": 0.042436,
+   "turns": 2,
+   "tokens": 34006,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 9,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 52.359817708,
+   "cost_usd": 0.1187326,
+   "turns": 15,
+   "tokens": 165910,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/limits/main.go:21 main"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 10.582186416,
+   "cost_usd": 0.0351332,
+   "turns": 2,
+   "tokens": 33982,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 32.255337042,
+   "cost_usd": 0.08734040000000001,
+   "turns": 12,
+   "tokens": 112463,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 15,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 11.097975583,
+   "cost_usd": 0.0364286,
+   "turns": 2,
+   "tokens": 34305,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 15,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 42.852898125,
+   "cost_usd": 0.1322026,
+   "turns": 14,
+   "tokens": 125679,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 20,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 12.084842625,
+   "cost_usd": 0.0411616,
+   "turns": 2,
+   "tokens": 35104,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 20,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 48.340164583,
+   "cost_usd": 0.17001919999999998,
+   "turns": 10,
+   "tokens": 183038,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 0.967741935483871,
+    "n_answer": 31,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [
+     "middleware/sunset_test.go:88 main"
+    ],
+    "out_of_scope": [
+     "_examples/custom-method/main.go:16 main",
+     "_examples/fileserver/main.go:28 main",
+     "_examples/graceful/main.go:17 main",
+     "_examples/graceful/main.go:58 service",
+     "_examples/hello-world/main.go:10 main",
+     "_examples/limits/main.go:21 main",
+     "_examples/rest/main.go:55 main",
+     "_examples/rest/main.go:219 adminRouter",
+     "_examples/todos-resource/main.go:14 main",
+     "_examples/versions/main.go:22 main"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 12.101459625,
+   "cost_usd": 0.0477476,
+   "turns": 2,
+   "tokens": 36308,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 30,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 68.968690834,
+   "cost_usd": 0.20001900000000009,
+   "turns": 18,
+   "tokens": 273964,
+   "score": {
+    "pass": false,
+    "recall": 0.9411764705882352,
+    "precision": 0.9696969696969696,
+    "n_answer": 33,
+    "flagged_incomplete": false,
+    "missed": [
+     "mux_test.go:877 TestMuxBig",
+     "tree_test.go:512 TestWalker"
+    ],
+    "extra": [
+     "mux_test.go:1384 TestNestedGroups"
+    ],
+    "out_of_scope": [
+     "_examples/rest/main.go:55 main",
+     "_examples/versions/main.go:22 main",
+     "_examples/versions/main.go:60 articleRouter",
+     "_examples/router-walk/main.go:11 main",
+     "_examples/todos-resource/main.go:14 main",
+     "_examples/todos-resource/todos.go:12 todosResource.Routes",
+     "_examples/todos-resource/users.go:12 usersResource.Routes"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 11.586937917,
+   "cost_usd": 0.047971,
+   "turns": 2,
+   "tokens": 36421,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 34,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 19.625934792,
+   "cost_usd": 0.0962258,
+   "turns": 7,
+   "tokens": 54124,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 9,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 8.05895525,
+   "cost_usd": 0.08530399999999999,
+   "turns": 2,
+   "tokens": 34798,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 9,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 45.870482334,
+   "cost_usd": 0.1220732,
+   "turns": 14,
+   "tokens": 135287,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/limits/main.go:21 main"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 9.581839917,
+   "cost_usd": 0.0358022,
+   "turns": 2,
+   "tokens": 35060,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 31.756613167,
+   "cost_usd": 0.0940672,
+   "turns": 12,
+   "tokens": 124853,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 15,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 11.595834042,
+   "cost_usd": 0.0396958,
+   "turns": 2,
+   "tokens": 35678,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 15,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 47.37226225,
+   "cost_usd": 0.1394528,
+   "turns": 17,
+   "tokens": 141887,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 20,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 12.589015667,
+   "cost_usd": 0.043866600000000006,
+   "turns": 2,
+   "tokens": 36433,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 20,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 39.7842665,
+   "cost_usd": 0.1377492,
+   "turns": 10,
+   "tokens": 114531,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 0.967741935483871,
+    "n_answer": 31,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [
+     "middleware/sunset_test.go:88 main"
+    ],
+    "out_of_scope": [
+     "_examples/rest/main.go:55 main",
+     "_examples/rest/main.go:219 adminRouter",
+     "_examples/graceful/main.go:17 main",
+     "_examples/graceful/main.go:58 service",
+     "_examples/custom-method/main.go:16 main",
+     "_examples/fileserver/main.go:28 main",
+     "_examples/todos-resource/main.go:14 main",
+     "_examples/hello-world/main.go:10 main",
+     "_examples/limits/main.go:21 main",
+     "_examples/versions/main.go:22 main"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 12.578402625,
+   "cost_usd": 0.04983560000000001,
+   "turns": 2,
+   "tokens": 37622,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 30,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 85.175224,
+   "cost_usd": 0.2370512,
+   "turns": 21,
+   "tokens": 286908,
+   "score": {
+    "pass": false,
+    "recall": 0.9117647058823528,
+    "precision": 1.0,
+    "n_answer": 31,
+    "flagged_incomplete": false,
+    "missed": [
+     "mux_test.go:877 TestMuxBig",
+     "mux_test.go:948 bigMux",
+     "tree_test.go:512 TestWalker"
+    ],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/rest/main.go:55 main",
+     "_examples/todos-resource/main.go:14 main",
+     "_examples/todos-resource/users.go:12 usersResource.Routes",
+     "_examples/todos-resource/todos.go:12 todosResource.Routes",
+     "_examples/versions/main.go:22 main",
+     "_examples/versions/main.go:60 articleRouter",
+     "_examples/router-walk/main.go:11 main"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 13.604385125,
+   "cost_usd": 0.0503236,
+   "turns": 2,
+   "tokens": 37789,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 34,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 18.639665916,
+   "cost_usd": 0.0624374,
+   "turns": 6,
+   "tokens": 47898,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 9,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 9.070243125,
+   "cost_usd": 0.0318492,
+   "turns": 2,
+   "tokens": 34975,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 9,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 35.753090792,
+   "cost_usd": 0.0870726,
+   "turns": 10,
+   "tokens": 104535,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/limits/main.go:21 main"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 9.558168041,
+   "cost_usd": 0.0326334,
+   "turns": 2,
+   "tokens": 35109,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 30.215352083,
+   "cost_usd": 0.06732280000000002,
+   "turns": 10,
+   "tokens": 92515,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 15,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 10.586952,
+   "cost_usd": 0.0361504,
+   "turns": 2,
+   "tokens": 35692,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 15,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 46.368867791,
+   "cost_usd": 0.1279992,
+   "turns": 12,
+   "tokens": 155426,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 20,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 11.078533584,
+   "cost_usd": 0.0392462,
+   "turns": 2,
+   "tokens": 36340,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 20,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 55.3938145,
+   "cost_usd": 0.1675134,
+   "turns": 13,
+   "tokens": 218418,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 0.967741935483871,
+    "n_answer": 31,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [
+     "middleware/sunset_test.go:88 main"
+    ],
+    "out_of_scope": [
+     "_examples/custom-method/main.go:16 main",
+     "_examples/fileserver/main.go:28 main",
+     "_examples/graceful/main.go:17 main",
+     "_examples/graceful/main.go:58 service",
+     "_examples/hello-world/main.go:10 main",
+     "_examples/limits/main.go:21 main",
+     "_examples/rest/main.go:55 main",
+     "_examples/rest/main.go:219 adminRouter",
+     "_examples/todos-resource/main.go:14 main",
+     "_examples/versions/main.go:22 main"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 12.099849375,
+   "cost_usd": 0.0452644,
+   "turns": 2,
+   "tokens": 37541,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 30,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 74.592722541,
+   "cost_usd": 0.23983179999999996,
+   "turns": 20,
+   "tokens": 268804,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 34,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/rest/main.go:55 main",
+     "_examples/todos-resource/main.go:14 main",
+     "_examples/todos-resource/todos.go:12 todosResource.Routes",
+     "_examples/todos-resource/users.go:12 usersResource.Routes",
+     "_examples/versions/main.go:22 main",
+     "_examples/versions/main.go:60 articleRouter",
+     "_examples/router-walk/main.go:11 main"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 2,
+   "wall_s": 12.104886166,
+   "cost_usd": 0.0461634,
+   "turns": 2,
+   "tokens": 37729,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 34,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 24.674349542,
+   "cost_usd": 0.1409602,
+   "turns": 7,
+   "tokens": 72431,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 9,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 26.193599208,
+   "cost_usd": 0.15001720000000002,
+   "turns": 7,
+   "tokens": 127161,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 9,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 31.225388208,
+   "cost_usd": 0.229338,
+   "turns": 7,
+   "tokens": 118324,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/limits/main.go:21 main"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 16.130474708,
+   "cost_usd": 0.0869014,
+   "turns": 3,
+   "tokens": 54227,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 27.711320667,
+   "cost_usd": 0.1120436,
+   "turns": 7,
+   "tokens": 63550,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 15,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 16.154403,
+   "cost_usd": 0.075319,
+   "turns": 2,
+   "tokens": 34900,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 15,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 47.361442417,
+   "cost_usd": 0.3075742,
+   "turns": 12,
+   "tokens": 170198,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 20,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 20.15823225,
+   "cost_usd": 0.0981868,
+   "turns": 3,
+   "tokens": 55868,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 20,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 56.426484791,
+   "cost_usd": 0.3110036,
+   "turns": 14,
+   "tokens": 235135,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 30,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/fileserver/main.go:28 main",
+     "_examples/custom-method/main.go:16 main",
+     "_examples/hello-world/main.go:10 main",
+     "_examples/limits/main.go:21 main",
+     "_examples/todos-resource/main.go:14 main",
+     "_examples/rest/main.go:55 main",
+     "_examples/rest/main.go:219 adminRouter",
+     "_examples/graceful/main.go:58 service",
+     "_examples/graceful/main.go:17 main",
+     "_examples/versions/main.go:22 main"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 37.789759917,
+   "cost_usd": 0.19701699999999997,
+   "turns": 6,
+   "tokens": 138392,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 30,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 89.14379475,
+   "cost_usd": 0.4630968,
+   "turns": 22,
+   "tokens": 392448,
+   "score": {
+    "pass": false,
+    "recall": 0.9411764705882352,
+    "precision": 1.0,
+    "n_answer": 32,
+    "flagged_incomplete": false,
+    "missed": [
+     "mux_test.go:877 TestMuxBig",
+     "tree_test.go:512 TestWalker"
+    ],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/rest/main.go:55 main",
+     "_examples/todos-resource/main.go:14 main",
+     "_examples/todos-resource/users.go:12 usersResource.Routes",
+     "_examples/todos-resource/todos.go:12 todosResource.Routes",
+     "_examples/versions/main.go:22 main",
+     "_examples/versions/main.go:60 articleRouter",
+     "_examples/router-walk/main.go:11 main"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 21.690098125,
+   "cost_usd": 0.1092662,
+   "turns": 3,
+   "tokens": 57997,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 34,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 26.201853417,
+   "cost_usd": 0.1586904,
+   "turns": 5,
+   "tokens": 61463,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 9,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 15.617558416,
+   "cost_usd": 0.2015418,
+   "turns": 3,
+   "tokens": 56574,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 9,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 35.811099708,
+   "cost_usd": 0.16312220000000002,
+   "turns": 8,
+   "tokens": 71200,
+   "score": {
+    "pass": false,
+    "recall": 0.9090909090909092,
+    "precision": 1.0,
+    "n_answer": 10,
+    "flagged_incomplete": false,
+    "missed": [
+     "tree_test.go:512 TestWalker"
+    ],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/limits/main.go:21 main"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 16.622501417,
+   "cost_usd": 0.0906904,
+   "turns": 3,
+   "tokens": 56117,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 30.741950167,
+   "cost_usd": 0.1362598,
+   "turns": 9,
+   "tokens": 99905,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 15,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 16.125241625,
+   "cost_usd": 0.0791368,
+   "turns": 2,
+   "tokens": 36118,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 15,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 42.807769583,
+   "cost_usd": 0.21353200000000003,
+   "turns": 11,
+   "tokens": 123062,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 20,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 29.709946542,
+   "cost_usd": 0.16837660000000002,
+   "turns": 6,
+   "tokens": 111745,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 20,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 44.3486415,
+   "cost_usd": 0.318559,
+   "turns": 8,
+   "tokens": 172984,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 30,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/rest/main.go:55 main",
+     "_examples/rest/main.go:219 adminRouter",
+     "_examples/todos-resource/main.go:14 main",
+     "_examples/fileserver/main.go:28 main",
+     "_examples/custom-method/main.go:16 main",
+     "_examples/hello-world/main.go:10 main",
+     "_examples/graceful/main.go:17 main",
+     "_examples/graceful/main.go:58 service",
+     "_examples/limits/main.go:21 main",
+     "_examples/versions/main.go:22 main"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 33.259369083,
+   "cost_usd": 0.198565,
+   "turns": 5,
+   "tokens": 116023,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 30,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/rest/main.go:55 main",
+     "_examples/rest/main.go:219 adminRouter",
+     "_examples/todos-resource/main.go:14 main",
+     "_examples/fileserver/main.go:28 main",
+     "_examples/hello-world/main.go:10 main",
+     "_examples/versions/main.go:22 main",
+     "_examples/graceful/main.go:58 service",
+     "_examples/graceful/main.go:17 main",
+     "_examples/custom-method/main.go:16 main",
+     "_examples/limits/main.go:21 main"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 136.0123415,
+   "cost_usd": 0.7017324000000003,
+   "turns": 29,
+   "tokens": 616854,
+   "score": {
+    "pass": true,
+    "recall": 0.9705882352941176,
+    "precision": 1.0,
+    "n_answer": 33,
+    "flagged_incomplete": false,
+    "missed": [
+     "tree_test.go:512 TestWalker"
+    ],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/rest/main.go:55 main",
+     "_examples/todos-resource/main.go:14 main",
+     "_examples/todos-resource/users.go:12 usersResource.Routes",
+     "_examples/todos-resource/todos.go:12 todosResource.Routes",
+     "_examples/versions/main.go:22 main",
+     "_examples/versions/main.go:60 articleRouter",
+     "_examples/router-walk/main.go:11 main"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 20.129798375,
+   "cost_usd": 0.1051304,
+   "turns": 2,
+   "tokens": 38463,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 34,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 25.691402583,
+   "cost_usd": 0.1202822,
+   "turns": 8,
+   "tokens": 65266,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 9,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 19.147811666,
+   "cost_usd": 0.08997640000000001,
+   "turns": 3,
+   "tokens": 56738,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 9,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 46.348444125,
+   "cost_usd": 0.16251920000000003,
+   "turns": 10,
+   "tokens": 116398,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/limits/main.go:21 main"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 25.191293042,
+   "cost_usd": 0.1182116,
+   "turns": 5,
+   "tokens": 100353,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/limits/main.go:21 main"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 41.829985542,
+   "cost_usd": 0.1229788,
+   "turns": 8,
+   "tokens": 87979,
+   "score": {
+    "pass": false,
+    "recall": 0.8666666666666667,
+    "precision": 1.0,
+    "n_answer": 13,
+    "flagged_incomplete": false,
+    "missed": [
+     "mux_test.go:1817 TestMuxMatch_HasBasePath",
+     "mux_test.go:1832 TestMuxMatch_DoesNotHaveBasePath"
+    ],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 13.093494959,
+   "cost_usd": 0.06861579999999999,
+   "turns": 2,
+   "tokens": 35980,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 15,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 45.831141709,
+   "cost_usd": 0.2265156,
+   "turns": 12,
+   "tokens": 126204,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 20,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 19.639993833,
+   "cost_usd": 0.090843,
+   "turns": 3,
+   "tokens": 57729,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 20,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 67.510699583,
+   "cost_usd": 0.3483962,
+   "turns": 18,
+   "tokens": 256727,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 30,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/rest/main.go:55 main",
+     "_examples/rest/main.go:219 adminRouter",
+     "_examples/todos-resource/main.go:14 main",
+     "_examples/fileserver/main.go:28 main",
+     "_examples/graceful/main.go:17 main",
+     "_examples/graceful/main.go:58 service",
+     "_examples/limits/main.go:21 main",
+     "_examples/custom-method/main.go:16 main",
+     "_examples/versions/main.go:22 main",
+     "_examples/hello-world/main.go:10 main"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 38.301836583,
+   "cost_usd": 0.2209778,
+   "turns": 8,
+   "tokens": 166703,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 30,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/hello-world/main.go:10 main",
+     "_examples/todos-resource/main.go:14 main",
+     "_examples/fileserver/main.go:28 main",
+     "_examples/custom-method/main.go:16 main",
+     "_examples/limits/main.go:21 main",
+     "_examples/graceful/main.go:58 service",
+     "_examples/graceful/main.go:17 main"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 106.371717958,
+   "cost_usd": 0.4749282,
+   "turns": 21,
+   "tokens": 343858,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 34,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [
+     "_examples/router-walk/main.go:11 main",
+     "_examples/rest/main.go:55 main",
+     "_examples/versions/main.go:22 main",
+     "_examples/versions/main.go:60 articleRouter",
+     "_examples/todos-resource/main.go:14 main",
+     "_examples/todos-resource/todos.go:12 todosResource.Routes",
+     "_examples/todos-resource/users.go:12 usersResource.Routes"
+    ],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "wall_s": 20.146856917,
+   "cost_usd": 0.099057,
+   "turns": 2,
+   "tokens": 38552,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 34,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  }
+ ]
+}

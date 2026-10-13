@@ -443,6 +443,7 @@ impl SemanticResolver for ApexHeuristicResolver {
             heuristic_type_fallbacks: heuristic_type_count,
             heuristic_call_ambiguous_drops,
             fallback_reasons: Default::default(),
+            compiler_unindexed_files: Vec::new(),
         };
 
         info!(

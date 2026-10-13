@@ -13,7 +13,7 @@ pub mod registry;
 
 pub use registry::{
     all_entries, auto_provision_enabled, cache_dir, entry_for, indexer_timeout,
-    require_cached_or_skip, IndexerEntry, InstallMethod,
+    require_cached_or_skip, IndexerEntry, InstallMethod, EXIT_INDEX_STALE,
 };
 
 /// Which batch indexer to invoke.
@@ -73,9 +73,16 @@ impl IndexerError {
     pub fn not_provisioned(&self) -> bool {
         self.exit_code == 3 || self.message.contains("IndexerNotProvisioned")
     }
+
+    /// A cached index exists but is stale or belongs to another workspace.
+    pub fn stale(&self) -> bool {
+        self.exit_code == EXIT_INDEX_STALE || self.message.starts_with("IndexStale")
+    }
 }
 
-/// Scan-time: reuse cache, never `npx`.
+/// Scan-time: reuse a cache whose fingerprint matches this workspace.
+/// Missing or stale caches are regenerated only when
+/// `GRIDSEAK_AUTO_PROVISION=1`; otherwise the error names the reason.
 pub fn provision_index(
     repo_root: impl AsRef<Path>,
     language: IndexerLanguage,
@@ -83,8 +90,9 @@ pub fn provision_index(
     let repo_root = repo_root.as_ref();
     match require_cached_or_skip(repo_root, language) {
         Ok(path) => Ok(path),
-        Err(err) if auto_provision_enabled() && !err.not_provisioned() => Err(err),
-        Err(_err) if auto_provision_enabled() => install_indexer(repo_root, language),
+        Err(err) if auto_provision_enabled() && (err.not_provisioned() || err.stale()) => {
+            install_indexer(repo_root, language)
+        }
         Err(err) => Err(err),
     }
 }
@@ -127,20 +135,58 @@ fn provision_typescript(repo_root: &Path) -> Result<PathBuf, IndexerError> {
             message: "missing package.json and tsconfig.json".into(),
         });
     }
-    run_npx_indexer(repo_root, "@sourcegraph/scip-typescript", "scip-typescript")
+    run_npx_indexer(
+        repo_root,
+        IndexerLanguage::TypeScript,
+        "@sourcegraph/scip-typescript",
+        "scip-typescript",
+    )
 }
 
 fn provision_python(repo_root: &Path) -> Result<PathBuf, IndexerError> {
     let has_python_project = ["pyproject.toml", "setup.py", "requirements.txt"]
         .iter()
         .any(|f| repo_root.join(f).exists());
-    if !has_python_project {
+    // Many repos keep Python under subfolders with no root marker; scip-python
+    // indexes any tree of .py files, so only refuse when there are none.
+    if !has_python_project && !has_file_with_extension(repo_root, "py", 4) {
         return Err(IndexerError {
             exit_code: 1,
-            message: "missing Python project markers".into(),
+            message: "no Python files or project markers".into(),
         });
     }
-    run_npx_indexer(repo_root, "@sourcegraph/scip-python", "scip-python")
+    run_npx_indexer(
+        repo_root,
+        IndexerLanguage::Python,
+        "@sourcegraph/scip-python",
+        "scip-python",
+    )
+}
+
+/// Whether `root` holds a `*.{ext}` file within `depth` directory levels,
+/// skipping dot-directories and vendored trees.
+fn has_file_with_extension(root: &Path, ext: &str, depth: usize) -> bool {
+    let Ok(entries) = std::fs::read_dir(root) else {
+        return false;
+    };
+    for entry in entries.flatten() {
+        let path = entry.path();
+        let name = entry.file_name();
+        let name = name.to_string_lossy();
+        if path.is_dir() {
+            if depth > 0
+                && !name.starts_with('.')
+                && name != "node_modules"
+                && name != "venv"
+                && has_file_with_extension(&path, ext, depth - 1)
+            {
+                return true;
+            }
+        } else if path.extension().is_some_and(|e| e == ext) {
+            return true;
+        }
+    }
+    false
 }
 
 fn provision_go(repo_root: &Path) -> Result<PathBuf, IndexerError> {
@@ -148,23 +194,42 @@ fn provision_go(repo_root: &Path) -> Result<PathBuf, IndexerError> {
     if !repo_root.join("go.mod").exists() {
         return Ok(bin);
     }
-    run_named_indexer(repo_root, "scip-go", &[bin.to_str().unwrap_or("scip-go")])
+    run_named_indexer(
+        repo_root,
+        IndexerLanguage::Go,
+        "scip-go",
+        &[bin.to_str().unwrap_or("scip-go")],
+    )
 }
 
 /// Doctor / provision path: PATH, then `~/.gridseak/bin/scip-go`, then GitHub release.
+/// `scip-go --version` output, trimmed (`0.2.7`).
+fn binary_version(bin: &Path) -> Option<String> {
+    let out = Command::new(bin).arg("--version").output().ok()?;
+    let text = String::from_utf8_lossy(&out.stdout);
+    let v = text
+        .split_whitespace()
+        .last()?
+        .trim_start_matches('v')
+        .to_string();
+    (!v.is_empty()).then_some(v)
+}
+
 fn ensure_scip_go_binary() -> Result<PathBuf, IndexerError> {
     if let Some(p) = which("scip-go") {
         return Ok(p);
     }
     let dest_dir = gridseak_bin_dir();
     let dest = dest_dir.join("scip-go");
-    if dest.is_file() {
-        return Ok(dest);
-    }
     let entry = entry_for(IndexerLanguage::Go).ok_or_else(|| IndexerError {
         exit_code: 2,
         message: "no registry entry for Go".into(),
     })?;
+    // Reuse a cached binary only when it is the pinned release; an older
+    // cached scip-go would otherwise outlive every version bump.
+    if dest.is_file() && binary_version(&dest).as_deref() == Some(entry.pinned_version) {
+        return Ok(dest);
+    }
     let (os, arch) = go_release_target();
     let ver = entry.pinned_version;
     let urls = [
@@ -342,10 +407,20 @@ fn provision_rust(repo_root: &Path) -> Result<PathBuf, IndexerError> {
             message: "IndexerNotProvisioned: rust-analyzer is not on PATH".into(),
         });
     }
-    run_named_indexer(repo_root, "rust-analyzer", &["rust-analyzer", "scip"])
+    run_named_indexer(
+        repo_root,
+        IndexerLanguage::Rust,
+        "rust-analyzer",
+        &["rust-analyzer", "scip"],
+    )
 }
 
-fn run_npx_indexer(repo_root: &Path, package: &str, label: &str) -> Result<PathBuf, IndexerError> {
+fn run_npx_indexer(
+    repo_root: &Path,
+    language: IndexerLanguage,
+    package: &str,
+    label: &str,
+) -> Result<PathBuf, IndexerError> {
     let output = Command::new("npx")
         .args(["--yes", package, "index", "--output", "index.scip"])
         .current_dir(repo_root)
@@ -354,11 +429,12 @@ fn run_npx_indexer(repo_root: &Path, package: &str, label: &str) -> Result<PathB
             exit_code: 127,
             message: format!("failed to spawn npx for {label}: {e}"),
         })?;
-    finish_index(repo_root, label, &output)
+    finish_index(repo_root, language, label, &output)
 }
 
 fn run_named_indexer(
     repo_root: &Path,
+    language: IndexerLanguage,
     label: &str,
     argv: &[&str],
 ) -> Result<PathBuf, IndexerError> {
@@ -374,25 +450,25 @@ fn run_named_indexer(
             exit_code: 127,
             message: format!("failed to spawn {label}: {e}"),
         })?;
-    finish_index(repo_root, label, &output)
+    finish_index(repo_root, language, label, &output)
 }
 
 fn finish_index(
     repo_root: &Path,
+    language: IndexerLanguage,
     label: &str,
     output: &std::process::Output,
 ) -> Result<PathBuf, IndexerError> {
     let index_path = repo_root.join("index.scip");
     if output.status.success() && index_path.exists() {
-        let language = IndexerLanguage::parse(label)
-            .or_else(|| label.strip_prefix("scip-").and_then(IndexerLanguage::parse))
-            .unwrap_or(IndexerLanguage::TypeScript);
         if let Some(entry) = entry_for(language) {
             let dest_dir = cache_dir(repo_root, entry);
             let _ = std::fs::create_dir_all(&dest_dir);
             let dest = dest_dir.join("index.scip");
             let _ = std::fs::copy(&index_path, &dest);
         }
+        // The only place the sidecar is written: right after the indexer
+        // actually ran for this workspace.
         if let Some(fp) = crate::fingerprint::fingerprint_workspace(repo_root, language) {
             crate::fingerprint::write_sidecar(repo_root, language, &fp);
         }

@@ -1,0 +1,22 @@
+{
+  "name": "gridseak",
+  "owner": {
+    "name": "GridSeak",
+    "url": "https://github.com/adenjessee/gridseak"
+  },
+  "metadata": {
+    "description": "GridSeak: local compiler-backed call graph for coding agents."
+  },
+  "plugins": [
+    {
+      "name": "gridseak",
+      "source": "./plugin",
+      "description": "Slim MCP + structural edit gate, and the audit-my-agent skill (/gridseak:audit): grade your coding agent on this repo against compiler truth. Needs the gridseak binary (curl -fsSL https://gridseak.com/install.sh | sh).",
+      "version": "0.2.0",
+      "homepage": "https://github.com/adenjessee/gridseak",
+      "license": "MIT",
+      "keywords": ["call-graph", "callers", "mcp", "audit"],
+      "category": "development"
+    }
+  ]
+}

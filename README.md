@@ -64,10 +64,10 @@ Next: gridseak setup   (wires the MCP server into your IDE)
 | Language | Extensions | Tier 0 (tree-sitter) | Tier 3 (compiler / LSP / SCIP) |
 | --- | --- | --- | --- |
 | **Rust** | `.rs` | Full symbol + import/call graph | **Yes** — `rust-analyzer` |
-| **TypeScript** | `.ts`, `.tsx`, `.mts`, `.cts` | Full | Planned (`tsserver`) |
+| **TypeScript** | `.ts`, `.tsx`, `.mts`, `.cts` | Full | **Yes** — `scip-typescript`; audited against `tsc` (97.4–98.5% of functions with every caller listed) |
 | **JavaScript** | `.js`, `.jsx`, `.mjs`, `.cjs` | Full | Planned |
-| **Python** | `.py` | Skeleton — symbols + imports; thinner call graph than Rust/TS | Planned |
-| **Go** | `.go` | Parsed (import edges verified) | If `gopls` is installed |
+| **Python** | `.py` | Skeleton — symbols + imports; thinner call graph than Rust/TS | **Yes** — `scip-python` (not yet audited) |
+| **Go** | `.go` | Parsed (import edges verified) | **Yes** — `scip-go` 0.2.7, auto-provisioned; audited against `go/types` (100% of callers on chi, Caddy, Kubernetes) |
 | **Java** | `.java` | Parsed | If `jdtls` is installed |
 | **C#** | `.cs` | Parsed | If OmniSharp is installed |
 | **Apex** (Salesforce) | `.cls`, `.trigger`, `.apxc` | Full + framework resolver | Optional (`apex-jorje`) |
@@ -140,10 +140,10 @@ configs into `~/.gridseak/bin`. SHA256-verified against the public manifest.
 ```sh
 # macOS (Apple Silicon + Intel) and Linux (x86_64 + aarch64):
 # tagged GitHub release tarball → ~/.gridseak/bin/gridseak
-curl -fsSL https://raw.githubusercontent.com/adenjessee/gridseak-graphengine/main/scripts/install.sh | bash
+curl -fsSL https://gridseak.com/install.sh | sh
 
-# Optional: SHA256-verified sidecar bundle (graphengine-parsing, ge-analyze)
-# curl -fsSL https://raw.githubusercontent.com/adenjessee/gridseak-graphengine/main/scripts/install/install.sh | bash
+# Same script, straight from this repository:
+# curl -fsSL https://raw.githubusercontent.com/adenjessee/gridseak/main/scripts/install/install.sh | sh
 ```
 
 Then: `export PATH="$HOME/.gridseak/bin:$PATH"` and `gridseak --version`.
@@ -183,6 +183,49 @@ gridseak setup --verify       # post-install sanity check
 Restart your IDE. From a fresh chat, ask: *"what's risky to refactor
 here?"* — your agent should call `gridseak_get_recommendations` within
 its first two tool calls. If it doesn't, run `gridseak setup --verify`.
+
+## Audit your agent
+
+From inside your coding agent, in your repo, say:
+
+> audit my agent on this repo
+
+With the Claude Code plugin installed, that sentence (or `/gridseak:audit`)
+runs the `audit-my-agent` skill:
+
+```text
+/plugin marketplace add adenjessee/gridseak
+/plugin install gridseak@gridseak
+```
+
+Other agents can follow the same steps from
+[`plugin/skills/audit-my-agent/SKILL.md`](plugin/skills/audit-my-agent/SKILL.md).
+Or run the CLI yourself:
+
+```sh
+gridseak scan .                  # the call graph must be 100% compiler-indexed
+gridseak audit --plan-only       # free: pick the tasks, write the answer keys
+gridseak audit                   # 6 tasks x 2 arms (plain, gridseak)
+```
+
+`gridseak audit` asks headless Claude Code "which functions transitively
+call X?" for targets picked from small to large caller sets, once alone
+(`plain`) and once with GridSeak's MCP tools (`gridseak`), and grades each
+answer against the compiler's call graph. It writes `report.html` (a
+shareable card), `report.md` and `results.json` under
+`.gridseak/audit/<timestamp>/`. The card shows, per arm: exact answers
+(recall >= 0.95, precision >= 0.9), **silent misses** (an incomplete list
+presented as complete), flagged misses, minutes, cost and tokens.
+
+**Cost:** it spends real money through your Claude Code login, about
+$0.25-3.50 per task run at API prices; 6 tasks x 2 arms is typically
+$8-25, capped at `--max-usd-per-task` (default $4) per run. Shrink it with
+`--tasks 3`, `--arms plain` or `--model <id>`. The skill always shows the
+plan and estimate and asks before spending.
+
+**Languages:** Go today (`scip-go`). TypeScript works when the scan is fully
+compiler-indexed. The audit refuses any scan with call edges that did not
+come from the compiler, because the answer key would be a guess.
 
 ## v0.1.0 scope (honest disclosure)
 

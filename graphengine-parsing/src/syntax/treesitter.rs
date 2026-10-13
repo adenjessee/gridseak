@@ -173,6 +173,22 @@ impl TreeSitterExtractor {
                 &file_path_str,
             ) {
                 results.extraction_coverage.push(coverage);
+            } else if root_node.has_error() {
+                // Error recovery can swallow whole declarations (the 0.20
+                // TS grammar loses a file at an interface call signature
+                // that starts with `<`), so the file's functions and the
+                // calls inside them may be missing. Say so instead of
+                // letting the gap pass as "no callers".
+                results.extraction_coverage.push(
+                    crate::application::ports::FileExtractionCoverage {
+                        file_path: file_path.to_path_buf(),
+                        language: language_name.to_string(),
+                        walked_node_count: 0,
+                        unwalked_node_count: 0,
+                        coverage_gaps: Vec::new(),
+                        confidence: crate::application::ports::CoverageConfidence::Low,
+                    },
+                );
             }
         }
 
@@ -316,6 +332,8 @@ impl TreeSitterExtractor {
                 symbol.set_property("visibility", vis);
             }
         }
+
+        disambiguate_colliding_ids(&mut results.symbols);
 
         info!(
             "Extracted {} symbols, {} unresolved references, {} imports, {} type refs from {}",
@@ -490,6 +508,38 @@ impl SyntaxExtractor for TreeSitterExtractor {
     }
 }
 
+/// Node ids hash (FQN, body). Two functions in one file can share both:
+/// TS methods of different classes (`unwrap() { return this._def.innerType }`)
+/// have class-free FQNs, and tests repeat `const f = () => s.parse(x)`. Graph
+/// assembly keeps the first node per id, so the copies vanished and their calls
+/// were credited to the survivor. Salt each later copy's id with its position.
+fn disambiguate_colliding_ids(symbols: &mut [Node]) {
+    let mut seen: std::collections::HashMap<String, (NodeKind, Range)> =
+        std::collections::HashMap::new();
+    for node in symbols.iter_mut() {
+        let here = (node.kind, node.location.clone());
+        match seen.get(&node.id) {
+            None => {
+                seen.insert(node.id.clone(), here);
+            }
+            // The same declaration captured twice: one node, as before.
+            Some(first) if *first == here => {}
+            Some(_) => {
+                let salted = crate::domain::node_id::compute_stable_id(
+                    &format!(
+                        "{}@{}:{}",
+                        node.id, node.location.start_line, node.location.start_char
+                    ),
+                    None,
+                    None,
+                );
+                node.id = salted;
+                seen.insert(node.id.clone(), here);
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -634,5 +684,63 @@ mod tests {
             !results.references.is_empty(),
             "expected javascript call sites to be captured"
         );
+    }
+
+    #[tokio::test]
+    async fn typescript_members_get_distinct_function_nodes() {
+        let config = load_config("typescript").expect("load typescript config");
+        let extractor = TreeSitterExtractor::new(config).expect("typescript extractor");
+        let temp_dir = TempDir::new().unwrap();
+        let file_path = temp_dir.path().join("schema.ts");
+        std::fs::write(
+            &file_path,
+            r#"class A {
+  unwrap() { return this.inner; }
+  static create = (x: number) => new A();
+  "~validate"(d: unknown) { return this.unwrap(); }
+  default(v: number) { return v; }
+  #hidden() { return 1; }
+}
+class B {
+  unwrap() { return this.inner; }
+}
+const inc = x => x + 1;
+var legacy = function () { return inc(1); };
+"#,
+        )
+        .unwrap();
+        let results = extractor
+            .extract(std::slice::from_ref(&file_path))
+            .await
+            .expect("extract typescript file");
+        let fns: Vec<(&str, u32, &str)> = results
+            .symbols
+            .iter()
+            .filter(|n| n.kind == NodeKind::Function)
+            .map(|n| {
+                (
+                    n.fqn.rsplit("::").next().unwrap(),
+                    n.location.start_line,
+                    n.id.as_str(),
+                )
+            })
+            .collect();
+        for (name, line) in [
+            ("unwrap", 2),
+            ("create", 3),
+            ("~validate", 4),
+            ("default", 5),
+            ("#hidden", 6),
+            ("unwrap", 9),
+            ("inc", 11),
+            ("legacy", 12),
+        ] {
+            assert!(
+                fns.iter().any(|(n, l, _)| *n == name && *l == line),
+                "missing {name}@{line} in {fns:?}"
+            );
+        }
+        let ids: std::collections::HashSet<&str> = fns.iter().map(|f| f.2).collect();
+        assert_eq!(ids.len(), fns.len(), "function ids collide: {fns:?}");
     }
 }

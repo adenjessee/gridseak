@@ -29,7 +29,12 @@ pub struct WorkspaceSnapshot {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct WorkspaceDelta {
     pub since_scan_seconds: i64,
+    /// First [`MAX_REPORTED_DIRTY_PATHS`] dirty paths; see `dirty_count`.
     pub dirty_paths: Vec<String>,
+    /// Total dirty paths. A fresh checkout can mark a whole monorepo dirty
+    /// by mtime; listing every path made one refusal 2.4 MB on Kubernetes.
+    #[serde(default)]
+    pub dirty_count: usize,
     pub buckets: GitBuckets,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub intersects_query: Option<Vec<String>>,
@@ -46,6 +51,8 @@ pub struct AnalysisReadiness {
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub segments_pending: Vec<String>,
 }
+
+pub const MAX_REPORTED_DIRTY_PATHS: usize = 25;
 
 pub fn compute_workspace_delta(
     project_root: &Path,
@@ -85,9 +92,13 @@ pub fn compute_workspace_delta(
         }
     });
 
+    let dirty_count = dirty_paths.len();
+    let mut dirty_paths = dirty_paths;
+    dirty_paths.truncate(MAX_REPORTED_DIRTY_PATHS);
     Ok(WorkspaceDelta {
         since_scan_seconds,
         dirty_paths,
+        dirty_count,
         buckets,
         intersects_query,
         agent_directive,
@@ -181,6 +192,29 @@ fn mtime_dirty_paths(project_root: &Path, scan_ts: DateTime<Utc>) -> anyhow::Res
         }
     }
     Ok(out.into_iter().collect())
+}
+
+/// Source files modified after the scan completed, by mtime. Unlike
+/// [`compute_workspace_delta`] this ignores git status (an uncommitted file
+/// scanned after its last edit is not stale) and non-source files.
+pub fn source_files_changed_since(
+    project_root: &Path,
+    scan_completed_at: &str,
+) -> anyhow::Result<Vec<String>> {
+    const SOURCE_EXTS: &[&str] = &[
+        "go", "ts", "tsx", "js", "jsx", "mjs", "cjs", "py", "rs", "java", "kt", "cls", "trigger",
+        "cs",
+    ];
+    let scan_ts = DateTime::parse_from_rfc3339(scan_completed_at)?.with_timezone(&Utc);
+    Ok(mtime_dirty_paths(project_root, scan_ts)?
+        .into_iter()
+        .filter(|p| {
+            Path::new(p)
+                .extension()
+                .and_then(|e| e.to_str())
+                .is_some_and(|e| SOURCE_EXTS.contains(&e))
+        })
+        .collect())
 }
 
 pub fn normalize_rel_path(path: &str) -> String {

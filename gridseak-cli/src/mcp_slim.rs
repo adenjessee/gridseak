@@ -93,7 +93,7 @@ impl SlimGridSeakMcp {
     }
 
     #[tool(
-        description = "If I change this function, what breaks? Transitive upstream callers. Pass a file path to use file blast instead (set file=)."
+        description = "If I change this function, what breaks? Transitive upstream callers. symbol= is an FQN or a location (`path/to/file.ts:123` for the function declared on that line; use it when the name is common). `rows` are functions/methods only; code outside any function is under `top_level_callers`. Pass a file path to use file blast instead (set file=)."
     )]
     async fn gridseak_graph_blast_radius(
         &self,
@@ -118,6 +118,7 @@ impl SlimGridSeakMcp {
             symbol,
             depth: params.depth,
             cap: params.cap,
+            uses: params.uses,
         };
         let view = crate::graph_tool_blast_radius(&self.store, &mapped)?;
         crate::ok_json(&view)
@@ -183,6 +184,10 @@ struct BlastOrFileParams {
     depth: Option<usize>,
     #[serde(default)]
     cap: Option<usize>,
+    /// `all` (default), `calls` (calls + interface dispatch) or `static`
+    /// (direct calls only). Symbol mode only.
+    #[serde(default)]
+    uses: Option<String>,
 }
 
 #[tool_handler]

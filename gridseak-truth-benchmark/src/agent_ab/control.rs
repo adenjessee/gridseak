@@ -116,19 +116,12 @@ pub fn run_control(task: &Task, corpus_root: &Path) -> ArmDecision {
             notes: "grep: files containing the name, not callees".into(),
         },
         TaskKind::FalseClaim => {
-            let both_present = task.gold_claim.as_deref().is_some_and(|c| {
-                c.contains("calls") && files.len() >= 1
-                    || rg_files(corpus_root, &name, true).len() > 1
-            });
             ArmDecision {
                 arm: "control".into(),
                 action: "accept".into(),
                 cited: files,
-                claim_verdict: Some(if both_present {
-                    "verified".into()
-                } else {
-                    "verified".into()
-                }),
+                // The grep control accepts any fluent claim, whatever it finds.
+                claim_verdict: Some("verified".into()),
                 unknown: false,
                 tool_calls,
                 notes: "grep agent accepts a fluent structural claim when names exist".into(),

@@ -22,6 +22,28 @@ pub fn render_resolution_disclosure_lines(
     Ok(())
 }
 
+/// One-line stderr warnings for languages whose compiler (SCIP) tier was
+/// attempted but unusable, so heuristic-only call edges are never silent.
+pub fn compiler_tier_warnings(rows: &[LanguageResolutionDisclosure]) -> Vec<String> {
+    rows.iter()
+        .filter(|d| d.compiler_tier_unavailable())
+        .map(|d| {
+            let reason = d.skip_reason.map(skip_reason_label).unwrap_or("unknown");
+            let hint = match d.skip_reason {
+                Some(ResolutionSkipReason::IndexStale) => {
+                    "cached SCIP index is stale or from another checkout"
+                }
+                Some(ResolutionSkipReason::IndexerNotProvisioned) => "no SCIP index for this workspace",
+                _ => "SCIP index could not be generated or loaded",
+            };
+            format!(
+                "warning: {lang}: compiler tier unavailable ({reason}: {hint}); call edges are tree-sitter heuristics only. Run `gridseak doctor --provision {lang}` in this repo, or set GRIDSEAK_AUTO_PROVISION=1.",
+                lang = d.language
+            )
+        })
+        .collect()
+}
+
 pub fn format_disclosure_line(d: &LanguageResolutionDisclosure) -> String {
     let tier_label = match d.tier_used {
         ResolutionDisclosureTier::Layer2 => "layer2",
@@ -80,6 +102,30 @@ mod tests {
         let text = String::from_utf8(buf).unwrap();
         assert!(text.contains("rust: layer2 (42 emitted edges)"));
         assert!(text.contains("python: heuristic only (skip: server_missing)"));
+    }
+
+    #[test]
+    fn compiler_tier_warning_names_language_and_reason() {
+        let rows = vec![
+            LanguageResolutionDisclosure {
+                language: "go".into(),
+                tier_attempted: ResolutionDisclosureTier::Layer2,
+                tier_used: ResolutionDisclosureTier::Heuristic,
+                skip_reason: Some(ResolutionSkipReason::IndexStale),
+                emitted_edges: None,
+            },
+            LanguageResolutionDisclosure {
+                language: "rust".into(),
+                tier_attempted: ResolutionDisclosureTier::Layer2,
+                tier_used: ResolutionDisclosureTier::Layer2,
+                skip_reason: None,
+                emitted_edges: Some(3),
+            },
+        ];
+        let warnings = compiler_tier_warnings(&rows);
+        assert_eq!(warnings.len(), 1);
+        assert!(warnings[0].starts_with("warning: go: compiler tier unavailable (index_stale"));
+        assert!(warnings[0].contains("gridseak doctor --provision go"));
     }
 
     #[test]

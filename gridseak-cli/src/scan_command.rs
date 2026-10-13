@@ -252,6 +252,16 @@ pub async fn run_scan_now(
     let report: HealthReport = serde_json::from_value(report_value.clone())
         .context("persisted report failed to deserialize into HealthReport — schema drift?")?;
 
+    // Parse-stage stderr goes to a per-scan log, so surface compiler-tier
+    // fallbacks here; heuristic-only call edges must never be silent.
+    if let Some(rq) = report.resolution_quality.as_ref() {
+        for line in
+            crate::render::resolution_disclosure::compiler_tier_warnings(&rq.resolution_disclosure)
+        {
+            eprintln!("{line}");
+        }
+    }
+
     let view = ScanReportView::build(&report, &refreshed, &scan);
 
     let format = args.hero_format(global_json);

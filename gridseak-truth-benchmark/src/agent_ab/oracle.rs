@@ -81,7 +81,7 @@ impl ArtifactOracle {
             .collect();
         let prefer = |fqn: &str| !fqn.contains("::deno::") && !fqn.contains("/_examples/");
         if rows.len() == 1 {
-            return Some(rows.into_iter().next()?);
+            return rows.into_iter().next();
         }
         rows.into_iter().find(|(_, fqn)| {
             prefer(fqn) && (fqn.ends_with(needle) || fqn.ends_with(&format!("::{needle}")))
@@ -89,15 +89,10 @@ impl ArtifactOracle {
     }
 
     pub fn callers(&self, id: &str, compiler_only: bool) -> anyhow::Result<Vec<String>> {
-        let sql = if compiler_only {
-            "SELECT n.fqn, e.provenance FROM edges e
+        // `compiler_only` filters rows by provenance below.
+        let sql = "SELECT n.fqn, e.provenance FROM edges e
              JOIN nodes n ON n.id = e.from_id
-             WHERE e.to_id = ?1 AND json_extract(e.kind, '$.kind') = 'Call'"
-        } else {
-            "SELECT n.fqn, e.provenance FROM edges e
-             JOIN nodes n ON n.id = e.from_id
-             WHERE e.to_id = ?1 AND json_extract(e.kind, '$.kind') = 'Call'"
-        };
+             WHERE e.to_id = ?1 AND json_extract(e.kind, '$.kind') = 'Call'";
         let mut stmt = self.conn.prepare(sql)?;
         let rows = stmt.query_map([id], |r| {
             Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?))
