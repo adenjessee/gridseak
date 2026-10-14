@@ -88,6 +88,22 @@ impl ResolutionDisclosure {
         }
     }
 
+    /// Rust: the SCIP index was unusable (`reason`), so the in-process
+    /// rust-analyzer resolver ran instead. Still semantic (`layer2`), but
+    /// per call site with name-match fallback, so the skip reason is kept
+    /// and the report carries `compiler_tier_unavailable_v1`.
+    pub fn layer2_fallback_to_ra_ide(language: &str, reason: SkipReason) -> Self {
+        Self {
+            language: language.to_string(),
+            tier_attempted: ResolutionTierKind::Layer2,
+            tier_used: ResolutionTierKind::Layer2,
+            skip_reason: Some(reason),
+            emitted_edges: None,
+            index_fingerprint: None,
+            index_age_seconds: None,
+        }
+    }
+
     pub fn subprocess_lsp(language: &str, emitted_edges: Option<u64>) -> Self {
         Self {
             language: language.to_string(),

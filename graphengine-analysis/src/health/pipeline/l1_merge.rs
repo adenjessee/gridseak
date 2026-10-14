@@ -74,11 +74,15 @@ pub fn try_l1_fast_merge(
         }
         None => AnalysisConfig::for_ecosystem(detected),
     };
+    if !super::super::report_matches_edge_basis(&payload.report, cfg.metrics_edge_basis) {
+        return Ok(None);
+    }
 
-    let mut graph = AnalysisGraph::load_with_module_config(
+    let mut graph = AnalysisGraph::load_with_options(
         &graph_conn,
         cfg.modules.analysis_depth,
         cfg.modules.strip_build_convention_dirs,
+        cfg.metrics_edge_basis,
     )?;
 
     let scoped_fn_ids = filter_function_ids_to_changed_paths(&graph, delta);

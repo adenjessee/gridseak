@@ -175,9 +175,16 @@ See [`docs/02-strategy/S2_INCREMENTAL_ANALYSIS_DESIGN.md`](docs/02-strategy/S2_I
   Tier 3 edges that look correct but miss instantiation-specific
   facts. We are tracking this in the universal-fidelity sprint.
 - **Macro-generated code in Rust** is mostly invisible to tree-sitter
-  (Tier 0) and grep (Tier 1). Tier 3 (LSP) sees post-expansion code
-  and can produce confusing edges when you expect to see pre-macro
-  code.
+  (Tier 0) and grep (Tier 1). The Rust compiler tier (a
+  `rust-analyzer scip` index) records calls written inside macro
+  arguments (`format!("{}", f(x))`, `vec![g()]`) but not calls that
+  exist only in a `macro_rules!` body's expansion, and none of the calls
+  rustc inserts for operators and desugaring (`==`, `[]`, `*`, `for`).
+- **Rust trait calls**: a call through `dyn Trait` or a generic bound is
+  `dispatch` to every workspace impl (third-party traits included,
+  standard-library traits such as `Clone` or `Iterator` excluded). A
+  call on a concrete type to a default method the type does not override
+  is also labelled `dispatch`.
 - **Dynamic dispatch** (trait objects, function pointers, dynamic
   imports) is approximate by definition. We do not attempt
   whole-program devirtualization in GridSeak.

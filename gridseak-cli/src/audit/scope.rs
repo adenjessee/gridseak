@@ -1,6 +1,7 @@
 //! What a `gridseak audit` answer key can vouch for, and how the question
 //! states it: the files the compiler index covers, the files the parser could
-//! only partly read, and TypeScript call shapes the generic question leaves open.
+//! only partly read, calls the compiler could not resolve (Python), and the
+//! TypeScript / Python call shapes the generic question leaves open.
 
 use std::collections::HashSet;
 
@@ -18,6 +19,10 @@ pub(super) struct Coverage {
     pub(super) partial: HashSet<String>,
     /// Shortest paths (dirs end in `/`) covering exactly the unindexed files.
     excluded: Vec<String>,
+    /// Names called at sites the compiler could not resolve (Python: a
+    /// receiver typed `Any`). Such a call may reach any function of that name.
+    unresolved: HashSet<String>,
+    unresolved_sites: usize,
 }
 
 impl Coverage {
@@ -58,11 +63,28 @@ impl Coverage {
             .collect();
         excluded.sort();
         excluded.dedup();
+        let sites: Vec<(String, u32, String)> = conn
+            .query_row(
+                "SELECT value FROM metadata WHERE key = 'resolution_compiler_unresolved_calls'",
+                [],
+                |r| r.get::<_, String>(0),
+            )
+            .ok()
+            .and_then(|v| serde_json::from_str(&v).ok())
+            .unwrap_or_default();
         Self {
             unindexed,
             partial,
             excluded,
+            unresolved_sites: sites.len(),
+            unresolved: sites.into_iter().map(|(_, _, name)| name).collect(),
         }
+    }
+
+    /// Whether a call the compiler could not resolve names one of `names`
+    /// (the target and its callers): it could be a caller the key lacks.
+    pub(super) fn hides_callers<'a>(&self, mut names: impl Iterator<Item = &'a str>) -> bool {
+        !self.unresolved.is_empty() && names.any(|n| self.unresolved.contains(n))
     }
 
     /// Sentence added to each question so the asked scope matches the key.
@@ -94,13 +116,35 @@ impl Coverage {
                 self.partial.len()
             );
         }
+        if self.unresolved_sites > 0 {
+            s += &format!(
+                "; targets whose callers share a name with any of the {} calls the compiler could not resolve (untyped receivers) are not asked",
+                self.unresolved_sites
+            );
+        }
         s
     }
 }
 
+/// TypeScript/JavaScript and Python shapes the generic question leaves open,
+/// stated the way the key (and the type checkers) treat them.
+pub(super) fn lang_rules(file: &str) -> &'static str {
+    if file.ends_with(".py") || file.ends_with(".pyi") {
+        return " In Python, a `def` nested in a function is a named function. `C(...)` calls the `__init__` \
+         (or `__new__`) C defines or inherits (neither for an `Enum`, whose `E(value)` looks a member up), \
+         `super().m(...)` calls the base class's m, and `obj.m(...)` \
+         calls the m that obj's type defines or inherits, not overrides in subclasses; a call of an \
+         `@abstractmethod` or of a `Protocol` method is dynamic dispatch. A name defined in several \
+         `if`/`else` or `try`/`except` branches calls each definition the call can reach; `@overload` \
+         stubs are never called. `@d(...)` calls d; a bare `@d`, reading a `@property`, `with`, iteration \
+         and operators are not direct calls.";
+    }
+    ts_rules(file)
+}
+
 /// TypeScript/JavaScript shapes the generic question leaves open, stated the
 /// way the key (and the TypeScript checker) treats them.
-pub(super) fn ts_rules(file: &str) -> &'static str {
+fn ts_rules(file: &str) -> &'static str {
     let ts = [".ts", ".tsx", ".mts", ".cts", ".js", ".jsx", ".mjs", ".cjs"];
     if !ts.iter().any(|e| file.ends_with(e)) {
         return "";
@@ -150,8 +194,9 @@ mod tests {
         assert!(cov
             .question_note()
             .contains("ignore `adapters/`, `src/gen/x.ts`, `vite.config.ts`."));
-        assert!(ts_rules("src/a.ts").contains("super(...)"));
-        assert_eq!(ts_rules("main.go"), "");
+        assert!(lang_rules("src/a.ts").contains("super(...)"));
+        assert!(lang_rules("pkg/a.py").contains("__init__"));
+        assert_eq!(lang_rules("main.go"), "");
     }
 
     #[test]
@@ -161,5 +206,23 @@ mod tests {
             .unwrap();
         let cov = Coverage::load(&conn, "/r/", &HashSet::new());
         assert!(cov.question_note().is_empty() && cov.key_note().is_empty());
+        assert!(!cov.hides_callers(["invoke"].into_iter()));
+    }
+
+    #[test]
+    fn unresolved_python_calls_hide_same_named_callers() {
+        let conn = Connection::open_in_memory().unwrap();
+        conn.execute_batch(
+            r#"CREATE TABLE metadata (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+               INSERT INTO metadata VALUES ('resolution_compiler_unresolved_calls',
+                 '[["tests/test_a.py",4,"invoke"],["tests/test_b.py",9,"invoke"]]');"#,
+        )
+        .unwrap();
+        let cov = Coverage::load(&conn, "/r/", &HashSet::new());
+        assert!(cov.hides_callers(["main", "invoke"].into_iter()));
+        assert!(!cov.hides_callers(["main", "parse_args"].into_iter()));
+        assert!(cov
+            .key_note()
+            .contains("any of the 2 calls the compiler could not resolve"));
     }
 }

@@ -44,6 +44,6 @@ pub use classification::is_synthetic_node;
 pub use language::{detect_ecosystem, detect_primary_language};
 pub use loader::{read_metadata, validate_schema};
 pub use types::{
-    Confidence, DeclarativeKind, EdgeKind, FrameworkKind, GraphEdge, GraphNode, NodeKind,
-    PersistedEdgeKind,
+    CallUse, Confidence, DeclarativeKind, EdgeKind, FrameworkKind, GraphEdge, GraphNode,
+    MetricsEdgeBasis, NodeKind, PersistedEdgeKind,
 };

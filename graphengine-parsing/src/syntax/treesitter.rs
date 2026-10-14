@@ -173,7 +173,9 @@ impl TreeSitterExtractor {
                 &file_path_str,
             ) {
                 results.extraction_coverage.push(coverage);
-            } else if root_node.has_error() {
+            } else if root_node.has_error()
+                && (language_name != "python" || has_error_node(root_node))
+            {
                 // Error recovery can swallow whole declarations (the 0.20
                 // TS grammar loses a file at an interface call signature
                 // that starts with `<`), so the file's functions and the
@@ -540,6 +542,21 @@ fn disambiguate_colliding_ids(symbols: &mut [Node]) {
     }
 }
 
+/// Whether recovery skipped source text (an `ERROR` node). A tree whose only
+/// errors are zero-width `MISSING` tokens still holds every declaration: the
+/// 0.20 Python grammar inserts one for a trailing comma in a multi-line
+/// subscript (`dict[\n    K,\n    V,\n]`), which is valid Python.
+fn has_error_node(node: tree_sitter::Node<'_>) -> bool {
+    if node.is_error() {
+        return true;
+    }
+    let mut c = node.walk();
+    let found = node
+        .children(&mut c)
+        .any(|ch| ch.has_error() && has_error_node(ch));
+    found
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -656,6 +673,35 @@ mod tests {
             !results.references.is_empty(),
             "expected python call sites to be captured"
         );
+    }
+
+    #[tokio::test]
+    async fn python_missing_token_recovery_is_not_a_partial_parse() {
+        let config = load_config("python").expect("load python config");
+        let extractor = TreeSitterExtractor::new(config).expect("python extractor");
+        let temp_dir = TempDir::new().unwrap();
+        // Valid Python the 0.20 grammar recovers with a zero-width MISSING
+        // token (trailing comma in a multi-line subscript) ...
+        let ok = temp_dir.path().join("ok.py");
+        std::fs::write(
+            &ok,
+            "def f():\n    x: dict[\n        int,\n        str,\n    ] = {}\n    return x\n",
+        )
+        .unwrap();
+        // ... and text it has to skip (an ERROR node).
+        let bad = temp_dir.path().join("bad.py");
+        std::fs::write(&bad, "def g(:\n    return )(\n").unwrap();
+        let results = extractor
+            .extract(&[ok.clone(), bad.clone()])
+            .await
+            .expect("extract");
+        let low: Vec<_> = results
+            .extraction_coverage
+            .iter()
+            .filter(|c| c.confidence == crate::application::ports::CoverageConfidence::Low)
+            .map(|c| c.file_path.clone())
+            .collect();
+        assert_eq!(low, vec![bad]);
     }
 
     #[tokio::test]

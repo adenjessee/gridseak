@@ -47,6 +47,12 @@ pub fn try_fast_path(
         return Ok(None);
     }
     let cached_report = cached_report.unwrap();
+    // A report computed on another metrics edge basis (including every
+    // report from before the basis existed) is not reusable.
+    if !super::report_matches_edge_basis(&cached_report, super::graph::MetricsEdgeBasis::default())
+    {
+        return Ok(None);
+    }
 
     if stats.is_zero_delta() {
         return Ok(Some(FastPathOutcome {

@@ -64,7 +64,8 @@ pub fn all_entries() -> &'static [IndexerEntry] {
             ],
             install_method: InstallMethod::NpxPackage,
             package_or_repo: "@sourcegraph/scip-typescript",
-            pinned_version: "0.3.0",
+            // The version the zod/hono answer keys were validated against.
+            pinned_version: "0.4.0",
             checksum_sha256: None,
             command: &["scip-typescript", "index"],
             timeout: DEFAULT_TIMEOUT,
@@ -101,8 +102,9 @@ pub fn all_entries() -> &'static [IndexerEntry] {
             package_or_repo: "rust-analyzer",
             pinned_version: "workspace",
             checksum_sha256: None,
-            command: &["rust-analyzer", "scip"],
-            timeout: DEFAULT_TIMEOUT,
+            command: &["rust-analyzer", "scip", "."],
+            // First run on a workspace builds proc macros and build scripts.
+            timeout: Duration::from_secs(900),
             cache_dir_name: "scip-rust",
         },
         IndexerEntry {
@@ -273,7 +275,7 @@ mod tests {
     fn typescript_is_npx_package() {
         let e = entry_for(IndexerLanguage::TypeScript).expect("ts");
         assert_eq!(e.install_method, InstallMethod::NpxPackage);
-        assert_eq!(e.pinned_version, "0.3.0");
+        assert_eq!(e.pinned_version, "0.4.0");
     }
 
     #[test]

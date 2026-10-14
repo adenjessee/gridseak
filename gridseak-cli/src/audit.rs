@@ -24,7 +24,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 mod scope;
-use scope::{ts_rules, Coverage};
+use scope::{lang_rules, Coverage};
 
 #[derive(Args, Debug, Clone)]
 pub struct AuditArgs {
@@ -529,7 +529,10 @@ impl Graph {
         let mut pools: Vec<Vec<(String, Vec<String>, usize)>> = vec![Vec::new(); bands.len()];
         for id in ids {
             let (cl, depth) = self.closure(id, 400);
-            if depth < 2 || self.touches_partial(id, &cl) {
+            let names = std::iter::once(id)
+                .chain(&cl)
+                .map(|c| self.nodes[c].name.as_str());
+            if depth < 2 || self.touches_partial(id, &cl) || self.coverage.hides_callers(names) {
                 continue;
             }
             if let Some(b) = bands
@@ -588,7 +591,7 @@ impl Graph {
                     file: t.file.clone(),
                     line: t.line,
                     question: question(repo, &t.name, &t.file, t.line)
-                        + ts_rules(&t.file)
+                        + lang_rules(&t.file)
                         + &self.coverage.question_note(),
                     max_depth: depth,
                     answer,

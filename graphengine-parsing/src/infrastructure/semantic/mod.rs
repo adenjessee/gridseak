@@ -23,6 +23,8 @@ pub mod symbol_mapping;
 #[cfg(feature = "scip")]
 pub mod index_backed;
 #[cfg(feature = "scip")]
+mod python_calls;
+#[cfg(feature = "scip")]
 pub mod scip_semantic_index;
 
 #[cfg(feature = "rust-layer2")]

@@ -1,0 +1,2800 @@
+{
+  "repo": "gascity",
+  "root": "<repo>",
+  "date": "2026-10-13",
+  "agent": "Claude Code",
+  "model": "agent default",
+  "mode": "read-only tools + language toolchain",
+  "answer_key": "GridSeak compiler-indexed call graph (351261 edges, 100% from the compiler index); the 371 files outside the compiler project are excluded from questions and keys; targets whose callers could reach the 2 partly parsed file(s) are not asked",
+  "call_edges": 351261,
+  "tasks": [
+    {
+      "id": "t1",
+      "band": "small",
+      "target": "ProxiedStore.adoptPin",
+      "file": "internal/beads/proxied_guard_tick.go",
+      "line": 794,
+      "question": "In this repository (gascity), list every function and method, including those in test files, that transitively calls `ProxiedStore.adoptPin` (declared at internal/beads/proxied_guard_tick.go:794) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `ProxiedStore.adoptPin` itself. Consider only code the Go toolchain builds (`go build ./...` and `go test ./...`): skip directories whose names start with `_` or `.`, and `testdata`. The list must be complete. Only consider code the compiler project covers: ignore `cmd/gc-write-mint/e2e_test.go`, `cmd/gc/beads_blocked_repair_integration_test.go`, `cmd/gc/beads_native_compat_integration_test.go`, `cmd/gc/beads_provider_missing_scope_stop_linux_test.go`, `cmd/gc/beads_provider_script_scope_lifecycle_linux_test.go`, `cmd/gc/beads_provider_script_shared_server_linux_test.go`, `cmd/gc/capstone_integration_test.go`, `cmd/gc/cmd_daemon_windows.go`, `cmd/gc/cmd_hook_claim_runmap_other.go`, `cmd/gc/cmd_rig_include_registry_integration_test.go`, `cmd/gc/dolt_data_dir_lock_linux.go`, `cmd/gc/dolt_data_dir_lock_linux_test.go`, `cmd/gc/dolt_data_dir_lock_other.go`, `cmd/gc/dolt_disk_preflight_windows.go`, `cmd/gc/doltlite_reindex_native.go`, `cmd/gc/doltlite_store_native.go`, `cmd/gc/doltlite_store_native_test.go`, `cmd/gc/embedded_rig_custom_types_integration_test.go`, `cmd/gc/fs_pressure_linux.go`, `cmd/gc/fs_pressure_test.go`, `cmd/gc/live_submit_probe_test.go`, `cmd/gc/metrics_census_ignore_testhook_test.go`, `cmd/gc/native_dolt_rebind_integration_test.go`, `cmd/gc/order_dynamic_integration_test.go`, `cmd/gc/orders_lane_fs_pressure_test.go`, `cmd/gc/phase2_real_transport_deadline_test.go`, `cmd/gc/phase2_real_transport_test.go`, `cmd/gc/proc_environ_settled_test.go`, `cmd/gc/productmetrics_controls_process_testhook_test.go`, `cmd/gc/productmetrics_controls_pty_darwin_test.go`, `cmd/gc/productmetrics_controls_pty_linux_test.go`, `cmd/gc/productmetrics_controls_testhook.go`, `cmd/gc/productmetrics_private_process_testhook_test.go`, `cmd/gc/productmetrics_testhook.go`, `cmd/gc/productmetrics_testhook_test.go`, `cmd/gc/provider_op_process_windows.go`, `cmd/gc/reconcile_effect_recycle_tmux_integration_test.go`, `cmd/gc/reconcile_effect_stop_tmux_integration_test.go`, `cmd/gc/rig_add_path_durability_test.go`, `cmd/gc/sigpipe_windows.go`, `cmd/gc/storage_boot_workspace_integration_test.go`, `cmd/gc/suspension_state_linux_test.go`, `cmd/gc/tmux_leak_guard_check_test.go`, `cmd/gc/tmux_leak_guard_mntns_test.go`, `cmd/gc/tmux_leak_guard_test.go`, `examples/bd/dolt/compact_history_protection_real_dolt_test.go`, `examples/bd/dolt/compact_real_dolt_callbound_test.go`, `examples/bd/dolt/compact_real_dolt_test.go`, `examples/gastown/dolt_orphan_sweep_integration_test.go`, `examples/gastown/maintenance_bd_integration_test.go`, `examples/gastown/maintenance_scripts_dolt_integration_test.go`, `internal/api/dashport_support.go`, `internal/bazeltest/lock_other.go`, `internal/bdflags/freshness_test.go`, `internal/beads/bdstore_conditional_integration_bridge_test.go`, `internal/beads/bdstore_conditional_integration_test.go`, `internal/beads/bdstore_conditional_release_integration_test.go`, `internal/beads/doltlite_count.go`, `internal/beads/doltlite_count_test.go`, `internal/beads/doltlite_namespace_census.go`, `internal/beads/doltlite_namespace_census_test.go`, `internal/beads/doltlite_read_store.go`, `internal/beads/doltlite_read_store_capabilities.go`, `internal/beads/doltlite_read_store_graph_only_ready.go`, `internal/beads/doltlite_read_store_graph_ready_test.go`, `internal/beads/doltlite_read_store_test.go`, `internal/beads/doltlite_seek_test.go`, `internal/beads/exec/br_test.go`, `internal/beads/exec_timeout_linux.go`, `internal/beads/exec_timeout_linux_test.go`, `internal/beads/exec_timeout_windows.go`, `internal/beads/export_integration_test.go`, `internal/beads/hangbudget_linux_test.go`, `internal/beads/native_dolt_store_facade_integration_test.go`, `internal/beads/native_dolt_store_graph_apply_integration_test.go`, `internal/beads/native_dolt_store_integration_test.go`, `internal/beads/native_dolt_store_label_cas_integration_test.go`, `internal/beads/native_dolt_store_metadata_cas_integration_test.go`, `internal/beads/native_dolt_store_metadata_merge_integration_test.go`, `internal/beads/native_dolt_store_metadata_preserve_integration_test.go`, `internal/beads/native_dolt_store_metadata_stress_integration_test.go`, `internal/beads/native_dolt_store_ready_veto_limit_integration_test.go`, `internal/beads/native_list_pushdown_integration_test.go`, `internal/beads/proxyendpoint/birth_linux.go`, `internal/beads/proxyendpoint/birth_linux_test.go`, `internal/beads/session_key_hook_bd_integration_test.go`, `internal/beads/sqlite_sequence_floor_temp_linux.go`, `internal/beads/sqlite_store_sequence_floor_process_linux_test.go`, `internal/config/fingerprint_ctime_windows.go`, `internal/config/repo_cache_lock_windows.go`, `internal/configedit/configedit_linux_test.go`, `internal/credentialprovider/credentialprovider_process_unix_test.go`, `internal/credentialprovider/credentialprovider_process_windows_test.go`, `internal/credentialprovider/environment_windows.go`, `internal/credentialprovider/runner_windows.go`, `internal/events/inode_windows.go`, `internal/events/rename_linux.go`, `internal/execgrace/signal_windows.go`, `internal/gchome/trust_unsupported.go`, `internal/gitcred/rules_windows.go`, `internal/hostboot/hostboot_linux.go`, `internal/hostboot/hostboot_linux_test.go`, `internal/hostboot/hostboot_unsupported.go`, `internal/loopbackport/lease_linux.go`, `internal/orders/trigger_exec_windows.go`, `internal/packman/networkgit_group_windows.go`, `internal/packregistry/file_lock_windows.go`, `internal/pathdurability/probe_linux.go`, `internal/pidutil/cmdline_other.go`, `internal/pidutil/vanish_linux_test.go`, `internal/productmetrics/platform_unsupported.go`, `internal/productmetrics/platform_unsupported_test.go`, `internal/productmetrics/productmetrics_testhook.go`, `internal/productmetrics/service_state_unsupported_test.go`, `internal/productmetrics/spawn_unsupported.go`, `internal/productmetrics/storage_rename_linux.go`, `internal/runtime/acp/conformance_test.go`, `internal/runtime/acp/events_protocol_test.go`, `internal/runtime/acp/proctable_integration_test.go`, `internal/runtime/acp/proctable_linux_test.go`, `internal/runtime/acp/protocol_conformance_test.go`, `internal/runtime/acp/testdata/`, `internal/runtime/acp/turn_events_protocol_test.go`, `internal/runtime/exec/idle_integration_test.go`, `internal/runtime/proctable/descendants_linux.go`, `internal/runtime/proctable/descendants_stub.go`, `internal/runtime/proctable/environ_linux.go`, `internal/runtime/proctable/environ_linux_test.go`, `internal/runtime/proctable/environ_stub.go`, `internal/runtime/proctable/guard_test.go`, `internal/runtime/proctable/identity_linux.go`, `internal/runtime/proctable/identity_stub.go`, `internal/runtime/proctable/infrastructure_argv_linux.go`, `internal/runtime/proctable/infrastructure_argv_stub.go`, `internal/runtime/proctable/kill_stub.go`, `internal/runtime/proctable/scan_linux.go`, `internal/runtime/proctable/scan_linux_test.go`, `internal/runtime/proctable/scan_stub.go`, `internal/runtime/proctable/scan_stub_test.go`, `internal/runtime/proctable/supervisor_fork_orphan_repro_test.go`, `internal/runtime/ssh/conformance_integration_test.go`, `internal/runtime/ssh/session_env_file_integration_test.go`, `internal/runtime/ssh/ssh_localhost_integration_test.go`, `internal/runtime/subprocess/seam_conformance_test.go`, `internal/runtime/tmux/adapter_test.go`, `internal/runtime/tmux/dialog_feedback_survey_integration_test.go`, `internal/runtime/tmux/dialog_model_switch_integration_test.go`, `internal/runtime/tmux/empty_server_liveness_integration_test.go`, `internal/runtime/tmux/exact_target_integration_test.go`, `internal/runtime/tmux/hidden_attach_hook_test.go`, `internal/runtime/tmux/nudge_clear_before_paste_integration_test.go`, `internal/runtime/tmux/nudge_confirm_lag_integration_test.go`, `internal/runtime/tmux/nudge_poke_integration_test.go`, `internal/runtime/tmux/nudge_staged_draft_integration_test.go`, `internal/runtime/tmux/nudge_submit_confirm_integration_test.go`, `internal/runtime/tmux/nudge_submit_key_sequence_integration_test.go`, `internal/runtime/tmux/process_group_windows.go`, `internal/runtime/tmux/seam_conformance_test.go`, `internal/runtime/tmux/server_socket_probe_linux.go`, `internal/runtime/tmux/server_socket_probe_other.go`, `internal/runtime/tmux/session_env_file_integration_test.go`, `internal/runtime/tmux/session_object_integration_test.go`, `internal/runtime/tmux/tmux_test.go`, `internal/runtime/tmux/wake_pane_integration_test.go`, `internal/session/manager_tmux_integration_test.go`, `internal/session/orphan_infrastructure_fence_linux_test.go`, `internal/session/runtime_lease_boot_linux.go`, `internal/session/runtime_lease_boot_other.go`, `internal/storebinding/beadsworkspace/engine_integration_test.go`, `internal/storebinding/migration_guard_unsupported.go`, `internal/storebinding/sqlite/graph_capability_linux_test.go`, `internal/storebinding/sqlite/graph_fence_linux_test.go`, `internal/storebinding/sqlite/graph_identity_other.go`, `internal/storebinding/sqlite/graph_schema_admission_linux_test.go`, `internal/storebinding/sqlite/legacy_hot_journal_linux_test.go`, `internal/storebinding/sqlite/legacy_sessions_snapshot_other.go`, `internal/storebinding/sqlite/sqlite_fence_process_linux_test.go`, `internal/storebinding/sqlite/sqlite_fence_release_linux_test.go`, `internal/storebinding/sqlite/sqlite_readonly_fence_linux_test.go`, `internal/storebinding/sqlite/sqlite_snapshot_temp_linux.go`, `internal/storebinding/sqlite/sqlite_source_fd_linux.go`, `internal/storebinding/sqlite/sqlite_source_fd_linux_test.go`, `internal/storebinding/sqlite/sqlite_vfs_linux_test.go`, `internal/storebinding/sqlite/sqlite_writer_reservation_linux.go`, `internal/suspensionstate/fence_linux_test.go`, `internal/suspensionstate/fence_windows.go`, `internal/testutil/flock_linux.go`, `internal/workspacesvc/proxy_process_linux.go`, `internal/worktree/lock_windows.go`, `scripts/add-testenv-import.go`, `scripts/bazel-bep-summary.go`, `scripts/shard-budget.go`, `scripts/test-timing-plan.go`, `scripts/test-timing-summary.go`, `scripts/testdata/`, `test/acceptance/agent_env_test.go`, `test/acceptance/agent_suspend_test.go`, `test/acceptance/beads_blocked_repair_test.go`, `test/acceptance/beads_cli_contract_home_isolation_test.go`, `test/acceptance/beads_cli_contract_test.go`, `test/acceptance/beads_health_test.go`, `test/acceptance/beads_migrate_proxied_test.go`, `test/acceptance/beads_proxied_default_test.go`, `test/acceptance/beads_proxied_idle_timeout_test.go`, `test/acceptance/beads_proxied_native_safety_test.go`, `test/acceptance/beads_proxied_native_test.go`, `test/acceptance/beads_proxied_shared_server_test.go`, `test/acceptance/beads_proxied_suspension_quiescence_test.go`, `test/acceptance/beads_topology_matrix_test.go`, `test/acceptance/cli_basics_test.go`, `test/acceptance/config_pack_test.go`, `test/acceptance/converge_test.go`, `test/acceptance/convoy_test.go`, `test/acceptance/dashboard_serve_test.go`, `test/acceptance/doctor_mail_test.go`, `test/acceptance/doctor_proxied_backup_coverage_test.go`, `test/acceptance/doctor_stopped_store_test.go`, `test/acceptance/drain_ack_test.go`, `test/acceptance/env_invariant_test.go`, `test/acceptance/example_cities_test.go`, `test/acceptance/formula_events_test.go`, `test/acceptance/gastown_pack_cache_test.go`, `test/acceptance/gastown_smoke_test.go`, `test/acceptance/handoff_test.go`, `test/acceptance/helpers/dir_writable_other.go`, `test/acceptance/import_named_sessions_regression_test.go`, `test/acceptance/init_lifecycle_test.go`, `test/acceptance/integration_selfhost_ux_test.go`, `test/acceptance/migration_regression_test.go`, `test/acceptance/nudge_service_test.go`, `test/acceptance/order_commands_test.go`, `test/acceptance/order_env_test.go`, `test/acceptance/pack_registry_live_test.go`, `test/acceptance/pack_test.go`, `test/acceptance/prime_test.go`, `test/acceptance/rig_test.go`, `test/acceptance/session_test.go`, `test/acceptance/skill_test.go`, `test/acceptance/sling_test.go`, `test/acceptance/status_test.go`, `test/acceptance/supervisor_registry_test.go`, `test/acceptance/tier_b/idle_bead_stability_test.go`, `test/acceptance/tier_b/lifecycle_b_test.go`, `test/acceptance/tier_b/pool_workquery_test.go`, `test/acceptance/tier_b/split_storage_migrated_formula_test.go`, `test/acceptance/tier_c/fresh_install_spawn_test.go`, `test/acceptance/tier_c/tierc_helpers_test.go`, `test/acceptance/tier_c/tierc_test.go`, `test/acceptance/tutorial_goldens/auth_status_test.go`, `test/acceptance/tutorial_goldens/continuity_regression_test.go`, `test/acceptance/tutorial_goldens/formula_helpers_regression_test.go`, `test/acceptance/tutorial_goldens/formula_helpers_test.go`, `test/acceptance/tutorial_goldens/harness_test.go`, `test/acceptance/tutorial_goldens/main_test.go`, `test/acceptance/tutorial_goldens/manifests_test.go`, `test/acceptance/tutorial_goldens/snapshot.go`, `test/acceptance/tutorial_goldens/tutorial01_test.go`, `test/acceptance/tutorial_goldens/tutorial02_test.go`, `test/acceptance/tutorial_goldens/tutorial03_test.go`, `test/acceptance/tutorial_goldens/tutorial04_communication_test.go`, `test/acceptance/tutorial_goldens/tutorial05_test.go`, `test/acceptance/tutorial_goldens/tutorial06_test.go`, `test/acceptance/tutorial_goldens/tutorial07_test.go`, `test/acceptance/wait_test.go`, `test/acceptance/worker_inference/classification_test.go`, `test/acceptance/worker_inference/main_test.go`, `test/acceptance/worker_inference/worker_handle_city_helpers_test.go`, `test/acceptance/worker_inference/worker_handle_city_test.go`, `test/acceptance/worker_inference/worker_handle_live_helpers_test.go`, `test/acceptance/worker_inference/worker_inference_helpers_test.go`, `test/acceptance/worker_inference/worker_inference_test.go`, `test/acceptance/worktree_lifecycle_test.go`, `test/acceptance/worktree_test.go`, `test/containerhost/docker_session_test.go`, `test/containerhost/k8s_session_test.go`, `test/dashport/cmd/`, `test/dashport/corpus/`, `test/dashport/fixtures.go`, `test/dashport/harness.go`, `test/dashport/projection_test.go`, `test/integration/bdstore_batch_delete_test.go`, `test/integration/bdstore_batch_reads_test.go`, `test/integration/bdstore_runner_isolation_test.go`, `test/integration/bdstore_test.go`, `test/integration/dolt_config_test.go`, `test/integration/dolt_managed_chaos_test.go`, `test/integration/dolt_persistence_test.go`, `test/integration/e2e_comm_test.go`, `test/integration/e2e_config_test.go`, `test/integration/e2e_events_test.go`, `test/integration/e2e_helpers_test.go`, `test/integration/e2e_hook_test.go`, `test/integration/e2e_lifecycle_test.go`, `test/integration/e2e_mail_test.go`, `test/integration/e2e_multi_test.go`, `test/integration/e2e_pool_test.go`, `test/integration/e2e_test.go`, `test/integration/gastown_config_test.go`, `test/integration/gastown_controller_test.go`, `test/integration/gastown_events_test.go`, `test/integration/gastown_formula_test.go`, `test/integration/gastown_handoff_test.go`, `test/integration/gastown_helpers_test.go`, `test/integration/gastown_mail_test.go`, `test/integration/gastown_multirig_test.go`, `test/integration/gastown_pipeline_test.go`, `test/integration/gastown_polecat_test.go`, `test/integration/gastown_pool_test.go`, `test/integration/gastown_reconciler_test.go`, `test/integration/gastown_refinery_test.go`, `test/integration/gastown_shutdown_test.go`, `test/integration/gastown_sling_test.go`, `test/integration/gastown_witness_test.go`, `test/integration/gc_live_contract_store_conflict_test.go`, `test/integration/gc_live_contract_test.go`, `test/integration/graph_dispatch_harness_test.go`, `test/integration/graph_dispatch_test.go`, `test/integration/helpers_test.go`, `test/integration/huma_binary_test.go`, `test/integration/integration_test.go`, `test/integration/mail_test.go`, `test/integration/review_check_scripts_test.go`, `test/integration/review_formula_test.go`, `test/integration/skill_lifecycle_test.go`, `test/integration/start_drift_test.go`, `test/integration/supervisor_unit_guard_test.go`, `test/integration/tool_home_test.go`, `test/integration/tutorial_path_test.go`, `test/integration/workflow_event_wait_test.go`, `tools/`.",
+      "max_depth": 7,
+      "answer": [
+        {
+          "file": "cmd/gc/beads_proxied_native.go",
+          "line": 384,
+          "name": "proxiedNativeOpener.open"
+        },
+        {
+          "file": "internal/beads/proxied_guard_tick.go",
+          "line": 220,
+          "name": "ProxiedStore.StartGuard"
+        },
+        {
+          "file": "internal/beads/proxied_guard_tick.go",
+          "line": 224,
+          "name": "ProxiedStore.startGuard"
+        },
+        {
+          "file": "internal/beads/proxied_guard_tick.go",
+          "line": 245,
+          "name": "proxiedGuard.run"
+        },
+        {
+          "file": "internal/beads/proxied_guard_tick.go",
+          "line": 280,
+          "name": "proxiedGuard.tick"
+        },
+        {
+          "file": "internal/beads/proxied_guard_tick.go",
+          "line": 288,
+          "name": "proxiedGuard.tickSteps"
+        },
+        {
+          "file": "internal/beads/proxied_guard_tick.go",
+          "line": 353,
+          "name": "proxiedGuard.checkGeneration"
+        },
+        {
+          "file": "internal/beads/proxied_guard_tick_test.go",
+          "line": 136,
+          "name": "guardFixture.start"
+        },
+        {
+          "file": "internal/beads/proxied_guard_tick_test.go",
+          "line": 176,
+          "name": "TestProxiedGuardTickRepinsOnGenerationChange"
+        },
+        {
+          "file": "internal/beads/proxied_guard_tick_test.go",
+          "line": 234,
+          "name": "TestProxiedGuardTickRepinRefusesWhenTheNewGenerationDoesNotAdmit"
+        },
+        {
+          "file": "internal/beads/proxied_guard_tick_test.go",
+          "line": 264,
+          "name": "TestProxiedGuardTickDemotesOnCursorDrift"
+        },
+        {
+          "file": "internal/beads/proxied_guard_tick_test.go",
+          "line": 321,
+          "name": "TestProxiedGuardTickUndecidedReadsDecideNothing"
+        },
+        {
+          "file": "internal/beads/proxied_guard_tick_test.go",
+          "line": 378,
+          "name": "TestProxiedGuardTickDemotesOnAForeignSocketOwner"
+        },
+        {
+          "file": "internal/beads/proxied_guard_tick_test.go",
+          "line": 403,
+          "name": "TestProxiedGuardTickStopsOnCloseStore"
+        },
+        {
+          "file": "internal/beads/proxied_guard_tick_test.go",
+          "line": 431,
+          "name": "TestProxiedGuardStartIsIdempotentPerStore"
+        },
+        {
+          "file": "internal/beads/proxied_guard_tick_test.go",
+          "line": 561,
+          "name": "TestProxiedGuardTickStandsDownNonTerminallyWhenTheNewGenerationDoesNotAdmit"
+        },
+        {
+          "file": "internal/beads/proxied_guard_tick_test.go",
+          "line": 639,
+          "name": "TestProxiedGuardTickDoesNotServeAMovedRootWhileTheNewProxyRefuses"
+        },
+        {
+          "file": "internal/beads/proxied_guard_tick_test.go",
+          "line": 709,
+          "name": "TestProxiedGuardTickRecoversANonTerminallyDemotedHandle"
+        },
+        {
+          "file": "internal/beads/proxied_guard_tick_test.go",
+          "line": 802,
+          "name": "TestProxiedGuardTickSpendsOneSessionPerTick"
+        },
+        {
+          "file": "internal/beads/proxied_guard_tick_test.go",
+          "line": 891,
+          "name": "TestProxiedGuardTickForgetsTheMemoOnCursorDrift"
+        },
+        {
+          "file": "internal/beads/proxied_guard_tick_test.go",
+          "line": 939,
+          "name": "TestStartGuardArmsARealTicker"
+        },
+        {
+          "file": "internal/beads/proxied_guard_tick_test.go",
+          "line": 992,
+          "name": "TestStartGuardIsIdempotentPerStore"
+        },
+        {
+          "file": "internal/beads/proxied_guard_tick_test.go",
+          "line": 1074,
+          "name": "TestCloseStoreDuringAGuardRecoveryClosesTheRecoveredLeaf"
+        },
+        {
+          "file": "internal/beads/proxied_guard_tick_test.go",
+          "line": 1152,
+          "name": "TestProxiedGuardTickStandsDownALeafTheReadPathAlreadyRepinned"
+        },
+        {
+          "file": "internal/beads/proxied_incident_log_test.go",
+          "line": 110,
+          "name": "TestProxiedHeadMovedIsLoudAtEverySite"
+        }
+      ],
+      "kind": "callers"
+    },
+    {
+      "id": "t2",
+      "band": "small",
+      "target": "parseBeadList",
+      "file": "internal/beads/exec/exec.go",
+      "line": 169,
+      "question": "In this repository (gascity), list every function and method, including those in test files, that transitively calls `parseBeadList` (declared at internal/beads/exec/exec.go:169) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `parseBeadList` itself. Consider only code the Go toolchain builds (`go build ./...` and `go test ./...`): skip directories whose names start with `_` or `.`, and `testdata`. The list must be complete. Only consider code the compiler project covers: ignore `cmd/gc-write-mint/e2e_test.go`, `cmd/gc/beads_blocked_repair_integration_test.go`, `cmd/gc/beads_native_compat_integration_test.go`, `cmd/gc/beads_provider_missing_scope_stop_linux_test.go`, `cmd/gc/beads_provider_script_scope_lifecycle_linux_test.go`, `cmd/gc/beads_provider_script_shared_server_linux_test.go`, `cmd/gc/capstone_integration_test.go`, `cmd/gc/cmd_daemon_windows.go`, `cmd/gc/cmd_hook_claim_runmap_other.go`, `cmd/gc/cmd_rig_include_registry_integration_test.go`, `cmd/gc/dolt_data_dir_lock_linux.go`, `cmd/gc/dolt_data_dir_lock_linux_test.go`, `cmd/gc/dolt_data_dir_lock_other.go`, `cmd/gc/dolt_disk_preflight_windows.go`, `cmd/gc/doltlite_reindex_native.go`, `cmd/gc/doltlite_store_native.go`, `cmd/gc/doltlite_store_native_test.go`, `cmd/gc/embedded_rig_custom_types_integration_test.go`, `cmd/gc/fs_pressure_linux.go`, `cmd/gc/fs_pressure_test.go`, `cmd/gc/live_submit_probe_test.go`, `cmd/gc/metrics_census_ignore_testhook_test.go`, `cmd/gc/native_dolt_rebind_integration_test.go`, `cmd/gc/order_dynamic_integration_test.go`, `cmd/gc/orders_lane_fs_pressure_test.go`, `cmd/gc/phase2_real_transport_deadline_test.go`, `cmd/gc/phase2_real_transport_test.go`, `cmd/gc/proc_environ_settled_test.go`, `cmd/gc/productmetrics_controls_process_testhook_test.go`, `cmd/gc/productmetrics_controls_pty_darwin_test.go`, `cmd/gc/productmetrics_controls_pty_linux_test.go`, `cmd/gc/productmetrics_controls_testhook.go`, `cmd/gc/productmetrics_private_process_testhook_test.go`, `cmd/gc/productmetrics_testhook.go`, `cmd/gc/productmetrics_testhook_test.go`, `cmd/gc/provider_op_process_windows.go`, `cmd/gc/reconcile_effect_recycle_tmux_integration_test.go`, `cmd/gc/reconcile_effect_stop_tmux_integration_test.go`, `cmd/gc/rig_add_path_durability_test.go`, `cmd/gc/sigpipe_windows.go`, `cmd/gc/storage_boot_workspace_integration_test.go`, `cmd/gc/suspension_state_linux_test.go`, `cmd/gc/tmux_leak_guard_check_test.go`, `cmd/gc/tmux_leak_guard_mntns_test.go`, `cmd/gc/tmux_leak_guard_test.go`, `examples/bd/dolt/compact_history_protection_real_dolt_test.go`, `examples/bd/dolt/compact_real_dolt_callbound_test.go`, `examples/bd/dolt/compact_real_dolt_test.go`, `examples/gastown/dolt_orphan_sweep_integration_test.go`, `examples/gastown/maintenance_bd_integration_test.go`, `examples/gastown/maintenance_scripts_dolt_integration_test.go`, `internal/api/dashport_support.go`, `internal/bazeltest/lock_other.go`, `internal/bdflags/freshness_test.go`, `internal/beads/bdstore_conditional_integration_bridge_test.go`, `internal/beads/bdstore_conditional_integration_test.go`, `internal/beads/bdstore_conditional_release_integration_test.go`, `internal/beads/doltlite_count.go`, `internal/beads/doltlite_count_test.go`, `internal/beads/doltlite_namespace_census.go`, `internal/beads/doltlite_namespace_census_test.go`, `internal/beads/doltlite_read_store.go`, `internal/beads/doltlite_read_store_capabilities.go`, `internal/beads/doltlite_read_store_graph_only_ready.go`, `internal/beads/doltlite_read_store_graph_ready_test.go`, `internal/beads/doltlite_read_store_test.go`, `internal/beads/doltlite_seek_test.go`, `internal/beads/exec/br_test.go`, `internal/beads/exec_timeout_linux.go`, `internal/beads/exec_timeout_linux_test.go`, `internal/beads/exec_timeout_windows.go`, `internal/beads/export_integration_test.go`, `internal/beads/hangbudget_linux_test.go`, `internal/beads/native_dolt_store_facade_integration_test.go`, `internal/beads/native_dolt_store_graph_apply_integration_test.go`, `internal/beads/native_dolt_store_integration_test.go`, `internal/beads/native_dolt_store_label_cas_integration_test.go`, `internal/beads/native_dolt_store_metadata_cas_integration_test.go`, `internal/beads/native_dolt_store_metadata_merge_integration_test.go`, `internal/beads/native_dolt_store_metadata_preserve_integration_test.go`, `internal/beads/native_dolt_store_metadata_stress_integration_test.go`, `internal/beads/native_dolt_store_ready_veto_limit_integration_test.go`, `internal/beads/native_list_pushdown_integration_test.go`, `internal/beads/proxyendpoint/birth_linux.go`, `internal/beads/proxyendpoint/birth_linux_test.go`, `internal/beads/session_key_hook_bd_integration_test.go`, `internal/beads/sqlite_sequence_floor_temp_linux.go`, `internal/beads/sqlite_store_sequence_floor_process_linux_test.go`, `internal/config/fingerprint_ctime_windows.go`, `internal/config/repo_cache_lock_windows.go`, `internal/configedit/configedit_linux_test.go`, `internal/credentialprovider/credentialprovider_process_unix_test.go`, `internal/credentialprovider/credentialprovider_process_windows_test.go`, `internal/credentialprovider/environment_windows.go`, `internal/credentialprovider/runner_windows.go`, `internal/events/inode_windows.go`, `internal/events/rename_linux.go`, `internal/execgrace/signal_windows.go`, `internal/gchome/trust_unsupported.go`, `internal/gitcred/rules_windows.go`, `internal/hostboot/hostboot_linux.go`, `internal/hostboot/hostboot_linux_test.go`, `internal/hostboot/hostboot_unsupported.go`, `internal/loopbackport/lease_linux.go`, `internal/orders/trigger_exec_windows.go`, `internal/packman/networkgit_group_windows.go`, `internal/packregistry/file_lock_windows.go`, `internal/pathdurability/probe_linux.go`, `internal/pidutil/cmdline_other.go`, `internal/pidutil/vanish_linux_test.go`, `internal/productmetrics/platform_unsupported.go`, `internal/productmetrics/platform_unsupported_test.go`, `internal/productmetrics/productmetrics_testhook.go`, `internal/productmetrics/service_state_unsupported_test.go`, `internal/productmetrics/spawn_unsupported.go`, `internal/productmetrics/storage_rename_linux.go`, `internal/runtime/acp/conformance_test.go`, `internal/runtime/acp/events_protocol_test.go`, `internal/runtime/acp/proctable_integration_test.go`, `internal/runtime/acp/proctable_linux_test.go`, `internal/runtime/acp/protocol_conformance_test.go`, `internal/runtime/acp/testdata/`, `internal/runtime/acp/turn_events_protocol_test.go`, `internal/runtime/exec/idle_integration_test.go`, `internal/runtime/proctable/descendants_linux.go`, `internal/runtime/proctable/descendants_stub.go`, `internal/runtime/proctable/environ_linux.go`, `internal/runtime/proctable/environ_linux_test.go`, `internal/runtime/proctable/environ_stub.go`, `internal/runtime/proctable/guard_test.go`, `internal/runtime/proctable/identity_linux.go`, `internal/runtime/proctable/identity_stub.go`, `internal/runtime/proctable/infrastructure_argv_linux.go`, `internal/runtime/proctable/infrastructure_argv_stub.go`, `internal/runtime/proctable/kill_stub.go`, `internal/runtime/proctable/scan_linux.go`, `internal/runtime/proctable/scan_linux_test.go`, `internal/runtime/proctable/scan_stub.go`, `internal/runtime/proctable/scan_stub_test.go`, `internal/runtime/proctable/supervisor_fork_orphan_repro_test.go`, `internal/runtime/ssh/conformance_integration_test.go`, `internal/runtime/ssh/session_env_file_integration_test.go`, `internal/runtime/ssh/ssh_localhost_integration_test.go`, `internal/runtime/subprocess/seam_conformance_test.go`, `internal/runtime/tmux/adapter_test.go`, `internal/runtime/tmux/dialog_feedback_survey_integration_test.go`, `internal/runtime/tmux/dialog_model_switch_integration_test.go`, `internal/runtime/tmux/empty_server_liveness_integration_test.go`, `internal/runtime/tmux/exact_target_integration_test.go`, `internal/runtime/tmux/hidden_attach_hook_test.go`, `internal/runtime/tmux/nudge_clear_before_paste_integration_test.go`, `internal/runtime/tmux/nudge_confirm_lag_integration_test.go`, `internal/runtime/tmux/nudge_poke_integration_test.go`, `internal/runtime/tmux/nudge_staged_draft_integration_test.go`, `internal/runtime/tmux/nudge_submit_confirm_integration_test.go`, `internal/runtime/tmux/nudge_submit_key_sequence_integration_test.go`, `internal/runtime/tmux/process_group_windows.go`, `internal/runtime/tmux/seam_conformance_test.go`, `internal/runtime/tmux/server_socket_probe_linux.go`, `internal/runtime/tmux/server_socket_probe_other.go`, `internal/runtime/tmux/session_env_file_integration_test.go`, `internal/runtime/tmux/session_object_integration_test.go`, `internal/runtime/tmux/tmux_test.go`, `internal/runtime/tmux/wake_pane_integration_test.go`, `internal/session/manager_tmux_integration_test.go`, `internal/session/orphan_infrastructure_fence_linux_test.go`, `internal/session/runtime_lease_boot_linux.go`, `internal/session/runtime_lease_boot_other.go`, `internal/storebinding/beadsworkspace/engine_integration_test.go`, `internal/storebinding/migration_guard_unsupported.go`, `internal/storebinding/sqlite/graph_capability_linux_test.go`, `internal/storebinding/sqlite/graph_fence_linux_test.go`, `internal/storebinding/sqlite/graph_identity_other.go`, `internal/storebinding/sqlite/graph_schema_admission_linux_test.go`, `internal/storebinding/sqlite/legacy_hot_journal_linux_test.go`, `internal/storebinding/sqlite/legacy_sessions_snapshot_other.go`, `internal/storebinding/sqlite/sqlite_fence_process_linux_test.go`, `internal/storebinding/sqlite/sqlite_fence_release_linux_test.go`, `internal/storebinding/sqlite/sqlite_readonly_fence_linux_test.go`, `internal/storebinding/sqlite/sqlite_snapshot_temp_linux.go`, `internal/storebinding/sqlite/sqlite_source_fd_linux.go`, `internal/storebinding/sqlite/sqlite_source_fd_linux_test.go`, `internal/storebinding/sqlite/sqlite_vfs_linux_test.go`, `internal/storebinding/sqlite/sqlite_writer_reservation_linux.go`, `internal/suspensionstate/fence_linux_test.go`, `internal/suspensionstate/fence_windows.go`, `internal/testutil/flock_linux.go`, `internal/workspacesvc/proxy_process_linux.go`, `internal/worktree/lock_windows.go`, `scripts/add-testenv-import.go`, `scripts/bazel-bep-summary.go`, `scripts/shard-budget.go`, `scripts/test-timing-plan.go`, `scripts/test-timing-summary.go`, `scripts/testdata/`, `test/acceptance/agent_env_test.go`, `test/acceptance/agent_suspend_test.go`, `test/acceptance/beads_blocked_repair_test.go`, `test/acceptance/beads_cli_contract_home_isolation_test.go`, `test/acceptance/beads_cli_contract_test.go`, `test/acceptance/beads_health_test.go`, `test/acceptance/beads_migrate_proxied_test.go`, `test/acceptance/beads_proxied_default_test.go`, `test/acceptance/beads_proxied_idle_timeout_test.go`, `test/acceptance/beads_proxied_native_safety_test.go`, `test/acceptance/beads_proxied_native_test.go`, `test/acceptance/beads_proxied_shared_server_test.go`, `test/acceptance/beads_proxied_suspension_quiescence_test.go`, `test/acceptance/beads_topology_matrix_test.go`, `test/acceptance/cli_basics_test.go`, `test/acceptance/config_pack_test.go`, `test/acceptance/converge_test.go`, `test/acceptance/convoy_test.go`, `test/acceptance/dashboard_serve_test.go`, `test/acceptance/doctor_mail_test.go`, `test/acceptance/doctor_proxied_backup_coverage_test.go`, `test/acceptance/doctor_stopped_store_test.go`, `test/acceptance/drain_ack_test.go`, `test/acceptance/env_invariant_test.go`, `test/acceptance/example_cities_test.go`, `test/acceptance/formula_events_test.go`, `test/acceptance/gastown_pack_cache_test.go`, `test/acceptance/gastown_smoke_test.go`, `test/acceptance/handoff_test.go`, `test/acceptance/helpers/dir_writable_other.go`, `test/acceptance/import_named_sessions_regression_test.go`, `test/acceptance/init_lifecycle_test.go`, `test/acceptance/integration_selfhost_ux_test.go`, `test/acceptance/migration_regression_test.go`, `test/acceptance/nudge_service_test.go`, `test/acceptance/order_commands_test.go`, `test/acceptance/order_env_test.go`, `test/acceptance/pack_registry_live_test.go`, `test/acceptance/pack_test.go`, `test/acceptance/prime_test.go`, `test/acceptance/rig_test.go`, `test/acceptance/session_test.go`, `test/acceptance/skill_test.go`, `test/acceptance/sling_test.go`, `test/acceptance/status_test.go`, `test/acceptance/supervisor_registry_test.go`, `test/acceptance/tier_b/idle_bead_stability_test.go`, `test/acceptance/tier_b/lifecycle_b_test.go`, `test/acceptance/tier_b/pool_workquery_test.go`, `test/acceptance/tier_b/split_storage_migrated_formula_test.go`, `test/acceptance/tier_c/fresh_install_spawn_test.go`, `test/acceptance/tier_c/tierc_helpers_test.go`, `test/acceptance/tier_c/tierc_test.go`, `test/acceptance/tutorial_goldens/auth_status_test.go`, `test/acceptance/tutorial_goldens/continuity_regression_test.go`, `test/acceptance/tutorial_goldens/formula_helpers_regression_test.go`, `test/acceptance/tutorial_goldens/formula_helpers_test.go`, `test/acceptance/tutorial_goldens/harness_test.go`, `test/acceptance/tutorial_goldens/main_test.go`, `test/acceptance/tutorial_goldens/manifests_test.go`, `test/acceptance/tutorial_goldens/snapshot.go`, `test/acceptance/tutorial_goldens/tutorial01_test.go`, `test/acceptance/tutorial_goldens/tutorial02_test.go`, `test/acceptance/tutorial_goldens/tutorial03_test.go`, `test/acceptance/tutorial_goldens/tutorial04_communication_test.go`, `test/acceptance/tutorial_goldens/tutorial05_test.go`, `test/acceptance/tutorial_goldens/tutorial06_test.go`, `test/acceptance/tutorial_goldens/tutorial07_test.go`, `test/acceptance/wait_test.go`, `test/acceptance/worker_inference/classification_test.go`, `test/acceptance/worker_inference/main_test.go`, `test/acceptance/worker_inference/worker_handle_city_helpers_test.go`, `test/acceptance/worker_inference/worker_handle_city_test.go`, `test/acceptance/worker_inference/worker_handle_live_helpers_test.go`, `test/acceptance/worker_inference/worker_inference_helpers_test.go`, `test/acceptance/worker_inference/worker_inference_test.go`, `test/acceptance/worktree_lifecycle_test.go`, `test/acceptance/worktree_test.go`, `test/containerhost/docker_session_test.go`, `test/containerhost/k8s_session_test.go`, `test/dashport/cmd/`, `test/dashport/corpus/`, `test/dashport/fixtures.go`, `test/dashport/harness.go`, `test/dashport/projection_test.go`, `test/integration/bdstore_batch_delete_test.go`, `test/integration/bdstore_batch_reads_test.go`, `test/integration/bdstore_runner_isolation_test.go`, `test/integration/bdstore_test.go`, `test/integration/dolt_config_test.go`, `test/integration/dolt_managed_chaos_test.go`, `test/integration/dolt_persistence_test.go`, `test/integration/e2e_comm_test.go`, `test/integration/e2e_config_test.go`, `test/integration/e2e_events_test.go`, `test/integration/e2e_helpers_test.go`, `test/integration/e2e_hook_test.go`, `test/integration/e2e_lifecycle_test.go`, `test/integration/e2e_mail_test.go`, `test/integration/e2e_multi_test.go`, `test/integration/e2e_pool_test.go`, `test/integration/e2e_test.go`, `test/integration/gastown_config_test.go`, `test/integration/gastown_controller_test.go`, `test/integration/gastown_events_test.go`, `test/integration/gastown_formula_test.go`, `test/integration/gastown_handoff_test.go`, `test/integration/gastown_helpers_test.go`, `test/integration/gastown_mail_test.go`, `test/integration/gastown_multirig_test.go`, `test/integration/gastown_pipeline_test.go`, `test/integration/gastown_polecat_test.go`, `test/integration/gastown_pool_test.go`, `test/integration/gastown_reconciler_test.go`, `test/integration/gastown_refinery_test.go`, `test/integration/gastown_shutdown_test.go`, `test/integration/gastown_sling_test.go`, `test/integration/gastown_witness_test.go`, `test/integration/gc_live_contract_store_conflict_test.go`, `test/integration/gc_live_contract_test.go`, `test/integration/graph_dispatch_harness_test.go`, `test/integration/graph_dispatch_test.go`, `test/integration/helpers_test.go`, `test/integration/huma_binary_test.go`, `test/integration/integration_test.go`, `test/integration/mail_test.go`, `test/integration/review_check_scripts_test.go`, `test/integration/review_formula_test.go`, `test/integration/skill_lifecycle_test.go`, `test/integration/start_drift_test.go`, `test/integration/supervisor_unit_guard_test.go`, `test/integration/tool_home_test.go`, `test/integration/tutorial_path_test.go`, `test/integration/workflow_event_wait_test.go`, `tools/`.",
+      "max_depth": 3,
+      "answer": [
+        {
+          "file": "internal/beads/exec/br_script_test.go",
+          "line": 12,
+          "name": "TestGcBeadsBrReadyIncludeEphemeralFailsLoudlyUntilSupported"
+        },
+        {
+          "file": "internal/beads/exec/exec.go",
+          "line": 362,
+          "name": "Store.List"
+        },
+        {
+          "file": "internal/beads/exec/exec.go",
+          "line": 408,
+          "name": "Store.ListOpen"
+        },
+        {
+          "file": "internal/beads/exec/exec.go",
+          "line": 418,
+          "name": "Store.Ready"
+        },
+        {
+          "file": "internal/beads/exec/exec.go",
+          "line": 447,
+          "name": "Store.Children"
+        },
+        {
+          "file": "internal/beads/exec/exec.go",
+          "line": 457,
+          "name": "Store.ListByLabel"
+        },
+        {
+          "file": "internal/beads/exec/exec.go",
+          "line": 469,
+          "name": "Store.ListByAssignee"
+        },
+        {
+          "file": "internal/beads/exec/exec.go",
+          "line": 480,
+          "name": "Store.ListByMetadata"
+        },
+        {
+          "file": "internal/beads/exec/exec_test.go",
+          "line": 171,
+          "name": "TestCreate_deferUntilRoundTripsThroughConformanceScript"
+        },
+        {
+          "file": "internal/beads/exec/exec_test.go",
+          "line": 209,
+          "name": "TestCreate_ephemeralRoundTripsThroughConformanceScript"
+        },
+        {
+          "file": "internal/beads/exec/exec_test.go",
+          "line": 762,
+          "name": "TestList"
+        },
+        {
+          "file": "internal/beads/exec/exec_test.go",
+          "line": 779,
+          "name": "TestList_statusFilter"
+        },
+        {
+          "file": "internal/beads/exec/exec_test.go",
+          "line": 796,
+          "name": "TestList_empty"
+        },
+        {
+          "file": "internal/beads/exec/exec_test.go",
+          "line": 815,
+          "name": "TestReady"
+        },
+        {
+          "file": "internal/beads/exec/exec_test.go",
+          "line": 832,
+          "name": "TestReady_wispsRequestsEphemeralRows"
+        },
+        {
+          "file": "internal/beads/exec/exec_test.go",
+          "line": 870,
+          "name": "TestReady_tierBothRequestsEphemeralRows"
+        },
+        {
+          "file": "internal/beads/exec/exec_test.go",
+          "line": 911,
+          "name": "TestReady_includeEphemeralUnsupportedReturnsError"
+        },
+        {
+          "file": "internal/beads/exec/exec_test.go",
+          "line": 941,
+          "name": "TestReady_includeEphemeralExit2ReturnsError"
+        },
+        {
+          "file": "internal/beads/exec/exec_test.go",
+          "line": 971,
+          "name": "TestReady_treatsMissingOrEmptyStatusAsOpen"
+        },
+        {
+          "file": "internal/beads/exec/exec_test.go",
+          "line": 999,
+          "name": "TestReady_excludesFutureDeferredBeads"
+        },
+        {
+          "file": "internal/beads/exec/exec_test.go",
+          "line": 1029,
+          "name": "TestChildren"
+        },
+        {
+          "file": "internal/beads/exec/exec_test.go",
+          "line": 1046,
+          "name": "TestListByLabel"
+        },
+        {
+          "file": "internal/beads/exec/exec_test.go",
+          "line": 1168,
+          "name": "TestList_numericMetadataValuesCoercedToStrings"
+        },
+        {
+          "file": "internal/beads/exec/exec_test.go",
+          "line": 1198,
+          "name": "TestErrorPropagation"
+        },
+        {
+          "file": "internal/beads/exec/exec_test.go",
+          "line": 1215,
+          "name": "TestUnknownOperation_exit2"
+        },
+        {
+          "file": "internal/beads/exec/exec_test.go",
+          "line": 1231,
+          "name": "TestTimeout"
+        },
+        {
+          "file": "internal/beads/exec/exec_test.go",
+          "line": 1389,
+          "name": "TestListForwardsSupportedFilters"
+        },
+        {
+          "file": "internal/beads/exec/exec_test.go",
+          "line": 1422,
+          "name": "TestListWithCreatedBeforeDoesNotForwardLimitBeforeClientFilter"
+        },
+        {
+          "file": "internal/beads/exec/exec_test.go",
+          "line": 1460,
+          "name": "TestListWithSeekAfterDoesNotForwardLimitBeforeClientFilter"
+        }
+      ],
+      "kind": "callers"
+    },
+    {
+      "id": "t3",
+      "band": "medium",
+      "target": "isUnavailableSocketError",
+      "file": "internal/runtime/subprocess/subprocess.go",
+      "line": 959,
+      "question": "In this repository (gascity), list every function and method, including those in test files, that transitively calls `isUnavailableSocketError` (declared at internal/runtime/subprocess/subprocess.go:959) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `isUnavailableSocketError` itself. Consider only code the Go toolchain builds (`go build ./...` and `go test ./...`): skip directories whose names start with `_` or `.`, and `testdata`. The list must be complete. Only consider code the compiler project covers: ignore `cmd/gc-write-mint/e2e_test.go`, `cmd/gc/beads_blocked_repair_integration_test.go`, `cmd/gc/beads_native_compat_integration_test.go`, `cmd/gc/beads_provider_missing_scope_stop_linux_test.go`, `cmd/gc/beads_provider_script_scope_lifecycle_linux_test.go`, `cmd/gc/beads_provider_script_shared_server_linux_test.go`, `cmd/gc/capstone_integration_test.go`, `cmd/gc/cmd_daemon_windows.go`, `cmd/gc/cmd_hook_claim_runmap_other.go`, `cmd/gc/cmd_rig_include_registry_integration_test.go`, `cmd/gc/dolt_data_dir_lock_linux.go`, `cmd/gc/dolt_data_dir_lock_linux_test.go`, `cmd/gc/dolt_data_dir_lock_other.go`, `cmd/gc/dolt_disk_preflight_windows.go`, `cmd/gc/doltlite_reindex_native.go`, `cmd/gc/doltlite_store_native.go`, `cmd/gc/doltlite_store_native_test.go`, `cmd/gc/embedded_rig_custom_types_integration_test.go`, `cmd/gc/fs_pressure_linux.go`, `cmd/gc/fs_pressure_test.go`, `cmd/gc/live_submit_probe_test.go`, `cmd/gc/metrics_census_ignore_testhook_test.go`, `cmd/gc/native_dolt_rebind_integration_test.go`, `cmd/gc/order_dynamic_integration_test.go`, `cmd/gc/orders_lane_fs_pressure_test.go`, `cmd/gc/phase2_real_transport_deadline_test.go`, `cmd/gc/phase2_real_transport_test.go`, `cmd/gc/proc_environ_settled_test.go`, `cmd/gc/productmetrics_controls_process_testhook_test.go`, `cmd/gc/productmetrics_controls_pty_darwin_test.go`, `cmd/gc/productmetrics_controls_pty_linux_test.go`, `cmd/gc/productmetrics_controls_testhook.go`, `cmd/gc/productmetrics_private_process_testhook_test.go`, `cmd/gc/productmetrics_testhook.go`, `cmd/gc/productmetrics_testhook_test.go`, `cmd/gc/provider_op_process_windows.go`, `cmd/gc/reconcile_effect_recycle_tmux_integration_test.go`, `cmd/gc/reconcile_effect_stop_tmux_integration_test.go`, `cmd/gc/rig_add_path_durability_test.go`, `cmd/gc/sigpipe_windows.go`, `cmd/gc/storage_boot_workspace_integration_test.go`, `cmd/gc/suspension_state_linux_test.go`, `cmd/gc/tmux_leak_guard_check_test.go`, `cmd/gc/tmux_leak_guard_mntns_test.go`, `cmd/gc/tmux_leak_guard_test.go`, `examples/bd/dolt/compact_history_protection_real_dolt_test.go`, `examples/bd/dolt/compact_real_dolt_callbound_test.go`, `examples/bd/dolt/compact_real_dolt_test.go`, `examples/gastown/dolt_orphan_sweep_integration_test.go`, `examples/gastown/maintenance_bd_integration_test.go`, `examples/gastown/maintenance_scripts_dolt_integration_test.go`, `internal/api/dashport_support.go`, `internal/bazeltest/lock_other.go`, `internal/bdflags/freshness_test.go`, `internal/beads/bdstore_conditional_integration_bridge_test.go`, `internal/beads/bdstore_conditional_integration_test.go`, `internal/beads/bdstore_conditional_release_integration_test.go`, `internal/beads/doltlite_count.go`, `internal/beads/doltlite_count_test.go`, `internal/beads/doltlite_namespace_census.go`, `internal/beads/doltlite_namespace_census_test.go`, `internal/beads/doltlite_read_store.go`, `internal/beads/doltlite_read_store_capabilities.go`, `internal/beads/doltlite_read_store_graph_only_ready.go`, `internal/beads/doltlite_read_store_graph_ready_test.go`, `internal/beads/doltlite_read_store_test.go`, `internal/beads/doltlite_seek_test.go`, `internal/beads/exec/br_test.go`, `internal/beads/exec_timeout_linux.go`, `internal/beads/exec_timeout_linux_test.go`, `internal/beads/exec_timeout_windows.go`, `internal/beads/export_integration_test.go`, `internal/beads/hangbudget_linux_test.go`, `internal/beads/native_dolt_store_facade_integration_test.go`, `internal/beads/native_dolt_store_graph_apply_integration_test.go`, `internal/beads/native_dolt_store_integration_test.go`, `internal/beads/native_dolt_store_label_cas_integration_test.go`, `internal/beads/native_dolt_store_metadata_cas_integration_test.go`, `internal/beads/native_dolt_store_metadata_merge_integration_test.go`, `internal/beads/native_dolt_store_metadata_preserve_integration_test.go`, `internal/beads/native_dolt_store_metadata_stress_integration_test.go`, `internal/beads/native_dolt_store_ready_veto_limit_integration_test.go`, `internal/beads/native_list_pushdown_integration_test.go`, `internal/beads/proxyendpoint/birth_linux.go`, `internal/beads/proxyendpoint/birth_linux_test.go`, `internal/beads/session_key_hook_bd_integration_test.go`, `internal/beads/sqlite_sequence_floor_temp_linux.go`, `internal/beads/sqlite_store_sequence_floor_process_linux_test.go`, `internal/config/fingerprint_ctime_windows.go`, `internal/config/repo_cache_lock_windows.go`, `internal/configedit/configedit_linux_test.go`, `internal/credentialprovider/credentialprovider_process_unix_test.go`, `internal/credentialprovider/credentialprovider_process_windows_test.go`, `internal/credentialprovider/environment_windows.go`, `internal/credentialprovider/runner_windows.go`, `internal/events/inode_windows.go`, `internal/events/rename_linux.go`, `internal/execgrace/signal_windows.go`, `internal/gchome/trust_unsupported.go`, `internal/gitcred/rules_windows.go`, `internal/hostboot/hostboot_linux.go`, `internal/hostboot/hostboot_linux_test.go`, `internal/hostboot/hostboot_unsupported.go`, `internal/loopbackport/lease_linux.go`, `internal/orders/trigger_exec_windows.go`, `internal/packman/networkgit_group_windows.go`, `internal/packregistry/file_lock_windows.go`, `internal/pathdurability/probe_linux.go`, `internal/pidutil/cmdline_other.go`, `internal/pidutil/vanish_linux_test.go`, `internal/productmetrics/platform_unsupported.go`, `internal/productmetrics/platform_unsupported_test.go`, `internal/productmetrics/productmetrics_testhook.go`, `internal/productmetrics/service_state_unsupported_test.go`, `internal/productmetrics/spawn_unsupported.go`, `internal/productmetrics/storage_rename_linux.go`, `internal/runtime/acp/conformance_test.go`, `internal/runtime/acp/events_protocol_test.go`, `internal/runtime/acp/proctable_integration_test.go`, `internal/runtime/acp/proctable_linux_test.go`, `internal/runtime/acp/protocol_conformance_test.go`, `internal/runtime/acp/testdata/`, `internal/runtime/acp/turn_events_protocol_test.go`, `internal/runtime/exec/idle_integration_test.go`, `internal/runtime/proctable/descendants_linux.go`, `internal/runtime/proctable/descendants_stub.go`, `internal/runtime/proctable/environ_linux.go`, `internal/runtime/proctable/environ_linux_test.go`, `internal/runtime/proctable/environ_stub.go`, `internal/runtime/proctable/guard_test.go`, `internal/runtime/proctable/identity_linux.go`, `internal/runtime/proctable/identity_stub.go`, `internal/runtime/proctable/infrastructure_argv_linux.go`, `internal/runtime/proctable/infrastructure_argv_stub.go`, `internal/runtime/proctable/kill_stub.go`, `internal/runtime/proctable/scan_linux.go`, `internal/runtime/proctable/scan_linux_test.go`, `internal/runtime/proctable/scan_stub.go`, `internal/runtime/proctable/scan_stub_test.go`, `internal/runtime/proctable/supervisor_fork_orphan_repro_test.go`, `internal/runtime/ssh/conformance_integration_test.go`, `internal/runtime/ssh/session_env_file_integration_test.go`, `internal/runtime/ssh/ssh_localhost_integration_test.go`, `internal/runtime/subprocess/seam_conformance_test.go`, `internal/runtime/tmux/adapter_test.go`, `internal/runtime/tmux/dialog_feedback_survey_integration_test.go`, `internal/runtime/tmux/dialog_model_switch_integration_test.go`, `internal/runtime/tmux/empty_server_liveness_integration_test.go`, `internal/runtime/tmux/exact_target_integration_test.go`, `internal/runtime/tmux/hidden_attach_hook_test.go`, `internal/runtime/tmux/nudge_clear_before_paste_integration_test.go`, `internal/runtime/tmux/nudge_confirm_lag_integration_test.go`, `internal/runtime/tmux/nudge_poke_integration_test.go`, `internal/runtime/tmux/nudge_staged_draft_integration_test.go`, `internal/runtime/tmux/nudge_submit_confirm_integration_test.go`, `internal/runtime/tmux/nudge_submit_key_sequence_integration_test.go`, `internal/runtime/tmux/process_group_windows.go`, `internal/runtime/tmux/seam_conformance_test.go`, `internal/runtime/tmux/server_socket_probe_linux.go`, `internal/runtime/tmux/server_socket_probe_other.go`, `internal/runtime/tmux/session_env_file_integration_test.go`, `internal/runtime/tmux/session_object_integration_test.go`, `internal/runtime/tmux/tmux_test.go`, `internal/runtime/tmux/wake_pane_integration_test.go`, `internal/session/manager_tmux_integration_test.go`, `internal/session/orphan_infrastructure_fence_linux_test.go`, `internal/session/runtime_lease_boot_linux.go`, `internal/session/runtime_lease_boot_other.go`, `internal/storebinding/beadsworkspace/engine_integration_test.go`, `internal/storebinding/migration_guard_unsupported.go`, `internal/storebinding/sqlite/graph_capability_linux_test.go`, `internal/storebinding/sqlite/graph_fence_linux_test.go`, `internal/storebinding/sqlite/graph_identity_other.go`, `internal/storebinding/sqlite/graph_schema_admission_linux_test.go`, `internal/storebinding/sqlite/legacy_hot_journal_linux_test.go`, `internal/storebinding/sqlite/legacy_sessions_snapshot_other.go`, `internal/storebinding/sqlite/sqlite_fence_process_linux_test.go`, `internal/storebinding/sqlite/sqlite_fence_release_linux_test.go`, `internal/storebinding/sqlite/sqlite_readonly_fence_linux_test.go`, `internal/storebinding/sqlite/sqlite_snapshot_temp_linux.go`, `internal/storebinding/sqlite/sqlite_source_fd_linux.go`, `internal/storebinding/sqlite/sqlite_source_fd_linux_test.go`, `internal/storebinding/sqlite/sqlite_vfs_linux_test.go`, `internal/storebinding/sqlite/sqlite_writer_reservation_linux.go`, `internal/suspensionstate/fence_linux_test.go`, `internal/suspensionstate/fence_windows.go`, `internal/testutil/flock_linux.go`, `internal/workspacesvc/proxy_process_linux.go`, `internal/worktree/lock_windows.go`, `scripts/add-testenv-import.go`, `scripts/bazel-bep-summary.go`, `scripts/shard-budget.go`, `scripts/test-timing-plan.go`, `scripts/test-timing-summary.go`, `scripts/testdata/`, `test/acceptance/agent_env_test.go`, `test/acceptance/agent_suspend_test.go`, `test/acceptance/beads_blocked_repair_test.go`, `test/acceptance/beads_cli_contract_home_isolation_test.go`, `test/acceptance/beads_cli_contract_test.go`, `test/acceptance/beads_health_test.go`, `test/acceptance/beads_migrate_proxied_test.go`, `test/acceptance/beads_proxied_default_test.go`, `test/acceptance/beads_proxied_idle_timeout_test.go`, `test/acceptance/beads_proxied_native_safety_test.go`, `test/acceptance/beads_proxied_native_test.go`, `test/acceptance/beads_proxied_shared_server_test.go`, `test/acceptance/beads_proxied_suspension_quiescence_test.go`, `test/acceptance/beads_topology_matrix_test.go`, `test/acceptance/cli_basics_test.go`, `test/acceptance/config_pack_test.go`, `test/acceptance/converge_test.go`, `test/acceptance/convoy_test.go`, `test/acceptance/dashboard_serve_test.go`, `test/acceptance/doctor_mail_test.go`, `test/acceptance/doctor_proxied_backup_coverage_test.go`, `test/acceptance/doctor_stopped_store_test.go`, `test/acceptance/drain_ack_test.go`, `test/acceptance/env_invariant_test.go`, `test/acceptance/example_cities_test.go`, `test/acceptance/formula_events_test.go`, `test/acceptance/gastown_pack_cache_test.go`, `test/acceptance/gastown_smoke_test.go`, `test/acceptance/handoff_test.go`, `test/acceptance/helpers/dir_writable_other.go`, `test/acceptance/import_named_sessions_regression_test.go`, `test/acceptance/init_lifecycle_test.go`, `test/acceptance/integration_selfhost_ux_test.go`, `test/acceptance/migration_regression_test.go`, `test/acceptance/nudge_service_test.go`, `test/acceptance/order_commands_test.go`, `test/acceptance/order_env_test.go`, `test/acceptance/pack_registry_live_test.go`, `test/acceptance/pack_test.go`, `test/acceptance/prime_test.go`, `test/acceptance/rig_test.go`, `test/acceptance/session_test.go`, `test/acceptance/skill_test.go`, `test/acceptance/sling_test.go`, `test/acceptance/status_test.go`, `test/acceptance/supervisor_registry_test.go`, `test/acceptance/tier_b/idle_bead_stability_test.go`, `test/acceptance/tier_b/lifecycle_b_test.go`, `test/acceptance/tier_b/pool_workquery_test.go`, `test/acceptance/tier_b/split_storage_migrated_formula_test.go`, `test/acceptance/tier_c/fresh_install_spawn_test.go`, `test/acceptance/tier_c/tierc_helpers_test.go`, `test/acceptance/tier_c/tierc_test.go`, `test/acceptance/tutorial_goldens/auth_status_test.go`, `test/acceptance/tutorial_goldens/continuity_regression_test.go`, `test/acceptance/tutorial_goldens/formula_helpers_regression_test.go`, `test/acceptance/tutorial_goldens/formula_helpers_test.go`, `test/acceptance/tutorial_goldens/harness_test.go`, `test/acceptance/tutorial_goldens/main_test.go`, `test/acceptance/tutorial_goldens/manifests_test.go`, `test/acceptance/tutorial_goldens/snapshot.go`, `test/acceptance/tutorial_goldens/tutorial01_test.go`, `test/acceptance/tutorial_goldens/tutorial02_test.go`, `test/acceptance/tutorial_goldens/tutorial03_test.go`, `test/acceptance/tutorial_goldens/tutorial04_communication_test.go`, `test/acceptance/tutorial_goldens/tutorial05_test.go`, `test/acceptance/tutorial_goldens/tutorial06_test.go`, `test/acceptance/tutorial_goldens/tutorial07_test.go`, `test/acceptance/wait_test.go`, `test/acceptance/worker_inference/classification_test.go`, `test/acceptance/worker_inference/main_test.go`, `test/acceptance/worker_inference/worker_handle_city_helpers_test.go`, `test/acceptance/worker_inference/worker_handle_city_test.go`, `test/acceptance/worker_inference/worker_handle_live_helpers_test.go`, `test/acceptance/worker_inference/worker_inference_helpers_test.go`, `test/acceptance/worker_inference/worker_inference_test.go`, `test/acceptance/worktree_lifecycle_test.go`, `test/acceptance/worktree_test.go`, `test/containerhost/docker_session_test.go`, `test/containerhost/k8s_session_test.go`, `test/dashport/cmd/`, `test/dashport/corpus/`, `test/dashport/fixtures.go`, `test/dashport/harness.go`, `test/dashport/projection_test.go`, `test/integration/bdstore_batch_delete_test.go`, `test/integration/bdstore_batch_reads_test.go`, `test/integration/bdstore_runner_isolation_test.go`, `test/integration/bdstore_test.go`, `test/integration/dolt_config_test.go`, `test/integration/dolt_managed_chaos_test.go`, `test/integration/dolt_persistence_test.go`, `test/integration/e2e_comm_test.go`, `test/integration/e2e_config_test.go`, `test/integration/e2e_events_test.go`, `test/integration/e2e_helpers_test.go`, `test/integration/e2e_hook_test.go`, `test/integration/e2e_lifecycle_test.go`, `test/integration/e2e_mail_test.go`, `test/integration/e2e_multi_test.go`, `test/integration/e2e_pool_test.go`, `test/integration/e2e_test.go`, `test/integration/gastown_config_test.go`, `test/integration/gastown_controller_test.go`, `test/integration/gastown_events_test.go`, `test/integration/gastown_formula_test.go`, `test/integration/gastown_handoff_test.go`, `test/integration/gastown_helpers_test.go`, `test/integration/gastown_mail_test.go`, `test/integration/gastown_multirig_test.go`, `test/integration/gastown_pipeline_test.go`, `test/integration/gastown_polecat_test.go`, `test/integration/gastown_pool_test.go`, `test/integration/gastown_reconciler_test.go`, `test/integration/gastown_refinery_test.go`, `test/integration/gastown_shutdown_test.go`, `test/integration/gastown_sling_test.go`, `test/integration/gastown_witness_test.go`, `test/integration/gc_live_contract_store_conflict_test.go`, `test/integration/gc_live_contract_test.go`, `test/integration/graph_dispatch_harness_test.go`, `test/integration/graph_dispatch_test.go`, `test/integration/helpers_test.go`, `test/integration/huma_binary_test.go`, `test/integration/integration_test.go`, `test/integration/mail_test.go`, `test/integration/review_check_scripts_test.go`, `test/integration/review_formula_test.go`, `test/integration/skill_lifecycle_test.go`, `test/integration/start_drift_test.go`, `test/integration/supervisor_unit_guard_test.go`, `test/integration/tool_home_test.go`, `test/integration/tutorial_path_test.go`, `test/integration/workflow_event_wait_test.go`, `tools/`.",
+      "max_depth": 4,
+      "answer": [
+        {
+          "file": "internal/runtime/subprocess/seams.go",
+          "line": 61,
+          "name": "subprocessRuntime.Teardown"
+        },
+        {
+          "file": "internal/runtime/subprocess/seams.go",
+          "line": 121,
+          "name": "subprocessPlace.Teardown"
+        },
+        {
+          "file": "internal/runtime/subprocess/seams.go",
+          "line": 181,
+          "name": "detachedAttachment.Interrupt"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess.go",
+          "line": 282,
+          "name": "Provider.Stop"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess.go",
+          "line": 306,
+          "name": "Provider.Interrupt"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess.go",
+          "line": 876,
+          "name": "Provider.sendSocketCommand"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess.go",
+          "line": 880,
+          "name": "Provider.sendSocketCommandAt"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess.go",
+          "line": 942,
+          "name": "Provider.stopBySocket"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess.go",
+          "line": 946,
+          "name": "Provider.stopBySocketAt"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 68,
+          "name": "requirePrivateFallbackRejected"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 96,
+          "name": "TestStartCreatesProcess"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 109,
+          "name": "TestStartPersistsRuntimeMetadataForGetMeta"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 139,
+          "name": "TestStartLongSocketPathUsesShortSocketName"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 185,
+          "name": "TestStartVeryLongSocketDirFallsBackToTempDir"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 229,
+          "name": "TestFallbackKeepsBindableLegacyTempPathPastConservativeLimit"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 281,
+          "name": "TestLegacySocketRemainsVisibleWhenPrivateFallbackIsMissing"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 356,
+          "name": "TestOverlongTempDirUsesPrivateFallbackAcrossProviders"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 419,
+          "name": "TestPrivateFallbackRejectsHostilePrecreation"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 517,
+          "name": "TestStopUnknownSessionWithVeryLongSocketDirIsIdempotent"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 533,
+          "name": "TestStartDuplicateNameFails"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 546,
+          "name": "TestStartReusesDeadName"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 566,
+          "name": "TestStopKillsProcess"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 579,
+          "name": "TestStopKillsProcessGroupDescendants"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 622,
+          "name": "TestStopIdempotent"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 629,
+          "name": "TestStopDeadProcess"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 667,
+          "name": "TestEnvPassedToProcess"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 696,
+          "name": "TestEmptyEnvOverrideIsAbsentFromProcess"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 739,
+          "name": "TestWorkDirSet"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 771,
+          "name": "TestStartStagesSingleFileCopyIntoWorkDirRoot"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 799,
+          "name": "TestStartStagesKiroPackOverlayBeforeLaunch"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 932,
+          "name": "TestSocketCreated"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 944,
+          "name": "TestSocketRemovedAfterStop"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 964,
+          "name": "TestStopBySocket_ReturnsErrorWhenSocketRejectsStop"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 991,
+          "name": "TestStopBySocket_PreservesCanonicalErrorWhenLegacyPathIsTooLong"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 1045,
+          "name": "TestStopBySocket_FallsBackToLegacySocketWhenCanonicalRejectsStop"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 1112,
+          "name": "TestCrossProcessStopBySocket"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 1170,
+          "name": "TestCrossProcessInterruptBySocket"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 1190,
+          "name": "TestInterruptPreservesBestEffortForNormalSocketProtocolError"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 1208,
+          "name": "TestIsRunningViaSocket"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 1229,
+          "name": "TestListRunningViaSocket"
+        },
+        {
+          "file": "internal/runtime/subprocess/subprocess_test.go",
+          "line": 1467,
+          "name": "TestSubprocessStopReturnsAfterReap"
+        }
+      ],
+      "kind": "callers"
+    },
+    {
+      "id": "t4",
+      "band": "medium",
+      "target": "currentSessionAssigneeIdentities",
+      "file": "cmd/gc/idle_nudge.go",
+      "line": 418,
+      "question": "In this repository (gascity), list every function and method, including those in test files, that transitively calls `currentSessionAssigneeIdentities` (declared at cmd/gc/idle_nudge.go:418) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `currentSessionAssigneeIdentities` itself. Consider only code the Go toolchain builds (`go build ./...` and `go test ./...`): skip directories whose names start with `_` or `.`, and `testdata`. The list must be complete. Only consider code the compiler project covers: ignore `cmd/gc-write-mint/e2e_test.go`, `cmd/gc/beads_blocked_repair_integration_test.go`, `cmd/gc/beads_native_compat_integration_test.go`, `cmd/gc/beads_provider_missing_scope_stop_linux_test.go`, `cmd/gc/beads_provider_script_scope_lifecycle_linux_test.go`, `cmd/gc/beads_provider_script_shared_server_linux_test.go`, `cmd/gc/capstone_integration_test.go`, `cmd/gc/cmd_daemon_windows.go`, `cmd/gc/cmd_hook_claim_runmap_other.go`, `cmd/gc/cmd_rig_include_registry_integration_test.go`, `cmd/gc/dolt_data_dir_lock_linux.go`, `cmd/gc/dolt_data_dir_lock_linux_test.go`, `cmd/gc/dolt_data_dir_lock_other.go`, `cmd/gc/dolt_disk_preflight_windows.go`, `cmd/gc/doltlite_reindex_native.go`, `cmd/gc/doltlite_store_native.go`, `cmd/gc/doltlite_store_native_test.go`, `cmd/gc/embedded_rig_custom_types_integration_test.go`, `cmd/gc/fs_pressure_linux.go`, `cmd/gc/fs_pressure_test.go`, `cmd/gc/live_submit_probe_test.go`, `cmd/gc/metrics_census_ignore_testhook_test.go`, `cmd/gc/native_dolt_rebind_integration_test.go`, `cmd/gc/order_dynamic_integration_test.go`, `cmd/gc/orders_lane_fs_pressure_test.go`, `cmd/gc/phase2_real_transport_deadline_test.go`, `cmd/gc/phase2_real_transport_test.go`, `cmd/gc/proc_environ_settled_test.go`, `cmd/gc/productmetrics_controls_process_testhook_test.go`, `cmd/gc/productmetrics_controls_pty_darwin_test.go`, `cmd/gc/productmetrics_controls_pty_linux_test.go`, `cmd/gc/productmetrics_controls_testhook.go`, `cmd/gc/productmetrics_private_process_testhook_test.go`, `cmd/gc/productmetrics_testhook.go`, `cmd/gc/productmetrics_testhook_test.go`, `cmd/gc/provider_op_process_windows.go`, `cmd/gc/reconcile_effect_recycle_tmux_integration_test.go`, `cmd/gc/reconcile_effect_stop_tmux_integration_test.go`, `cmd/gc/rig_add_path_durability_test.go`, `cmd/gc/sigpipe_windows.go`, `cmd/gc/storage_boot_workspace_integration_test.go`, `cmd/gc/suspension_state_linux_test.go`, `cmd/gc/tmux_leak_guard_check_test.go`, `cmd/gc/tmux_leak_guard_mntns_test.go`, `cmd/gc/tmux_leak_guard_test.go`, `examples/bd/dolt/compact_history_protection_real_dolt_test.go`, `examples/bd/dolt/compact_real_dolt_callbound_test.go`, `examples/bd/dolt/compact_real_dolt_test.go`, `examples/gastown/dolt_orphan_sweep_integration_test.go`, `examples/gastown/maintenance_bd_integration_test.go`, `examples/gastown/maintenance_scripts_dolt_integration_test.go`, `internal/api/dashport_support.go`, `internal/bazeltest/lock_other.go`, `internal/bdflags/freshness_test.go`, `internal/beads/bdstore_conditional_integration_bridge_test.go`, `internal/beads/bdstore_conditional_integration_test.go`, `internal/beads/bdstore_conditional_release_integration_test.go`, `internal/beads/doltlite_count.go`, `internal/beads/doltlite_count_test.go`, `internal/beads/doltlite_namespace_census.go`, `internal/beads/doltlite_namespace_census_test.go`, `internal/beads/doltlite_read_store.go`, `internal/beads/doltlite_read_store_capabilities.go`, `internal/beads/doltlite_read_store_graph_only_ready.go`, `internal/beads/doltlite_read_store_graph_ready_test.go`, `internal/beads/doltlite_read_store_test.go`, `internal/beads/doltlite_seek_test.go`, `internal/beads/exec/br_test.go`, `internal/beads/exec_timeout_linux.go`, `internal/beads/exec_timeout_linux_test.go`, `internal/beads/exec_timeout_windows.go`, `internal/beads/export_integration_test.go`, `internal/beads/hangbudget_linux_test.go`, `internal/beads/native_dolt_store_facade_integration_test.go`, `internal/beads/native_dolt_store_graph_apply_integration_test.go`, `internal/beads/native_dolt_store_integration_test.go`, `internal/beads/native_dolt_store_label_cas_integration_test.go`, `internal/beads/native_dolt_store_metadata_cas_integration_test.go`, `internal/beads/native_dolt_store_metadata_merge_integration_test.go`, `internal/beads/native_dolt_store_metadata_preserve_integration_test.go`, `internal/beads/native_dolt_store_metadata_stress_integration_test.go`, `internal/beads/native_dolt_store_ready_veto_limit_integration_test.go`, `internal/beads/native_list_pushdown_integration_test.go`, `internal/beads/proxyendpoint/birth_linux.go`, `internal/beads/proxyendpoint/birth_linux_test.go`, `internal/beads/session_key_hook_bd_integration_test.go`, `internal/beads/sqlite_sequence_floor_temp_linux.go`, `internal/beads/sqlite_store_sequence_floor_process_linux_test.go`, `internal/config/fingerprint_ctime_windows.go`, `internal/config/repo_cache_lock_windows.go`, `internal/configedit/configedit_linux_test.go`, `internal/credentialprovider/credentialprovider_process_unix_test.go`, `internal/credentialprovider/credentialprovider_process_windows_test.go`, `internal/credentialprovider/environment_windows.go`, `internal/credentialprovider/runner_windows.go`, `internal/events/inode_windows.go`, `internal/events/rename_linux.go`, `internal/execgrace/signal_windows.go`, `internal/gchome/trust_unsupported.go`, `internal/gitcred/rules_windows.go`, `internal/hostboot/hostboot_linux.go`, `internal/hostboot/hostboot_linux_test.go`, `internal/hostboot/hostboot_unsupported.go`, `internal/loopbackport/lease_linux.go`, `internal/orders/trigger_exec_windows.go`, `internal/packman/networkgit_group_windows.go`, `internal/packregistry/file_lock_windows.go`, `internal/pathdurability/probe_linux.go`, `internal/pidutil/cmdline_other.go`, `internal/pidutil/vanish_linux_test.go`, `internal/productmetrics/platform_unsupported.go`, `internal/productmetrics/platform_unsupported_test.go`, `internal/productmetrics/productmetrics_testhook.go`, `internal/productmetrics/service_state_unsupported_test.go`, `internal/productmetrics/spawn_unsupported.go`, `internal/productmetrics/storage_rename_linux.go`, `internal/runtime/acp/conformance_test.go`, `internal/runtime/acp/events_protocol_test.go`, `internal/runtime/acp/proctable_integration_test.go`, `internal/runtime/acp/proctable_linux_test.go`, `internal/runtime/acp/protocol_conformance_test.go`, `internal/runtime/acp/testdata/`, `internal/runtime/acp/turn_events_protocol_test.go`, `internal/runtime/exec/idle_integration_test.go`, `internal/runtime/proctable/descendants_linux.go`, `internal/runtime/proctable/descendants_stub.go`, `internal/runtime/proctable/environ_linux.go`, `internal/runtime/proctable/environ_linux_test.go`, `internal/runtime/proctable/environ_stub.go`, `internal/runtime/proctable/guard_test.go`, `internal/runtime/proctable/identity_linux.go`, `internal/runtime/proctable/identity_stub.go`, `internal/runtime/proctable/infrastructure_argv_linux.go`, `internal/runtime/proctable/infrastructure_argv_stub.go`, `internal/runtime/proctable/kill_stub.go`, `internal/runtime/proctable/scan_linux.go`, `internal/runtime/proctable/scan_linux_test.go`, `internal/runtime/proctable/scan_stub.go`, `internal/runtime/proctable/scan_stub_test.go`, `internal/runtime/proctable/supervisor_fork_orphan_repro_test.go`, `internal/runtime/ssh/conformance_integration_test.go`, `internal/runtime/ssh/session_env_file_integration_test.go`, `internal/runtime/ssh/ssh_localhost_integration_test.go`, `internal/runtime/subprocess/seam_conformance_test.go`, `internal/runtime/tmux/adapter_test.go`, `internal/runtime/tmux/dialog_feedback_survey_integration_test.go`, `internal/runtime/tmux/dialog_model_switch_integration_test.go`, `internal/runtime/tmux/empty_server_liveness_integration_test.go`, `internal/runtime/tmux/exact_target_integration_test.go`, `internal/runtime/tmux/hidden_attach_hook_test.go`, `internal/runtime/tmux/nudge_clear_before_paste_integration_test.go`, `internal/runtime/tmux/nudge_confirm_lag_integration_test.go`, `internal/runtime/tmux/nudge_poke_integration_test.go`, `internal/runtime/tmux/nudge_staged_draft_integration_test.go`, `internal/runtime/tmux/nudge_submit_confirm_integration_test.go`, `internal/runtime/tmux/nudge_submit_key_sequence_integration_test.go`, `internal/runtime/tmux/process_group_windows.go`, `internal/runtime/tmux/seam_conformance_test.go`, `internal/runtime/tmux/server_socket_probe_linux.go`, `internal/runtime/tmux/server_socket_probe_other.go`, `internal/runtime/tmux/session_env_file_integration_test.go`, `internal/runtime/tmux/session_object_integration_test.go`, `internal/runtime/tmux/tmux_test.go`, `internal/runtime/tmux/wake_pane_integration_test.go`, `internal/session/manager_tmux_integration_test.go`, `internal/session/orphan_infrastructure_fence_linux_test.go`, `internal/session/runtime_lease_boot_linux.go`, `internal/session/runtime_lease_boot_other.go`, `internal/storebinding/beadsworkspace/engine_integration_test.go`, `internal/storebinding/migration_guard_unsupported.go`, `internal/storebinding/sqlite/graph_capability_linux_test.go`, `internal/storebinding/sqlite/graph_fence_linux_test.go`, `internal/storebinding/sqlite/graph_identity_other.go`, `internal/storebinding/sqlite/graph_schema_admission_linux_test.go`, `internal/storebinding/sqlite/legacy_hot_journal_linux_test.go`, `internal/storebinding/sqlite/legacy_sessions_snapshot_other.go`, `internal/storebinding/sqlite/sqlite_fence_process_linux_test.go`, `internal/storebinding/sqlite/sqlite_fence_release_linux_test.go`, `internal/storebinding/sqlite/sqlite_readonly_fence_linux_test.go`, `internal/storebinding/sqlite/sqlite_snapshot_temp_linux.go`, `internal/storebinding/sqlite/sqlite_source_fd_linux.go`, `internal/storebinding/sqlite/sqlite_source_fd_linux_test.go`, `internal/storebinding/sqlite/sqlite_vfs_linux_test.go`, `internal/storebinding/sqlite/sqlite_writer_reservation_linux.go`, `internal/suspensionstate/fence_linux_test.go`, `internal/suspensionstate/fence_windows.go`, `internal/testutil/flock_linux.go`, `internal/workspacesvc/proxy_process_linux.go`, `internal/worktree/lock_windows.go`, `scripts/add-testenv-import.go`, `scripts/bazel-bep-summary.go`, `scripts/shard-budget.go`, `scripts/test-timing-plan.go`, `scripts/test-timing-summary.go`, `scripts/testdata/`, `test/acceptance/agent_env_test.go`, `test/acceptance/agent_suspend_test.go`, `test/acceptance/beads_blocked_repair_test.go`, `test/acceptance/beads_cli_contract_home_isolation_test.go`, `test/acceptance/beads_cli_contract_test.go`, `test/acceptance/beads_health_test.go`, `test/acceptance/beads_migrate_proxied_test.go`, `test/acceptance/beads_proxied_default_test.go`, `test/acceptance/beads_proxied_idle_timeout_test.go`, `test/acceptance/beads_proxied_native_safety_test.go`, `test/acceptance/beads_proxied_native_test.go`, `test/acceptance/beads_proxied_shared_server_test.go`, `test/acceptance/beads_proxied_suspension_quiescence_test.go`, `test/acceptance/beads_topology_matrix_test.go`, `test/acceptance/cli_basics_test.go`, `test/acceptance/config_pack_test.go`, `test/acceptance/converge_test.go`, `test/acceptance/convoy_test.go`, `test/acceptance/dashboard_serve_test.go`, `test/acceptance/doctor_mail_test.go`, `test/acceptance/doctor_proxied_backup_coverage_test.go`, `test/acceptance/doctor_stopped_store_test.go`, `test/acceptance/drain_ack_test.go`, `test/acceptance/env_invariant_test.go`, `test/acceptance/example_cities_test.go`, `test/acceptance/formula_events_test.go`, `test/acceptance/gastown_pack_cache_test.go`, `test/acceptance/gastown_smoke_test.go`, `test/acceptance/handoff_test.go`, `test/acceptance/helpers/dir_writable_other.go`, `test/acceptance/import_named_sessions_regression_test.go`, `test/acceptance/init_lifecycle_test.go`, `test/acceptance/integration_selfhost_ux_test.go`, `test/acceptance/migration_regression_test.go`, `test/acceptance/nudge_service_test.go`, `test/acceptance/order_commands_test.go`, `test/acceptance/order_env_test.go`, `test/acceptance/pack_registry_live_test.go`, `test/acceptance/pack_test.go`, `test/acceptance/prime_test.go`, `test/acceptance/rig_test.go`, `test/acceptance/session_test.go`, `test/acceptance/skill_test.go`, `test/acceptance/sling_test.go`, `test/acceptance/status_test.go`, `test/acceptance/supervisor_registry_test.go`, `test/acceptance/tier_b/idle_bead_stability_test.go`, `test/acceptance/tier_b/lifecycle_b_test.go`, `test/acceptance/tier_b/pool_workquery_test.go`, `test/acceptance/tier_b/split_storage_migrated_formula_test.go`, `test/acceptance/tier_c/fresh_install_spawn_test.go`, `test/acceptance/tier_c/tierc_helpers_test.go`, `test/acceptance/tier_c/tierc_test.go`, `test/acceptance/tutorial_goldens/auth_status_test.go`, `test/acceptance/tutorial_goldens/continuity_regression_test.go`, `test/acceptance/tutorial_goldens/formula_helpers_regression_test.go`, `test/acceptance/tutorial_goldens/formula_helpers_test.go`, `test/acceptance/tutorial_goldens/harness_test.go`, `test/acceptance/tutorial_goldens/main_test.go`, `test/acceptance/tutorial_goldens/manifests_test.go`, `test/acceptance/tutorial_goldens/snapshot.go`, `test/acceptance/tutorial_goldens/tutorial01_test.go`, `test/acceptance/tutorial_goldens/tutorial02_test.go`, `test/acceptance/tutorial_goldens/tutorial03_test.go`, `test/acceptance/tutorial_goldens/tutorial04_communication_test.go`, `test/acceptance/tutorial_goldens/tutorial05_test.go`, `test/acceptance/tutorial_goldens/tutorial06_test.go`, `test/acceptance/tutorial_goldens/tutorial07_test.go`, `test/acceptance/wait_test.go`, `test/acceptance/worker_inference/classification_test.go`, `test/acceptance/worker_inference/main_test.go`, `test/acceptance/worker_inference/worker_handle_city_helpers_test.go`, `test/acceptance/worker_inference/worker_handle_city_test.go`, `test/acceptance/worker_inference/worker_handle_live_helpers_test.go`, `test/acceptance/worker_inference/worker_inference_helpers_test.go`, `test/acceptance/worker_inference/worker_inference_test.go`, `test/acceptance/worktree_lifecycle_test.go`, `test/acceptance/worktree_test.go`, `test/containerhost/docker_session_test.go`, `test/containerhost/k8s_session_test.go`, `test/dashport/cmd/`, `test/dashport/corpus/`, `test/dashport/fixtures.go`, `test/dashport/harness.go`, `test/dashport/projection_test.go`, `test/integration/bdstore_batch_delete_test.go`, `test/integration/bdstore_batch_reads_test.go`, `test/integration/bdstore_runner_isolation_test.go`, `test/integration/bdstore_test.go`, `test/integration/dolt_config_test.go`, `test/integration/dolt_managed_chaos_test.go`, `test/integration/dolt_persistence_test.go`, `test/integration/e2e_comm_test.go`, `test/integration/e2e_config_test.go`, `test/integration/e2e_events_test.go`, `test/integration/e2e_helpers_test.go`, `test/integration/e2e_hook_test.go`, `test/integration/e2e_lifecycle_test.go`, `test/integration/e2e_mail_test.go`, `test/integration/e2e_multi_test.go`, `test/integration/e2e_pool_test.go`, `test/integration/e2e_test.go`, `test/integration/gastown_config_test.go`, `test/integration/gastown_controller_test.go`, `test/integration/gastown_events_test.go`, `test/integration/gastown_formula_test.go`, `test/integration/gastown_handoff_test.go`, `test/integration/gastown_helpers_test.go`, `test/integration/gastown_mail_test.go`, `test/integration/gastown_multirig_test.go`, `test/integration/gastown_pipeline_test.go`, `test/integration/gastown_polecat_test.go`, `test/integration/gastown_pool_test.go`, `test/integration/gastown_reconciler_test.go`, `test/integration/gastown_refinery_test.go`, `test/integration/gastown_shutdown_test.go`, `test/integration/gastown_sling_test.go`, `test/integration/gastown_witness_test.go`, `test/integration/gc_live_contract_store_conflict_test.go`, `test/integration/gc_live_contract_test.go`, `test/integration/graph_dispatch_harness_test.go`, `test/integration/graph_dispatch_test.go`, `test/integration/helpers_test.go`, `test/integration/huma_binary_test.go`, `test/integration/integration_test.go`, `test/integration/mail_test.go`, `test/integration/review_check_scripts_test.go`, `test/integration/review_formula_test.go`, `test/integration/skill_lifecycle_test.go`, `test/integration/start_drift_test.go`, `test/integration/supervisor_unit_guard_test.go`, `test/integration/tool_home_test.go`, `test/integration/tutorial_path_test.go`, `test/integration/workflow_event_wait_test.go`, `tools/`.",
+      "max_depth": 5,
+      "answer": [
+        {
+          "file": "cmd/gc/city_runtime.go",
+          "line": 1796,
+          "name": "CityRuntime.tickBeadReconcile"
+        },
+        {
+          "file": "cmd/gc/city_runtime.go",
+          "line": 1973,
+          "name": "CityRuntime.startupBeadReconcile"
+        },
+        {
+          "file": "cmd/gc/city_runtime.go",
+          "line": 3137,
+          "name": "CityRuntime.beadReconcileTick"
+        },
+        {
+          "file": "cmd/gc/city_runtime_phases_test.go",
+          "line": 906,
+          "name": "TestLegacySessionEntryGuardBlocksAndCountsUnderV2"
+        },
+        {
+          "file": "cmd/gc/city_runtime_release_callsite_test.go",
+          "line": 43,
+          "name": "TestBeadReconcileTick_OrphanReleaseCallSite_RetainsLiveAndWakeProtectedWork"
+        },
+        {
+          "file": "cmd/gc/city_runtime_test.go",
+          "line": 188,
+          "name": "TestCityRuntimeBeadReconcileTick_BootDoesNotBlockOnWispSweep"
+        },
+        {
+          "file": "cmd/gc/city_runtime_test.go",
+          "line": 3549,
+          "name": "TestCityRuntimeBeadReconcileTick_TransientStoreQueryPartialKeepsRunningPoolSessionUntilRecoveryTick"
+        },
+        {
+          "file": "cmd/gc/city_runtime_test.go",
+          "line": 3642,
+          "name": "TestCityRuntimeBeadReconcileTick_IdleClaimNudgeFallsBackForBlankNudgeOnReportActivityRuntime"
+        },
+        {
+          "file": "cmd/gc/city_runtime_test.go",
+          "line": 3731,
+          "name": "TestCityRuntimeBeadReconcileTick_IdleClaimNudgeSeesReadyUnassignedRoutedTrigger"
+        },
+        {
+          "file": "cmd/gc/city_runtime_test.go",
+          "line": 3835,
+          "name": "TestCityRuntimeBeadReconcileTick_ScaleCheckPartialKeepsOnlyAffectedPoolSession"
+        },
+        {
+          "file": "cmd/gc/city_runtime_test.go",
+          "line": 3937,
+          "name": "TestCityRuntimeBeadReconcileTick_ScaleCheckPartialPreservesDormantAffectedPoolSessionWithoutDrain"
+        },
+        {
+          "file": "cmd/gc/city_runtime_test.go",
+          "line": 4007,
+          "name": "TestCityRuntimeBeadReconcileTick_StoreQueryPartialDoesNotReleaseAssignedWork"
+        },
+        {
+          "file": "cmd/gc/city_runtime_test.go",
+          "line": 4057,
+          "name": "TestCityRuntimeBeadReconcileTick_SessionQueryPartialDoesNotReleaseAssignedWork"
+        },
+        {
+          "file": "cmd/gc/city_runtime_test.go",
+          "line": 4191,
+          "name": "TestCityRuntimeBeadReconcileTick_KeepsAssignedPoolWorkerAwake"
+        },
+        {
+          "file": "cmd/gc/city_runtime_test.go",
+          "line": 4256,
+          "name": "TestCityRuntimeBeadReconcileTick_SweepRespectsLiveAssignedWork"
+        },
+        {
+          "file": "cmd/gc/city_runtime_v2_test.go",
+          "line": 1405,
+          "name": "TestV2LegacySessionEntriesReportedInTrace"
+        },
+        {
+          "file": "cmd/gc/continuation_nudge_test.go",
+          "line": 649,
+          "name": "TestNudgeStalledPoolContinuations_BindingRigRootedCandidateIsNudged"
+        },
+        {
+          "file": "cmd/gc/continuation_nudge_test.go",
+          "line": 816,
+          "name": "TestNudgeStalledPoolContinuations_ObserveNudgePersistBackoffAndCap"
+        },
+        {
+          "file": "cmd/gc/continuation_nudge_test.go",
+          "line": 872,
+          "name": "TestNudgeStalledPoolContinuations_WriteAheadFailurePreventsDelivery"
+        },
+        {
+          "file": "cmd/gc/continuation_nudge_test.go",
+          "line": 910,
+          "name": "TestNudgeStalledPoolContinuations_ReservesBeforeSuccessfulDelivery"
+        },
+        {
+          "file": "cmd/gc/continuation_nudge_test.go",
+          "line": 952,
+          "name": "TestNudgeStalledPoolContinuations_DeliveryFailureConsumesAttempt"
+        },
+        {
+          "file": "cmd/gc/continuation_nudge_test.go",
+          "line": 1000,
+          "name": "TestNudgeStalledPoolContinuations_PartialSnapshotPreservesMarker"
+        },
+        {
+          "file": "cmd/gc/continuation_nudge_test.go",
+          "line": 1030,
+          "name": "TestNudgeStalledPoolContinuations_AmbiguityPreservesMarker"
+        },
+        {
+          "file": "cmd/gc/continuation_nudge_test.go",
+          "line": 1125,
+          "name": "TestNudgeStalledPoolContinuations_RevalidatesImmediatelyBeforeDelivery"
+        },
+        {
+          "file": "cmd/gc/continuation_nudge_test.go",
+          "line": 1206,
+          "name": "TestNudgeStalledPoolContinuations_RevalidationIgnoresRootSessionStamp"
+        },
+        {
+          "file": "cmd/gc/continuation_nudge_test.go",
+          "line": 1255,
+          "name": "TestNudgeStalledPoolContinuations_RevalidationBypassesPrimedCache"
+        },
+        {
+          "file": "cmd/gc/continuation_nudge_test.go",
+          "line": 1388,
+          "name": "TestNudgeStalledPoolContinuations_ClaimClearsMarker"
+        },
+        {
+          "file": "cmd/gc/continuation_nudge_test.go",
+          "line": 1423,
+          "name": "TestNudgeStalledPoolContinuations_RecycledGenerationRestartsGrace"
+        },
+        {
+          "file": "cmd/gc/continuation_nudge_test.go",
+          "line": 1464,
+          "name": "TestNudgeStalledPoolContinuations_DelayedScopeControlStartsGraceAtSuccessor"
+        },
+        {
+          "file": "cmd/gc/continuation_nudge_test.go",
+          "line": 1504,
+          "name": "TestNudgeStalledPoolContinuations_NoCandidateDoesNotWrite"
+        },
+        {
+          "file": "cmd/gc/continuation_nudge_test.go",
+          "line": 1520,
+          "name": "TestNudgeStalledPoolContinuations_AcceptsCurrentSessionIdentities"
+        },
+        {
+          "file": "cmd/gc/continuation_nudge_test.go",
+          "line": 1549,
+          "name": "TestNudgeStalledPoolContinuations_RejectsHistoricalAlias"
+        },
+        {
+          "file": "cmd/gc/continuation_nudge_test.go",
+          "line": 1572,
+          "name": "TestNudgeStalledPoolContinuations_FailsClosed"
+        },
+        {
+          "file": "cmd/gc/execution_backstop.go",
+          "line": 267,
+          "name": "poolExecutionBackstop.resolve"
+        },
+        {
+          "file": "cmd/gc/execution_backstop.go",
+          "line": 417,
+          "name": "poolExecutionBackstop.observeHold"
+        },
+        {
+          "file": "cmd/gc/idle_nudge.go",
+          "line": 159,
+          "name": "nudgeStalledPoolContinuations"
+        },
+        {
+          "file": "cmd/gc/idle_nudge.go",
+          "line": 343,
+          "name": "newPoolContinuationCandidateSnapshot"
+        },
+        {
+          "file": "cmd/gc/idle_nudge_test.go",
+          "line": 653,
+          "name": "TestBeadReconcileTickDrainsAWedgedPoolSlot"
+        },
+        {
+          "file": "cmd/gc/per_dispatch_model_test.go",
+          "line": 732,
+          "name": "TestCityRuntimeBeadReconcileTick_AppliesTriggerPinsThroughResidencyReader"
+        },
+        {
+          "file": "cmd/gc/pool_orphan_foreign_identity_test.go",
+          "line": 1084,
+          "name": "TestCityRuntimeBeadReconcileTick_ReleasesTrimmedSeatClaimAfterClose"
+        },
+        {
+          "file": "cmd/gc/pool_orphan_foreign_identity_test.go",
+          "line": 1233,
+          "name": "TestCityRuntimeBeadReconcileTick_OrphanCloseReleasesTrimmedSeatAndClosesIt"
+        },
+        {
+          "file": "cmd/gc/reconcile_steps_nudges.go",
+          "line": 64,
+          "name": "externalReadsLane.nudges"
+        },
+        {
+          "file": "cmd/gc/reconcile_steps_pool_test.go",
+          "line": 47,
+          "name": "TestNudgeStepsUseLastAllocation"
+        },
+        {
+          "file": "cmd/gc/reconcile_steps_pool_test.go",
+          "line": 129,
+          "name": "TestNudgeStepsReadImmutableSummary"
+        },
+        {
+          "file": "cmd/gc/reconcile_steps_pool_test.go",
+          "line": 276,
+          "name": "TestNudgeStepsDrainAWedgedSlot"
+        },
+        {
+          "file": "cmd/gc/reconcile_steps_pool_test.go",
+          "line": 310,
+          "name": "TestNudgeStepsNudgeARigPoolWithoutNudge"
+        },
+        {
+          "file": "cmd/gc/session_fields_runtime_test.go",
+          "line": 110,
+          "name": "TestSessionFieldsFlowsWriteTheirKeys"
+        },
+        {
+          "file": "cmd/gc/session_reconciler_binding_orphan_test.go",
+          "line": 123,
+          "name": "bindingOrphanReconcileEnv.tick"
+        },
+        {
+          "file": "cmd/gc/session_reconciler_binding_orphan_test.go",
+          "line": 164,
+          "name": "TestSessionReconcilerOrphanCloseReleasesBindingResidentWorkThroughAlignedStores"
+        },
+        {
+          "file": "cmd/gc/session_reconciler_close_orphan_trace_test.go",
+          "line": 114,
+          "name": "closeOrphanEnv.tick"
+        },
+        {
+          "file": "cmd/gc/session_reconciler_close_orphan_trace_test.go",
+          "line": 180,
+          "name": "TestSessionReconcilerOrphanCloseReleasesHeldWorkThenCloses"
+        },
+        {
+          "file": "cmd/gc/session_reconciler_close_orphan_trace_test.go",
+          "line": 212,
+          "name": "TestSessionReconcilerOrphanCloseRecordsClosedOnlyWhenClosed"
+        },
+        {
+          "file": "cmd/gc/session_reconciler_close_orphan_trace_test.go",
+          "line": 245,
+          "name": "TestSessionReconcilerOrphanCloseLeavesLiveSeatWorkAlone"
+        },
+        {
+          "file": "cmd/gc/session_reconciler_trace_integration_test.go",
+          "line": 17,
+          "name": "TestSessionReconcilerTraceLifecycleRecordsTick"
+        },
+        {
+          "file": "cmd/gc/session_reconciler_trace_integration_test.go",
+          "line": 467,
+          "name": "TestSessionReconcilerTraceGH1654WorkRequestedStartCandidates"
+        },
+        {
+          "file": "cmd/gc/warm_bind_nudge_test.go",
+          "line": 611,
+          "name": "TestBeadReconcileTickWarmBindNudgesTemplateAssignedDemand"
+        },
+        {
+          "file": "cmd/gc/work_release_test.go",
+          "line": 421,
+          "name": "TestBeadReconcileTickDetectsStrandedClaims"
+        },
+        {
+          "file": "cmd/gc/work_release_test.go",
+          "line": 492,
+          "name": "TestOrphanCloseCompletesOverStrandedClaims"
+        }
+      ],
+      "kind": "callers"
+    },
+    {
+      "id": "t5",
+      "band": "large",
+      "target": "effectExecutor.submit",
+      "file": "cmd/gc/reconcile_session_effects.go",
+      "line": 179,
+      "question": "In this repository (gascity), list every function and method, including those in test files, that transitively calls `effectExecutor.submit` (declared at cmd/gc/reconcile_session_effects.go:179) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `effectExecutor.submit` itself. Consider only code the Go toolchain builds (`go build ./...` and `go test ./...`): skip directories whose names start with `_` or `.`, and `testdata`. The list must be complete. Only consider code the compiler project covers: ignore `cmd/gc-write-mint/e2e_test.go`, `cmd/gc/beads_blocked_repair_integration_test.go`, `cmd/gc/beads_native_compat_integration_test.go`, `cmd/gc/beads_provider_missing_scope_stop_linux_test.go`, `cmd/gc/beads_provider_script_scope_lifecycle_linux_test.go`, `cmd/gc/beads_provider_script_shared_server_linux_test.go`, `cmd/gc/capstone_integration_test.go`, `cmd/gc/cmd_daemon_windows.go`, `cmd/gc/cmd_hook_claim_runmap_other.go`, `cmd/gc/cmd_rig_include_registry_integration_test.go`, `cmd/gc/dolt_data_dir_lock_linux.go`, `cmd/gc/dolt_data_dir_lock_linux_test.go`, `cmd/gc/dolt_data_dir_lock_other.go`, `cmd/gc/dolt_disk_preflight_windows.go`, `cmd/gc/doltlite_reindex_native.go`, `cmd/gc/doltlite_store_native.go`, `cmd/gc/doltlite_store_native_test.go`, `cmd/gc/embedded_rig_custom_types_integration_test.go`, `cmd/gc/fs_pressure_linux.go`, `cmd/gc/fs_pressure_test.go`, `cmd/gc/live_submit_probe_test.go`, `cmd/gc/metrics_census_ignore_testhook_test.go`, `cmd/gc/native_dolt_rebind_integration_test.go`, `cmd/gc/order_dynamic_integration_test.go`, `cmd/gc/orders_lane_fs_pressure_test.go`, `cmd/gc/phase2_real_transport_deadline_test.go`, `cmd/gc/phase2_real_transport_test.go`, `cmd/gc/proc_environ_settled_test.go`, `cmd/gc/productmetrics_controls_process_testhook_test.go`, `cmd/gc/productmetrics_controls_pty_darwin_test.go`, `cmd/gc/productmetrics_controls_pty_linux_test.go`, `cmd/gc/productmetrics_controls_testhook.go`, `cmd/gc/productmetrics_private_process_testhook_test.go`, `cmd/gc/productmetrics_testhook.go`, `cmd/gc/productmetrics_testhook_test.go`, `cmd/gc/provider_op_process_windows.go`, `cmd/gc/reconcile_effect_recycle_tmux_integration_test.go`, `cmd/gc/reconcile_effect_stop_tmux_integration_test.go`, `cmd/gc/rig_add_path_durability_test.go`, `cmd/gc/sigpipe_windows.go`, `cmd/gc/storage_boot_workspace_integration_test.go`, `cmd/gc/suspension_state_linux_test.go`, `cmd/gc/tmux_leak_guard_check_test.go`, `cmd/gc/tmux_leak_guard_mntns_test.go`, `cmd/gc/tmux_leak_guard_test.go`, `examples/bd/dolt/compact_history_protection_real_dolt_test.go`, `examples/bd/dolt/compact_real_dolt_callbound_test.go`, `examples/bd/dolt/compact_real_dolt_test.go`, `examples/gastown/dolt_orphan_sweep_integration_test.go`, `examples/gastown/maintenance_bd_integration_test.go`, `examples/gastown/maintenance_scripts_dolt_integration_test.go`, `internal/api/dashport_support.go`, `internal/bazeltest/lock_other.go`, `internal/bdflags/freshness_test.go`, `internal/beads/bdstore_conditional_integration_bridge_test.go`, `internal/beads/bdstore_conditional_integration_test.go`, `internal/beads/bdstore_conditional_release_integration_test.go`, `internal/beads/doltlite_count.go`, `internal/beads/doltlite_count_test.go`, `internal/beads/doltlite_namespace_census.go`, `internal/beads/doltlite_namespace_census_test.go`, `internal/beads/doltlite_read_store.go`, `internal/beads/doltlite_read_store_capabilities.go`, `internal/beads/doltlite_read_store_graph_only_ready.go`, `internal/beads/doltlite_read_store_graph_ready_test.go`, `internal/beads/doltlite_read_store_test.go`, `internal/beads/doltlite_seek_test.go`, `internal/beads/exec/br_test.go`, `internal/beads/exec_timeout_linux.go`, `internal/beads/exec_timeout_linux_test.go`, `internal/beads/exec_timeout_windows.go`, `internal/beads/export_integration_test.go`, `internal/beads/hangbudget_linux_test.go`, `internal/beads/native_dolt_store_facade_integration_test.go`, `internal/beads/native_dolt_store_graph_apply_integration_test.go`, `internal/beads/native_dolt_store_integration_test.go`, `internal/beads/native_dolt_store_label_cas_integration_test.go`, `internal/beads/native_dolt_store_metadata_cas_integration_test.go`, `internal/beads/native_dolt_store_metadata_merge_integration_test.go`, `internal/beads/native_dolt_store_metadata_preserve_integration_test.go`, `internal/beads/native_dolt_store_metadata_stress_integration_test.go`, `internal/beads/native_dolt_store_ready_veto_limit_integration_test.go`, `internal/beads/native_list_pushdown_integration_test.go`, `internal/beads/proxyendpoint/birth_linux.go`, `internal/beads/proxyendpoint/birth_linux_test.go`, `internal/beads/session_key_hook_bd_integration_test.go`, `internal/beads/sqlite_sequence_floor_temp_linux.go`, `internal/beads/sqlite_store_sequence_floor_process_linux_test.go`, `internal/config/fingerprint_ctime_windows.go`, `internal/config/repo_cache_lock_windows.go`, `internal/configedit/configedit_linux_test.go`, `internal/credentialprovider/credentialprovider_process_unix_test.go`, `internal/credentialprovider/credentialprovider_process_windows_test.go`, `internal/credentialprovider/environment_windows.go`, `internal/credentialprovider/runner_windows.go`, `internal/events/inode_windows.go`, `internal/events/rename_linux.go`, `internal/execgrace/signal_windows.go`, `internal/gchome/trust_unsupported.go`, `internal/gitcred/rules_windows.go`, `internal/hostboot/hostboot_linux.go`, `internal/hostboot/hostboot_linux_test.go`, `internal/hostboot/hostboot_unsupported.go`, `internal/loopbackport/lease_linux.go`, `internal/orders/trigger_exec_windows.go`, `internal/packman/networkgit_group_windows.go`, `internal/packregistry/file_lock_windows.go`, `internal/pathdurability/probe_linux.go`, `internal/pidutil/cmdline_other.go`, `internal/pidutil/vanish_linux_test.go`, `internal/productmetrics/platform_unsupported.go`, `internal/productmetrics/platform_unsupported_test.go`, `internal/productmetrics/productmetrics_testhook.go`, `internal/productmetrics/service_state_unsupported_test.go`, `internal/productmetrics/spawn_unsupported.go`, `internal/productmetrics/storage_rename_linux.go`, `internal/runtime/acp/conformance_test.go`, `internal/runtime/acp/events_protocol_test.go`, `internal/runtime/acp/proctable_integration_test.go`, `internal/runtime/acp/proctable_linux_test.go`, `internal/runtime/acp/protocol_conformance_test.go`, `internal/runtime/acp/testdata/`, `internal/runtime/acp/turn_events_protocol_test.go`, `internal/runtime/exec/idle_integration_test.go`, `internal/runtime/proctable/descendants_linux.go`, `internal/runtime/proctable/descendants_stub.go`, `internal/runtime/proctable/environ_linux.go`, `internal/runtime/proctable/environ_linux_test.go`, `internal/runtime/proctable/environ_stub.go`, `internal/runtime/proctable/guard_test.go`, `internal/runtime/proctable/identity_linux.go`, `internal/runtime/proctable/identity_stub.go`, `internal/runtime/proctable/infrastructure_argv_linux.go`, `internal/runtime/proctable/infrastructure_argv_stub.go`, `internal/runtime/proctable/kill_stub.go`, `internal/runtime/proctable/scan_linux.go`, `internal/runtime/proctable/scan_linux_test.go`, `internal/runtime/proctable/scan_stub.go`, `internal/runtime/proctable/scan_stub_test.go`, `internal/runtime/proctable/supervisor_fork_orphan_repro_test.go`, `internal/runtime/ssh/conformance_integration_test.go`, `internal/runtime/ssh/session_env_file_integration_test.go`, `internal/runtime/ssh/ssh_localhost_integration_test.go`, `internal/runtime/subprocess/seam_conformance_test.go`, `internal/runtime/tmux/adapter_test.go`, `internal/runtime/tmux/dialog_feedback_survey_integration_test.go`, `internal/runtime/tmux/dialog_model_switch_integration_test.go`, `internal/runtime/tmux/empty_server_liveness_integration_test.go`, `internal/runtime/tmux/exact_target_integration_test.go`, `internal/runtime/tmux/hidden_attach_hook_test.go`, `internal/runtime/tmux/nudge_clear_before_paste_integration_test.go`, `internal/runtime/tmux/nudge_confirm_lag_integration_test.go`, `internal/runtime/tmux/nudge_poke_integration_test.go`, `internal/runtime/tmux/nudge_staged_draft_integration_test.go`, `internal/runtime/tmux/nudge_submit_confirm_integration_test.go`, `internal/runtime/tmux/nudge_submit_key_sequence_integration_test.go`, `internal/runtime/tmux/process_group_windows.go`, `internal/runtime/tmux/seam_conformance_test.go`, `internal/runtime/tmux/server_socket_probe_linux.go`, `internal/runtime/tmux/server_socket_probe_other.go`, `internal/runtime/tmux/session_env_file_integration_test.go`, `internal/runtime/tmux/session_object_integration_test.go`, `internal/runtime/tmux/tmux_test.go`, `internal/runtime/tmux/wake_pane_integration_test.go`, `internal/session/manager_tmux_integration_test.go`, `internal/session/orphan_infrastructure_fence_linux_test.go`, `internal/session/runtime_lease_boot_linux.go`, `internal/session/runtime_lease_boot_other.go`, `internal/storebinding/beadsworkspace/engine_integration_test.go`, `internal/storebinding/migration_guard_unsupported.go`, `internal/storebinding/sqlite/graph_capability_linux_test.go`, `internal/storebinding/sqlite/graph_fence_linux_test.go`, `internal/storebinding/sqlite/graph_identity_other.go`, `internal/storebinding/sqlite/graph_schema_admission_linux_test.go`, `internal/storebinding/sqlite/legacy_hot_journal_linux_test.go`, `internal/storebinding/sqlite/legacy_sessions_snapshot_other.go`, `internal/storebinding/sqlite/sqlite_fence_process_linux_test.go`, `internal/storebinding/sqlite/sqlite_fence_release_linux_test.go`, `internal/storebinding/sqlite/sqlite_readonly_fence_linux_test.go`, `internal/storebinding/sqlite/sqlite_snapshot_temp_linux.go`, `internal/storebinding/sqlite/sqlite_source_fd_linux.go`, `internal/storebinding/sqlite/sqlite_source_fd_linux_test.go`, `internal/storebinding/sqlite/sqlite_vfs_linux_test.go`, `internal/storebinding/sqlite/sqlite_writer_reservation_linux.go`, `internal/suspensionstate/fence_linux_test.go`, `internal/suspensionstate/fence_windows.go`, `internal/testutil/flock_linux.go`, `internal/workspacesvc/proxy_process_linux.go`, `internal/worktree/lock_windows.go`, `scripts/add-testenv-import.go`, `scripts/bazel-bep-summary.go`, `scripts/shard-budget.go`, `scripts/test-timing-plan.go`, `scripts/test-timing-summary.go`, `scripts/testdata/`, `test/acceptance/agent_env_test.go`, `test/acceptance/agent_suspend_test.go`, `test/acceptance/beads_blocked_repair_test.go`, `test/acceptance/beads_cli_contract_home_isolation_test.go`, `test/acceptance/beads_cli_contract_test.go`, `test/acceptance/beads_health_test.go`, `test/acceptance/beads_migrate_proxied_test.go`, `test/acceptance/beads_proxied_default_test.go`, `test/acceptance/beads_proxied_idle_timeout_test.go`, `test/acceptance/beads_proxied_native_safety_test.go`, `test/acceptance/beads_proxied_native_test.go`, `test/acceptance/beads_proxied_shared_server_test.go`, `test/acceptance/beads_proxied_suspension_quiescence_test.go`, `test/acceptance/beads_topology_matrix_test.go`, `test/acceptance/cli_basics_test.go`, `test/acceptance/config_pack_test.go`, `test/acceptance/converge_test.go`, `test/acceptance/convoy_test.go`, `test/acceptance/dashboard_serve_test.go`, `test/acceptance/doctor_mail_test.go`, `test/acceptance/doctor_proxied_backup_coverage_test.go`, `test/acceptance/doctor_stopped_store_test.go`, `test/acceptance/drain_ack_test.go`, `test/acceptance/env_invariant_test.go`, `test/acceptance/example_cities_test.go`, `test/acceptance/formula_events_test.go`, `test/acceptance/gastown_pack_cache_test.go`, `test/acceptance/gastown_smoke_test.go`, `test/acceptance/handoff_test.go`, `test/acceptance/helpers/dir_writable_other.go`, `test/acceptance/import_named_sessions_regression_test.go`, `test/acceptance/init_lifecycle_test.go`, `test/acceptance/integration_selfhost_ux_test.go`, `test/acceptance/migration_regression_test.go`, `test/acceptance/nudge_service_test.go`, `test/acceptance/order_commands_test.go`, `test/acceptance/order_env_test.go`, `test/acceptance/pack_registry_live_test.go`, `test/acceptance/pack_test.go`, `test/acceptance/prime_test.go`, `test/acceptance/rig_test.go`, `test/acceptance/session_test.go`, `test/acceptance/skill_test.go`, `test/acceptance/sling_test.go`, `test/acceptance/status_test.go`, `test/acceptance/supervisor_registry_test.go`, `test/acceptance/tier_b/idle_bead_stability_test.go`, `test/acceptance/tier_b/lifecycle_b_test.go`, `test/acceptance/tier_b/pool_workquery_test.go`, `test/acceptance/tier_b/split_storage_migrated_formula_test.go`, `test/acceptance/tier_c/fresh_install_spawn_test.go`, `test/acceptance/tier_c/tierc_helpers_test.go`, `test/acceptance/tier_c/tierc_test.go`, `test/acceptance/tutorial_goldens/auth_status_test.go`, `test/acceptance/tutorial_goldens/continuity_regression_test.go`, `test/acceptance/tutorial_goldens/formula_helpers_regression_test.go`, `test/acceptance/tutorial_goldens/formula_helpers_test.go`, `test/acceptance/tutorial_goldens/harness_test.go`, `test/acceptance/tutorial_goldens/main_test.go`, `test/acceptance/tutorial_goldens/manifests_test.go`, `test/acceptance/tutorial_goldens/snapshot.go`, `test/acceptance/tutorial_goldens/tutorial01_test.go`, `test/acceptance/tutorial_goldens/tutorial02_test.go`, `test/acceptance/tutorial_goldens/tutorial03_test.go`, `test/acceptance/tutorial_goldens/tutorial04_communication_test.go`, `test/acceptance/tutorial_goldens/tutorial05_test.go`, `test/acceptance/tutorial_goldens/tutorial06_test.go`, `test/acceptance/tutorial_goldens/tutorial07_test.go`, `test/acceptance/wait_test.go`, `test/acceptance/worker_inference/classification_test.go`, `test/acceptance/worker_inference/main_test.go`, `test/acceptance/worker_inference/worker_handle_city_helpers_test.go`, `test/acceptance/worker_inference/worker_handle_city_test.go`, `test/acceptance/worker_inference/worker_handle_live_helpers_test.go`, `test/acceptance/worker_inference/worker_inference_helpers_test.go`, `test/acceptance/worker_inference/worker_inference_test.go`, `test/acceptance/worktree_lifecycle_test.go`, `test/acceptance/worktree_test.go`, `test/containerhost/docker_session_test.go`, `test/containerhost/k8s_session_test.go`, `test/dashport/cmd/`, `test/dashport/corpus/`, `test/dashport/fixtures.go`, `test/dashport/harness.go`, `test/dashport/projection_test.go`, `test/integration/bdstore_batch_delete_test.go`, `test/integration/bdstore_batch_reads_test.go`, `test/integration/bdstore_runner_isolation_test.go`, `test/integration/bdstore_test.go`, `test/integration/dolt_config_test.go`, `test/integration/dolt_managed_chaos_test.go`, `test/integration/dolt_persistence_test.go`, `test/integration/e2e_comm_test.go`, `test/integration/e2e_config_test.go`, `test/integration/e2e_events_test.go`, `test/integration/e2e_helpers_test.go`, `test/integration/e2e_hook_test.go`, `test/integration/e2e_lifecycle_test.go`, `test/integration/e2e_mail_test.go`, `test/integration/e2e_multi_test.go`, `test/integration/e2e_pool_test.go`, `test/integration/e2e_test.go`, `test/integration/gastown_config_test.go`, `test/integration/gastown_controller_test.go`, `test/integration/gastown_events_test.go`, `test/integration/gastown_formula_test.go`, `test/integration/gastown_handoff_test.go`, `test/integration/gastown_helpers_test.go`, `test/integration/gastown_mail_test.go`, `test/integration/gastown_multirig_test.go`, `test/integration/gastown_pipeline_test.go`, `test/integration/gastown_polecat_test.go`, `test/integration/gastown_pool_test.go`, `test/integration/gastown_reconciler_test.go`, `test/integration/gastown_refinery_test.go`, `test/integration/gastown_shutdown_test.go`, `test/integration/gastown_sling_test.go`, `test/integration/gastown_witness_test.go`, `test/integration/gc_live_contract_store_conflict_test.go`, `test/integration/gc_live_contract_test.go`, `test/integration/graph_dispatch_harness_test.go`, `test/integration/graph_dispatch_test.go`, `test/integration/helpers_test.go`, `test/integration/huma_binary_test.go`, `test/integration/integration_test.go`, `test/integration/mail_test.go`, `test/integration/review_check_scripts_test.go`, `test/integration/review_formula_test.go`, `test/integration/skill_lifecycle_test.go`, `test/integration/start_drift_test.go`, `test/integration/supervisor_unit_guard_test.go`, `test/integration/tool_home_test.go`, `test/integration/tutorial_path_test.go`, `test/integration/workflow_event_wait_test.go`, `tools/`.",
+      "max_depth": 8,
+      "answer": [
+        {
+          "file": "cmd/gc/api_kill_fence_test.go",
+          "line": 40,
+          "name": "TestAPIKillUnderFenceIsNotACrash"
+        },
+        {
+          "file": "cmd/gc/api_kill_fence_test.go",
+          "line": 155,
+          "name": "TestKilledWokenSeatRestartsAsANewIncarnationInBothModes"
+        },
+        {
+          "file": "cmd/gc/city_runtime_v2_test.go",
+          "line": 1508,
+          "name": "TestPlannerTraceSinkRecordsChangedRows"
+        },
+        {
+          "file": "cmd/gc/close_allowed_scenarios_test.go",
+          "line": 19,
+          "name": "TestCloseAllowed_StaleRequestsCloseUndesiredRowsInBothModes"
+        },
+        {
+          "file": "cmd/gc/close_allowed_scenarios_test.go",
+          "line": 186,
+          "name": "TestCloseAllowed_AHeldUndesiredRowKeepsItsClaims"
+        },
+        {
+          "file": "cmd/gc/reconcile_arms_idle_test.go",
+          "line": 723,
+          "name": "TestPassRecordsTheIdleStop"
+        },
+        {
+          "file": "cmd/gc/reconcile_effect_create_test.go",
+          "line": 57,
+          "name": "TestPlannerRecordsCreateBeforeSubmit"
+        },
+        {
+          "file": "cmd/gc/reconcile_effect_create_test.go",
+          "line": 80,
+          "name": "TestPlannerMintsCreateTokenAtSubmit"
+        },
+        {
+          "file": "cmd/gc/reconcile_effect_create_test.go",
+          "line": 114,
+          "name": "TestExecutorKeysCreatesByToken"
+        },
+        {
+          "file": "cmd/gc/reconcile_effect_create_test.go",
+          "line": 139,
+          "name": "TestAbandonedCreateSettlesAmbiguousWithToken"
+        },
+        {
+          "file": "cmd/gc/reconcile_effect_create_test.go",
+          "line": 178,
+          "name": "TestCreateAbandonedBeforeItsWriteStaysThrottled"
+        },
+        {
+          "file": "cmd/gc/reconcile_effect_create_test.go",
+          "line": 241,
+          "name": "TestPassClearsAmbiguousCreatesAndAlertsAtHardBound"
+        },
+        {
+          "file": "cmd/gc/reconcile_effect_create_test.go",
+          "line": 267,
+          "name": "TestNamedAmbiguousCreateClearsOnItsIdentityRow"
+        },
+        {
+          "file": "cmd/gc/reconcile_effect_create_test.go",
+          "line": 302,
+          "name": "TestExecutorRefusesCreatesWhileStartsClosed"
+        },
+        {
+          "file": "cmd/gc/reconcile_effect_create_test.go",
+          "line": 320,
+          "name": "TestPlannerStopJoinsCreateEffects"
+        },
+        {
+          "file": "cmd/gc/reconcile_effect_heal_test.go",
+          "line": 209,
+          "name": "TestHealRefusalsAlertAtTheCap"
+        },
+        {
+          "file": "cmd/gc/reconcile_effect_launch_test.go",
+          "line": 1119,
+          "name": "TestPlannerHandsItsGuardToTheStartAndFlushes"
+        },
+        {
+          "file": "cmd/gc/reconcile_effect_launch_test.go",
+          "line": 1454,
+          "name": "TestNonPreserveStopEndsALateStart"
+        },
+        {
+          "file": "cmd/gc/reconcile_effect_launch_test.go",
+          "line": 1499,
+          "name": "TestExecutorStopCancelsWithTheShutdownCause"
+        },
+        {
+          "file": "cmd/gc/reconcile_effect_metadata_test.go",
+          "line": 28,
+          "name": "bossSim"
+        },
+        {
+          "file": "cmd/gc/reconcile_effect_metadata_test.go",
+          "line": 39,
+          "name": "TestSimRowMetadataConflictRecordedOnceRetriedWhenFree"
+        },
+        {
+          "file": "cmd/gc/reconcile_effect_metadata_test.go",
+          "line": 73,
+          "name": "TestSimRowMetadataAliasLockErrorWritesNothing"
+        },
+        {
+          "file": "cmd/gc/reconcile_effect_metadata_test.go",
+          "line": 98,
+          "name": "TestSimRowMetadataSyncsRuntimeAliasOnCurrentOnly"
+        },
+        {
+          "file": "cmd/gc/reconcile_effect_metadata_test.go",
+          "line": 184,
+          "name": "TestSimRowMetadataConflictBySessionNameDefersTheAlias"
+        },
+        {
+          "file": "cmd/gc/reconcile_effect_metadata_test.go",
+          "line": 198,
+          "name": "TestSimRowMetadataLockErrorDefersTheAlias"
+        },
+        {
+          "file": "cmd/gc/reconcile_effect_metadata_test.go",
+          "line": 215,
+          "name": "TestSimRowMetadataRefusesALockTheFreshRowDoesNotTake"
+        },
+        {
+          "file": "cmd/gc/reconcile_effect_tx_test.go",
+          "line": 256,
+          "name": "TestTxCallIsGatedLikeAWrite"
+        },
+        {
+          "file": "cmd/gc/reconcile_effect_tx_test.go",
+          "line": 819,
+          "name": "TestExecutorSettlesAnAbandonedEffectByItsLatch"
+        },
+        {
+          "file": "cmd/gc/reconcile_effects_test.go",
+          "line": 80,
+          "name": "TestExecutorSettlesOnceUnderFakeClock"
+        },
+        {
+          "file": "cmd/gc/reconcile_effects_test.go",
+          "line": 112,
+          "name": "TestExecutorRefusesStartsWhileClosed"
+        },
+        {
+          "file": "cmd/gc/reconcile_effects_test.go",
+          "line": 146,
+          "name": "TestUnregisteredKindRefusesNoEffect"
+        },
+        {
+          "file": "cmd/gc/reconcile_effects_test.go",
+          "line": 175,
+          "name": "TestDeadlinesHaveNoException"
+        },
+        {
+          "file": "cmd/gc/reconcile_effects_test.go",
+          "line": 225,
+          "name": "TestExecutorCausesCarryTheFinalizePrefix"
+        },
+        {
+          "file": "cmd/gc/reconcile_effects_test.go",
+          "line": 292,
+          "name": "TestEffectContextCarriesTheDeadline"
+        },
+        {
+          "file": "cmd/gc/reconcile_effects_test.go",
+          "line": 330,
+          "name": "TestExecutorPostsALateLandingsEvent"
+        },
+        {
+          "file": "cmd/gc/reconcile_effects_test.go",
+          "line": 449,
+          "name": "TestAmbiguousFinalizeIsPacedByItsOwnBackoff"
+        },
+        {
+          "file": "cmd/gc/reconcile_effects_test.go",
+          "line": 474,
+          "name": "TestSwapCancelIsLabeledApartFromShutdown"
+        },
+        {
+          "file": "cmd/gc/reconcile_effects_wiring_test.go",
+          "line": 19,
+          "name": "TestPlannerRuntimeWiresTheExecutor"
+        },
+        {
+          "file": "cmd/gc/reconcile_effects_wiring_test.go",
+          "line": 52,
+          "name": "TestBeforeProviderSwapClosesExecutorStarts"
+        },
+        {
+          "file": "cmd/gc/reconcile_effects_wiring_test.go",
+          "line": 80,
+          "name": "TestPlannerSubmitSettlesRefusedSubmits"
+        },
+        {
+          "file": "cmd/gc/reconcile_execution_stalled_oneshot_test.go",
+          "line": 20,
+          "name": "TestSimExecutionStalledRequestIsOneShot"
+        },
+        {
+          "file": "cmd/gc/reconcile_execution_stalled_oneshot_test.go",
+          "line": 60,
+          "name": "TestSimExecutionStalledRequestSpentByADormantSeat"
+        },
+        {
+          "file": "cmd/gc/reconcile_execution_stalled_oneshot_test.go",
+          "line": 324,
+          "name": "TestSimExecutionStalledBadListingsKeepTheRequest"
+        },
+        {
+          "file": "cmd/gc/reconcile_observe_identity_test.go",
+          "line": 35,
+          "name": "TestRekeyRefusalsAlertOncePerEpisode"
+        },
+        {
+          "file": "cmd/gc/reconcile_observe_identity_test.go",
+          "line": 81,
+          "name": "TestNewerSelfHeldAlertsOncePastDwell"
+        },
+        {
+          "file": "cmd/gc/reconcile_observe_identity_test.go",
+          "line": 116,
+          "name": "TestRekeyRefusalsAlertWiredThroughThePlanner"
+        },
+        {
+          "file": "cmd/gc/reconcile_observe_v2_test.go",
+          "line": 30,
+          "name": "newObserveFixture"
+        },
+        {
+          "file": "cmd/gc/reconcile_observe_v2_test.go",
+          "line": 79,
+          "name": "TestPassRecordCarriesSoakFields"
+        },
+        {
+          "file": "cmd/gc/reconcile_observe_v2_test.go",
+          "line": 143,
+          "name": "TestPassRecordOnlyOnChangeOrPatrol"
+        },
+        {
+          "file": "cmd/gc/reconcile_observe_v2_test.go",
+          "line": 177,
+          "name": "TestAmbiguousCreateBoundClearAlerts"
+        },
+        {
+          "file": "cmd/gc/reconcile_observe_v2_test.go",
+          "line": 206,
+          "name": "TestV2AlertsOncePerEpisode"
+        },
+        {
+          "file": "cmd/gc/reconcile_observe_v2_test.go",
+          "line": 335,
+          "name": "TestStopOutstandingAlertAt30MinutesThenEvery15"
+        },
+        {
+          "file": "cmd/gc/reconcile_observe_v2_test.go",
+          "line": 431,
+          "name": "TestStopOutstandingAlertOnlyOwnRowsOutsideTheQuietHold"
+        },
+        {
+          "file": "cmd/gc/reconcile_pass.go",
+          "line": 81,
+          "name": "planner.tracePass"
+        },
+        {
+          "file": "cmd/gc/reconcile_pass.go",
+          "line": 222,
+          "name": "planner.submit"
+        },
+        {
+          "file": "cmd/gc/reconcile_pass_test.go",
+          "line": 18,
+          "name": "gatherFixture.passRecord"
+        },
+        {
+          "file": "cmd/gc/reconcile_pass_test.go",
+          "line": 42,
+          "name": "TestPassTraceOnlySubmitsNothing"
+        },
+        {
+          "file": "cmd/gc/reconcile_pass_test.go",
+          "line": 71,
+          "name": "TestPassSkipsRowsWithEffectInFlight"
+        },
+        {
+          "file": "cmd/gc/reconcile_pass_test.go",
+          "line": 92,
+          "name": "TestDecideRowPanicHoldsRow"
+        },
+        {
+          "file": "cmd/gc/reconcile_pass_test.go",
+          "line": 121,
+          "name": "TestPassPublishesImmutableAllocationSummary"
+        },
+        {
+          "file": "cmd/gc/reconcile_pass_test.go",
+          "line": 150,
+          "name": "TestPassIsDeterministic"
+        },
+        {
+          "file": "cmd/gc/reconcile_pass_test.go",
+          "line": 202,
+          "name": "TestPassCarriesAdmissionStateAndDeadlines"
+        },
+        {
+          "file": "cmd/gc/reconcile_pass_test.go",
+          "line": 220,
+          "name": "TestPassWakesAtRowBackoffExpiry"
+        },
+        {
+          "file": "cmd/gc/reconcile_pass_test.go",
+          "line": 236,
+          "name": "TestPassAppliesBootGate"
+        },
+        {
+          "file": "cmd/gc/reconcile_pass_test.go",
+          "line": 254,
+          "name": "TestTracePassKeepsNoTokenDebit"
+        },
+        {
+          "file": "cmd/gc/reconcile_pass_test.go",
+          "line": 275,
+          "name": "TestPassWithEffectsSubmitsRegisteredKindsOnly"
+        },
+        {
+          "file": "cmd/gc/reconcile_planner_runtime.go",
+          "line": 251,
+          "name": "plannerRuntime.pass"
+        },
+        {
+          "file": "cmd/gc/reconcile_replay_test.go",
+          "line": 245,
+          "name": "replayPass"
+        },
+        {
+          "file": "cmd/gc/reconcile_replay_test.go",
+          "line": 376,
+          "name": "replay"
+        },
+        {
+          "file": "cmd/gc/reconcile_replay_test.go",
+          "line": 571,
+          "name": "TestReplay"
+        },
+        {
+          "file": "cmd/gc/reconcile_replay_test.go",
+          "line": 588,
+          "name": "TestReplaySampleMatchesExpectedDivergences"
+        },
+        {
+          "file": "cmd/gc/reconcile_session_differential_test.go",
+          "line": 812,
+          "name": "v2Parity"
+        },
+        {
+          "file": "cmd/gc/reconcile_session_differential_test.go",
+          "line": 834,
+          "name": "newV2World"
+        },
+        {
+          "file": "cmd/gc/reconcile_session_differential_test.go",
+          "line": 972,
+          "name": "checkParity"
+        },
+        {
+          "file": "cmd/gc/reconcile_session_differential_test.go",
+          "line": 1835,
+          "name": "TestSessionDifferentialFixtures"
+        },
+        {
+          "file": "cmd/gc/reconcile_session_differential_test.go",
+          "line": 2203,
+          "name": "TestFreshDrainBeginsReachAdmission"
+        },
+        {
+          "file": "cmd/gc/reconcile_session_differential_test.go",
+          "line": 2257,
+          "name": "TestIdleProbesPaceAPatrolApart"
+        },
+        {
+          "file": "cmd/gc/reconcile_session_differential_test.go",
+          "line": 2315,
+          "name": "TestIdlePaceHoldsOnlyIdleProbes"
+        },
+        {
+          "file": "cmd/gc/reconcile_session_effects.go",
+          "line": 164,
+          "name": "effectExecutor.submitIntent"
+        },
+        {
+          "file": "cmd/gc/reconcile_session_effects_test.go",
+          "line": 59,
+          "name": "TestEffectExecutorDeadlineSettlesHungEffect"
+        },
+        {
+          "file": "cmd/gc/reconcile_session_effects_test.go",
+          "line": 91,
+          "name": "TestCityShutdownKeepsGracefulStopAfterV2StopWithStartInFlight"
+        },
+        {
+          "file": "cmd/gc/reconcile_session_effects_test.go",
+          "line": 119,
+          "name": "TestEffectExecutorRecoversRunPanic"
+        },
+        {
+          "file": "cmd/gc/reconcile_session_effects_test.go",
+          "line": 152,
+          "name": "TestBeforeProviderSwapWaitsInFlightStartsBounded"
+        },
+        {
+          "file": "cmd/gc/reconcile_session_effects_test.go",
+          "line": 307,
+          "name": "TestReloadProviderSwapWaitsForV2StartsBeforeListing"
+        },
+        {
+          "file": "cmd/gc/reconcile_session_effects_test.go",
+          "line": 362,
+          "name": "TestBeforeProviderSwapWaitsTheDefaultStartupForZero"
+        },
+        {
+          "file": "cmd/gc/reconcile_session_timeline_test.go",
+          "line": 444,
+          "name": "runTimeline"
+        },
+        {
+          "file": "cmd/gc/reconcile_session_timeline_test.go",
+          "line": 732,
+          "name": "TestSessionTimelineDifferential"
+        },
+        {
+          "file": "cmd/gc/reconcile_session_timeline_test.go",
+          "line": 746,
+          "name": "TestTimelineLegacyGoldenIgnoresV2"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_invariants_test.go",
+          "line": 790,
+          "name": "TestSimChecksBite"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_invariants_test.go",
+          "line": 1064,
+          "name": "signaledSim"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_invariants_test.go",
+          "line": 1085,
+          "name": "TestSimProbeErrorHoldsTheStopUntilItRecovers"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_invariants_test.go",
+          "line": 1125,
+          "name": "TestSimExcusedRefusalIsFinalized"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_invariants_test.go",
+          "line": 1153,
+          "name": "TestSimCloseBeforeQuiescenceExcusesNoKill"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_invariants_test.go",
+          "line": 1179,
+          "name": "TestSimStepClearsItsCloses"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_invariants_test.go",
+          "line": 1233,
+          "name": "TestSimI4ClosedRowAsTheCloseFoundIt"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_invariants_test.go",
+          "line": 1271,
+          "name": "TestNamedPaneCountsAnOwnerlessRuntime"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_invariants_test.go",
+          "line": 1297,
+          "name": "TestSimI23CatchesAWrongGoneNote"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_invariants_test.go",
+          "line": 1320,
+          "name": "TestSimI4JustClosedRollbackVerdict"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_pending_test.go",
+          "line": 524,
+          "name": "TestSimPendingRelaxationsBite"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_pending_test.go",
+          "line": 747,
+          "name": "TestSimCorpusFlooredPending"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_pending_test.go",
+          "line": 762,
+          "name": "TestSimPendingCreateTimers"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_pending_test.go",
+          "line": 804,
+          "name": "TestSimPendingAdoptUnderHold"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_pending_test.go",
+          "line": 842,
+          "name": "staleCreateSim"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_pending_test.go",
+          "line": 859,
+          "name": "TestSimPC2CatchesASkippedStaleCreateExit"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_pending_test.go",
+          "line": 886,
+          "name": "TestSimPC3CatchesALostCommitLeftRunning"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_pending_test.go",
+          "line": 906,
+          "name": "TestFailedCreateCloseRetiresHolds"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_pending_test.go",
+          "line": 941,
+          "name": "TestRollbackScreenParkRewritesHolds"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_respawn_test.go",
+          "line": 66,
+          "name": "sim.restartController"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_respawn_test.go",
+          "line": 84,
+          "name": "respawnSim"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_respawn_test.go",
+          "line": 139,
+          "name": "TestSimIdleRespawnLifecycle"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_respawn_test.go",
+          "line": 265,
+          "name": "TestSimRespawnChecksBite"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_respawn_test.go",
+          "line": 314,
+          "name": "TestSimRestartChecksTheOldControllersWrites"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 26,
+          "name": "scripted"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 31,
+          "name": "scriptedWith"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 85,
+          "name": "TestSimR5StaleHealRedecidesAtTheStore"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 129,
+          "name": "TestSimR14PartialListingConcludesNoAbsence"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 154,
+          "name": "TestSimR17ReplayedEventsWriteNothing"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 184,
+          "name": "TestSimR34R35ServerGone"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 217,
+          "name": "TestSimR45NeverListedStopPendingRowReadsGone"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 236,
+          "name": "TestSimR47DrainAckLosesToPreWake"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 283,
+          "name": "TestSimStabilityClearsAcrossTime"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 310,
+          "name": "TestSimDetachedAtFollowsTheAttachFact"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 346,
+          "name": "TestSimDeadRuntimeHealFreesAnUnwantedRow"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 352,
+          "name": "deadRuntimeHealAcrossTime"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 395,
+          "name": "TestSimAckedRequestWithADeadRuntimeIsFinalized"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 465,
+          "name": "TestSimI15StabilityCarveOut"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 593,
+          "name": "TestSimDeadRuntimeHealSkipsCensusOnlyRigRows"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 624,
+          "name": "TestSimTxDecidesAgainInsideTheEffect"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 672,
+          "name": "TestSimYoungDeathRestartsAPoolSeatInPlace"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 719,
+          "name": "TestSimDeferredStrandedDeathsRecordOnce"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 757,
+          "name": "TestSimCutoverV5HashesRebaselineNotDrain"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 780,
+          "name": "TestSimSoftReloadAcceptsDriftOnce"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 817,
+          "name": "TestSimR43IdentityBeforeRebaseline"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 845,
+          "name": "TestSimRollbackStopsABeadScopedNameOnly"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 872,
+          "name": "TestSimConfigDriftWaitsForTheHumanThenDrains"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 914,
+          "name": "TestSimJ27StaleAckAcrossSameGenerationRestart"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 961,
+          "name": "TestSimLateQuarantineCommitsThenClears"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 1065,
+          "name": "TestSimFloorAckKeepsTheSeatWarm"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 1142,
+          "name": "TestSimFloorAckOnADeadPaneRunsAgainInPlace"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 1174,
+          "name": "floorAckThenDie"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 1196,
+          "name": "TestSimFloorAckOnADeadPaneByWakeAge"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 1219,
+          "name": "TestSimFloorAckOnARateLimitedDeadPaneIsQuarantined"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 1233,
+          "name": "TestSimUnackedOperatorDrainBlocksNoControllerDrain"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 1275,
+          "name": "TestSimOperatorDrainBetweenPassAndEffect"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 1314,
+          "name": "TestSimOperatorDrainSurvivesACanceledControllerRequest"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 1337,
+          "name": "lostCommitRun"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 1343,
+          "name": "lostCommitRunWith"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 1387,
+          "name": "TestSimLostCommit"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 1413,
+          "name": "TestSimPendingCreateStaleSelfExit"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 1440,
+          "name": "TestSimLostCommitSparesASecondControllersRuntime"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 1469,
+          "name": "TestSimSoftSuspendIsNoHold"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 1534,
+          "name": "TestSimR46AckedRowOverATokenlessCorpseFinalizes"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 1591,
+          "name": "TestSimZombieOverAGoneRuntimeRunsOnce"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_scenarios_test.go",
+          "line": 1622,
+          "name": "TestSimRuntimeBackAfterAnAbsenceNoteIsAdopted"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_test.go",
+          "line": 443,
+          "name": "newSim"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_test.go",
+          "line": 1614,
+          "name": "TestSimCorpusShiftedRNG"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_test.go",
+          "line": 1633,
+          "name": "TestSimCorpus"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_test.go",
+          "line": 1670,
+          "name": "TestSimCorpusFloored"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_test.go",
+          "line": 1693,
+          "name": "TestSimCorpusPinnedSeeds"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_test.go",
+          "line": 1707,
+          "name": "TestSimCorpusFlooredPinnedSeeds"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_test.go",
+          "line": 1756,
+          "name": "TestSimInvariantsCatchSeededMutants"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_test.go",
+          "line": 1810,
+          "name": "TestSimAttachModelsEnsureRunning"
+        },
+        {
+          "file": "cmd/gc/reconcile_sim_v59x_test.go",
+          "line": 21,
+          "name": "TestQuarantinedCommitBoundCountsOnlyV2sTime"
+        },
+        {
+          "file": "cmd/gc/v2_manual_close_stale_census_test.go",
+          "line": 21,
+          "name": "TestV2ClosedManualRowOnStaleCensusIsNeitherCreatedNorStarted"
+        }
+      ],
+      "kind": "callers"
+    },
+    {
+      "id": "t6",
+      "band": "large",
+      "target": "ReadProviderFileRaw",
+      "file": "internal/sessionlog/reader.go",
+      "line": 241,
+      "question": "In this repository (gascity), list every function and method, including those in test files, that transitively calls `ReadProviderFileRaw` (declared at internal/sessionlog/reader.go:241) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `ReadProviderFileRaw` itself. Consider only code the Go toolchain builds (`go build ./...` and `go test ./...`): skip directories whose names start with `_` or `.`, and `testdata`. The list must be complete. Only consider code the compiler project covers: ignore `cmd/gc-write-mint/e2e_test.go`, `cmd/gc/beads_blocked_repair_integration_test.go`, `cmd/gc/beads_native_compat_integration_test.go`, `cmd/gc/beads_provider_missing_scope_stop_linux_test.go`, `cmd/gc/beads_provider_script_scope_lifecycle_linux_test.go`, `cmd/gc/beads_provider_script_shared_server_linux_test.go`, `cmd/gc/capstone_integration_test.go`, `cmd/gc/cmd_daemon_windows.go`, `cmd/gc/cmd_hook_claim_runmap_other.go`, `cmd/gc/cmd_rig_include_registry_integration_test.go`, `cmd/gc/dolt_data_dir_lock_linux.go`, `cmd/gc/dolt_data_dir_lock_linux_test.go`, `cmd/gc/dolt_data_dir_lock_other.go`, `cmd/gc/dolt_disk_preflight_windows.go`, `cmd/gc/doltlite_reindex_native.go`, `cmd/gc/doltlite_store_native.go`, `cmd/gc/doltlite_store_native_test.go`, `cmd/gc/embedded_rig_custom_types_integration_test.go`, `cmd/gc/fs_pressure_linux.go`, `cmd/gc/fs_pressure_test.go`, `cmd/gc/live_submit_probe_test.go`, `cmd/gc/metrics_census_ignore_testhook_test.go`, `cmd/gc/native_dolt_rebind_integration_test.go`, `cmd/gc/order_dynamic_integration_test.go`, `cmd/gc/orders_lane_fs_pressure_test.go`, `cmd/gc/phase2_real_transport_deadline_test.go`, `cmd/gc/phase2_real_transport_test.go`, `cmd/gc/proc_environ_settled_test.go`, `cmd/gc/productmetrics_controls_process_testhook_test.go`, `cmd/gc/productmetrics_controls_pty_darwin_test.go`, `cmd/gc/productmetrics_controls_pty_linux_test.go`, `cmd/gc/productmetrics_controls_testhook.go`, `cmd/gc/productmetrics_private_process_testhook_test.go`, `cmd/gc/productmetrics_testhook.go`, `cmd/gc/productmetrics_testhook_test.go`, `cmd/gc/provider_op_process_windows.go`, `cmd/gc/reconcile_effect_recycle_tmux_integration_test.go`, `cmd/gc/reconcile_effect_stop_tmux_integration_test.go`, `cmd/gc/rig_add_path_durability_test.go`, `cmd/gc/sigpipe_windows.go`, `cmd/gc/storage_boot_workspace_integration_test.go`, `cmd/gc/suspension_state_linux_test.go`, `cmd/gc/tmux_leak_guard_check_test.go`, `cmd/gc/tmux_leak_guard_mntns_test.go`, `cmd/gc/tmux_leak_guard_test.go`, `examples/bd/dolt/compact_history_protection_real_dolt_test.go`, `examples/bd/dolt/compact_real_dolt_callbound_test.go`, `examples/bd/dolt/compact_real_dolt_test.go`, `examples/gastown/dolt_orphan_sweep_integration_test.go`, `examples/gastown/maintenance_bd_integration_test.go`, `examples/gastown/maintenance_scripts_dolt_integration_test.go`, `internal/api/dashport_support.go`, `internal/bazeltest/lock_other.go`, `internal/bdflags/freshness_test.go`, `internal/beads/bdstore_conditional_integration_bridge_test.go`, `internal/beads/bdstore_conditional_integration_test.go`, `internal/beads/bdstore_conditional_release_integration_test.go`, `internal/beads/doltlite_count.go`, `internal/beads/doltlite_count_test.go`, `internal/beads/doltlite_namespace_census.go`, `internal/beads/doltlite_namespace_census_test.go`, `internal/beads/doltlite_read_store.go`, `internal/beads/doltlite_read_store_capabilities.go`, `internal/beads/doltlite_read_store_graph_only_ready.go`, `internal/beads/doltlite_read_store_graph_ready_test.go`, `internal/beads/doltlite_read_store_test.go`, `internal/beads/doltlite_seek_test.go`, `internal/beads/exec/br_test.go`, `internal/beads/exec_timeout_linux.go`, `internal/beads/exec_timeout_linux_test.go`, `internal/beads/exec_timeout_windows.go`, `internal/beads/export_integration_test.go`, `internal/beads/hangbudget_linux_test.go`, `internal/beads/native_dolt_store_facade_integration_test.go`, `internal/beads/native_dolt_store_graph_apply_integration_test.go`, `internal/beads/native_dolt_store_integration_test.go`, `internal/beads/native_dolt_store_label_cas_integration_test.go`, `internal/beads/native_dolt_store_metadata_cas_integration_test.go`, `internal/beads/native_dolt_store_metadata_merge_integration_test.go`, `internal/beads/native_dolt_store_metadata_preserve_integration_test.go`, `internal/beads/native_dolt_store_metadata_stress_integration_test.go`, `internal/beads/native_dolt_store_ready_veto_limit_integration_test.go`, `internal/beads/native_list_pushdown_integration_test.go`, `internal/beads/proxyendpoint/birth_linux.go`, `internal/beads/proxyendpoint/birth_linux_test.go`, `internal/beads/session_key_hook_bd_integration_test.go`, `internal/beads/sqlite_sequence_floor_temp_linux.go`, `internal/beads/sqlite_store_sequence_floor_process_linux_test.go`, `internal/config/fingerprint_ctime_windows.go`, `internal/config/repo_cache_lock_windows.go`, `internal/configedit/configedit_linux_test.go`, `internal/credentialprovider/credentialprovider_process_unix_test.go`, `internal/credentialprovider/credentialprovider_process_windows_test.go`, `internal/credentialprovider/environment_windows.go`, `internal/credentialprovider/runner_windows.go`, `internal/events/inode_windows.go`, `internal/events/rename_linux.go`, `internal/execgrace/signal_windows.go`, `internal/gchome/trust_unsupported.go`, `internal/gitcred/rules_windows.go`, `internal/hostboot/hostboot_linux.go`, `internal/hostboot/hostboot_linux_test.go`, `internal/hostboot/hostboot_unsupported.go`, `internal/loopbackport/lease_linux.go`, `internal/orders/trigger_exec_windows.go`, `internal/packman/networkgit_group_windows.go`, `internal/packregistry/file_lock_windows.go`, `internal/pathdurability/probe_linux.go`, `internal/pidutil/cmdline_other.go`, `internal/pidutil/vanish_linux_test.go`, `internal/productmetrics/platform_unsupported.go`, `internal/productmetrics/platform_unsupported_test.go`, `internal/productmetrics/productmetrics_testhook.go`, `internal/productmetrics/service_state_unsupported_test.go`, `internal/productmetrics/spawn_unsupported.go`, `internal/productmetrics/storage_rename_linux.go`, `internal/runtime/acp/conformance_test.go`, `internal/runtime/acp/events_protocol_test.go`, `internal/runtime/acp/proctable_integration_test.go`, `internal/runtime/acp/proctable_linux_test.go`, `internal/runtime/acp/protocol_conformance_test.go`, `internal/runtime/acp/testdata/`, `internal/runtime/acp/turn_events_protocol_test.go`, `internal/runtime/exec/idle_integration_test.go`, `internal/runtime/proctable/descendants_linux.go`, `internal/runtime/proctable/descendants_stub.go`, `internal/runtime/proctable/environ_linux.go`, `internal/runtime/proctable/environ_linux_test.go`, `internal/runtime/proctable/environ_stub.go`, `internal/runtime/proctable/guard_test.go`, `internal/runtime/proctable/identity_linux.go`, `internal/runtime/proctable/identity_stub.go`, `internal/runtime/proctable/infrastructure_argv_linux.go`, `internal/runtime/proctable/infrastructure_argv_stub.go`, `internal/runtime/proctable/kill_stub.go`, `internal/runtime/proctable/scan_linux.go`, `internal/runtime/proctable/scan_linux_test.go`, `internal/runtime/proctable/scan_stub.go`, `internal/runtime/proctable/scan_stub_test.go`, `internal/runtime/proctable/supervisor_fork_orphan_repro_test.go`, `internal/runtime/ssh/conformance_integration_test.go`, `internal/runtime/ssh/session_env_file_integration_test.go`, `internal/runtime/ssh/ssh_localhost_integration_test.go`, `internal/runtime/subprocess/seam_conformance_test.go`, `internal/runtime/tmux/adapter_test.go`, `internal/runtime/tmux/dialog_feedback_survey_integration_test.go`, `internal/runtime/tmux/dialog_model_switch_integration_test.go`, `internal/runtime/tmux/empty_server_liveness_integration_test.go`, `internal/runtime/tmux/exact_target_integration_test.go`, `internal/runtime/tmux/hidden_attach_hook_test.go`, `internal/runtime/tmux/nudge_clear_before_paste_integration_test.go`, `internal/runtime/tmux/nudge_confirm_lag_integration_test.go`, `internal/runtime/tmux/nudge_poke_integration_test.go`, `internal/runtime/tmux/nudge_staged_draft_integration_test.go`, `internal/runtime/tmux/nudge_submit_confirm_integration_test.go`, `internal/runtime/tmux/nudge_submit_key_sequence_integration_test.go`, `internal/runtime/tmux/process_group_windows.go`, `internal/runtime/tmux/seam_conformance_test.go`, `internal/runtime/tmux/server_socket_probe_linux.go`, `internal/runtime/tmux/server_socket_probe_other.go`, `internal/runtime/tmux/session_env_file_integration_test.go`, `internal/runtime/tmux/session_object_integration_test.go`, `internal/runtime/tmux/tmux_test.go`, `internal/runtime/tmux/wake_pane_integration_test.go`, `internal/session/manager_tmux_integration_test.go`, `internal/session/orphan_infrastructure_fence_linux_test.go`, `internal/session/runtime_lease_boot_linux.go`, `internal/session/runtime_lease_boot_other.go`, `internal/storebinding/beadsworkspace/engine_integration_test.go`, `internal/storebinding/migration_guard_unsupported.go`, `internal/storebinding/sqlite/graph_capability_linux_test.go`, `internal/storebinding/sqlite/graph_fence_linux_test.go`, `internal/storebinding/sqlite/graph_identity_other.go`, `internal/storebinding/sqlite/graph_schema_admission_linux_test.go`, `internal/storebinding/sqlite/legacy_hot_journal_linux_test.go`, `internal/storebinding/sqlite/legacy_sessions_snapshot_other.go`, `internal/storebinding/sqlite/sqlite_fence_process_linux_test.go`, `internal/storebinding/sqlite/sqlite_fence_release_linux_test.go`, `internal/storebinding/sqlite/sqlite_readonly_fence_linux_test.go`, `internal/storebinding/sqlite/sqlite_snapshot_temp_linux.go`, `internal/storebinding/sqlite/sqlite_source_fd_linux.go`, `internal/storebinding/sqlite/sqlite_source_fd_linux_test.go`, `internal/storebinding/sqlite/sqlite_vfs_linux_test.go`, `internal/storebinding/sqlite/sqlite_writer_reservation_linux.go`, `internal/suspensionstate/fence_linux_test.go`, `internal/suspensionstate/fence_windows.go`, `internal/testutil/flock_linux.go`, `internal/workspacesvc/proxy_process_linux.go`, `internal/worktree/lock_windows.go`, `scripts/add-testenv-import.go`, `scripts/bazel-bep-summary.go`, `scripts/shard-budget.go`, `scripts/test-timing-plan.go`, `scripts/test-timing-summary.go`, `scripts/testdata/`, `test/acceptance/agent_env_test.go`, `test/acceptance/agent_suspend_test.go`, `test/acceptance/beads_blocked_repair_test.go`, `test/acceptance/beads_cli_contract_home_isolation_test.go`, `test/acceptance/beads_cli_contract_test.go`, `test/acceptance/beads_health_test.go`, `test/acceptance/beads_migrate_proxied_test.go`, `test/acceptance/beads_proxied_default_test.go`, `test/acceptance/beads_proxied_idle_timeout_test.go`, `test/acceptance/beads_proxied_native_safety_test.go`, `test/acceptance/beads_proxied_native_test.go`, `test/acceptance/beads_proxied_shared_server_test.go`, `test/acceptance/beads_proxied_suspension_quiescence_test.go`, `test/acceptance/beads_topology_matrix_test.go`, `test/acceptance/cli_basics_test.go`, `test/acceptance/config_pack_test.go`, `test/acceptance/converge_test.go`, `test/acceptance/convoy_test.go`, `test/acceptance/dashboard_serve_test.go`, `test/acceptance/doctor_mail_test.go`, `test/acceptance/doctor_proxied_backup_coverage_test.go`, `test/acceptance/doctor_stopped_store_test.go`, `test/acceptance/drain_ack_test.go`, `test/acceptance/env_invariant_test.go`, `test/acceptance/example_cities_test.go`, `test/acceptance/formula_events_test.go`, `test/acceptance/gastown_pack_cache_test.go`, `test/acceptance/gastown_smoke_test.go`, `test/acceptance/handoff_test.go`, `test/acceptance/helpers/dir_writable_other.go`, `test/acceptance/import_named_sessions_regression_test.go`, `test/acceptance/init_lifecycle_test.go`, `test/acceptance/integration_selfhost_ux_test.go`, `test/acceptance/migration_regression_test.go`, `test/acceptance/nudge_service_test.go`, `test/acceptance/order_commands_test.go`, `test/acceptance/order_env_test.go`, `test/acceptance/pack_registry_live_test.go`, `test/acceptance/pack_test.go`, `test/acceptance/prime_test.go`, `test/acceptance/rig_test.go`, `test/acceptance/session_test.go`, `test/acceptance/skill_test.go`, `test/acceptance/sling_test.go`, `test/acceptance/status_test.go`, `test/acceptance/supervisor_registry_test.go`, `test/acceptance/tier_b/idle_bead_stability_test.go`, `test/acceptance/tier_b/lifecycle_b_test.go`, `test/acceptance/tier_b/pool_workquery_test.go`, `test/acceptance/tier_b/split_storage_migrated_formula_test.go`, `test/acceptance/tier_c/fresh_install_spawn_test.go`, `test/acceptance/tier_c/tierc_helpers_test.go`, `test/acceptance/tier_c/tierc_test.go`, `test/acceptance/tutorial_goldens/auth_status_test.go`, `test/acceptance/tutorial_goldens/continuity_regression_test.go`, `test/acceptance/tutorial_goldens/formula_helpers_regression_test.go`, `test/acceptance/tutorial_goldens/formula_helpers_test.go`, `test/acceptance/tutorial_goldens/harness_test.go`, `test/acceptance/tutorial_goldens/main_test.go`, `test/acceptance/tutorial_goldens/manifests_test.go`, `test/acceptance/tutorial_goldens/snapshot.go`, `test/acceptance/tutorial_goldens/tutorial01_test.go`, `test/acceptance/tutorial_goldens/tutorial02_test.go`, `test/acceptance/tutorial_goldens/tutorial03_test.go`, `test/acceptance/tutorial_goldens/tutorial04_communication_test.go`, `test/acceptance/tutorial_goldens/tutorial05_test.go`, `test/acceptance/tutorial_goldens/tutorial06_test.go`, `test/acceptance/tutorial_goldens/tutorial07_test.go`, `test/acceptance/wait_test.go`, `test/acceptance/worker_inference/classification_test.go`, `test/acceptance/worker_inference/main_test.go`, `test/acceptance/worker_inference/worker_handle_city_helpers_test.go`, `test/acceptance/worker_inference/worker_handle_city_test.go`, `test/acceptance/worker_inference/worker_handle_live_helpers_test.go`, `test/acceptance/worker_inference/worker_inference_helpers_test.go`, `test/acceptance/worker_inference/worker_inference_test.go`, `test/acceptance/worktree_lifecycle_test.go`, `test/acceptance/worktree_test.go`, `test/containerhost/docker_session_test.go`, `test/containerhost/k8s_session_test.go`, `test/dashport/cmd/`, `test/dashport/corpus/`, `test/dashport/fixtures.go`, `test/dashport/harness.go`, `test/dashport/projection_test.go`, `test/integration/bdstore_batch_delete_test.go`, `test/integration/bdstore_batch_reads_test.go`, `test/integration/bdstore_runner_isolation_test.go`, `test/integration/bdstore_test.go`, `test/integration/dolt_config_test.go`, `test/integration/dolt_managed_chaos_test.go`, `test/integration/dolt_persistence_test.go`, `test/integration/e2e_comm_test.go`, `test/integration/e2e_config_test.go`, `test/integration/e2e_events_test.go`, `test/integration/e2e_helpers_test.go`, `test/integration/e2e_hook_test.go`, `test/integration/e2e_lifecycle_test.go`, `test/integration/e2e_mail_test.go`, `test/integration/e2e_multi_test.go`, `test/integration/e2e_pool_test.go`, `test/integration/e2e_test.go`, `test/integration/gastown_config_test.go`, `test/integration/gastown_controller_test.go`, `test/integration/gastown_events_test.go`, `test/integration/gastown_formula_test.go`, `test/integration/gastown_handoff_test.go`, `test/integration/gastown_helpers_test.go`, `test/integration/gastown_mail_test.go`, `test/integration/gastown_multirig_test.go`, `test/integration/gastown_pipeline_test.go`, `test/integration/gastown_polecat_test.go`, `test/integration/gastown_pool_test.go`, `test/integration/gastown_reconciler_test.go`, `test/integration/gastown_refinery_test.go`, `test/integration/gastown_shutdown_test.go`, `test/integration/gastown_sling_test.go`, `test/integration/gastown_witness_test.go`, `test/integration/gc_live_contract_store_conflict_test.go`, `test/integration/gc_live_contract_test.go`, `test/integration/graph_dispatch_harness_test.go`, `test/integration/graph_dispatch_test.go`, `test/integration/helpers_test.go`, `test/integration/huma_binary_test.go`, `test/integration/integration_test.go`, `test/integration/mail_test.go`, `test/integration/review_check_scripts_test.go`, `test/integration/review_formula_test.go`, `test/integration/skill_lifecycle_test.go`, `test/integration/start_drift_test.go`, `test/integration/supervisor_unit_guard_test.go`, `test/integration/tool_home_test.go`, `test/integration/tutorial_path_test.go`, `test/integration/workflow_event_wait_test.go`, `tools/`.",
+      "max_depth": 8,
+      "answer": [
+        {
+          "file": "cmd/gc/cmd_session_logs.go",
+          "line": 424,
+          "name": "readSessionFile"
+        },
+        {
+          "file": "internal/api/enqueue_keys_test.go",
+          "line": 67,
+          "name": "TestAPILegacySessionCreateEnqueuesSessionKey"
+        },
+        {
+          "file": "internal/api/handler_agent_output.go",
+          "line": 106,
+          "name": "Server.trySessionLogOutputHuma"
+        },
+        {
+          "file": "internal/api/handler_agent_output.go",
+          "line": 154,
+          "name": "Server.handleAgentOutput"
+        },
+        {
+          "file": "internal/api/handler_agent_output.go",
+          "line": 178,
+          "name": "Server.trySessionLogOutput"
+        },
+        {
+          "file": "internal/api/handler_agent_output_stream.go",
+          "line": 27,
+          "name": "Server.handleAgentOutputStream"
+        },
+        {
+          "file": "internal/api/handler_agent_output_stream.go",
+          "line": 92,
+          "name": "Server.streamSessionLog"
+        },
+        {
+          "file": "internal/api/handler_agent_output_stream.go",
+          "line": 286,
+          "name": "Server.streamSessionLogHuma"
+        },
+        {
+          "file": "internal/api/handler_agent_output_test.go",
+          "line": 447,
+          "name": "TestAgentOutputStreamNewTurns"
+        },
+        {
+          "file": "internal/api/handler_agent_output_test.go",
+          "line": 583,
+          "name": "TestAgentOutputStreamFollowsRotatedGeminiTranscriptAfterWake"
+        },
+        {
+          "file": "internal/api/handler_agent_output_test.go",
+          "line": 702,
+          "name": "TestAgentOutputStreamWorkerOperationEventWakesPeekFallback"
+        },
+        {
+          "file": "internal/api/handler_agent_output_test.go",
+          "line": 743,
+          "name": "TestAgentOutputStreamWorkerOperationSessionIDWakesPeekFallback"
+        },
+        {
+          "file": "internal/api/handler_extmsg_agent_binding_test.go",
+          "line": 46,
+          "name": "postExtMsg"
+        },
+        {
+          "file": "internal/api/handler_extmsg_agent_binding_test.go",
+          "line": 58,
+          "name": "TestHandleExtMsgBindAgentNamePersistsConfiguredIdentity"
+        },
+        {
+          "file": "internal/api/handler_extmsg_agent_binding_test.go",
+          "line": 87,
+          "name": "TestHandleExtMsgBindRejectsAmbiguousOrMissingTarget"
+        },
+        {
+          "file": "internal/api/handler_extmsg_agent_binding_test.go",
+          "line": 107,
+          "name": "TestHandleExtMsgBindRejectsUnknownAgentName"
+        },
+        {
+          "file": "internal/api/handler_extmsg_agent_binding_test.go",
+          "line": 119,
+          "name": "TestHandleExtMsgInboundAgentBoundColdWakesNamedSession"
+        },
+        {
+          "file": "internal/api/handler_extmsg_agent_binding_test.go",
+          "line": 162,
+          "name": "TestHandleExtMsgOutboundAgentBoundAuthorizesResolvedAgentSession"
+        },
+        {
+          "file": "internal/api/handler_extmsg_agent_binding_test.go",
+          "line": 199,
+          "name": "TestHandleExtMsgBindReplaceHandsOffActiveBinding"
+        },
+        {
+          "file": "internal/api/handler_extmsg_default_route_test.go",
+          "line": 15,
+          "name": "TestHandleExtMsgInboundDefaultRouteBindsAndColdWakes"
+        },
+        {
+          "file": "internal/api/handler_extmsg_default_route_test.go",
+          "line": 62,
+          "name": "TestHandleExtMsgInboundDefaultRouteMatchesMixedCaseProvider"
+        },
+        {
+          "file": "internal/api/handler_extmsg_default_route_test.go",
+          "line": 106,
+          "name": "TestHandleExtMsgInboundDefaultRouteUnknownAgentStaysUnbound"
+        },
+        {
+          "file": "internal/api/handler_extmsg_test.go",
+          "line": 51,
+          "name": "TestHandleExtMsgOutboundNotifiesPeerMembersAndMaterializesNamedSessions"
+        },
+        {
+          "file": "internal/api/handler_extmsg_test.go",
+          "line": 273,
+          "name": "TestHandleExtMsgOutboundNotifiesDeliveredConversationMembers"
+        },
+        {
+          "file": "internal/api/handler_extmsg_test.go",
+          "line": 407,
+          "name": "TestHandleExtMsgInboundNormalizedTransientStorageFaultReturns500"
+        },
+        {
+          "file": "internal/api/handler_extmsg_test.go",
+          "line": 431,
+          "name": "TestHandleExtMsgInboundNormalizedInvalidConversationReturns400"
+        },
+        {
+          "file": "internal/api/handler_extmsg_test.go",
+          "line": 458,
+          "name": "TestHandleExtMsgInboundNormalizedInvariantViolationReturns400"
+        },
+        {
+          "file": "internal/api/handler_session_agents_test.go",
+          "line": 67,
+          "name": "TestHandleSessionAgentList"
+        },
+        {
+          "file": "internal/api/handler_session_agents_test.go",
+          "line": 101,
+          "name": "TestHandleSessionAgentGet"
+        },
+        {
+          "file": "internal/api/handler_sessions_test.go",
+          "line": 3931,
+          "name": "createAgentSessionViaLegacyRoute"
+        },
+        {
+          "file": "internal/api/handler_sessions_test.go",
+          "line": 3973,
+          "name": "TestLegacyHandleSessionCreatePersistsProviderDefaultsAsCommandBaseline"
+        },
+        {
+          "file": "internal/api/handler_sessions_test.go",
+          "line": 4265,
+          "name": "TestLegacySessionPermissionModeRouteUpdatesSchemaBackedOverride"
+        },
+        {
+          "file": "internal/api/handler_sessions_test.go",
+          "line": 4317,
+          "name": "TestLegacySessionPermissionModeRouteRequiresCSRFHeader"
+        },
+        {
+          "file": "internal/api/handler_sessions_test.go",
+          "line": 4506,
+          "name": "TestLegacyHandleProviderSessionCreatePersistsOptionsInTemplateOverrides"
+        },
+        {
+          "file": "internal/api/handler_sessions_test.go",
+          "line": 5160,
+          "name": "TestHandleSessionMessageMaterializesBoundNamedSessionUsingQualifiedIdentity"
+        },
+        {
+          "file": "internal/api/handler_sessions_test.go",
+          "line": 6849,
+          "name": "TestLegacySessionStreamRawStoppedWithoutOutputReturnsNotFound"
+        },
+        {
+          "file": "internal/api/handler_sessions_test.go",
+          "line": 7176,
+          "name": "TestCityScopedSessionStreamReloadsRotatedGeminiTranscriptAcrossRestart"
+        },
+        {
+          "file": "internal/api/handler_sessions_test.go",
+          "line": 7256,
+          "name": "TestCityScopedSessionStreamFollowsRotatedGeminiTranscriptAfterWake"
+        },
+        {
+          "file": "internal/api/handler_sessions_test.go",
+          "line": 7351,
+          "name": "TestHandleSessionStreamWorkerOperationEventWakesTranscriptReload"
+        },
+        {
+          "file": "internal/api/handler_sessions_test.go",
+          "line": 7421,
+          "name": "TestHandleSessionStreamRawWorkerOperationEventWakesTranscriptReload"
+        },
+        {
+          "file": "internal/api/handler_sessions_test.go",
+          "line": 7488,
+          "name": "TestHandleSessionStreamRawStallEmitsPendingWithoutTranscriptGrowth"
+        },
+        {
+          "file": "internal/api/handler_sessions_test.go",
+          "line": 7739,
+          "name": "TestHandleSessionStreamTranscriptWriteWakesWithoutPolling"
+        },
+        {
+          "file": "internal/api/handler_sessions_test.go",
+          "line": 7803,
+          "name": "TestHandleSessionStreamConversationFiltersNonDisplayEntries"
+        },
+        {
+          "file": "internal/api/handler_sessions_test.go",
+          "line": 7843,
+          "name": "TestHandleSessionStreamConversationRedactsThinkingText"
+        },
+        {
+          "file": "internal/api/handler_sessions_test.go",
+          "line": 7881,
+          "name": "TestHandleSessionStreamRawUsesLatestCompactionTail"
+        },
+        {
+          "file": "internal/api/handler_sessions_test.go",
+          "line": 8214,
+          "name": "TestHandleSessionStreamConversationIncludesCodexSystemError"
+        },
+        {
+          "file": "internal/api/huma_handlers_agents.go",
+          "line": 572,
+          "name": "Server.humaHandleAgentOutput"
+        },
+        {
+          "file": "internal/api/huma_handlers_agents.go",
+          "line": 582,
+          "name": "Server.humaHandleAgentOutputQualified"
+        },
+        {
+          "file": "internal/api/huma_handlers_agents.go",
+          "line": 596,
+          "name": "Server.agentOutputByName"
+        },
+        {
+          "file": "internal/api/huma_handlers_agents.go",
+          "line": 704,
+          "name": "Server.streamAgentOutput"
+        },
+        {
+          "file": "internal/api/huma_handlers_agents.go",
+          "line": 713,
+          "name": "Server.streamAgentOutputQualified"
+        },
+        {
+          "file": "internal/api/huma_handlers_agents.go",
+          "line": 718,
+          "name": "Server.doStreamAgentOutput"
+        },
+        {
+          "file": "internal/api/server.go",
+          "line": 351,
+          "name": "Server.legacyAgentHandler"
+        },
+        {
+          "file": "internal/api/server.go",
+          "line": 383,
+          "name": "Server.ServeHTTP"
+        },
+        {
+          "file": "internal/api/session_create_demand_only_test.go",
+          "line": 104,
+          "name": "TestHandleSessionCreateRefusesDemandOnlySingletonAgent"
+        },
+        {
+          "file": "internal/api/session_create_demand_only_test.go",
+          "line": 214,
+          "name": "TestHandleSessionWakeRefusesDemandOnlySingletonSession"
+        },
+        {
+          "file": "internal/api/session_model_phase0_lifecycle_spec_test.go",
+          "line": 520,
+          "name": "TestPhase0AgentCompatibility_CreateWritesEphemeralOrigin"
+        },
+        {
+          "file": "internal/api/session_stream_acp_test.go",
+          "line": 118,
+          "name": "TestAgentOutputStreamHumaDeliversCompleteGrowingACPMessage"
+        },
+        {
+          "file": "internal/api/worker_factory_test.go",
+          "line": 1297,
+          "name": "TestWorkerFactorySharesDerivedActivityMemoAcrossRequests"
+        },
+        {
+          "file": "internal/sessionlog/acp_wire_reader_test.go",
+          "line": 281,
+          "name": "TestReadACPCaptureRawKeepsEveryChunkRecord"
+        },
+        {
+          "file": "internal/sessionlog/acp_wire_reader_test.go",
+          "line": 305,
+          "name": "TestReadACPCapturePagination"
+        },
+        {
+          "file": "internal/sessionlog/antigravity_reader_test.go",
+          "line": 583,
+          "name": "TestReadProviderFileAntigravityAppliesMessageIDCursors"
+        },
+        {
+          "file": "internal/sessionlog/kimi_reader_test.go",
+          "line": 376,
+          "name": "TestReadProviderFileNewerDispatchesKimi"
+        },
+        {
+          "file": "internal/sessionlog/kimi_reader_test.go",
+          "line": 405,
+          "name": "TestReadProviderFileKimiAppliesMessageIDCursors"
+        },
+        {
+          "file": "internal/sessionlog/pagination.go",
+          "line": 57,
+          "name": "readProviderFilePage"
+        },
+        {
+          "file": "internal/sessionlog/reader.go",
+          "line": 341,
+          "name": "ReadProviderFileOlder"
+        },
+        {
+          "file": "internal/sessionlog/reader.go",
+          "line": 347,
+          "name": "ReadProviderFileRawOlder"
+        },
+        {
+          "file": "internal/sessionlog/reader.go",
+          "line": 402,
+          "name": "ReadProviderFileNewer"
+        },
+        {
+          "file": "internal/sessionlog/reader.go",
+          "line": 408,
+          "name": "ReadProviderFileRawNewer"
+        },
+        {
+          "file": "internal/sessionlog/reader_pagination_test.go",
+          "line": 14,
+          "name": "TestReadProviderFilePaginationMatrix"
+        },
+        {
+          "file": "internal/sessionlog/reader_pagination_test.go",
+          "line": 114,
+          "name": "TestReadProviderFileEmptyCursorPreservesNoCursorReads"
+        },
+        {
+          "file": "internal/sessionlog/reader_pagination_test.go",
+          "line": 191,
+          "name": "TestReadProviderFilePageRejectsDuplicateEntryIDs"
+        },
+        {
+          "file": "internal/sessionlog/reader_pagination_test.go",
+          "line": 345,
+          "name": "TestSyntheticCursorInvalidatesInsteadOfAliasingAfterRewrite"
+        },
+        {
+          "file": "internal/sessionlog/reader_pagination_test.go",
+          "line": 488,
+          "name": "readPaginationProviderFile"
+        },
+        {
+          "file": "internal/sessionlog/reader_pagination_test.go",
+          "line": 495,
+          "name": "readPaginationProviderPage"
+        },
+        {
+          "file": "internal/worker/acp_capture_test.go",
+          "line": 70,
+          "name": "TestSessionHandleStateBusyFromACPCapture"
+        },
+        {
+          "file": "internal/worker/acp_capture_test.go",
+          "line": 173,
+          "name": "TestSessionHandleStateBusyFromACPCaptureWithSessionKey"
+        },
+        {
+          "file": "internal/worker/acp_capture_test.go",
+          "line": 196,
+          "name": "TestSessionHandleStateKeylessACPUsesCaptureTail"
+        },
+        {
+          "file": "internal/worker/acp_capture_test.go",
+          "line": 208,
+          "name": "TestLoadHistoryFromACPCapture"
+        },
+        {
+          "file": "internal/worker/acp_capture_test.go",
+          "line": 261,
+          "name": "TestLoadHistoryACPCapturePartialReplyAndDroppedRecords"
+        },
+        {
+          "file": "internal/worker/factory.go",
+          "line": 331,
+          "name": "Factory.ReadTranscript"
+        },
+        {
+          "file": "internal/worker/factory.go",
+          "line": 336,
+          "name": "Factory.LoadHistory"
+        },
+        {
+          "file": "internal/worker/handle_history.go",
+          "line": 28,
+          "name": "SessionHandle.Transcript"
+        },
+        {
+          "file": "internal/worker/handle_history.go",
+          "line": 78,
+          "name": "SessionHandle.History"
+        },
+        {
+          "file": "internal/worker/handle_history.go",
+          "line": 87,
+          "name": "SessionHandle.historyWithRequest"
+        },
+        {
+          "file": "internal/worker/handle_history_provider_test.go",
+          "line": 94,
+          "name": "TestSessionHandleReadsCustomZCodeProviderTranscriptByKind"
+        },
+        {
+          "file": "internal/worker/handle_history_provider_test.go",
+          "line": 138,
+          "name": "TestSessionHandleReadsClaudeKindTranscriptDespiteKimiName"
+        },
+        {
+          "file": "internal/worker/handle_history_provider_test.go",
+          "line": 194,
+          "name": "TestSessionHandleStateDerivesBusyFromZCodeMirrorByKind"
+        },
+        {
+          "file": "internal/worker/handle_lifecycle.go",
+          "line": 256,
+          "name": "SessionHandle.State"
+        },
+        {
+          "file": "internal/worker/handle_test.go",
+          "line": 24,
+          "name": "TestSessionHandleStartStopState"
+        },
+        {
+          "file": "internal/worker/handle_test.go",
+          "line": 109,
+          "name": "TestSessionHandleStateBusyDoesNotPrimeHistoryCache"
+        },
+        {
+          "file": "internal/worker/handle_test.go",
+          "line": 176,
+          "name": "TestSessionHandleStateReusesDerivedActivityAcrossPolls"
+        },
+        {
+          "file": "internal/worker/handle_test.go",
+          "line": 1001,
+          "name": "TestSessionHandlePendingRespondAndBlockedState"
+        },
+        {
+          "file": "internal/worker/handle_test.go",
+          "line": 1073,
+          "name": "TestSessionHandleHistoryLoadsNormalizedTranscript"
+        },
+        {
+          "file": "internal/worker/handle_test.go",
+          "line": 1109,
+          "name": "TestSessionHandleHistoryDoesNotPersistCodexResumeKeyFromTranscript"
+        },
+        {
+          "file": "internal/worker/handle_test.go",
+          "line": 1183,
+          "name": "TestSessionHandleStateDoesNotPersistCodexResumeKeyWithoutPrimingHistoryCache"
+        },
+        {
+          "file": "internal/worker/handle_test.go",
+          "line": 2185,
+          "name": "TestSessionHandleHistoryStitchesGeminiRotatedTranscriptAcrossRestart"
+        },
+        {
+          "file": "internal/worker/handle_test.go",
+          "line": 2275,
+          "name": "TestSessionHandleHistoryRetainsStitchedHistoryAcrossPostRotationRewrite"
+        },
+        {
+          "file": "internal/worker/handle_test.go",
+          "line": 2377,
+          "name": "TestSessionHandleHistoryTreatsSameGeminiTranscriptRewriteAsReplacement"
+        },
+        {
+          "file": "internal/worker/handle_test.go",
+          "line": 2838,
+          "name": "TestSessionHandleHistoryIdentitySurvivesLateCodexResumeKey"
+        },
+        {
+          "file": "internal/worker/handle_test.go",
+          "line": 2932,
+          "name": "startKeyedClaudeHistorySession"
+        },
+        {
+          "file": "internal/worker/handle_test.go",
+          "line": 2992,
+          "name": "TestSessionHandleHistoryDoesNotStitchAcrossFreshReset"
+        },
+        {
+          "file": "internal/worker/handle_test.go",
+          "line": 3035,
+          "name": "TestSessionHandleHistoryDoesNotStitchAbandonedTranscriptBeforeKeyMint"
+        },
+        {
+          "file": "internal/worker/handle_test.go",
+          "line": 3074,
+          "name": "TestSessionHandleHistoryDoesNotStitchFreshWakeThatKeepsEpoch"
+        },
+        {
+          "file": "internal/worker/operation_events_test.go",
+          "line": 109,
+          "name": "TestSessionHandleHistoryRecordsFailureEvent"
+        },
+        {
+          "file": "internal/worker/operation_events_test.go",
+          "line": 139,
+          "name": "TestSessionHandleHistoryOmitsEventWhenOperationEventsSuppressed"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter.go",
+          "line": 176,
+          "name": "SessionLogAdapter.TailActivityForProvider"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter.go",
+          "line": 249,
+          "name": "SessionLogAdapter.ReadTranscript"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter.go",
+          "line": 308,
+          "name": "SessionLogAdapter.LoadHistory"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 41,
+          "name": "TestSessionLogAdapterLoadHistoryClaude"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 118,
+          "name": "TestSessionLogAdapterLoadHistoryGenerationNeverNewerThanContent"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 164,
+          "name": "TestSessionLogAdapterLoadHistoryCarriesImageBlockMetadata"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 191,
+          "name": "TestSessionLogAdapterLoadHistoryCarriesUserPromptMetadata"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 240,
+          "name": "TestSessionLogAdapterLoadHistoryCarriesStructuredClaudeEditResult"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 281,
+          "name": "TestSessionLogAdapterLoadHistoryCarriesStructuredClaudeReadSidecarResult"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 317,
+          "name": "TestSessionLogAdapterLoadHistoryCarriesStructuredCodexShellResults"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 362,
+          "name": "TestSessionLogAdapterLoadHistoryCarriesStructuredCopilotToolResults"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 435,
+          "name": "TestSessionLogAdapterLoadHistoryCarriesStructuredKiroToolResults"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 496,
+          "name": "TestSessionLogAdapterLoadHistoryCarriesStructuredAmpToolResults"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 561,
+          "name": "TestSessionLogAdapterLoadHistoryCarriesStructuredGrokACPToolResults"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 622,
+          "name": "TestSessionLogAdapterLoadHistoryCarriesStructuredAuggieACPToolResults"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 683,
+          "name": "TestSessionLogAdapterLoadHistoryCarriesCodexCommandFailure"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 716,
+          "name": "TestSessionLogAdapterLoadHistoryCarriesCodexTokenUsage"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 753,
+          "name": "TestSessionLogAdapterLoadHistoryCanonicalizesThinkingTextAndSignature"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 781,
+          "name": "TestSessionLogAdapterLoadHistoryAntigravityOpenToolUseIDs"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 802,
+          "name": "TestSessionLogAdapterLoadHistoryAntigravityCompletedToolUseIDs"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 830,
+          "name": "TestSessionLogAdapterReadTranscriptAntigravityHonorsCursors"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 882,
+          "name": "TestSessionLogAdapterReadTranscriptRawEmitsMultipartRecordsOnce"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 935,
+          "name": "TestSessionLogAdapterLoadHistoryHonorsCursors"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 1037,
+          "name": "TestSessionLogAdapterLoadHistoryKimiToolResultError"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 1122,
+          "name": "TestSessionLogAdapterLoadHistoryNormalizesOMPExecutionResults"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 1200,
+          "name": "TestSessionLogAdapterLoadHistoryCodex"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 1259,
+          "name": "TestSessionLogAdapterLoadHistoryGemini"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 1317,
+          "name": "TestSessionLogAdapterLoadHistoryGeminiErrorMessage"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 1354,
+          "name": "TestSessionLogAdapterLoadHistoryOpenCodeCarriesInfoMetadata"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 1391,
+          "name": "TestSessionLogAdapterMarksMalformedTailDegraded"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 1429,
+          "name": "TestSessionLogAdapterPreservesDurableInteractionHistory"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 1481,
+          "name": "TestSessionLogAdapterResolvedInteractionClearsTailPending"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 1512,
+          "name": "TestSessionLogAdapterCodexResolvedInteractionClearsTailPending"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 1547,
+          "name": "TestSessionLogAdapterGeminiResolvedInteractionClearsTailPending"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 1586,
+          "name": "TestSessionLogAdapterMarksCodexMalformedInteriorDegraded"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 1622,
+          "name": "TestSessionLogAdapterPreservesCompactionEvidenceWhenDegraded"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 1656,
+          "name": "TestSessionLogAdapterKeepsAllMalformedHistoryUnknown"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 1739,
+          "name": "TestSessionLogAdapterKimiCodeNativeSession"
+        },
+        {
+          "file": "internal/worker/sessionlog_adapter_test.go",
+          "line": 1781,
+          "name": "TestCodexSnapshotAndActivityAgreeOnExplicitCompletion"
+        },
+        {
+          "file": "internal/worker/sessionlog_pagination_test.go",
+          "line": 69,
+          "name": "TestLoadHistorySkipsCodexTailUsageOnBeforePage"
+        },
+        {
+          "file": "internal/worker/sessionlog_pagination_test.go",
+          "line": 111,
+          "name": "TestSessionLogAdapterPaginationProviderMatrix"
+        },
+        {
+          "file": "internal/worker/sessionlog_pagination_test.go",
+          "line": 230,
+          "name": "TestSessionLogAdapterPaginationKeepsTranscriptGlobalTailMetadata"
+        },
+        {
+          "file": "internal/worker/sessionlog_pagination_test.go",
+          "line": 268,
+          "name": "TestSessionLogAdapterPaginationKeepsResolvedInteractionOutOfGlobalPending"
+        },
+        {
+          "file": "internal/worker/sessionlog_pagination_test.go",
+          "line": 297,
+          "name": "TestSessionLogAdapterRejectsBeforeAndAfterConsistently"
+        },
+        {
+          "file": "internal/worker/sessionlog_pagination_test.go",
+          "line": 331,
+          "name": "TestSessionLogAdapterPropagatesDuplicateEntryID"
+        },
+        {
+          "file": "internal/worker/sessionlog_pagination_test.go",
+          "line": 399,
+          "name": "TestSessionHandleTranscriptAndHistoryPropagateCursorErrors"
+        },
+        {
+          "file": "internal/worker/sessionlog_pagination_test.go",
+          "line": 436,
+          "name": "TestSessionHandleHistoryCursorPagesBypassContinuityCache"
+        },
+        {
+          "file": "internal/worker/sessionlog_pagination_test.go",
+          "line": 484,
+          "name": "TestSessionHandleTranscriptAndHistoryPropagateDuplicateEntryID"
+        },
+        {
+          "file": "internal/worker/subagent_guard_adapter_test.go",
+          "line": 24,
+          "name": "adapterBackedTranscript.Transcript"
+        },
+        {
+          "file": "internal/worker/subagent_guard_adapter_test.go",
+          "line": 67,
+          "name": "TestInFlightBackgroundSubagents_PreCompactionSpawnThroughRealAdapter"
+        },
+        {
+          "file": "internal/worker/workertest/corpus.go",
+          "line": 65,
+          "name": "LoadCorpusHistory"
+        },
+        {
+          "file": "internal/worker/workertest/phase1.go",
+          "line": 232,
+          "name": "LoadSnapshot"
+        },
+        {
+          "file": "internal/worker/workertest/phase1_conformance_test.go",
+          "line": 69,
+          "name": "TestPhase1Conformance"
+        },
+        {
+          "file": "internal/worker/workertest/phase1_conformance_test.go",
+          "line": 162,
+          "name": "TestTranscriptUsageResultDetectsMismatchAndDrift"
+        },
+        {
+          "file": "internal/worker/workertest/phase1_conformance_test.go",
+          "line": 199,
+          "name": "TestTranscriptUsageCostResultDetectsModelAndPricingDrift"
+        },
+        {
+          "file": "internal/worker/workertest/phase1_conformance_test.go",
+          "line": 240,
+          "name": "mustLoadSnapshot"
+        },
+        {
+          "file": "internal/worker/workertest/phase2_conformance_test.go",
+          "line": 58,
+          "name": "TestPhase2HistoryDiagnostics"
+        },
+        {
+          "file": "internal/worker/workertest/phase2_conformance_test.go",
+          "line": 82,
+          "name": "TestPiMalformedTranscriptFixtureReportsMalformedTail"
+        },
+        {
+          "file": "internal/worker/workertest/phase2_conformance_test.go",
+          "line": 202,
+          "name": "TestPhase2DurableInteractionHistory"
+        },
+        {
+          "file": "internal/worker/workertest/phase2_conformance_test.go",
+          "line": 223,
+          "name": "TestPhase2InteractionLifecycleHistory"
+        },
+        {
+          "file": "internal/worker/workertest/phase2_conformance_test.go",
+          "line": 258,
+          "name": "TestPhase2ToolEventSubstrate"
+        },
+        {
+          "file": "internal/worker/workertest/phase2_transcript_helpers_test.go",
+          "line": 471,
+          "name": "loadHistory"
+        },
+        {
+          "file": "internal/worker/workertest/structured_conformance_test.go",
+          "line": 74,
+          "name": "loadCursorStructuredHistory"
+        },
+        {
+          "file": "internal/worker/workertest/structured_conformance_test.go",
+          "line": 99,
+          "name": "loadGeminiStructuredHistory"
+        },
+        {
+          "file": "internal/worker/workertest/structured_conformance_test.go",
+          "line": 165,
+          "name": "loadClaudeStructuredHistory"
+        },
+        {
+          "file": "internal/worker/workertest/structured_conformance_test.go",
+          "line": 187,
+          "name": "loadCodexStructuredHistory"
+        },
+        {
+          "file": "internal/worker/workertest/structured_corpus_test.go",
+          "line": 15,
+          "name": "TestStructuredCorpusConformance"
+        },
+        {
+          "file": "internal/worker/workertest/structured_corpus_test.go",
+          "line": 50,
+          "name": "TestDiscoverAndLoadStructuredCorpus"
+        }
+      ],
+      "kind": "callers"
+    }
+  ],
+  "runs": [
+    {
+      "task": "t1",
+      "arm": "plain",
+      "model": "agent default",
+      "rep": 1,
+      "wall_s": 56.456136959,
+      "cost_usd": 0.422909,
+      "turns": 13,
+      "tokens": 382034,
+      "score": {
+        "pass": true,
+        "recall": 1.0,
+        "precision": 1.0,
+        "n_answer": 25,
+        "flagged_incomplete": false,
+        "missed": [],
+        "extra": [],
+        "out_of_scope": [],
+        "error": null
+      }
+    },
+    {
+      "task": "t1",
+      "arm": "gridseak",
+      "model": "agent default",
+      "rep": 1,
+      "wall_s": 27.217652375,
+      "cost_usd": 0.377561,
+      "turns": 3,
+      "tokens": 108682,
+      "score": {
+        "pass": true,
+        "recall": 1.0,
+        "precision": 1.0,
+        "n_answer": 25,
+        "flagged_incomplete": false,
+        "missed": [],
+        "extra": [],
+        "out_of_scope": [],
+        "error": null
+      }
+    },
+    {
+      "task": "t2",
+      "arm": "plain",
+      "model": "agent default",
+      "rep": 1,
+      "wall_s": 51.413891709,
+      "cost_usd": 0.3304544,
+      "turns": 13,
+      "tokens": 258683,
+      "score": {
+        "pass": true,
+        "recall": 1.0,
+        "precision": 1.0,
+        "n_answer": 29,
+        "flagged_incomplete": false,
+        "missed": [],
+        "extra": [],
+        "out_of_scope": [],
+        "error": null
+      }
+    },
+    {
+      "task": "t2",
+      "arm": "gridseak",
+      "model": "agent default",
+      "rep": 1,
+      "wall_s": 25.706016417,
+      "cost_usd": 0.251767,
+      "turns": 3,
+      "tokens": 106739,
+      "score": {
+        "pass": true,
+        "recall": 1.0,
+        "precision": 1.0,
+        "n_answer": 29,
+        "flagged_incomplete": false,
+        "missed": [],
+        "extra": [],
+        "out_of_scope": [],
+        "error": null
+      }
+    },
+    {
+      "task": "t3",
+      "arm": "plain",
+      "model": "agent default",
+      "rep": 1,
+      "wall_s": 81.655897333,
+      "cost_usd": 0.52175,
+      "turns": 14,
+      "tokens": 446109,
+      "score": {
+        "pass": true,
+        "recall": 1.0,
+        "precision": 1.0,
+        "n_answer": 41,
+        "flagged_incomplete": false,
+        "missed": [],
+        "extra": [],
+        "out_of_scope": [],
+        "error": null
+      }
+    },
+    {
+      "task": "t3",
+      "arm": "gridseak",
+      "model": "agent default",
+      "rep": 1,
+      "wall_s": 31.759227666,
+      "cost_usd": 0.2891248,
+      "turns": 3,
+      "tokens": 111623,
+      "score": {
+        "pass": true,
+        "recall": 1.0,
+        "precision": 1.0,
+        "n_answer": 41,
+        "flagged_incomplete": false,
+        "missed": [],
+        "extra": [],
+        "out_of_scope": [],
+        "error": null
+      }
+    },
+    {
+      "task": "t4",
+      "arm": "plain",
+      "model": "agent default",
+      "rep": 1,
+      "wall_s": 105.322739625,
+      "cost_usd": 0.7892638000000001,
+      "turns": 24,
+      "tokens": 831878,
+      "score": {
+        "pass": false,
+        "recall": 0.9310344827586207,
+        "precision": 1.0,
+        "n_answer": 54,
+        "flagged_incomplete": false,
+        "missed": [
+          "cmd/gc/city_runtime.go:1796 CityRuntime.tickBeadReconcile",
+          "cmd/gc/city_runtime.go:1973 CityRuntime.startupBeadReconcile",
+          "cmd/gc/execution_backstop.go:267 poolExecutionBackstop.resolve",
+          "cmd/gc/execution_backstop.go:417 poolExecutionBackstop.observeHold"
+        ],
+        "extra": [],
+        "out_of_scope": [],
+        "error": null
+      }
+    },
+    {
+      "task": "t4",
+      "arm": "gridseak",
+      "model": "agent default",
+      "rep": 1,
+      "wall_s": 53.996956708,
+      "cost_usd": 0.342279,
+      "turns": 3,
+      "tokens": 118350,
+      "score": {
+        "pass": true,
+        "recall": 1.0,
+        "precision": 1.0,
+        "n_answer": 58,
+        "flagged_incomplete": false,
+        "missed": [],
+        "extra": [],
+        "out_of_scope": [],
+        "error": null
+      }
+    },
+    {
+      "task": "t5",
+      "arm": "plain",
+      "model": "agent default",
+      "rep": 1,
+      "wall_s": 311.913869875,
+      "cost_usd": 1.8101978,
+      "turns": 39,
+      "tokens": 1896648,
+      "score": {
+        "pass": true,
+        "recall": 0.9939024390243902,
+        "precision": 1.0,
+        "n_answer": 163,
+        "flagged_incomplete": false,
+        "missed": [
+          "cmd/gc/reconcile_replay_test.go:588 TestReplaySampleMatchesExpectedDivergences"
+        ],
+        "extra": [],
+        "out_of_scope": [],
+        "error": null
+      }
+    },
+    {
+      "task": "t5",
+      "arm": "gridseak",
+      "model": "agent default",
+      "rep": 1,
+      "wall_s": 119.17903575,
+      "cost_usd": 0.7395868000000001,
+      "turns": 14,
+      "tokens": 601392,
+      "score": {
+        "pass": true,
+        "recall": 1.0,
+        "precision": 1.0,
+        "n_answer": 164,
+        "flagged_incomplete": false,
+        "missed": [],
+        "extra": [],
+        "out_of_scope": [],
+        "error": null
+      }
+    },
+    {
+      "task": "t6",
+      "arm": "plain",
+      "model": "agent default",
+      "rep": 1,
+      "wall_s": 466.652821084,
+      "cost_usd": 3.5208804,
+      "turns": 71,
+      "tokens": 6393476,
+      "score": {
+        "pass": true,
+        "recall": 1.0,
+        "precision": 1.0,
+        "n_answer": 174,
+        "flagged_incomplete": false,
+        "missed": [],
+        "extra": [],
+        "out_of_scope": [],
+        "error": null
+      }
+    },
+    {
+      "task": "t6",
+      "arm": "gridseak",
+      "model": "agent default",
+      "rep": 1,
+      "wall_s": 141.0314805,
+      "cost_usd": 0.7071578000000001,
+      "turns": 9,
+      "tokens": 317676,
+      "score": {
+        "pass": true,
+        "recall": 1.0,
+        "precision": 1.0,
+        "n_answer": 174,
+        "flagged_incomplete": false,
+        "missed": [],
+        "extra": [],
+        "out_of_scope": [],
+        "error": null
+      }
+    }
+  ]
+}

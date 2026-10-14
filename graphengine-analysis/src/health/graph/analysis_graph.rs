@@ -31,15 +31,33 @@ use rusqlite::Connection;
 use super::classification::is_synthetic_node;
 use super::language::propagate_file_metadata_to_descendants;
 use super::loader::{load_edges, load_nodes};
-use super::types::{Confidence, EdgeKind, GraphEdge, GraphNode, NodeKind};
+use super::types::{
+    CallUse, Confidence, EdgeKind, GraphEdge, GraphNode, MetricsEdgeBasis, NodeKind,
+};
 
 pub struct AnalysisGraph {
     pub nodes: BTreeMap<String, GraphNode>,
     pub edges: Vec<GraphEdge>,
 
-    // Adjacency: non-containment edges only
+    // Adjacency: non-containment edges counted by the metrics edge
+    // basis. Under `MetricsEdgeBasis::DirectCalls` (the default) Call
+    // edges tagged `via = dispatch | value` are NOT here; they live in
+    // `indirect_call_edge_indices` / `indirect_incoming` instead.
     pub outgoing: HashMap<String, Vec<usize>>,
     pub incoming: HashMap<String, Vec<usize>>,
+
+    /// Call edges excluded from metric adjacency by the edge basis
+    /// (dispatch fan-out and function-as-value uses). Empty under
+    /// `MetricsEdgeBasis::AllUses`.
+    pub indirect_call_edge_indices: Vec<usize>,
+    /// `to_id` -> indices of the indirect Call edges that reach it.
+    /// Read only by liveness (dead-code) checks.
+    pub indirect_incoming: HashMap<String, Vec<usize>>,
+    /// `indirect_call_edge_indices` restricted the same way as
+    /// `production_structural_edge_indices` (no synthetic, test,
+    /// vendor or generated endpoints). Used to list cycles that exist
+    /// only through dispatch / value uses, as information.
+    pub production_indirect_call_edge_indices: Vec<usize>,
 
     // Containment tree
     pub containment_parent: HashMap<String, String>,
@@ -95,6 +113,9 @@ pub struct AnalysisGraph {
     /// `CAVEAT_UNKNOWN_EDGE_KIND_SKIP_V1` when non-zero. Always zero
     /// for a DB written by the current engine.
     unknown_edge_kind_count: usize,
+
+    /// Which Call edges the metric adjacency counts.
+    edge_basis: MetricsEdgeBasis,
 }
 
 impl AnalysisGraph {
@@ -105,6 +126,9 @@ impl AnalysisGraph {
             edges: Vec::new(),
             outgoing: HashMap::new(),
             incoming: HashMap::new(),
+            indirect_call_edge_indices: Vec::new(),
+            indirect_incoming: HashMap::new(),
+            production_indirect_call_edge_indices: Vec::new(),
             containment_parent: HashMap::new(),
             containment_children: HashMap::new(),
             structural_edge_indices: Vec::new(),
@@ -121,6 +145,7 @@ impl AnalysisGraph {
             analysis_module_depth: 0,
             strip_build_dirs: false,
             unknown_edge_kind_count: 0,
+            edge_basis: MetricsEdgeBasis::default(),
         }
     }
 
@@ -147,11 +172,21 @@ impl AnalysisGraph {
         depth: usize,
         strip_build_dirs: bool,
     ) -> Result<Self> {
+        Self::load_with_options(conn, depth, strip_build_dirs, MetricsEdgeBasis::default())
+    }
+
+    /// Load with full module config and an explicit metrics edge basis.
+    pub fn load_with_options(
+        conn: &Connection,
+        depth: usize,
+        strip_build_dirs: bool,
+        edge_basis: MetricsEdgeBasis,
+    ) -> Result<Self> {
         let nodes = load_nodes(conn)?;
         let mut unknown_kind_count = 0usize;
         let edges = load_edges(conn, &nodes, &mut unknown_kind_count)?;
 
-        let mut graph = Self::build(nodes, edges);
+        let mut graph = Self::build_with_basis(nodes, edges, edge_basis);
         graph.unknown_edge_kind_count = unknown_kind_count;
         graph.analysis_module_depth = depth;
         graph.strip_build_dirs = strip_build_dirs;
@@ -171,9 +206,25 @@ impl AnalysisGraph {
         self.unknown_edge_kind_count
     }
 
+    /// The metrics edge basis this graph's adjacency was built with.
+    pub fn edge_basis(&self) -> MetricsEdgeBasis {
+        self.edge_basis
+    }
+
+    /// Build with the default metrics edge basis (direct calls).
     pub(crate) fn build(nodes: BTreeMap<String, GraphNode>, edges: Vec<GraphEdge>) -> Self {
+        Self::build_with_basis(nodes, edges, MetricsEdgeBasis::default())
+    }
+
+    pub(crate) fn build_with_basis(
+        nodes: BTreeMap<String, GraphNode>,
+        edges: Vec<GraphEdge>,
+        edge_basis: MetricsEdgeBasis,
+    ) -> Self {
         let mut outgoing: HashMap<String, Vec<usize>> = HashMap::new();
         let mut incoming: HashMap<String, Vec<usize>> = HashMap::new();
+        let mut indirect_incoming: HashMap<String, Vec<usize>> = HashMap::new();
+        let mut indirect_call_edge_indices: Vec<usize> = Vec::new();
         let mut containment_parent: HashMap<String, String> = HashMap::new();
         let mut containment_children: HashMap<String, Vec<String>> = HashMap::new();
         let mut structural_edge_indices: Vec<usize> = Vec::new();
@@ -185,6 +236,12 @@ impl AnalysisGraph {
                     .entry(edge.from_id.clone())
                     .or_default()
                     .push(edge.to_id.clone());
+            } else if edge_basis == MetricsEdgeBasis::DirectCalls && edge.is_indirect_call() {
+                indirect_incoming
+                    .entry(edge.to_id.clone())
+                    .or_default()
+                    .push(idx);
+                indirect_call_edge_indices.push(idx);
             } else {
                 outgoing.entry(edge.from_id.clone()).or_default().push(idx);
                 incoming.entry(edge.to_id.clone()).or_default().push(idx);
@@ -253,6 +310,9 @@ impl AnalysisGraph {
             edges,
             outgoing,
             incoming,
+            indirect_call_edge_indices,
+            indirect_incoming,
+            production_indirect_call_edge_indices: Vec::new(),
             containment_parent,
             containment_children,
             structural_edge_indices,
@@ -269,6 +329,7 @@ impl AnalysisGraph {
             analysis_module_depth: 2,
             strip_build_dirs: false,
             unknown_edge_kind_count: 0,
+            edge_basis,
         }
     }
 
@@ -417,6 +478,23 @@ impl AnalysisGraph {
             .copied()
             .filter(|&ei| self.edges[ei].confidence.is_high())
             .collect();
+
+        self.production_indirect_call_edge_indices = self
+            .indirect_call_edge_indices
+            .iter()
+            .copied()
+            .filter(|&ei| {
+                let e = &self.edges[ei];
+                !self.is_synthetic_id(&e.from_id)
+                    && !self.is_synthetic_id(&e.to_id)
+                    && !self.is_non_production_node(&e.from_id)
+                    && !self.is_non_production_node(&e.to_id)
+            })
+            .collect();
+    }
+
+    fn is_synthetic_id(&self, id: &str) -> bool {
+        self.nodes.get(id).is_some_and(is_synthetic_node)
     }
 
     /// Validate post-preparation invariants on the graph. Returns Err with a
@@ -455,7 +533,7 @@ impl AnalysisGraph {
         }
 
         let edge_count = self.edges.len();
-        let edge_buckets: [(&str, &[usize]); 4] = [
+        let edge_buckets: [(&str, &[usize]); 6] = [
             ("structural_edge_indices", &self.structural_edge_indices),
             (
                 "clean_structural_edge_indices",
@@ -468,6 +546,14 @@ impl AnalysisGraph {
             (
                 "high_only_production_structural_edge_indices",
                 &self.high_only_production_structural_edge_indices,
+            ),
+            (
+                "indirect_call_edge_indices",
+                &self.indirect_call_edge_indices,
+            ),
+            (
+                "production_indirect_call_edge_indices",
+                &self.production_indirect_call_edge_indices,
             ),
         ];
         for (name, indices) in edge_buckets {
@@ -591,6 +677,44 @@ impl AnalysisGraph {
                     .count()
             })
             .unwrap_or(0)
+    }
+
+    /// Incoming uses that keep a function alive, for dead-code purposes.
+    ///
+    /// Rule: a function is "called" if anything uses it -- a direct call,
+    /// a call through an interface / trait method (dispatch), or a
+    /// reference to it as a value (callback, stored fn pointer). So this
+    /// is `fan_in` plus the dispatch / value Call edges the metrics edge
+    /// basis keeps out of `incoming`. Without this, every trait impl and
+    /// every callback would be reported dead once metrics switched to
+    /// direct calls.
+    pub fn liveness_fan_in(&self, node_id: &str) -> usize {
+        self.fan_in(node_id) + self.indirect_incoming.get(node_id).map_or(0, |v| v.len())
+    }
+
+    /// [`Self::liveness_fan_in`] restricted to `Confidence::High` edges.
+    pub fn liveness_fan_in_high_only(&self, node_id: &str) -> usize {
+        self.fan_in_high_only(node_id)
+            + self.indirect_incoming.get(node_id).map_or(0, |v| {
+                v.iter()
+                    .filter(|&&ei| self.edges[ei].confidence.is_high())
+                    .count()
+            })
+    }
+
+    /// Counts of Call edges kept out of metric adjacency, as
+    /// `(dispatch, value)`. Both zero under `MetricsEdgeBasis::AllUses`.
+    pub fn indirect_call_edge_counts(&self) -> (usize, usize) {
+        let mut dispatch = 0;
+        let mut value = 0;
+        for &ei in &self.indirect_call_edge_indices {
+            match self.edges[ei].via {
+                Some(CallUse::Dispatch) => dispatch += 1,
+                Some(CallUse::Value) => value += 1,
+                _ => {}
+            }
+        }
+        (dispatch, value)
     }
 
     /// Fan-out counting only `Confidence::High` edges.

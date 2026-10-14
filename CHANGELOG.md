@@ -9,6 +9,63 @@ will call those out explicitly here when they happen.
 
 ## [Unreleased]
 
+## [0.1.3] — 2026-10-14
+
+Python and Rust join Go and TypeScript at the compiler tier, each with an
+independent answer-key checker, and health metrics count direct calls.
+
+### Added
+
+- Python at the compiler tier (scip-python, pinned 0.6.6). Class
+  instantiation reaches `__init__`/`__new__` along the MRO; redeclared names
+  (`@overload`, property setters, platform branches) no longer create false
+  edges; star-imported names resolve to the right class; abstract and
+  `Protocol` calls are dispatch. Calls the index cannot type are recorded,
+  and `gridseak audit` skips targets they could affect. Answer keys match a
+  mypy-based oracle and a test-suite runtime witness on Click, Flask and
+  httpx (`tests/recall-audit/py-oracle/`, evidence 21: with GridSeak 45/45
+  exact vs 39/45 alone).
+- Rust at the compiler tier: `rust-analyzer scip` plus the reference sweep,
+  with the in-process rust-analyzer resolver as a visible fallback.
+  Owner-qualified method names, trait calls through `dyn`/generics as
+  dispatch, closures credited to the enclosing fn. On GridSeak's own code
+  every call edge now comes from the compiler (was 18%), and a rustc-MIR
+  oracle (`tests/recall-audit/rust-oracle/`) finds 99.9% direct-call recall
+  at 99.4% precision.
+- `gridseak audit --plan <tasks.json>` reuses an earlier plan so repeats
+  merge into one card.
+
+### Changed
+
+- Health metrics count direct calls. Cycles, tangle, fan-in / hotspots,
+  blast radius, call depth, coupling, cohesion, layers and API surface now
+  leave out Call edges the compiler index tagged as interface/trait dispatch
+  (fanned out to every implementation) or as a function used as a value.
+  Dead code still counts those uses as callers, so trait impls and callbacks
+  are not reported dead. Reports carry the
+  `metrics_edge_basis_direct_calls_v1` caveat and
+  `integrity_status.metrics_edge_basis` (excluded edge counts, plus cycles
+  that close only through dispatch / value uses, listed as information).
+  `metrics_edge_basis = "all_uses"` in an analysis config restores the old
+  counting. On GridSeak itself this removes three fake cycles where
+  `DisclosedSemanticResolver` forwards to the resolver it wraps. The
+  `gridseak graph` fan-in, hotspots, module-coupling and cycles queries use
+  the same basis.
+- Indexers installed through npx are pinned: scip-python 0.6.6,
+  scip-typescript 0.4.0 (the versions the answer keys were validated with).
+- The audit recognises plain-worded incompleteness warnings ("I couldn't
+  produce the complete list") as flagged, not silent, misses.
+
+### Fixed
+
+- Scans skip nested git checkouts (agent worktrees, submodules, cloned
+  repos) and `.claude/` / `.gridseak/`. Claude Code agent worktrees were
+  being indexed as extra copies of the repo.
+- A scan restricted to some languages drops the parse-DB rows of languages
+  it leaves out, so an earlier full scan's heuristic edges no longer linger.
+- Cached files are re-resolved, and the analysis rebuilt, when a file's
+  resolution tier changes.
+
 ## [0.1.2] — 2026-10-12
 
 Compiler-grade call graph, measured against the compilers themselves,

@@ -20,6 +20,14 @@ use super::{
 // ---------------------------------------------------------------------------
 // Functions ranked by Call-edge fan-in / fan-out
 // ---------------------------------------------------------------------------
+//
+// Fan-in / fan-out, hotspots, module coupling and cycles count direct
+// calls only (`provenance.via` = `call` or absent), matching the health
+// report's `direct_calls_v1` metrics edge basis: a call through a trait
+// method is fanned out to every implementation and would otherwise
+// inflate counts and close cycles no code path takes. `dead_code`
+// below still counts every use, since a function reached only through
+// dispatch or used as a value is not dead.
 
 pub fn top_fan_in(conn: &Connection, limit: usize) -> Result<Vec<FanRow>, GraphQueryError> {
     let mut stmt = conn.prepare(
@@ -27,6 +35,7 @@ pub fn top_fan_in(conn: &Connection, limit: usize) -> Result<Vec<FanRow>, GraphQ
          FROM edges e
          JOIN nodes n ON n.id = e.to_id
          WHERE json_extract(e.kind, '$.kind') = 'Call' AND n.kind = 'Function'
+           AND COALESCE(json_extract(e.provenance, '$.via'), 'call') = 'call'
          GROUP BY e.to_id
          ORDER BY fan_in DESC, n.fqn ASC
          LIMIT ?1",
@@ -54,6 +63,7 @@ pub fn top_fan_out(conn: &Connection, limit: usize) -> Result<Vec<FanRow>, Graph
          FROM edges e
          JOIN nodes n ON n.id = e.from_id
          WHERE json_extract(e.kind, '$.kind') = 'Call' AND n.kind = 'Function'
+           AND COALESCE(json_extract(e.provenance, '$.via'), 'call') = 'call'
          GROUP BY e.from_id
          ORDER BY fan_out DESC, n.fqn ASC
          LIMIT ?1",
@@ -88,6 +98,7 @@ pub fn hotspots(
          FROM edges e
          JOIN nodes n ON n.id = e.to_id
          WHERE json_extract(e.kind, '$.kind') = 'Call' AND n.kind = 'Function'
+           AND COALESCE(json_extract(e.provenance, '$.via'), 'call') = 'call'
          GROUP BY e.to_id
          HAVING fan_in >= ?1
          ORDER BY fan_in DESC, n.fqn ASC
@@ -512,6 +523,7 @@ pub fn module_coupling(
          JOIN module_of mf ON mf.fn_id = e.from_id
          JOIN module_of mt ON mt.fn_id = e.to_id
          WHERE json_extract(e.kind, '$.kind') = 'Call'
+           AND COALESCE(json_extract(e.provenance, '$.via'), 'call') = 'call'
            AND mf.module_id != mt.module_id
          GROUP BY mf.module_id, mt.module_id
          ORDER BY edge_count DESC, from_module ASC, to_module ASC
@@ -575,7 +587,9 @@ pub fn cycles(
     let mut adjacency: HashMap<String, Vec<String>> = HashMap::new();
     {
         let mut all_stmt = conn.prepare(
-            "SELECT from_id, to_id FROM edges WHERE json_extract(kind, '$.kind') = 'Call'",
+            "SELECT from_id, to_id FROM edges
+             WHERE json_extract(kind, '$.kind') = 'Call'
+               AND COALESCE(json_extract(provenance, '$.via'), 'call') = 'call'",
         )?;
         let mut rows = all_stmt.query([])?;
         while let Some(row) = rows.next()? {
@@ -919,6 +933,36 @@ mod tests {
         let rows = cycles(&conn, 5, 6).unwrap();
         // root → mid → leaf → root is a real cycle
         assert!(rows.iter().any(|c| c.length == 3));
+    }
+
+    #[test]
+    fn structural_queries_count_direct_calls_dead_code_counts_every_use() {
+        let conn = build_test_db();
+        // hot → caller_a closes a loop only through dispatch; orphan is
+        // reached only as a value.
+        conn.execute_batch(
+            r#"INSERT INTO edges (from_id, to_id, kind, provenance) VALUES
+                ('fn_hot', 'fn_caller_a', '{"kind":"Call"}', '{"source":"Compiler","confidence":"High","via":"dispatch"}'),
+                ('fn_leaf', 'fn_hot', '{"kind":"Call"}', '{"source":"Compiler","confidence":"High","via":"dispatch"}'),
+                ('fn_root', 'fn_orphan', '{"kind":"Call"}', '{"source":"Compiler","confidence":"High","via":"value"}');"#,
+        )
+        .unwrap();
+        let rows = cycles(&conn, 10, 6).unwrap();
+        assert!(
+            rows.iter()
+                .all(|c| !c.members.iter().any(|n| n.id == "fn_caller_a")),
+            "dispatch-only loop must not be a cycle"
+        );
+        let hot = top_fan_in(&conn, 1).unwrap();
+        assert_eq!(hot[0].node.id, "fn_hot");
+        assert_eq!(hot[0].count, 4, "dispatch edge from leaf not counted");
+        assert!(
+            !dead_code(&conn, 50)
+                .unwrap()
+                .iter()
+                .any(|r| r.node.id == "fn_orphan"),
+            "a function used as a value is not dead"
+        );
     }
 
     #[test]

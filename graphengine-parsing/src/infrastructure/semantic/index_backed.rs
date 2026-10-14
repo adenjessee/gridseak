@@ -14,6 +14,7 @@ use crate::application::ports::{
 };
 use crate::application::resolution_disclosure::ResolutionDisclosure;
 use crate::domain::{Edge, EdgeKind, Provenance, ProvenanceSource, Range, UseKind};
+use crate::infrastructure::semantic::python_calls::{self, is_declaration_site, PyResolver};
 use crate::infrastructure::semantic::symbol_mapping::SymbolIndex;
 
 /// Outcome of one SCIP-backed call-site lookup.
@@ -114,9 +115,27 @@ impl<I: SemanticIndex + Send + Sync> IndexBackedSemanticResolver<I> {
             (String, String),
             (UseKind, crate::domain::Confidence),
         > = std::collections::BTreeMap::new();
+        let python = language_matches("python", &self.language);
+        let rust = language_matches("rust", &self.language);
+        let mut py = PyResolver::default();
+        if python {
+            // A redeclaration's name is recorded as a use of the first one.
+            for (site, def) in occurrences {
+                if is_declaration_site(&mut source_cache, site) {
+                    py.add_declaration_site(&def.symbol_moniker, site);
+                }
+            }
+        }
         for (site, def) in occurrences {
+            let renamed = python
+                .then(|| {
+                    python_calls::renamed_definition(&self.index, &mut source_cache, site, def)
+                })
+                .flatten();
+            let def = renamed.as_ref().unwrap_or(def);
             if !file_is_under(&def.file, &self.workspace_root)
                 || !is_callable_symbol(&def.symbol_moniker)
+                || (python && is_declaration_site(&mut source_cache, site))
             {
                 continue;
             }
@@ -156,9 +175,100 @@ impl<I: SemanticIndex + Send + Sync> IndexBackedSemanticResolver<I> {
             };
             let callees: Vec<(&crate::domain::Node, crate::domain::Confidence, UseKind)> =
                 match direct.or_else(inherited_ctor) {
+                    Some(node) if python => {
+                        let via = use_kind_at(&mut source_cache, site);
+                        let run = py.variants(
+                            &self.index,
+                            symbol_index,
+                            &mut source_cache,
+                            def,
+                            &name,
+                            node,
+                            site,
+                        );
+                        let confidence = if run.len() > 1 {
+                            crate::domain::Confidence::Medium
+                        } else {
+                            def.confidence
+                        };
+                        if py.is_abstract(&self.index, &mut source_cache, node, &def.symbol_moniker)
+                        {
+                            // A call of an abstract / Protocol method may run
+                            // any override: dispatch, not a direct call.
+                            let via = if via == UseKind::Call {
+                                UseKind::Dispatch
+                            } else {
+                                via
+                            };
+                            let mut out = vec![(node, confidence, via)];
+                            for imp in self.index.implementations_of(&def.symbol_moniker) {
+                                let imp_name = short_symbol_name(&imp.symbol_moniker);
+                                if let Some(n) = symbol_index.find_definition_node(&imp, &imp_name)
+                                {
+                                    out.push((n, imp.confidence, via));
+                                }
+                            }
+                            out
+                        } else {
+                            run.into_iter().map(|n| (n, confidence, via)).collect()
+                        }
+                    }
+                    // Rust: a use resolved to the trait's own method
+                    // (`Trait#m().`) went through `dyn Trait` or a generic
+                    // bound — any impl may run, so it is dispatch to the
+                    // default body and every implementation. Calls on a
+                    // concrete type resolve to `impl#[T][Trait]m().` and
+                    // stay direct calls. Known imprecision: a concrete
+                    // receiver calling a default method its type does not
+                    // override is also named `Trait#m().`, so it reads as
+                    // dispatch (on serde_json, 20 such edges against 83
+                    // generic calls the opposite rule would call direct).
+                    Some(node) if rust && is_rust_trait_method(&def.symbol_moniker) => {
+                        let impls = self.index.implementations_of(&def.symbol_moniker);
+                        let via = match use_kind_at(&mut source_cache, site) {
+                            UseKind::Call => UseKind::Dispatch,
+                            other => other,
+                        };
+                        let mut out = vec![(node, def.confidence, via)];
+                        for imp in impls {
+                            let imp_name = short_symbol_name(&imp.symbol_moniker);
+                            if let Some(n) = symbol_index.find_definition_node(&imp, &imp_name) {
+                                out.push((n, imp.confidence, via));
+                            }
+                        }
+                        out
+                    }
                     Some(node) => {
                         let via = use_kind_at(&mut source_cache, site);
                         vec![(node, def.confidence, via)]
+                    }
+                    // `C(...)` runs the `__init__` C's MRO finds.
+                    None if python
+                        && def.symbol_moniker.ends_with('#')
+                        && use_kind_at(&mut source_cache, site) == UseKind::Call =>
+                    {
+                        py.constructor_of(
+                            &self.index,
+                            symbol_index,
+                            &mut source_cache,
+                            &def.symbol_moniker,
+                        )
+                        .map(|(init, init_def)| {
+                            let m = short_symbol_name(&init_def.symbol_moniker);
+                            py.variants(
+                                &self.index,
+                                symbol_index,
+                                &mut source_cache,
+                                &init_def,
+                                &m,
+                                init,
+                                site,
+                            )
+                        })
+                        .unwrap_or_default()
+                        .into_iter()
+                        .map(|n| (n, def.confidence, UseKind::Call))
+                        .collect()
                     }
                     None => self
                         .index
@@ -324,6 +434,34 @@ impl<I: SemanticIndex + Send + Sync> IndexBackedSemanticResolver<I> {
         files
     }
 
+    /// Python calls the index left unresolved (see
+    /// [`python_calls::unresolved_calls`]), workspace-relative.
+    fn unresolved_calls(&self, hints: &SyntaxResults) -> Vec<(String, u32, String)> {
+        let mut out = Vec::new();
+        for file in &hints.source_files {
+            let path = Path::new(file);
+            let Some(starts) = self.index.occurrence_starts(path) else {
+                continue;
+            };
+            let builtins: std::collections::HashSet<(u32, u32)> = starts
+                .iter()
+                .filter(|(_, _, s)| is_builtin_global(s))
+                .map(|(l, c, _)| (*l, *c))
+                .collect();
+            let starts: std::collections::HashSet<(u32, u32)> =
+                starts.into_iter().map(|(l, c, _)| (l, c)).collect();
+            let rel = path
+                .strip_prefix(&self.workspace_root)
+                .map(|p| p.to_string_lossy().to_string())
+                .unwrap_or_else(|_| file.clone());
+            for (line, name) in python_calls::unresolved_calls(path, &starts, &builtins) {
+                out.push((rel.clone(), line, name));
+            }
+        }
+        out.sort();
+        out
+    }
+
     fn resolve_imports_heuristic(&self, hints: &SyntaxResults, out: &mut ResolvedEdges) {
         let all_ranges: Vec<Range> = hints
             .import_specs
@@ -344,6 +482,7 @@ impl<I: SemanticIndex + Send + Sync> IndexBackedSemanticResolver<I> {
             hints,
             match self.language.as_str() {
                 "python" => vec![".py".to_string()],
+                "rust" => vec![".rs".to_string()],
                 _ => vec![
                     ".ts".to_string(),
                     ".tsx".to_string(),
@@ -356,6 +495,59 @@ impl<I: SemanticIndex + Send + Sync> IndexBackedSemanticResolver<I> {
             out.add_import_edge(edge);
         }
     }
+}
+
+/// Rust `use` paths name functions (`use crate::util::helper;`) but call
+/// nothing; drop occurrences inside the scan's `use` declarations so a
+/// module never looks like it calls everything it imports.
+fn drop_import_uses(
+    occurrences: Vec<(IndexTarget, IndexTarget)>,
+    hints: &SyntaxResults,
+) -> Vec<(IndexTarget, IndexTarget)> {
+    let mut by_file: std::collections::HashMap<&str, Vec<&Range>> =
+        std::collections::HashMap::new();
+    for spec in &hints.import_specs {
+        by_file
+            .entry(spec.range.file.as_str())
+            .or_default()
+            .push(&spec.range);
+    }
+    if by_file.is_empty() {
+        return occurrences;
+    }
+    occurrences
+        .into_iter()
+        .filter(|(site, _)| {
+            let file = site.file.to_string_lossy();
+            let Some(ranges) = by_file.get(file.as_ref()) else {
+                return true;
+            };
+            let at = (site.line, site.col);
+            !ranges
+                .iter()
+                .any(|r| (r.start_line, r.start_char) <= at && at < (r.end_line, r.end_char))
+        })
+        .collect()
+}
+
+/// rust-analyzer symbol of a method declared in a trait (`…/Trait#m().`),
+/// as opposed to an inherent or trait-impl method (`…/impl#[T]…m().`).
+fn is_rust_trait_method(symbol: &str) -> bool {
+    matches!(
+        graphengine_scip_adapter::rust_method_shape(symbol),
+        Some(graphengine_scip_adapter::RustMethod::TraitDecl { .. })
+    )
+}
+
+/// A top-level class or function of Python's `builtins` (`builtins/set#`).
+fn is_builtin_global(symbol: &str) -> bool {
+    symbol
+        .rsplit(' ')
+        .next()
+        .and_then(|d| d.strip_prefix("builtins/"))
+        .is_some_and(|rest| {
+            !rest.contains('#') || (rest.ends_with('#') && rest.matches('#').count() == 1)
+        })
 }
 
 /// Parse a TS/JS file with the TypeScript grammar (TSX for `.tsx`/`.jsx`).
@@ -573,6 +765,10 @@ fn use_kind_at(
     if rest.get(i) == Some(&'?') && rest.get(i + 1) == Some(&'.') {
         i += 2;
     }
+    // Rust turbofish `f::<T>(…)`.
+    if rest.get(i) == Some(&':') && rest.get(i + 1) == Some(&':') && rest.get(i + 2) == Some(&'<') {
+        i += 2;
+    }
     if let Some(open) = rest.get(i).copied().filter(|c| *c == '[' || *c == '<') {
         let close = if open == '[' { ']' } else { '>' };
         let mut depth = 0;
@@ -593,8 +789,9 @@ fn use_kind_at(
             };
             if c == open {
                 depth += 1;
-            } else if c == close && !(open == '<' && i > 0 && rest[i - 1] == '=') {
-                // The `>` of `=>` in `<(e: E) => void>` closes nothing.
+            } else if c == close && !(open == '<' && i > 0 && matches!(rest[i - 1], '=' | '-')) {
+                // The `>` of `=>` in `<(e: E) => void>` (or Rust's `->` in
+                // `f::<fn() -> u32>`) closes nothing.
                 depth -= 1;
                 if depth == 0 {
                     i += 1;
@@ -778,9 +975,17 @@ impl<I: SemanticIndex + Send + Sync> SemanticResolver for IndexBackedSemanticRes
                     out.mark_call_site_resolved(call_site.location.clone());
                 }
             }
+            let occurrences = if language_matches("rust", &self.language) {
+                drop_import_uses(occurrences, hints)
+            } else {
+                occurrences
+            };
             self.resolve_from_occurrences(&occurrences, &symbol_index, &mut seen, &mut out);
             self.resolve_super_calls(hints, &symbol_index, &mut seen, &mut out);
             out.stats.compiler_unindexed_files = self.unindexed_files(hints);
+            if language_matches("python", &self.language) {
+                out.stats.compiler_unresolved_calls = self.unresolved_calls(hints);
+            }
             // Heuristic import edges build a per-file name table that is
             // O(files x imported symbols) and, on Kubernetes-size Go repos,
             // runs for hours. Callers above never use it. Opt-out until the
@@ -1254,5 +1459,168 @@ mod tests {
         let edges = resolver.resolve(&hints).await.unwrap();
         assert!(edges.call_edges.is_empty());
         assert!(edges.resolved_call_sites.contains(&call_site.location));
+    }
+
+    /// scip-python-shaped index: definitions by symbol, uses by position.
+    struct PyIndex {
+        file: PathBuf,
+        defs: Vec<(String, (u32, u32))>,
+        /// 0-based position -> symbol, for `definition_at` (base classes).
+        at: Vec<((u32, u32), String)>,
+        /// 1-based use sites.
+        uses: Vec<((u32, u32), String)>,
+    }
+
+    impl PyIndex {
+        fn target(&self, symbol: &str, (line, col): (u32, u32)) -> IndexTarget {
+            IndexTarget {
+                file: self.file.clone(),
+                line,
+                col,
+                symbol_moniker: symbol.into(),
+                confidence: Confidence::High,
+            }
+        }
+    }
+
+    impl SemanticIndex for PyIndex {
+        fn definition_at(&self, _file: &Path, line: u32, col: u32) -> Option<IndexTarget> {
+            let (_, sym) = self.at.iter().find(|(p, _)| *p == (line, col))?;
+            self.definition_of(sym)
+        }
+        fn definition_of(&self, symbol: &str) -> Option<IndexTarget> {
+            let (_, pos) = self.defs.iter().find(|(s, _)| s == symbol)?;
+            Some(self.target(symbol, *pos))
+        }
+        fn declarations_of(&self, symbol: &str) -> Vec<IndexTarget> {
+            self.definition_of(symbol).into_iter().collect()
+        }
+        fn language(&self) -> &str {
+            "python"
+        }
+        fn reference_occurrences(&self) -> Option<Vec<(IndexTarget, IndexTarget)>> {
+            Some(
+                self.uses
+                    .iter()
+                    .filter_map(|(pos, sym)| {
+                        Some((self.target(sym, *pos), self.definition_of(sym)?))
+                    })
+                    .collect(),
+            )
+        }
+        fn occurrence_starts(&self, _file: &Path) -> Option<Vec<(u32, u32, String)>> {
+            let mut out: Vec<(u32, u32, String)> = self
+                .uses
+                .iter()
+                .map(|((l, c), s)| (l - 1, *c, s.clone()))
+                .collect();
+            out.extend(self.defs.iter().map(|(s, (l, c))| (l - 1, *c, s.clone())));
+            Some(out)
+        }
+    }
+
+    #[tokio::test]
+    async fn python_calls_follow_runtime_semantics() {
+        let dir = tempfile::tempdir().unwrap();
+        let file = dir.path().join("m.py");
+        std::fs::write(
+            &file,
+            "class Base:\n    def __init__(self): pass\nclass Mid(Base):\n    pass\n@overload\ndef f(x: int) -> int: ...\ndef f(x): return x\nclass A(ABC):\n    @abstractmethod\n    def run(self): ...\nclass Request:\n    def __init__(self): pass\nclass Response:\n    def __init__(self): pass\ndef make(a, pkg):\n    Mid()\n    f(1)\n    a.run()\n    pkg.Response()\n    a.unknown()\n    return Mid\n",
+        )
+        .unwrap();
+        let f = file.to_string_lossy().to_string();
+        let s = |d: &str| format!("scip-python python pkg 1.0 `m`/{d}");
+        let index = PyIndex {
+            file: file.clone(),
+            defs: vec![
+                (s("Base#"), (1, 6)),
+                (s("Base#__init__()."), (2, 8)),
+                (s("Mid#"), (3, 6)),
+                (s("f()."), (6, 4)),
+                (s("A#"), (8, 6)),
+                (s("A#run()."), (10, 8)),
+                (s("Request#"), (11, 6)),
+                (s("Request#__init__()."), (12, 8)),
+                (s("Response#"), (13, 6)),
+                (s("Response#__init__()."), (14, 8)),
+            ],
+            // `Base` in `class Mid(Base)`; `ABC` is external (no definition).
+            at: vec![((2, 10), s("Base#"))],
+            uses: vec![
+                ((16, 4), s("Mid#")),
+                ((17, 4), s("f().")),
+                // the implementation's own name, recorded as a use of the stub
+                ((7, 4), s("f().")),
+                ((18, 6), s("A#run().")),
+                // a star-imported name misnamed as its module's first name
+                ((19, 8), s("Request#")),
+                ((21, 11), s("Mid#")),
+            ],
+        };
+        let resolver = IndexBackedSemanticResolver::new(index, dir.path().to_path_buf(), "python");
+        let strukt = |name: &str, r: Range| {
+            Node::new(
+                crate::domain::NodeKind::Struct,
+                format!("m::{name}"),
+                r,
+                Provenance::new(ProvenanceSource::TreeSitter, Confidence::Medium),
+            )
+        };
+        let base_init = Node::function(
+            "m::Base::__init__".into(),
+            Range::with_file(2, 4, 2, 28, &f),
+        );
+        let stub = Node::function("m::stub::f".into(), Range::with_file(6, 0, 6, 25, &f));
+        let imp = Node::function("m::f".into(), Range::with_file(7, 0, 7, 18, &f));
+        let run = Node::function("m::A::run".into(), Range::with_file(10, 4, 10, 22, &f));
+        let req_init = Node::function(
+            "m::Request::__init__".into(),
+            Range::with_file(12, 4, 12, 28, &f),
+        );
+        let resp_init = Node::function(
+            "m::Response::__init__".into(),
+            Range::with_file(14, 4, 14, 28, &f),
+        );
+        let make = Node::function("m::make".into(), Range::with_file(15, 0, 21, 14, &f));
+        let mut hints = SyntaxResults::new();
+        hints.language = Some("python".into());
+        hints.source_files = vec![f.clone()];
+        hints.symbols = vec![
+            strukt("Base", Range::with_file(1, 0, 2, 28, &f)),
+            base_init.clone(),
+            strukt("Mid", Range::with_file(3, 0, 4, 8, &f)),
+            stub.clone(),
+            imp.clone(),
+            strukt("A", Range::with_file(8, 0, 10, 22, &f)),
+            run.clone(),
+            strukt("Request", Range::with_file(11, 0, 12, 28, &f)),
+            req_init.clone(),
+            strukt("Response", Range::with_file(13, 0, 14, 28, &f)),
+            resp_init.clone(),
+            make.clone(),
+        ];
+        let edges = resolver.resolve(&hints).await.unwrap();
+        let mut got: Vec<(String, String, Option<UseKind>)> = edges
+            .call_edges
+            .iter()
+            .map(|e| (e.from_id.clone(), e.to_id.clone(), e.provenance.via))
+            .collect();
+        got.sort();
+        let mut want = vec![
+            // `Mid()` runs the `__init__` Mid inherits from Base.
+            (make.id.clone(), base_init.id.clone(), Some(UseKind::Call)),
+            // `f(1)` runs the implementation, not the `@overload` stub.
+            (make.id.clone(), imp.id.clone(), Some(UseKind::Call)),
+            // `a.run()` goes through an abstract method.
+            (make.id.clone(), run.id.clone(), Some(UseKind::Dispatch)),
+            // `pkg.Response()` is Response, whatever the index named it.
+            (make.id.clone(), resp_init.id.clone(), Some(UseKind::Call)),
+        ];
+        want.sort();
+        assert_eq!(got, want);
+        assert_eq!(
+            edges.stats.compiler_unresolved_calls,
+            vec![("m.py".to_string(), 20, "unknown".to_string())]
+        );
     }
 }

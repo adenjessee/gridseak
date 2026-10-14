@@ -41,6 +41,16 @@ impl ScipSemanticIndex {
         self.inner.project_root()
     }
 
+    fn target(&self, def: graphengine_scip_adapter::ScipDefinition) -> IndexTarget {
+        IndexTarget {
+            file: self.inner.project_root().join(&def.relative_path),
+            line: def.line.saturating_add(1),
+            col: def.character,
+            symbol_moniker: def.symbol,
+            confidence: Confidence::High,
+        }
+    }
+
     /// How many of the index's documents exist under `workspace` (sampled).
     pub fn workspace_coverage(&self, workspace: &Path) -> DocumentCoverage {
         self.inner.workspace_coverage(workspace)
@@ -97,6 +107,35 @@ impl SemanticIndex for ScipSemanticIndex {
                 }
             })
             .collect()
+    }
+
+    fn declarations_of(&self, symbol: &str) -> Vec<IndexTarget> {
+        self.inner
+            .definitions_of(symbol)
+            .into_iter()
+            .map(|d| self.target(d))
+            .collect()
+    }
+
+    fn definition_of(&self, symbol: &str) -> Option<IndexTarget> {
+        self.inner.definition_of(symbol).map(|d| self.target(d))
+    }
+
+    fn module_level_definitions(&self, name: &str) -> Vec<IndexTarget> {
+        self.inner
+            .module_level_definitions(name)
+            .into_iter()
+            .map(|d| self.target(d))
+            .collect()
+    }
+
+    fn occurrence_starts(&self, file: &Path) -> Option<Vec<(u32, u32, String)>> {
+        self.inner.occurrence_starts(file)
+    }
+
+    fn supertypes_of(&self, symbol: &str) -> Vec<String> {
+        // For a class, SCIP `is_implementation` relationships name its bases.
+        self.inner.interfaces_implemented_by(symbol)
     }
 
     fn reference_occurrences(&self) -> Option<Vec<(IndexTarget, IndexTarget)>> {

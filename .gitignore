@@ -303,3 +303,7 @@ graphengine-infra/rust.json
 
 # Unlazy ledgers live in /tmp, never the repo root.
 /GATES.md
+
+# GridSeak indexes and cache (from scanning this repo with GridSeak)
+/index.scip
+.gridseak/

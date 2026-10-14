@@ -36,8 +36,13 @@ pub fn compiler_tier_warnings(rows: &[LanguageResolutionDisclosure]) -> Vec<Stri
                 Some(ResolutionSkipReason::IndexerNotProvisioned) => "no SCIP index for this workspace",
                 _ => "SCIP index could not be generated or loaded",
             };
+            let edges = if d.tier_used == ResolutionDisclosureTier::Layer2 {
+                "call edges come from the in-process rust-analyzer resolver (per call site, name-match fallback)"
+            } else {
+                "call edges are tree-sitter heuristics only"
+            };
             format!(
-                "warning: {lang}: compiler tier unavailable ({reason}: {hint}); call edges are tree-sitter heuristics only. Run `gridseak doctor --provision {lang}` in this repo, or set GRIDSEAK_AUTO_PROVISION=1.",
+                "warning: {lang}: compiler tier unavailable ({reason}: {hint}); {edges}. Run `gridseak doctor --provision {lang}` in this repo, or set GRIDSEAK_AUTO_PROVISION=1.",
                 lang = d.language
             )
         })
@@ -126,6 +131,21 @@ mod tests {
         assert_eq!(warnings.len(), 1);
         assert!(warnings[0].starts_with("warning: go: compiler tier unavailable (index_stale"));
         assert!(warnings[0].contains("gridseak doctor --provision go"));
+    }
+
+    #[test]
+    fn rust_fallback_to_ra_ide_warns_without_claiming_heuristics() {
+        let rows = vec![LanguageResolutionDisclosure {
+            language: "rust".into(),
+            tier_attempted: ResolutionDisclosureTier::Layer2,
+            tier_used: ResolutionDisclosureTier::Layer2,
+            skip_reason: Some(ResolutionSkipReason::IndexerNotProvisioned),
+            emitted_edges: Some(7),
+        }];
+        let warnings = compiler_tier_warnings(&rows);
+        assert_eq!(warnings.len(), 1);
+        assert!(warnings[0].contains("in-process rust-analyzer resolver"));
+        assert!(warnings[0].contains("gridseak doctor --provision rust"));
     }
 
     #[test]

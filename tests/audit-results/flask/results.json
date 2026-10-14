@@ -1,0 +1,1528 @@
+{
+ "repo": "flask",
+ "root": "<repo root>",
+ "date": "2026-10-13",
+ "agent": "Claude Code",
+ "model": "claude-haiku-5-5, claude-sonnet-5-5, claude-opus-5-5",
+ "mode": "read-only tools + language toolchain",
+ "answer_key": "GridSeak compiler-indexed call graph (1342 edges, 100% from the compiler index); targets whose callers share a name with any of the 991 calls the compiler could not resolve (untyped receivers) are not asked",
+ "call_edges": 1342,
+ "tasks": [
+  {
+   "id": "t1",
+   "band": "small",
+   "target": "generator",
+   "file": "src/flask/helpers.py",
+   "line": 126,
+   "question": "In this repository (flask), list every function and method, including those in test files, that transitively calls `generator` (declared at src/flask/helpers.py:126) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `generator` itself. The list must be complete. In Python, a `def` nested in a function is a named function. `C(...)` calls the `__init__` (or `__new__`) C defines or inherits (neither for an `Enum`, whose `E(value)` looks a member up), `super().m(...)` calls the base class's m, and `obj.m(...)` calls the m that obj's type defines or inherits, not overrides in subclasses; a call of an `@abstractmethod` or of a `Protocol` method is dynamic dispatch. A name defined in several `if`/`else` or `try`/`except` branches calls each definition the call can reach; `@overload` stubs are never called. `@d(...)` calls d; a bare `@d`, reading a `@property`, `with`, iteration and operators are not direct calls.",
+   "max_depth": 4,
+   "answer": [
+    {
+     "file": "src/flask/helpers.py",
+     "line": 63,
+     "name": "stream_with_context"
+    },
+    {
+     "file": "src/flask/helpers.py",
+     "line": 120,
+     "name": "decorator"
+    },
+    {
+     "file": "src/flask/templating.py",
+     "line": 163,
+     "name": "_stream"
+    },
+    {
+     "file": "src/flask/templating.py",
+     "line": 181,
+     "name": "stream_template"
+    },
+    {
+     "file": "src/flask/templating.py",
+     "line": 200,
+     "name": "stream_template_string"
+    },
+    {
+     "file": "tests/test_helpers.py",
+     "line": 231,
+     "name": "index"
+    },
+    {
+     "file": "tests/test_helpers.py",
+     "line": 275,
+     "name": "index"
+    },
+    {
+     "file": "tests/test_templating.py",
+     "line": 35,
+     "name": "index"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 386,
+     "name": "index"
+    },
+    {
+     "file": "tests/type_check/typing_route.py",
+     "line": 92,
+     "name": "return_template_stream"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t2",
+   "band": "small",
+   "target": "add_app_template_test",
+   "file": "src/flask/sansio/blueprints.py",
+   "line": 532,
+   "question": "In this repository (flask), list every function and method, including those in test files, that transitively calls `add_app_template_test` (declared at src/flask/sansio/blueprints.py:532) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `add_app_template_test` itself. The list must be complete. In Python, a `def` nested in a function is a named function. `C(...)` calls the `__init__` (or `__new__`) C defines or inherits (neither for an `Enum`, whose `E(value)` looks a member up), `super().m(...)` calls the base class's m, and `obj.m(...)` calls the m that obj's type defines or inherits, not overrides in subclasses; a call of an `@abstractmethod` or of a `Protocol` method is dynamic dispatch. A name defined in several `if`/`else` or `try`/`except` branches calls each definition the call can reach; `@overload` stubs are never called. `@d(...)` calls d; a bare `@d`, reading a `@property`, `with`, iteration and operators are not direct calls.",
+   "max_depth": 2,
+   "answer": [
+    {
+     "file": "src/flask/sansio/blueprints.py",
+     "line": 504,
+     "name": "app_template_test"
+    },
+    {
+     "file": "src/flask/sansio/blueprints.py",
+     "line": 525,
+     "name": "decorator"
+    },
+    {
+     "file": "tests/test_blueprints.py",
+     "line": 510,
+     "name": "test_template_test"
+    },
+    {
+     "file": "tests/test_blueprints.py",
+     "line": 547,
+     "name": "test_add_template_test"
+    },
+    {
+     "file": "tests/test_blueprints.py",
+     "line": 560,
+     "name": "test_template_test_with_name"
+    },
+    {
+     "file": "tests/test_blueprints.py",
+     "line": 573,
+     "name": "test_add_template_test_with_name"
+    },
+    {
+     "file": "tests/test_blueprints.py",
+     "line": 586,
+     "name": "test_template_test_with_template"
+    },
+    {
+     "file": "tests/test_blueprints.py",
+     "line": 603,
+     "name": "test_template_test_after_route_with_template"
+    },
+    {
+     "file": "tests/test_blueprints.py",
+     "line": 619,
+     "name": "test_add_template_test_with_template"
+    },
+    {
+     "file": "tests/test_blueprints.py",
+     "line": 636,
+     "name": "test_template_test_with_name_and_template"
+    },
+    {
+     "file": "tests/test_blueprints.py",
+     "line": 653,
+     "name": "test_add_template_test_with_name_and_template"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t3",
+   "band": "small",
+   "target": "add_app_template_filter",
+   "file": "src/flask/sansio/blueprints.py",
+   "line": 476,
+   "question": "In this repository (flask), list every function and method, including those in test files, that transitively calls `add_app_template_filter` (declared at src/flask/sansio/blueprints.py:476) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `add_app_template_filter` itself. The list must be complete. In Python, a `def` nested in a function is a named function. `C(...)` calls the `__init__` (or `__new__`) C defines or inherits (neither for an `Enum`, whose `E(value)` looks a member up), `super().m(...)` calls the base class's m, and `obj.m(...)` calls the m that obj's type defines or inherits, not overrides in subclasses; a call of an `@abstractmethod` or of a `Protocol` method is dynamic dispatch. A name defined in several `if`/`else` or `try`/`except` branches calls each definition the call can reach; `@overload` stubs are never called. `@d(...)` calls d; a bare `@d`, reading a `@property`, `with`, iteration and operators are not direct calls.",
+   "max_depth": 2,
+   "answer": [
+    {
+     "file": "src/flask/sansio/blueprints.py",
+     "line": 450,
+     "name": "app_template_filter"
+    },
+    {
+     "file": "src/flask/sansio/blueprints.py",
+     "line": 469,
+     "name": "decorator"
+    },
+    {
+     "file": "tests/test_blueprints.py",
+     "line": 350,
+     "name": "test_template_filter"
+    },
+    {
+     "file": "tests/test_blueprints.py",
+     "line": 387,
+     "name": "test_add_template_filter"
+    },
+    {
+     "file": "tests/test_blueprints.py",
+     "line": 400,
+     "name": "test_template_filter_with_name"
+    },
+    {
+     "file": "tests/test_blueprints.py",
+     "line": 413,
+     "name": "test_add_template_filter_with_name"
+    },
+    {
+     "file": "tests/test_blueprints.py",
+     "line": 426,
+     "name": "test_template_filter_with_template"
+    },
+    {
+     "file": "tests/test_blueprints.py",
+     "line": 443,
+     "name": "test_template_filter_after_route_with_template"
+    },
+    {
+     "file": "tests/test_blueprints.py",
+     "line": 459,
+     "name": "test_add_template_filter_with_template"
+    },
+    {
+     "file": "tests/test_blueprints.py",
+     "line": 476,
+     "name": "test_template_filter_with_name_and_template"
+    },
+    {
+     "file": "tests/test_blueprints.py",
+     "line": 493,
+     "name": "test_add_template_filter_with_name_and_template"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t4",
+   "band": "small",
+   "target": "make_response",
+   "file": "src/flask/app.py",
+   "line": 1224,
+   "question": "In this repository (flask), list every function and method, including those in test files, that transitively calls `make_response` (declared at src/flask/app.py:1224) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `make_response` itself. The list must be complete. In Python, a `def` nested in a function is a named function. `C(...)` calls the `__init__` (or `__new__`) C defines or inherits (neither for an `Enum`, whose `E(value)` looks a member up), `super().m(...)` calls the base class's m, and `obj.m(...)` calls the m that obj's type defines or inherits, not overrides in subclasses; a call of an `@abstractmethod` or of a `Protocol` method is dynamic dispatch. A name defined in several `if`/`else` or `try`/`except` branches calls each definition the call can reach; `@overload` stubs are never called. `@d(...)` calls d; a bare `@d`, reading a `@property`, `with`, iteration and operators are not direct calls.",
+   "max_depth": 4,
+   "answer": [
+    {
+     "file": "src/flask/app.py",
+     "line": 897,
+     "name": "handle_exception"
+    },
+    {
+     "file": "src/flask/app.py",
+     "line": 992,
+     "name": "full_dispatch_request"
+    },
+    {
+     "file": "src/flask/app.py",
+     "line": 1021,
+     "name": "finalize_request"
+    },
+    {
+     "file": "src/flask/app.py",
+     "line": 1566,
+     "name": "wsgi_app"
+    },
+    {
+     "file": "src/flask/app.py",
+     "line": 1618,
+     "name": "__call__"
+    },
+    {
+     "file": "src/flask/helpers.py",
+     "line": 151,
+     "name": "make_response"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 1287,
+     "name": "test_make_response"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 1309,
+     "name": "test_make_response_with_response_instance"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 1339,
+     "name": "test_jsonify_mimetype"
+    },
+    {
+     "file": "tests/test_helpers.py",
+     "line": 342,
+     "name": "test_make_response"
+    },
+    {
+     "file": "tests/test_views.py",
+     "line": 82,
+     "name": "new_function"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t5",
+   "band": "small",
+   "target": "render_template_string",
+   "file": "src/flask/templating.py",
+   "line": 151,
+   "question": "In this repository (flask), list every function and method, including those in test files, that transitively calls `render_template_string` (declared at src/flask/templating.py:151) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `render_template_string` itself. The list must be complete. In Python, a `def` nested in a function is a named function. `C(...)` calls the `__init__` (or `__new__`) C defines or inherits (neither for an `Enum`, whose `E(value)` looks a member up), `super().m(...)` calls the base class's m, and `obj.m(...)` calls the m that obj's type defines or inherits, not overrides in subclasses; a call of an `@abstractmethod` or of a `Protocol` method is dynamic dispatch. A name defined in several `if`/`else` or `try`/`except` branches calls each definition the call can reach; `@overload` stubs are never called. `@d(...)` calls d; a bare `@d`, reading a `@property`, `with`, iteration and operators are not direct calls.",
+   "max_depth": 2,
+   "answer": [
+    {
+     "file": "tests/test_appctx.py",
+     "line": 160,
+     "name": "test_custom_app_ctx_globals_class"
+    },
+    {
+     "file": "tests/test_blueprints.py",
+     "line": 673,
+     "name": "template_string"
+    },
+    {
+     "file": "tests/test_blueprints.py",
+     "line": 691,
+     "name": "bp_page"
+    },
+    {
+     "file": "tests/test_blueprints.py",
+     "line": 695,
+     "name": "app_page"
+    },
+    {
+     "file": "tests/test_blueprints.py",
+     "line": 711,
+     "name": "test_template_global"
+    },
+    {
+     "file": "tests/test_blueprints.py",
+     "line": 980,
+     "name": "b"
+    },
+    {
+     "file": "tests/test_json.py",
+     "line": 210,
+     "name": "test_tojson_filter"
+    },
+    {
+     "file": "tests/test_templating.py",
+     "line": 26,
+     "name": "index"
+    },
+    {
+     "file": "tests/test_templating.py",
+     "line": 42,
+     "name": "test_request_less_rendering"
+    },
+    {
+     "file": "tests/test_templating.py",
+     "line": 55,
+     "name": "index"
+    },
+    {
+     "file": "tests/test_templating.py",
+     "line": 113,
+     "name": "test_escaping_without_template_filename"
+    },
+    {
+     "file": "tests/test_templating.py",
+     "line": 359,
+     "name": "test_add_template_global"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t6",
+   "band": "medium",
+   "target": "__init__",
+   "file": "src/flask/app.py",
+   "line": 308,
+   "question": "In this repository (flask), list every function and method, including those in test files, that transitively calls `__init__` (declared at src/flask/app.py:308) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `__init__` itself. The list must be complete. In Python, a `def` nested in a function is a named function. `C(...)` calls the `__init__` (or `__new__`) C defines or inherits (neither for an `Enum`, whose `E(value)` looks a member up), `super().m(...)` calls the base class's m, and `obj.m(...)` calls the m that obj's type defines or inherits, not overrides in subclasses; a call of an `@abstractmethod` or of a `Protocol` method is dynamic dispatch. A name defined in several `if`/`else` or `try`/`except` branches calls each definition the call can reach; `@overload` stubs are never called. `@d(...)` calls d; a bare `@d`, reading a `@property`, `with`, iteration and operators are not direct calls.",
+   "max_depth": 2,
+   "answer": [
+    {
+     "file": "examples/celery/src/task_app/__init__.py",
+     "line": 7,
+     "name": "create_app"
+    },
+    {
+     "file": "examples/tutorial/flaskr/__init__.py",
+     "line": 6,
+     "name": "create_app"
+    },
+    {
+     "file": "examples/tutorial/tests/conftest.py",
+     "line": 16,
+     "name": "app"
+    },
+    {
+     "file": "examples/tutorial/tests/test_factory.py",
+     "line": 4,
+     "name": "test_config"
+    },
+    {
+     "file": "tests/conftest.py",
+     "line": 28,
+     "name": "app"
+    },
+    {
+     "file": "tests/test_apps/cliapp/factory.py",
+     "line": 4,
+     "name": "create_app"
+    },
+    {
+     "file": "tests/test_apps/cliapp/factory.py",
+     "line": 8,
+     "name": "create_app2"
+    },
+    {
+     "file": "tests/test_async.py",
+     "line": 41,
+     "name": "_async_app"
+    },
+    {
+     "file": "tests/test_async.py",
+     "line": 97,
+     "name": "test_async_before_after_request"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 1238,
+     "name": "test_response_type_errors"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 1435,
+     "name": "test_static_url_path"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 1446,
+     "name": "test_static_url_path_with_ending_slash"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 1457,
+     "name": "test_static_url_empty_path"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 1464,
+     "name": "test_static_url_empty_path_default"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 1471,
+     "name": "test_static_folder_with_pathlib_path"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 1480,
+     "name": "test_static_folder_with_ending_slash"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 1491,
+     "name": "test_static_route_with_host_matching"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 1529,
+     "name": "test_server_name_matching"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 1565,
+     "name": "test_server_name_subdomain"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 1783,
+     "name": "test_subdomain_basic_support"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 1803,
+     "name": "test_subdomain_matching"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 1816,
+     "name": "test_subdomain_matching_with_ports"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 1830,
+     "name": "test_subdomain_matching_other_name"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 1962,
+     "name": "test_app_freed_on_zero_refcount"
+    },
+    {
+     "file": "tests/test_blueprints.py",
+     "line": 175,
+     "name": "test_templates_and_static"
+    },
+    {
+     "file": "tests/test_cli.py",
+     "line": 47,
+     "name": "test_find_best_app"
+    },
+    {
+     "file": "tests/test_cli.py",
+     "line": 65,
+     "name": "create_app"
+    },
+    {
+     "file": "tests/test_cli.py",
+     "line": 74,
+     "name": "create_app"
+    },
+    {
+     "file": "tests/test_cli.py",
+     "line": 83,
+     "name": "make_app"
+    },
+    {
+     "file": "tests/test_cli.py",
+     "line": 94,
+     "name": "create_app"
+    },
+    {
+     "file": "tests/test_cli.py",
+     "line": 103,
+     "name": "create_app"
+    },
+    {
+     "file": "tests/test_cli.py",
+     "line": 121,
+     "name": "create_app"
+    },
+    {
+     "file": "tests/test_cli.py",
+     "line": 264,
+     "name": "create_app"
+    },
+    {
+     "file": "tests/test_cli.py",
+     "line": 306,
+     "name": "test_with_appcontext"
+    },
+    {
+     "file": "tests/test_cli.py",
+     "line": 319,
+     "name": "test_appgroup_app_context"
+    },
+    {
+     "file": "tests/test_cli.py",
+     "line": 348,
+     "name": "create_app"
+    },
+    {
+     "file": "tests/test_cli.py",
+     "line": 366,
+     "name": "create_app"
+    },
+    {
+     "file": "tests/test_cli.py",
+     "line": 447,
+     "name": "app"
+    },
+    {
+     "file": "tests/test_cli.py",
+     "line": 495,
+     "name": "test_no_routes"
+    },
+    {
+     "file": "tests/test_cli.py",
+     "line": 502,
+     "name": "test_subdomain"
+    },
+    {
+     "file": "tests/test_cli.py",
+     "line": 511,
+     "name": "test_host"
+    },
+    {
+     "file": "tests/test_config.py",
+     "line": 20,
+     "name": "test_config_from_pyfile"
+    },
+    {
+     "file": "tests/test_config.py",
+     "line": 26,
+     "name": "test_config_from_object"
+    },
+    {
+     "file": "tests/test_config.py",
+     "line": 32,
+     "name": "test_config_from_file_json"
+    },
+    {
+     "file": "tests/test_config.py",
+     "line": 39,
+     "name": "test_config_from_file_toml"
+    },
+    {
+     "file": "tests/test_config.py",
+     "line": 48,
+     "name": "test_from_prefixed_env"
+    },
+    {
+     "file": "tests/test_config.py",
+     "line": 69,
+     "name": "test_from_prefixed_env_custom_prefix"
+    },
+    {
+     "file": "tests/test_config.py",
+     "line": 79,
+     "name": "test_from_prefixed_env_nested"
+    },
+    {
+     "file": "tests/test_config.py",
+     "line": 110,
+     "name": "test_config_from_mapping"
+    },
+    {
+     "file": "tests/test_config.py",
+     "line": 132,
+     "name": "test_config_from_class"
+    },
+    {
+     "file": "tests/test_config.py",
+     "line": 144,
+     "name": "test_config_from_envvar"
+    },
+    {
+     "file": "tests/test_config.py",
+     "line": 161,
+     "name": "test_config_from_envvar_missing"
+    },
+    {
+     "file": "tests/test_config.py",
+     "line": 174,
+     "name": "test_config_missing"
+    },
+    {
+     "file": "tests/test_config.py",
+     "line": 186,
+     "name": "test_config_missing_file"
+    },
+    {
+     "file": "tests/test_config.py",
+     "line": 198,
+     "name": "test_custom_config_class"
+    },
+    {
+     "file": "tests/test_config.py",
+     "line": 211,
+     "name": "test_session_lifetime"
+    },
+    {
+     "file": "tests/test_config.py",
+     "line": 217,
+     "name": "test_get_namespace"
+    },
+    {
+     "file": "tests/test_config.py",
+     "line": 244,
+     "name": "test_from_pyfile_weird_encoding"
+    },
+    {
+     "file": "tests/test_helpers.py",
+     "line": 44,
+     "name": "test_static_file"
+    },
+    {
+     "file": "tests/test_helpers.py",
+     "line": 188,
+     "name": "test_app_aborter_class"
+    },
+    {
+     "file": "tests/test_helpers.py",
+     "line": 220,
+     "name": "test_name_with_import_error"
+    },
+    {
+     "file": "tests/test_helpers.py",
+     "line": 342,
+     "name": "test_make_response"
+    },
+    {
+     "file": "tests/test_helpers.py",
+     "line": 356,
+     "name": "test_open_resource"
+    },
+    {
+     "file": "tests/test_helpers.py",
+     "line": 364,
+     "name": "test_open_resource_exceptions"
+    },
+    {
+     "file": "tests/test_helpers.py",
+     "line": 372,
+     "name": "test_open_resource_with_encoding"
+    },
+    {
+     "file": "tests/test_instance_config.py",
+     "line": 8,
+     "name": "test_explicit_instance_paths"
+    },
+    {
+     "file": "tests/test_reqctx.py",
+     "line": 177,
+     "name": "test_session_error_pops_context"
+    },
+    {
+     "file": "tests/test_reqctx.py",
+     "line": 201,
+     "name": "test_session_dynamic_cookie_name"
+    },
+    {
+     "file": "tests/test_session_interface.py",
+     "line": 6,
+     "name": "test_open_session_with_endpoint"
+    },
+    {
+     "file": "tests/test_signals.py",
+     "line": 25,
+     "name": "test_before_render_template"
+    },
+    {
+     "file": "tests/test_signals.py",
+     "line": 50,
+     "name": "test_request_signals"
+    },
+    {
+     "file": "tests/test_signals.py",
+     "line": 95,
+     "name": "test_request_exception_signal"
+    },
+    {
+     "file": "tests/test_subclassing.py",
+     "line": 6,
+     "name": "test_suppressed_exception_logging"
+    },
+    {
+     "file": "tests/test_templating.py",
+     "line": 405,
+     "name": "test_custom_template_loader"
+    },
+    {
+     "file": "tests/test_templating.py",
+     "line": 443,
+     "name": "test_templates_auto_reload"
+    },
+    {
+     "file": "tests/test_templating.py",
+     "line": 524,
+     "name": "test_custom_jinja_env"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 116,
+     "name": "test_blueprint_with_subdomain"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 188,
+     "name": "test_session_transactions_no_null_sessions"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 304,
+     "name": "test_subdomain"
+    },
+    {
+     "file": "tests/test_user_error_handler.py",
+     "line": 163,
+     "name": "test_default_error_handler"
+    }
+   ],
+   "kind": "callers"
+  }
+ ],
+ "runs": [
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 55.472257583,
+   "cost_usd": 0.5192675999999999,
+   "turns": 15,
+   "tokens": 163809,
+   "score": {
+    "pass": false,
+    "recall": 0.9,
+    "precision": 1.0,
+    "n_answer": 9,
+    "flagged_incomplete": false,
+    "missed": [
+     "src/flask/helpers.py:63 stream_with_context"
+    ],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 26.201341584,
+   "cost_usd": 0.4251302,
+   "turns": 5,
+   "tokens": 133706,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 10,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 44.852814042,
+   "cost_usd": 0.3622062,
+   "turns": 10,
+   "tokens": 148401,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 35.804648084,
+   "cost_usd": 0.263324,
+   "turns": 4,
+   "tokens": 132902,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 45.357678542,
+   "cost_usd": 0.31006340000000004,
+   "turns": 11,
+   "tokens": 192621,
+   "score": {
+    "pass": false,
+    "recall": 0.9090909090909092,
+    "precision": 1.0,
+    "n_answer": 10,
+    "flagged_incomplete": false,
+    "missed": [
+     "src/flask/sansio/blueprints.py:469 decorator"
+    ],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 36.263081833,
+   "cost_usd": 0.305894,
+   "turns": 5,
+   "tokens": 138998,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 78.08479825,
+   "cost_usd": 0.5215702,
+   "turns": 15,
+   "tokens": 221842,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 55.922741041,
+   "cost_usd": 0.4521952000000001,
+   "turns": 9,
+   "tokens": 261018,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 103.271577041,
+   "cost_usd": 0.7196918000000001,
+   "turns": 18,
+   "tokens": 307670,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 12,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 40.329834208,
+   "cost_usd": 0.30216760000000004,
+   "turns": 8,
+   "tokens": 134949,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 12,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 294.258914834,
+   "cost_usd": 2.3472394000000008,
+   "turns": 20,
+   "tokens": 933457,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 80,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 53.924920875,
+   "cost_usd": 0.461893,
+   "turns": 7,
+   "tokens": 166125,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 80,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 34.2943995,
+   "cost_usd": 0.0818364,
+   "turns": 8,
+   "tokens": 89368,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 10,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 10.08563275,
+   "cost_usd": 0.042847,
+   "turns": 2,
+   "tokens": 35459,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 10,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 24.682759167,
+   "cost_usd": 0.05476399999999999,
+   "turns": 6,
+   "tokens": 49148,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 10.58075525,
+   "cost_usd": 0.0390374,
+   "turns": 2,
+   "tokens": 35884,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 21.158436292,
+   "cost_usd": 0.055391,
+   "turns": 4,
+   "tokens": 42668,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 10.081090083,
+   "cost_usd": 0.0400194,
+   "turns": 2,
+   "tokens": 35987,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 25.236147625,
+   "cost_usd": 0.0602842,
+   "turns": 7,
+   "tokens": 62300,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 11.592188375,
+   "cost_usd": 0.0396194,
+   "turns": 2,
+   "tokens": 35852,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 32.236427625,
+   "cost_usd": 0.08955940000000001,
+   "turns": 10,
+   "tokens": 102934,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 12,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 8.57027475,
+   "cost_usd": 0.0375282,
+   "turns": 2,
+   "tokens": 35723,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 12,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 102.727342,
+   "cost_usd": 0.2944416,
+   "turns": 17,
+   "tokens": 370060,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 0.963855421686747,
+    "n_answer": 83,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [
+     "tests/test_cli.py:246 test_scriptinfo",
+     "tests/test_cli.py:347 test_flaskgroup_app_context",
+     "tests/test_cli.py:365 test_flaskgroup_debug"
+    ],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 22.656524083,
+   "cost_usd": 0.096033,
+   "turns": 2,
+   "tokens": 46280,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 80,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 26.228357333,
+   "cost_usd": 0.1109088,
+   "turns": 6,
+   "tokens": 63738,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 10,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 22.183344292,
+   "cost_usd": 0.22326619999999997,
+   "turns": 5,
+   "tokens": 82364,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 10,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 22.663394042,
+   "cost_usd": 0.0914186,
+   "turns": 5,
+   "tokens": 40169,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 23.175262208,
+   "cost_usd": 0.11714560000000002,
+   "turns": 4,
+   "tokens": 79926,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 21.166962542,
+   "cost_usd": 0.0783158,
+   "turns": 5,
+   "tokens": 38201,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 19.632669791,
+   "cost_usd": 0.1122656,
+   "turns": 4,
+   "tokens": 79556,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 32.233218584,
+   "cost_usd": 0.1299142,
+   "turns": 10,
+   "tokens": 66257,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 25.684019708,
+   "cost_usd": 0.1361506,
+   "turns": 5,
+   "tokens": 104029,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 11,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 24.182536375,
+   "cost_usd": 0.11995,
+   "turns": 8,
+   "tokens": 55465,
+   "score": {
+    "pass": false,
+    "recall": 0.8333333333333334,
+    "precision": 1.0,
+    "n_answer": 10,
+    "flagged_incomplete": false,
+    "missed": [
+     "tests/test_blueprints.py:691 bp_page",
+     "tests/test_blueprints.py:695 app_page"
+    ],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 42.33236975,
+   "cost_usd": 0.15784240000000002,
+   "turns": 7,
+   "tokens": 129416,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 12,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 111.812354625,
+   "cost_usd": 0.4500008,
+   "turns": 15,
+   "tokens": 265136,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 80,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 48.364120167,
+   "cost_usd": 0.2638752,
+   "turns": 4,
+   "tokens": 108484,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 80,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  }
+ ]
+}

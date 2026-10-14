@@ -7,7 +7,55 @@
 use tree_sitter::Node;
 
 use crate::syntax::language::extractor::{binary_operator_text, LanguageSpecificExtractor};
+use crate::syntax::utils::fqn_builder::build_fqn;
 use crate::syntax::utils::rust_test_detector;
+
+/// Inline `mod` names and the `impl` type / `trait` name enclosing `node`,
+/// outermost first. A function nested in another function's body keeps only
+/// the owners outside that body's item (`fn` bodies are not path segments).
+fn rust_owner_path(node: &Node, source: &[u8]) -> Vec<String> {
+    let mut out = Vec::new();
+    let mut cur = node.parent();
+    while let Some(n) = cur {
+        match n.kind() {
+            "impl_item" => {
+                if let Some(t) = n
+                    .child_by_field_name("type")
+                    .and_then(|t| type_name(&t, source))
+                {
+                    out.push(t);
+                }
+            }
+            "trait_item" | "mod_item" => {
+                if let Some(name) = n
+                    .child_by_field_name("name")
+                    .and_then(|t| t.utf8_text(source).ok())
+                {
+                    out.push(name.to_string());
+                }
+            }
+            _ => {}
+        }
+        cur = n.parent();
+    }
+    out.reverse();
+    out
+}
+
+/// `Circle` for `Circle`, `Circle<T>`, `&'a Circle`, `crate::m::Circle<T>`;
+/// the full text (without spaces) for tuples, slices and other shapes.
+fn type_name(ty: &Node, source: &[u8]) -> Option<String> {
+    match ty.kind() {
+        "type_identifier" | "primitive_type" => ty.utf8_text(source).ok().map(str::to_string),
+        "generic_type" => type_name(&ty.child_by_field_name("type")?, source),
+        "scoped_type_identifier" => type_name(&ty.child_by_field_name("name")?, source),
+        "reference_type" | "pointer_type" => type_name(&ty.child_by_field_name("type")?, source),
+        _ => ty
+            .utf8_text(source)
+            .ok()
+            .map(|s| s.chars().filter(|c| !c.is_whitespace()).collect()),
+    }
+}
 
 #[derive(Debug, Default)]
 pub struct RustExtractor;
@@ -15,6 +63,33 @@ pub struct RustExtractor;
 impl LanguageSpecificExtractor for RustExtractor {
     fn language(&self) -> &str {
         "rust"
+    }
+
+    /// Functions are named by the inline modules and the `impl`/`trait`
+    /// block around them: `file_mod::tests::helper`, `file_mod::Circle::area`,
+    /// `file_mod::Area::twice`. Without the owner, `Circle::is_empty` and
+    /// `Square::is_empty` in one file shared an FQN (and, with equal bodies,
+    /// one node ID), and every hotspot read `mod::is_empty`.
+    fn build_symbol_fqn(
+        &self,
+        node: &Node,
+        source: &[u8],
+        simple_name: &str,
+        file_path: &str,
+        workspace_root: Option<&str>,
+    ) -> Option<String> {
+        if !matches!(node.kind(), "function_item" | "function_signature_item") {
+            return None;
+        }
+        let owners = rust_owner_path(node, source);
+        if owners.is_empty() {
+            return None;
+        }
+        Some(build_fqn(
+            &format!("{}::{simple_name}", owners.join("::")),
+            file_path,
+            workspace_root,
+        ))
     }
 
     fn is_function_definition(&self, kind: &str) -> bool {

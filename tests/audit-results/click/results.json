@@ -1,0 +1,3219 @@
+{
+ "repo": "click",
+ "root": "<repo root>",
+ "date": "2026-10-13",
+ "agent": "Claude Code",
+ "model": "claude-haiku-5-5, claude-sonnet-5-5, claude-opus-5-5",
+ "mode": "read-only tools + language toolchain",
+ "answer_key": "GridSeak compiler-indexed call graph (3240 edges, 100% from the compiler index); targets whose callers share a name with any of the 870 calls the compiler could not resolve (untyped receivers) are not asked",
+ "call_edges": 3240,
+ "tasks": [
+  {
+   "id": "t1",
+   "band": "small",
+   "target": "getchar",
+   "file": "src/click/termui.py",
+   "line": 957,
+   "question": "In this repository (click), list every function and method, including those in test files, that transitively calls `getchar` (declared at src/click/termui.py:957) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `getchar` itself. The list must be complete. In Python, a `def` nested in a function is a named function. `C(...)` calls the `__init__` (or `__new__`) C defines or inherits (neither for an `Enum`, whose `E(value)` looks a member up), `super().m(...)` calls the base class's m, and `obj.m(...)` calls the m that obj's type defines or inherits, not overrides in subclasses; a call of an `@abstractmethod` or of a `Protocol` method is dynamic dispatch. A name defined in several `if`/`else` or `try`/`except` branches calls each definition the call can reach; `@overload` stubs are never called. `@d(...)` calls d; a bare `@d`, reading a `@property`, `with`, iteration and operators are not direct calls.",
+   "max_depth": 2,
+   "answer": [
+    {
+     "file": "examples/termui/termui.py",
+     "line": 139,
+     "name": "pause"
+    },
+    {
+     "file": "examples/termui/termui.py",
+     "line": 145,
+     "name": "menu"
+    },
+    {
+     "file": "src/click/termui.py",
+     "line": 993,
+     "name": "pause"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 390,
+     "name": "test_getchar_windows"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 403,
+     "name": "test_getchar_special_key_windows"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 416,
+     "name": "test_getchar_windows_exceptions"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 139,
+     "name": "continue_it"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 153,
+     "name": "getchar_echo"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 251,
+     "name": "cli"
+    },
+    {
+     "file": "tests/test_utils/test_echo.py",
+     "line": 92,
+     "name": "test_echo_writing_to_standard_error"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t2",
+   "band": "small",
+   "target": "__init__",
+   "file": "src/click/utils.py",
+   "line": 216,
+   "question": "In this repository (click), list every function and method, including those in test files, that transitively calls `__init__` (declared at src/click/utils.py:216) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `__init__` itself. The list must be complete. In Python, a `def` nested in a function is a named function. `C(...)` calls the `__init__` (or `__new__`) C defines or inherits (neither for an `Enum`, whose `E(value)` looks a member up), `super().m(...)` calls the base class's m, and `obj.m(...)` calls the m that obj's type defines or inherits, not overrides in subclasses; a call of an `@abstractmethod` or of a `Protocol` method is dynamic dispatch. A name defined in several `if`/`else` or `try`/`except` branches calls each definition the call can reach; `@overload` stubs are never called. `@d(...)` calls d; a bare `@d`, reading a `@property`, `with`, iteration and operators are not direct calls.",
+   "max_depth": 2,
+   "answer": [
+    {
+     "file": "src/click/utils.py",
+     "line": 381,
+     "name": "open_file"
+    },
+    {
+     "file": "tests/test_utils/test_KeepOpenFile.py",
+     "line": 4,
+     "name": "test_iter_keepopenfile"
+    },
+    {
+     "file": "tests/test_utils/test_open_file.py",
+     "line": 14,
+     "name": "cli"
+    },
+    {
+     "file": "tests/test_utils/test_open_file.py",
+     "line": 37,
+     "name": "cli"
+    },
+    {
+     "file": "tests/test_utils/test_open_file.py",
+     "line": 51,
+     "name": "cli"
+    },
+    {
+     "file": "tests/test_utils/test_open_file.py",
+     "line": 59,
+     "name": "test_open_file_respects_ignore"
+    },
+    {
+     "file": "tests/test_utils/test_open_file.py",
+     "line": 67,
+     "name": "test_open_file_ignore_invalid_utf8"
+    },
+    {
+     "file": "tests/test_utils/test_open_file.py",
+     "line": 75,
+     "name": "test_open_file_ignore_no_encoding"
+    },
+    {
+     "file": "tests/test_utils/test_open_file.py",
+     "line": 92,
+     "name": "cli"
+    },
+    {
+     "file": "tests/test_utils/test_open_file.py",
+     "line": 104,
+     "name": "cli"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t3",
+   "band": "small",
+   "target": "_format_default",
+   "file": "src/click/termui.py",
+   "line": 128,
+   "question": "In this repository (click), list every function and method, including those in test files, that transitively calls `_format_default` (declared at src/click/termui.py:128) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `_format_default` itself. The list must be complete. In Python, a `def` nested in a function is a named function. `C(...)` calls the `__init__` (or `__new__`) C defines or inherits (neither for an `Enum`, whose `E(value)` looks a member up), `super().m(...)` calls the base class's m, and `obj.m(...)` calls the m that obj's type defines or inherits, not overrides in subclasses; a call of an `@abstractmethod` or of a `Protocol` method is dynamic dispatch. A name defined in several `if`/`else` or `try`/`except` branches calls each definition the call can reach; `@overload` stubs are never called. `@d(...)` calls d; a bare `@d`, reading a `@property`, `with`, iteration and operators are not direct calls.",
+   "max_depth": 4,
+   "answer": [
+    {
+     "file": "src/click/core.py",
+     "line": 3698,
+     "name": "prompt_for_value"
+    },
+    {
+     "file": "src/click/core.py",
+     "line": 3820,
+     "name": "consume_value"
+    },
+    {
+     "file": "src/click/termui.py",
+     "line": 108,
+     "name": "_build_prompt"
+    },
+    {
+     "file": "src/click/termui.py",
+     "line": 168,
+     "name": "prompt"
+    },
+    {
+     "file": "src/click/termui.py",
+     "line": 289,
+     "name": "confirm"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 1973,
+     "name": "cli"
+    },
+    {
+     "file": "tests/test_utils/test_confirm.py",
+     "line": 6,
+     "name": "test"
+    },
+    {
+     "file": "tests/test_utils/test_confirm.py",
+     "line": 25,
+     "name": "test_no"
+    },
+    {
+     "file": "tests/test_utils/test_echo.py",
+     "line": 92,
+     "name": "test_echo_writing_to_standard_error"
+    },
+    {
+     "file": "tests/test_utils/test_prompt.py",
+     "line": 10,
+     "name": "test_prompt_cast_default"
+    },
+    {
+     "file": "tests/test_utils/test_prompt.py",
+     "line": 17,
+     "name": "test_prompt_default_round_trips_through_type"
+    },
+    {
+     "file": "tests/test_utils/test_prompt.py",
+     "line": 34,
+     "name": "test_prompt_default_validated_by_type"
+    },
+    {
+     "file": "tests/test_utils/test_prompt.py",
+     "line": 44,
+     "name": "test_prompts_abort"
+    },
+    {
+     "file": "tests/test_utils/test_prompt.py",
+     "line": 94,
+     "name": "echo"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t4",
+   "band": "small",
+   "target": "format_pos",
+   "file": "src/click/_termui_impl.py",
+   "line": 195,
+   "question": "In this repository (click), list every function and method, including those in test files, that transitively calls `format_pos` (declared at src/click/_termui_impl.py:195) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `format_pos` itself. The list must be complete. In Python, a `def` nested in a function is a named function. `C(...)` calls the `__init__` (or `__new__`) C defines or inherits (neither for an `Enum`, whose `E(value)` looks a member up), `super().m(...)` calls the base class's m, and `obj.m(...)` calls the m that obj's type defines or inherits, not overrides in subclasses; a call of an `@abstractmethod` or of a `Protocol` method is dynamic dispatch. A name defined in several `if`/`else` or `try`/`except` branches calls each definition the call can reach; `@overload` stubs are never called. `@d(...)` calls d; a bare `@d`, reading a `@property`, `with`, iteration and operators are not direct calls.",
+   "max_depth": 4,
+   "answer": [
+    {
+     "file": "examples/termui/termui.py",
+     "line": 38,
+     "name": "progress"
+    },
+    {
+     "file": "src/click/_termui_impl.py",
+     "line": 115,
+     "name": "__enter__"
+    },
+    {
+     "file": "src/click/_termui_impl.py",
+     "line": 120,
+     "name": "__exit__"
+    },
+    {
+     "file": "src/click/_termui_impl.py",
+     "line": 128,
+     "name": "__iter__"
+    },
+    {
+     "file": "src/click/_termui_impl.py",
+     "line": 142,
+     "name": "render_finish"
+    },
+    {
+     "file": "src/click/_termui_impl.py",
+     "line": 223,
+     "name": "format_progress_line"
+    },
+    {
+     "file": "src/click/_termui_impl.py",
+     "line": 250,
+     "name": "render_progress"
+    },
+    {
+     "file": "src/click/_termui_impl.py",
+     "line": 318,
+     "name": "update"
+    },
+    {
+     "file": "src/click/_termui_impl.py",
+     "line": 349,
+     "name": "generator"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 114,
+     "name": "test_progressbar_lands_on_final_position"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 173,
+     "name": "test_progressbar_format_pos"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 203,
+     "name": "test_progressbar_format_progress_line"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 217,
+     "name": "test_progressbar_format_progress_line_with_show_func"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 359,
+     "name": "cli"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 377,
+     "name": "test_progress_bar_update_min_steps"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t5",
+   "band": "medium",
+   "target": "_infer_flag_kind",
+   "file": "src/click/core.py",
+   "line": 3249,
+   "question": "In this repository (click), list every function and method, including those in test files, that transitively calls `_infer_flag_kind` (declared at src/click/core.py:3249) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `_infer_flag_kind` itself. The list must be complete. In Python, a `def` nested in a function is a named function. `C(...)` calls the `__init__` (or `__new__`) C defines or inherits (neither for an `Enum`, whose `E(value)` looks a member up), `super().m(...)` calls the base class's m, and `obj.m(...)` calls the m that obj's type defines or inherits, not overrides in subclasses; a call of an `@abstractmethod` or of a `Protocol` method is dynamic dispatch. A name defined in several `if`/`else` or `try`/`except` branches calls each definition the call can reach; `@overload` stubs are never called. `@d(...)` calls d; a bare `@d`, reading a `@property`, `with`, iteration and operators are not direct calls.",
+   "max_depth": 2,
+   "answer": [
+    {
+     "file": "src/click/core.py",
+     "line": 3149,
+     "name": "__init__"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 111,
+     "name": "test_argument_normalizes_an_identifier_decl"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 245,
+     "name": "test_option_explicit_name_keeps_its_case"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 846,
+     "name": "test_help_invalid_default"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 977,
+     "name": "test_cast_multi_default"
+    },
+    {
+     "file": "tests/test_commands.py",
+     "line": 349,
+     "name": "test_group_add_command_name"
+    },
+    {
+     "file": "tests/test_commands.py",
+     "line": 401,
+     "name": "test_iter_params_for_processing"
+    },
+    {
+     "file": "tests/test_commands.py",
+     "line": 462,
+     "name": "test_get_help_option_names"
+    },
+    {
+     "file": "tests/test_context.py",
+     "line": 412,
+     "name": "__init__"
+    },
+    {
+     "file": "tests/test_context.py",
+     "line": 481,
+     "name": "__init__"
+    },
+    {
+     "file": "tests/test_context.py",
+     "line": 700,
+     "name": "test_propagate_show_default_setting"
+    },
+    {
+     "file": "tests/test_custom_classes.py",
+     "line": 47,
+     "name": "test_context_formatter_class"
+    },
+    {
+     "file": "tests/test_deprecations.py",
+     "line": 226,
+     "name": "test_unnormalized_explicit_name_deprecated"
+    },
+    {
+     "file": "tests/test_deprecations.py",
+     "line": 244,
+     "name": "test_normalized_explicit_name_not_deprecated"
+    },
+    {
+     "file": "tests/test_deprecations.py",
+     "line": 250,
+     "name": "test_unnormalized_name_on_a_refused_option_is_silent"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 40,
+     "name": "test_invalid_option"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 69,
+     "name": "test_deprecated_empty_help_no_leading_space"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 88,
+     "name": "test_help_spec"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 113,
+     "name": "test_spec"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 123,
+     "name": "test_spec_with_explicit_name"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 152,
+     "name": "test_deprecated_required"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 157,
+     "name": "test_deprecated_prompt"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 224,
+     "name": "test_suggest_possible_options"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 688,
+     "name": "test_multiple_default_type"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 697,
+     "name": "test_multiple_default_composite_type"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 718,
+     "name": "test_type_from_default_container"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 780,
+     "name": "test_dynamic_default_help_special_method"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 803,
+     "name": "test_intrange_default_help_text"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 811,
+     "name": "test_count_default_type_help"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 820,
+     "name": "test_file_type_help_default"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1117,
+     "name": "test_required_option"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1131,
+     "name": "test_missing_required_flag"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1155,
+     "name": "test_missing_envvar"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1527,
+     "name": "test_option_name_must_be_an_identifier"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1533,
+     "name": "test_option_prompt_still_guards_against_a_nameless_option"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1540,
+     "name": "test_option_name_check_applies_when_not_exposed"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1582,
+     "name": "test_flag_duplicate_names"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1588,
+     "name": "test_show_default_boolean_flag_name"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1605,
+     "name": "test_show_true_default_boolean_flag_value"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1623,
+     "name": "test_hide_false_default_boolean_flag_value"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1640,
+     "name": "test_show_default_string"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1682,
+     "name": "test_show_default_with_empty_string"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1694,
+     "name": "test_do_not_show_no_default"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1703,
+     "name": "test_do_not_show_default_empty_multiple"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1729,
+     "name": "test_show_default_precedence"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1768,
+     "name": "test_multiple_option_with_optional_value"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1791,
+     "name": "test_type_from_flag_value"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 2123,
+     "name": "test_flag_auto_detection"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 2138,
+     "name": "test_invalid_flag_combinations"
+    },
+    {
+     "file": "tests/test_parser.py",
+     "line": 27,
+     "name": "test_parser_collects_prefixes"
+    },
+    {
+     "file": "tests/test_shell_completion.py",
+     "line": 33,
+     "name": "test_command"
+    },
+    {
+     "file": "tests/test_shell_completion.py",
+     "line": 43,
+     "name": "test_group"
+    },
+    {
+     "file": "tests/test_shell_completion.py",
+     "line": 60,
+     "name": "test_nested_group"
+    },
+    {
+     "file": "tests/test_shell_completion.py",
+     "line": 79,
+     "name": "test_group_command_same_option"
+    },
+    {
+     "file": "tests/test_shell_completion.py",
+     "line": 89,
+     "name": "test_chained"
+    },
+    {
+     "file": "tests/test_shell_completion.py",
+     "line": 146,
+     "name": "test_type_choice"
+    },
+    {
+     "file": "tests/test_shell_completion.py",
+     "line": 153,
+     "name": "test_choice_special_characters"
+    },
+    {
+     "file": "tests/test_shell_completion.py",
+     "line": 160,
+     "name": "test_choice_conflicting_prefix"
+    },
+    {
+     "file": "tests/test_shell_completion.py",
+     "line": 172,
+     "name": "test_option_count"
+    },
+    {
+     "file": "tests/test_shell_completion.py",
+     "line": 178,
+     "name": "test_option_optional"
+    },
+    {
+     "file": "tests/test_shell_completion.py",
+     "line": 196,
+     "name": "test_path_types"
+    },
+    {
+     "file": "tests/test_shell_completion.py",
+     "line": 205,
+     "name": "test_absolute_path"
+    },
+    {
+     "file": "tests/test_shell_completion.py",
+     "line": 213,
+     "name": "test_option_flag"
+    },
+    {
+     "file": "tests/test_shell_completion.py",
+     "line": 227,
+     "name": "test_flag_option_with_nargs_option"
+    },
+    {
+     "file": "tests/test_shell_completion.py",
+     "line": 256,
+     "name": "test_option_multiple"
+    },
+    {
+     "file": "tests/test_shell_completion.py",
+     "line": 268,
+     "name": "test_option_nargs"
+    },
+    {
+     "file": "tests/test_shell_completion.py",
+     "line": 275,
+     "name": "test_argument_nargs"
+    },
+    {
+     "file": "tests/test_shell_completion.py",
+     "line": 293,
+     "name": "test_double_dash"
+    },
+    {
+     "file": "tests/test_shell_completion.py",
+     "line": 308,
+     "name": "test_hidden"
+    },
+    {
+     "file": "tests/test_shell_completion.py",
+     "line": 497,
+     "name": "test_choice_case_sensitive"
+    },
+    {
+     "file": "tests/test_utils/test_confirm.py",
+     "line": 44,
+     "name": "test_confirm_repeat"
+    },
+    {
+     "file": "tests/test_utils/test_sentinel.py",
+     "line": 90,
+     "name": "test_parameter_duplication"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t6",
+   "band": "large",
+   "target": "decorator",
+   "file": "src/click/decorators.py",
+   "line": 217,
+   "question": "In this repository (click), list every function and method, including those in test files, that transitively calls `decorator` (declared at src/click/decorators.py:217) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `decorator` itself. The list must be complete. In Python, a `def` nested in a function is a named function. `C(...)` calls the `__init__` (or `__new__`) C defines or inherits (neither for an `Enum`, whose `E(value)` looks a member up), `super().m(...)` calls the base class's m, and `obj.m(...)` calls the m that obj's type defines or inherits, not overrides in subclasses; a call of an `@abstractmethod` or of a `Protocol` method is dynamic dispatch. A name defined in several `if`/`else` or `try`/`except` branches calls each definition the call can reach; `@overload` stubs are never called. `@d(...)` calls d; a bare `@d`, reading a `@property`, `with`, iteration and operators are not direct calls.",
+   "max_depth": 5,
+   "answer": [
+    {
+     "file": "src/click/core.py",
+     "line": 1853,
+     "name": "command"
+    },
+    {
+     "file": "src/click/core.py",
+     "line": 1884,
+     "name": "decorator"
+    },
+    {
+     "file": "src/click/core.py",
+     "line": 1902,
+     "name": "group"
+    },
+    {
+     "file": "src/click/core.py",
+     "line": 1936,
+     "name": "decorator"
+    },
+    {
+     "file": "src/click/decorators.py",
+     "line": 168,
+     "name": "command"
+    },
+    {
+     "file": "src/click/decorators.py",
+     "line": 293,
+     "name": "group"
+    },
+    {
+     "file": "tests/test_abort_interrupt.py",
+     "line": 59,
+     "name": "_prompting_command"
+    },
+    {
+     "file": "tests/test_abort_interrupt.py",
+     "line": 68,
+     "name": "_interrupting_command"
+    },
+    {
+     "file": "tests/test_abort_interrupt.py",
+     "line": 94,
+     "name": "test_interrupt_while_reporting_abort"
+    },
+    {
+     "file": "tests/test_abort_interrupt.py",
+     "line": 117,
+     "name": "test_interrupt_while_reporting_error"
+    },
+    {
+     "file": "tests/test_abort_interrupt.py",
+     "line": 133,
+     "name": "test_late_interrupt_with_disabled_standalone_mode"
+    },
+    {
+     "file": "tests/test_abort_interrupt.py",
+     "line": 153,
+     "name": "test_interrupt_while_exiting_after_success"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 14,
+     "name": "test_nargs_star"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 27,
+     "name": "test_nargs_tup"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 50,
+     "name": "test_nargs_tup_composite"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 62,
+     "name": "test_nargs_mismatch_with_tuple_type"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 71,
+     "name": "test_nargs_err"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 98,
+     "name": "test_argument_names"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 207,
+     "name": "test_argument_metavar_renders_what_a_declaration_may_not"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 330,
+     "name": "test_parameter_name_is_not_nfkc_normalized"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 353,
+     "name": "test_argument_name_keeps_its_normalization_form"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 375,
+     "name": "test_argument_name_case_transform_can_collide"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 389,
+     "name": "test_argument_name_can_collide_with_an_option"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 407,
+     "name": "test_argument_has_no_auto_envvar"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 430,
+     "name": "test_argument_explicit_envvar_case_sensitivity"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 448,
+     "name": "test_bytes_args"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 471,
+     "name": "test_file_args"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 493,
+     "name": "test_path_allow_dash"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 504,
+     "name": "test_file_atomics"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 522,
+     "name": "test_stdout_default"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 547,
+     "name": "test_nargs_envvar"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 567,
+     "name": "test_nargs_envvar_only_if_values_empty"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 580,
+     "name": "test_empty_nargs"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 600,
+     "name": "test_missing_arg"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 650,
+     "name": "test_implicit_non_required"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 661,
+     "name": "test_argument_help"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 680,
+     "name": "test_argument_help_options_only_no_arguments_section"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 693,
+     "name": "test_argument_help_lists_undocumented_arguments"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 715,
+     "name": "test_argument_help_undocumented_arguments_only_no_section"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 729,
+     "name": "test_argument_help_deprecated_without_help_lists_all"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 749,
+     "name": "test_argument_help_empty_string_lists_all"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 786,
+     "name": "test_argument_help_optional_metavar"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 798,
+     "name": "test_deprecated_usage"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 822,
+     "name": "test_argument_metavar_marks_optional"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 839,
+     "name": "test_deprecated_usage_help_record"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 852,
+     "name": "test_deprecated_usage_help_record_without_help"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 910,
+     "name": "test_deprecated_warning"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 936,
+     "name": "test_eat_options"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 952,
+     "name": "test_nargs_star_ordering"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 965,
+     "name": "test_nargs_specified_plus_star_ordering"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 1001,
+     "name": "test_good_defaults_for_nargs"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 1088,
+     "name": "test_bad_defaults_for_nargs"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 1100,
+     "name": "test_multiple_param_decls_not_allowed"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 1114,
+     "name": "test_subcommand_help"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 1133,
+     "name": "test_nested_subcommand_help"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 1155,
+     "name": "test_when_argument_decorator_is_used_multiple_times_cls_is_preserved"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 1184,
+     "name": "test_duplicate_names_warning"
+    },
+    {
+     "file": "tests/test_arguments.py",
+     "line": 1208,
+     "name": "test_argument_custom_class_can_override_type_cast_value_and_never_sees_unset"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 12,
+     "name": "test_basic_functionality"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 73,
+     "name": "test_param_squatting_help_option_name"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 90,
+     "name": "test_option_reusing_help_flag"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 113,
+     "name": "test_repr"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 131,
+     "name": "test_return_values"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 141,
+     "name": "test_basic_group"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 167,
+     "name": "test_group_commands_dict"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 179,
+     "name": "test_group_from_list"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 201,
+     "name": "test_string_option"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 224,
+     "name": "test_int_option"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 250,
+     "name": "test_uuid_option"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 275,
+     "name": "test_float_option"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 307,
+     "name": "test_boolean_switch"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 330,
+     "name": "test_boolean_flag"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 347,
+     "name": "test_boolean_conversion"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 395,
+     "name": "test_flag_value_dual_options"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 418,
+     "name": "test_file_option"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 439,
+     "name": "test_file_lazy_mode"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 479,
+     "name": "test_path_option"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 523,
+     "name": "test_choice_option"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 544,
+     "name": "test_choice_argument"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 565,
+     "name": "test_choice_argument_enum"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 592,
+     "name": "test_choice_argument_custom_type"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 623,
+     "name": "test_choice_argument_none"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 651,
+     "name": "test_choice_argument_optional_metavar"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 678,
+     "name": "test_datetime_argument_optional_metavar"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 691,
+     "name": "test_datetime_option_default"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 718,
+     "name": "test_datetime_option_custom"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 729,
+     "name": "test_required_option"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 740,
+     "name": "test_evaluation_order"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 783,
+     "name": "test_hidden_option"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 794,
+     "name": "test_hidden_command"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 808,
+     "name": "test_hidden_group"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 827,
+     "name": "test_summary_line"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 863,
+     "name": "test_version_option_resolves_import_name_to_distribution"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 893,
+     "name": "test_version_option_ambiguous_import_name_errors"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 922,
+     "name": "test_version_option_unknown_package_errors"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 943,
+     "name": "test_custom_version_option"
+    },
+    {
+     "file": "tests/test_basic.py",
+     "line": 954,
+     "name": "test_custom_version_option_receives_context"
+    },
+    {
+     "file": "tests/test_chain.py",
+     "line": 15,
+     "name": "test_basic_chaining"
+    },
+    {
+     "file": "tests/test_chain.py",
+     "line": 47,
+     "name": "test_chaining_help"
+    },
+    {
+     "file": "tests/test_chain.py",
+     "line": 68,
+     "name": "test_chaining_with_options"
+    },
+    {
+     "file": "tests/test_chain.py",
+     "line": 89,
+     "name": "test_no_command_result_callback"
+    },
+    {
+     "file": "tests/test_chain.py",
+     "line": 107,
+     "name": "test_chaining_with_arguments"
+    },
+    {
+     "file": "tests/test_chain.py",
+     "line": 135,
+     "name": "test_pipeline"
+    },
+    {
+     "file": "tests/test_chain.py",
+     "line": 170,
+     "name": "test_args_and_chain"
+    },
+    {
+     "file": "tests/test_chain.py",
+     "line": 192,
+     "name": "test_group_arg_behavior"
+    },
+    {
+     "file": "tests/test_chain.py",
+     "line": 222,
+     "name": "test_group_chaining"
+    },
+    {
+     "file": "tests/test_command_decorators.py",
+     "line": 16,
+     "name": "test_custom_command_no_parens"
+    },
+    {
+     "file": "tests/test_command_decorators.py",
+     "line": 62,
+     "name": "test_params_argument"
+    },
+    {
+     "file": "tests/test_command_decorators.py",
+     "line": 86,
+     "name": "test_generate_name"
+    },
+    {
+     "file": "tests/test_commands.py",
+     "line": 8,
+     "name": "test_other_command_invoke"
+    },
+    {
+     "file": "tests/test_commands.py",
+     "line": 24,
+     "name": "test_other_command_forward"
+    },
+    {
+     "file": "tests/test_commands.py",
+     "line": 44,
+     "name": "test_forwarded_params_consistency"
+    },
+    {
+     "file": "tests/test_commands.py",
+     "line": 66,
+     "name": "test_auto_shorthelp"
+    },
+    {
+     "file": "tests/test_commands.py",
+     "line": 104,
+     "name": "test_default_maps"
+    },
+    {
+     "file": "tests/test_commands.py",
+     "line": 129,
+     "name": "test_group_with_args"
+    },
+    {
+     "file": "tests/test_commands.py",
+     "line": 144,
+     "name": "test_custom_parser"
+    },
+    {
+     "file": "tests/test_commands.py",
+     "line": 210,
+     "name": "test_object_propagation"
+    },
+    {
+     "file": "tests/test_commands.py",
+     "line": 262,
+     "name": "test_other_command_invoke_with_defaults"
+    },
+    {
+     "file": "tests/test_commands.py",
+     "line": 279,
+     "name": "test_invoked_subcommand"
+    },
+    {
+     "file": "tests/test_commands.py",
+     "line": 311,
+     "name": "test_subcommand_metavar_marks_optional"
+    },
+    {
+     "file": "tests/test_commands.py",
+     "line": 329,
+     "name": "test_aliased_command_canonical_name"
+    },
+    {
+     "file": "tests/test_commands.py",
+     "line": 472,
+     "name": "test_help_param_priority"
+    },
+    {
+     "file": "tests/test_commands.py",
+     "line": 541,
+     "name": "test_unprocessed_options"
+    },
+    {
+     "file": "tests/test_commands.py",
+     "line": 559,
+     "name": "test_deprecated_in_help_messages"
+    },
+    {
+     "file": "tests/test_commands.py",
+     "line": 573,
+     "name": "test_deprecated_empty_help_no_leading_space"
+    },
+    {
+     "file": "tests/test_commands.py",
+     "line": 588,
+     "name": "test_deprecated_in_invocation"
+    },
+    {
+     "file": "tests/test_commands.py",
+     "line": 600,
+     "name": "test_command_parse_args_collects_option_prefixes"
+    },
+    {
+     "file": "tests/test_commands.py",
+     "line": 613,
+     "name": "test_group_parse_args_collects_base_option_prefixes"
+    },
+    {
+     "file": "tests/test_commands.py",
+     "line": 635,
+     "name": "test_group_invoke_collects_used_option_prefixes"
+    },
+    {
+     "file": "tests/test_commands.py",
+     "line": 660,
+     "name": "test_abort_exceptions_with_disabled_standalone_mode"
+    },
+    {
+     "file": "tests/test_commands.py",
+     "line": 684,
+     "name": "test_suggest_possible_commands"
+    },
+    {
+     "file": "tests/test_context.py",
+     "line": 17,
+     "name": "test_ensure_context_objects"
+    },
+    {
+     "file": "tests/test_context.py",
+     "line": 39,
+     "name": "test_get_context_objects"
+    },
+    {
+     "file": "tests/test_context.py",
+     "line": 62,
+     "name": "test_get_context_objects_no_ensuring"
+    },
+    {
+     "file": "tests/test_context.py",
+     "line": 85,
+     "name": "test_get_context_objects_missing"
+    },
+    {
+     "file": "tests/test_context.py",
+     "line": 110,
+     "name": "test_multi_enter"
+    },
+    {
+     "file": "tests/test_context.py",
+     "line": 130,
+     "name": "test_global_context_object"
+    },
+    {
+     "file": "tests/test_context.py",
+     "line": 143,
+     "name": "test_context_meta"
+    },
+    {
+     "file": "tests/test_context.py",
+     "line": 162,
+     "name": "test_make_pass_meta_decorator"
+    },
+    {
+     "file": "tests/test_context.py",
+     "line": 294,
+     "name": "test_context_pushing"
+    },
+    {
+     "file": "tests/test_context.py",
+     "line": 320,
+     "name": "test_pass_obj"
+    },
+    {
+     "file": "tests/test_context.py",
+     "line": 336,
+     "name": "test_close_before_pop"
+    },
+    {
+     "file": "tests/test_context.py",
+     "line": 357,
+     "name": "test_close_before_exit"
+    },
+    {
+     "file": "tests/test_context.py",
+     "line": 395,
+     "name": "test_multiple_eager_callbacks"
+    },
+    {
+     "file": "tests/test_context.py",
+     "line": 436,
+     "name": "test_no_state_leaks"
+    },
+    {
+     "file": "tests/test_context.py",
+     "line": 663,
+     "name": "test_make_pass_decorator_args"
+    },
+    {
+     "file": "tests/test_context.py",
+     "line": 714,
+     "name": "test_exit_not_standalone"
+    },
+    {
+     "file": "tests/test_context.py",
+     "line": 766,
+     "name": "test_parameter_source"
+    },
+    {
+     "file": "tests/test_custom_classes.py",
+     "line": 20,
+     "name": "test_context_invoke_type"
+    },
+    {
+     "file": "tests/test_custom_classes.py",
+     "line": 66,
+     "name": "test_group_command_class"
+    },
+    {
+     "file": "tests/test_custom_classes.py",
+     "line": 84,
+     "name": "test_group_group_class"
+    },
+    {
+     "file": "tests/test_custom_classes.py",
+     "line": 102,
+     "name": "test_group_group_class_self"
+    },
+    {
+     "file": "tests/test_defaults.py",
+     "line": 22,
+     "name": "test_basic_defaults"
+    },
+    {
+     "file": "tests/test_defaults.py",
+     "line": 39,
+     "name": "test_multiple_defaults"
+    },
+    {
+     "file": "tests/test_defaults.py",
+     "line": 63,
+     "name": "test_nargs_plus_multiple"
+    },
+    {
+     "file": "tests/test_defaults.py",
+     "line": 110,
+     "name": "test_flag_default_map"
+    },
+    {
+     "file": "tests/test_defaults.py",
+     "line": 203,
+     "name": "test_lookup_default_callable_in_default_map"
+    },
+    {
+     "file": "tests/test_defaults.py",
+     "line": 254,
+     "name": "test_default_map_source"
+    },
+    {
+     "file": "tests/test_defaults.py",
+     "line": 275,
+     "name": "test_parameter_source_during_paramtype_convert"
+    },
+    {
+     "file": "tests/test_defaults.py",
+     "line": 318,
+     "name": "test_parameter_source_during_eager_callback"
+    },
+    {
+     "file": "tests/test_defaults.py",
+     "line": 351,
+     "name": "test_flask_debug_env_not_stomped_by_default_flag"
+    },
+    {
+     "file": "tests/test_defaults.py",
+     "line": 395,
+     "name": "test_parameter_source_on_parse_result_bypass"
+    },
+    {
+     "file": "tests/test_defaults.py",
+     "line": 422,
+     "name": "test_lookup_default_override_respected"
+    },
+    {
+     "file": "tests/test_defaults.py",
+     "line": 493,
+     "name": "test_default_map_with_callable_flag_value"
+    },
+    {
+     "file": "tests/test_defaults.py",
+     "line": 534,
+     "name": "test_default_map_nargs"
+    },
+    {
+     "file": "tests/test_defaults.py",
+     "line": 551,
+     "name": "test_unset_in_default_map"
+    },
+    {
+     "file": "tests/test_formatting.py",
+     "line": 7,
+     "name": "test_basic_functionality"
+    },
+    {
+     "file": "tests/test_formatting.py",
+     "line": 55,
+     "name": "test_wrapping_long_options_strings"
+    },
+    {
+     "file": "tests/test_formatting.py",
+     "line": 90,
+     "name": "test_wrapping_long_command_name"
+    },
+    {
+     "file": "tests/test_formatting.py",
+     "line": 125,
+     "name": "test_formatting_empty_help_lines"
+    },
+    {
+     "file": "tests/test_formatting.py",
+     "line": 148,
+     "name": "test_formatting_usage_error"
+    },
+    {
+     "file": "tests/test_formatting.py",
+     "line": 164,
+     "name": "test_formatting_usage_error_metavar_missing_arg"
+    },
+    {
+     "file": "tests/test_formatting.py",
+     "line": 185,
+     "name": "test_formatting_usage_error_metavar_bad_arg"
+    },
+    {
+     "file": "tests/test_formatting.py",
+     "line": 201,
+     "name": "test_formatting_usage_error_nested"
+    },
+    {
+     "file": "tests/test_formatting.py",
+     "line": 221,
+     "name": "test_formatting_usage_error_no_help"
+    },
+    {
+     "file": "tests/test_formatting.py",
+     "line": 236,
+     "name": "test_formatting_usage_custom_help"
+    },
+    {
+     "file": "tests/test_formatting.py",
+     "line": 285,
+     "name": "test_formatting_usage_error_help_hint"
+    },
+    {
+     "file": "tests/test_formatting.py",
+     "line": 317,
+     "name": "test_formatting_custom_type_metavar"
+    },
+    {
+     "file": "tests/test_formatting.py",
+     "line": 338,
+     "name": "test_truncating_docstring"
+    },
+    {
+     "file": "tests/test_formatting.py",
+     "line": 367,
+     "name": "test_truncating_docstring_no_help"
+    },
+    {
+     "file": "tests/test_formatting.py",
+     "line": 387,
+     "name": "test_removing_multiline_marker"
+    },
+    {
+     "file": "tests/test_formatting.py",
+     "line": 406,
+     "name": "test_global_show_default"
+    },
+    {
+     "file": "tests/test_info_dict.py",
+     "line": 334,
+     "name": "test_command_to_info_dict_multiple_arguments"
+    },
+    {
+     "file": "tests/test_normalization.py",
+     "line": 6,
+     "name": "test_option_normalization"
+    },
+    {
+     "file": "tests/test_normalization.py",
+     "line": 18,
+     "name": "test_choice_normalization"
+    },
+    {
+     "file": "tests/test_normalization.py",
+     "line": 53,
+     "name": "test_command_normalization"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 24,
+     "name": "test_prefixes"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 51,
+     "name": "test_deprecated_usage"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 131,
+     "name": "test_deprecated_warning"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 162,
+     "name": "test_invalid_nargs"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 171,
+     "name": "test_nargs_tup_composite_mult"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 183,
+     "name": "test_counting"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 206,
+     "name": "test_unknown_options"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 232,
+     "name": "test_multiple_required"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 294,
+     "name": "test_good_defaults_for_multiple"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 441,
+     "name": "test_bad_defaults_for_multiple"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 465,
+     "name": "test_empty_envvar"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 476,
+     "name": "test_multiple_envvar"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 489,
+     "name": "test_envvar_container_type"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 591,
+     "name": "test_boolean_flag_envvar"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 630,
+     "name": "test_boolean_envvar_bad_values"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 644,
+     "name": "test_multiple_default_help"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 657,
+     "name": "test_show_default_default_map"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 669,
+     "name": "test_show_default_container_defaults"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 730,
+     "name": "test_parse_multiple_default_composite_type"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 744,
+     "name": "test_dynamic_default_help_unset"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 762,
+     "name": "test_dynamic_default_help_text"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 836,
+     "name": "test_toupper_envvar_prefix"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 856,
+     "name": "test_auto_envvar_uses_the_transformed_name"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 871,
+     "name": "test_auto_envvar_ignores_decl_case"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 887,
+     "name": "test_auto_envvar_prefix_is_upper_cased"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 904,
+     "name": "test_auto_envvar_flattens_name_case"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 923,
+     "name": "test_auto_envvar_upper_can_change_length"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 944,
+     "name": "test_explicit_envvar_case_sensitivity"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 960,
+     "name": "test_explicit_envvar_list_keeps_each_spelling"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 973,
+     "name": "test_nargs_envvar"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 998,
+     "name": "test_show_envvar"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1009,
+     "name": "test_show_envvar_auto_prefix"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1020,
+     "name": "test_show_envvar_auto_prefix_dash_in_command"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1035,
+     "name": "test_custom_validation"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1053,
+     "name": "test_callback_validates_prompt"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1069,
+     "name": "test_winstyle_options"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1086,
+     "name": "test_legacy_options"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1140,
+     "name": "test_missing_choice"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1178,
+     "name": "test_case_insensitive_choice"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1211,
+     "name": "test_case_insensitive_choice_returned_exactly"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1222,
+     "name": "test_option_help_preserve_paragraphs"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1249,
+     "name": "test_argument_custom_class"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1265,
+     "name": "test_option_custom_class"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1293,
+     "name": "test_option_custom_class_can_override_type_cast_value_and_never_sees_unset"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1317,
+     "name": "test_option_custom_class_reusable"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1364,
+     "name": "test_help_option_custom_names_and_class"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1384,
+     "name": "test_bool_flag_with_type"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1394,
+     "name": "test_aliases_for_flags"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1449,
+     "name": "test_option_names"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1463,
+     "name": "test_option_name_case_transform_can_collide"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1479,
+     "name": "test_option_name_case_variants_share_one_parameter"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1509,
+     "name": "test_option_name_keeps_its_normalization_form"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1546,
+     "name": "test_option_explicit_name_carries_a_refused_declaration"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1566,
+     "name": "test_option_name_may_be_a_python_keyword"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1649,
+     "name": "test_string_show_default_shows_custom_string_in_prompt"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1756,
+     "name": "test_option_with_optional_value"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1909,
+     "name": "test_flag_value_and_default"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1928,
+     "name": "test_invalid_flag_definition"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 1977,
+     "name": "test_default_dual_option_callback"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 2093,
+     "name": "test_envvar_string_flag_value"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 2145,
+     "name": "test_non_flag_with_non_negatable_default"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 2203,
+     "name": "test_choice_usage_rendering"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 2287,
+     "name": "test_choice_default_rendering"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 2319,
+     "name": "test_duplicate_names_warning"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 2414,
+     "name": "test_dual_options_custom_type_sentinel_flag_value"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 2554,
+     "name": "test_custom_type_flag_value_standalone_option"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 2685,
+     "name": "test_custom_type_flag_value_dual_options"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 2748,
+     "name": "test_callable_flag_value_not_instantiated"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 2767,
+     "name": "test_callable_flag_value_default_map"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 2794,
+     "name": "test_callable_flag_value_show_default"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 2847,
+     "name": "test_callable_flag_value_get_default_override"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 2874,
+     "name": "test_flag_value_not_stringified_for_custom_types"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 2930,
+     "name": "test_custom_type_container_flag_value"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 2975,
+     "name": "test_bool_flag_pair_default"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 3226,
+     "name": "test_bool_flag_group_competition"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 3259,
+     "name": "test_bool_flag_group_competition_with_envvar"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 3292,
+     "name": "test_bool_flag_group_competition_with_default_map"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 3345,
+     "name": "test_bool_flag_group_parameter_source"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 3630,
+     "name": "test_flag_group_competition_non_boolean"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 3674,
+     "name": "test_flag_group_unset_vs_none_vs_explicit"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 3706,
+     "name": "test_flag_group_competition_duplicate_option_name"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 3721,
+     "name": "test_argument_sharing_param_name_warning"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 3740,
+     "name": "test_options_sharing_name_no_warning"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 3766,
+     "name": "test_flag_group_competition_repeated_cmdline"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 3829,
+     "name": "test_flag_group_competition_four_flags"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 3884,
+     "name": "test_flag_group_competition_envvar_prefix_and_unset_default_map"
+    },
+    {
+     "file": "tests/test_options.py",
+     "line": 3916,
+     "name": "test_flag_value_on_option_with_zero_or_one_args"
+    },
+    {
+     "file": "tests/test_shell_completion.py",
+     "line": 578,
+     "name": "test_files_closed"
+    },
+    {
+     "file": "tests/test_stream_lifecycle.py",
+     "line": 138,
+     "name": "test_getvalue_after_isolation_exit"
+    },
+    {
+     "file": "tests/test_stream_lifecycle.py",
+     "line": 189,
+     "name": "test_invoke_with_logger_warning"
+    },
+    {
+     "file": "tests/test_stream_lifecycle.py",
+     "line": 204,
+     "name": "test_invoke_with_logger_and_prompt"
+    },
+    {
+     "file": "tests/test_stream_lifecycle.py",
+     "line": 220,
+     "name": "test_sequential_invokes_with_logging"
+    },
+    {
+     "file": "tests/test_stream_lifecycle.py",
+     "line": 242,
+     "name": "test_invoke_with_stream_handler_on_stderr"
+    },
+    {
+     "file": "tests/test_stream_lifecycle.py",
+     "line": 263,
+     "name": "test_logging_with_cli_log_level"
+    },
+    {
+     "file": "tests/test_stream_lifecycle.py",
+     "line": 297,
+     "name": "test_invoke_with_thread_pool"
+    },
+    {
+     "file": "tests/test_stream_lifecycle.py",
+     "line": 313,
+     "name": "test_invoke_with_threads_writing_to_streams"
+    },
+    {
+     "file": "tests/test_stream_lifecycle.py",
+     "line": 337,
+     "name": "test_invoke_with_thread_pool_and_exit"
+    },
+    {
+     "file": "tests/test_stream_lifecycle.py",
+     "line": 352,
+     "name": "test_sequential_threaded_invokes"
+    },
+    {
+     "file": "tests/test_stream_lifecycle.py",
+     "line": 374,
+     "name": "test_output_isolation_across_invokes"
+    },
+    {
+     "file": "tests/test_stream_lifecycle.py",
+     "line": 389,
+     "name": "test_stderr_isolation_across_invokes"
+    },
+    {
+     "file": "tests/test_stream_lifecycle.py",
+     "line": 405,
+     "name": "test_mixed_output_order_preserved"
+    },
+    {
+     "file": "tests/test_stream_lifecycle.py",
+     "line": 422,
+     "name": "test_exception_does_not_corrupt_next_invoke"
+    },
+    {
+     "file": "tests/test_stream_lifecycle.py",
+     "line": 449,
+     "name": "test_sys_streams_restored_after_invoke"
+    },
+    {
+     "file": "tests/test_stream_lifecycle.py",
+     "line": 467,
+     "name": "test_sys_streams_restored_after_exception"
+    },
+    {
+     "file": "tests/test_stream_lifecycle.py",
+     "line": 495,
+     "name": "test_stress_thread_pool_with_exit"
+    },
+    {
+     "file": "tests/test_stream_lifecycle.py",
+     "line": 512,
+     "name": "test_stress_logging_sequential_invocations"
+    },
+    {
+     "file": "tests/test_stream_lifecycle.py",
+     "line": 528,
+     "name": "test_stress_gc_between_invocations"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 44,
+     "name": "test_progressbar_strip_regression"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 60,
+     "name": "test_progressbar_length_hint"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 90,
+     "name": "test_progressbar_no_tty"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 101,
+     "name": "test_progressbar_hidden_manual"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 242,
+     "name": "test_progressbar_is_iterator"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 257,
+     "name": "test_choices_list_in_prompt"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 285,
+     "name": "test_file_prompt_default_format"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 318,
+     "name": "test_progressbar_update"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 341,
+     "name": "test_progressbar_item_show_func"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 357,
+     "name": "test_progressbar_update_with_item_show_func"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 1040,
+     "name": "test_echo_via_pager_tty_pager_missing"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 1326,
+     "name": "test_prompt_required_with_required"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 1353,
+     "name": "test_prompt_required_false"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 1377,
+     "name": "test_confirmation_prompt"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 1430,
+     "name": "test_prompt_and_confirm_ansi_respects_color"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 1447,
+     "name": "test_false_show_default_cause_no_default_display_in_prompt"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 1487,
+     "name": "test_string_show_default_in_prompt"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 1679,
+     "name": "test_flag_value_prompt"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 1929,
+     "name": "test_hide_input_error_message"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 1945,
+     "name": "test_hide_input_confirmation_prompt_mismatch_unaffected"
+    },
+    {
+     "file": "tests/test_termui.py",
+     "line": 1966,
+     "name": "test_hide_input_value_never_leaks_when_err_true"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 16,
+     "name": "test_runner"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 34,
+     "name": "test_echo_stdin_stream"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 52,
+     "name": "test_echo_stdin_prompts"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 92,
+     "name": "test_runner_with_stream"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 115,
+     "name": "test_prompts"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 137,
+     "name": "test_getchar"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 167,
+     "name": "test_catch_exceptions"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 191,
+     "name": "test_catch_exceptions_cli_runner"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 213,
+     "name": "test_with_color"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 229,
+     "name": "test_with_color_errors"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 249,
+     "name": "test_with_color_but_pause_not_blocking"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 260,
+     "name": "test_with_echo_via_pager"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 271,
+     "name": "test_exit_code_and_output_from_sys_exit"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 341,
+     "name": "test_env"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 359,
+     "name": "test_stderr"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 396,
+     "name": "test_args"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 408,
+     "name": "test_setting_prog_name_in_extra"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 419,
+     "name": "test_command_standalone_mode_returns_value"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 432,
+     "name": "test_file_stdin_attrs"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 460,
+     "name": "test_tempdir_replacement_pattern"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 548,
+     "name": "test_isolation_flushes_unflushed_stderr"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 568,
+     "name": "test_pdb_uses_real_streams"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 586,
+     "name": "test_pdb_explicit_streams_honored"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 603,
+     "name": "test_pdb_init_restored_after_invoke"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 637,
+     "name": "test_capture_fd_os_write"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 654,
+     "name": "test_capture_fd_stale_reference"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 680,
+     "name": "test_capture_fd_logging_handler"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 726,
+     "name": "test_capture_fd_faulthandler"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 740,
+     "name": "test_capture_sys_fileno_raises"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 761,
+     "name": "test_capture_fd_stderr_separation"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 785,
+     "name": "test_capture_fd_nesting"
+    },
+    {
+     "file": "tests/test_testing.py",
+     "line": 810,
+     "name": "test_capture_pytest_matrix"
+    },
+    {
+     "file": "tests/test_utils/test_confirm.py",
+     "line": 4,
+     "name": "test_prompts"
+    },
+    {
+     "file": "tests/test_utils/test_echo.py",
+     "line": 12,
+     "name": "test_echo"
+    },
+    {
+     "file": "tests/test_utils/test_open_file.py",
+     "line": 11,
+     "name": "test_open_file"
+    },
+    {
+     "file": "tests/test_utils/test_open_file.py",
+     "line": 32,
+     "name": "test_open_file_pathlib_dash"
+    },
+    {
+     "file": "tests/test_utils/test_open_file.py",
+     "line": 48,
+     "name": "test_open_file_ignore_errors_stdin"
+    },
+    {
+     "file": "tests/test_utils/test_open_file.py",
+     "line": 85,
+     "name": "test_open_file_atomic_permissions_existing_file"
+    },
+    {
+     "file": "tests/test_utils/test_open_file.py",
+     "line": 101,
+     "name": "test_open_file_atomic_permissions_new_file"
+    }
+   ],
+   "kind": "callers"
+  }
+ ],
+ "runs": [
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 62.014784,
+   "cost_usd": 0.5900747999999999,
+   "turns": 13,
+   "tokens": 240452,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 10,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 45.320960125,
+   "cost_usd": 0.3580424,
+   "turns": 5,
+   "tokens": 135002,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 10,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 52.905618,
+   "cost_usd": 0.4514296,
+   "turns": 12,
+   "tokens": 258272,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 10,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 28.21233125,
+   "cost_usd": 0.2119982,
+   "turns": 3,
+   "tokens": 95779,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 10,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 546.562699917,
+   "cost_usd": 3.9783368000000014,
+   "turns": 35,
+   "tokens": 2536722,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 38.30994325,
+   "cost_usd": 0.3313222,
+   "turns": 8,
+   "tokens": 182431,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 75.040840792,
+   "cost_usd": 0.7190616,
+   "turns": 7,
+   "tokens": 224097,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 15,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 64.021928334,
+   "cost_usd": 0.8252944000000002,
+   "turns": 10,
+   "tokens": 449826,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 15,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 434.558692542,
+   "cost_usd": 3.1099076,
+   "turns": 38,
+   "tokens": 1900640,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 72,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 74.063443125,
+   "cost_usd": 0.5778574000000001,
+   "turns": 8,
+   "tokens": 213016,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 72,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 645.910875542,
+   "cost_usd": 4.5624884,
+   "turns": 17,
+   "tokens": 1220569,
+   "score": {
+    "pass": false,
+    "recall": 0.0,
+    "precision": 0.0,
+    "n_answer": 0,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": "no parsable JSON answer"
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 213.95076925,
+   "cost_usd": 1.8454958,
+   "turns": 24,
+   "tokens": 1024953,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 353,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 26.245734167,
+   "cost_usd": 0.062136399999999994,
+   "turns": 10,
+   "tokens": 63208,
+   "score": {
+    "pass": false,
+    "recall": 0.7,
+    "precision": 1.0,
+    "n_answer": 7,
+    "flagged_incomplete": false,
+    "missed": [
+     "tests/test_termui.py:390 test_getchar_windows",
+     "tests/test_termui.py:403 test_getchar_special_key_windows",
+     "tests/test_termui.py:416 test_getchar_windows_exceptions"
+    ],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 9.574963125,
+   "cost_usd": 0.0890946,
+   "turns": 2,
+   "tokens": 35684,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 10,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 24.701388875,
+   "cost_usd": 0.057228,
+   "turns": 8,
+   "tokens": 71247,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 10,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 11.592512834,
+   "cost_usd": 0.0393706,
+   "turns": 2,
+   "tokens": 35927,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 10,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 49.867068542,
+   "cost_usd": 0.1276412,
+   "turns": 15,
+   "tokens": 153143,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 10.5828785,
+   "cost_usd": 0.0422534,
+   "turns": 2,
+   "tokens": 36752,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 48.388971458,
+   "cost_usd": 0.142223,
+   "turns": 18,
+   "tokens": 159207,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 15,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 11.578268,
+   "cost_usd": 0.039518,
+   "turns": 2,
+   "tokens": 36194,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 15,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 118.857357792,
+   "cost_usd": 0.364447,
+   "turns": 20,
+   "tokens": 456335,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 0.972972972972973,
+    "n_answer": 74,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [
+     "src/click/decorators.py:373 option.decorator",
+     "tests/test_arguments.py:166 test_parameter_name_is_an_identifier_or_deprecated"
+    ],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 22.686219041,
+   "cost_usd": 0.0888668,
+   "turns": 2,
+   "tokens": 44788,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 72,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 274.536930625,
+   "cost_usd": 0.9437175999999998,
+   "turns": 32,
+   "tokens": 1132271,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 353,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 92.73167975,
+   "cost_usd": 0.3107824,
+   "turns": 7,
+   "tokens": 165329,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 353,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 35.416180125,
+   "cost_usd": 0.1259706,
+   "turns": 9,
+   "tokens": 95688,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 10,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 19.139821709,
+   "cost_usd": 0.13110280000000002,
+   "turns": 5,
+   "tokens": 99853,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 10,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 23.176427916,
+   "cost_usd": 0.102842,
+   "turns": 6,
+   "tokens": 63724,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 10,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 16.126124709,
+   "cost_usd": 0.0973312,
+   "turns": 4,
+   "tokens": 58388,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 10,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 55.907921542,
+   "cost_usd": 0.3286186,
+   "turns": 15,
+   "tokens": 166422,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 29.716440708,
+   "cost_usd": 0.1721224,
+   "turns": 6,
+   "tokens": 109687,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 44.313334291,
+   "cost_usd": 0.19774900000000004,
+   "turns": 12,
+   "tokens": 137514,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 15,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t4",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 26.199997708,
+   "cost_usd": 0.14504060000000002,
+   "turns": 5,
+   "tokens": 106068,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 15,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 99.21918675,
+   "cost_usd": 0.6321406,
+   "turns": 21,
+   "tokens": 469942,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 72,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t5",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 41.326727083,
+   "cost_usd": 0.2344252,
+   "turns": 4,
+   "tokens": 103752,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 72,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 304.3358415,
+   "cost_usd": 1.4422042000000002,
+   "turns": 27,
+   "tokens": 954934,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 353,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t6",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 141.598075709,
+   "cost_usd": 0.6918796,
+   "turns": 12,
+   "tokens": 315709,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 353,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  }
+ ]
+}

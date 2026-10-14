@@ -95,6 +95,10 @@ pub struct ScipIndex {
     project_root: PathBuf,
     by_relative_path: HashMap<String, DocumentOccurrences>,
     definitions_by_symbol: HashMap<String, ScipDefinition>,
+    /// Every definition occurrence of symbols defined more than once.
+    /// scip-python reuses one symbol for same-named functions nested in
+    /// different methods of a class (`Group#decorator().`).
+    repeated_definitions: HashMap<String, Vec<ScipDefinition>>,
     implementations_by_symbol: HashMap<String, Vec<String>>,
     /// Reverse of `implementations_by_symbol`: method -> interface methods it satisfies.
     implemented_by_symbol: HashMap<String, Vec<String>>,
@@ -120,7 +124,8 @@ impl ScipIndex {
         }
 
         let mut by_relative_path = HashMap::new();
-        let mut definitions_by_symbol = HashMap::new();
+        let mut definitions_by_symbol: HashMap<String, ScipDefinition> = HashMap::new();
+        let mut repeated_definitions: HashMap<String, Vec<ScipDefinition>> = HashMap::new();
         let mut implementations_by_symbol: HashMap<String, Vec<String>> = HashMap::new();
         let mut implemented_by_symbol: HashMap<String, Vec<String>> = HashMap::new();
         let mut references_by_symbol: HashMap<String, Vec<ScipDefinition>> = HashMap::new();
@@ -151,7 +156,15 @@ impl ScipIndex {
                     symbol: occ.symbol.clone(),
                 };
                 if has_definition_role(occ.symbol_roles) {
-                    definitions_by_symbol.insert(occ.symbol.clone(), loc);
+                    if let Some(prev) =
+                        definitions_by_symbol.insert(occ.symbol.clone(), loc.clone())
+                    {
+                        let all = repeated_definitions.entry(occ.symbol.clone()).or_default();
+                        if all.is_empty() {
+                            all.push(prev);
+                        }
+                        all.push(loc);
+                    }
                 } else {
                     references_by_symbol
                         .entry(occ.symbol.clone())
@@ -161,10 +174,17 @@ impl ScipIndex {
             }
             by_relative_path.insert(normalize_rel_path(&entry.relative_path), entry);
         }
+        link_rust_trait_impls(
+            &definitions_by_symbol,
+            &references_by_symbol,
+            &mut implementations_by_symbol,
+            &mut implemented_by_symbol,
+        );
         Ok(Self {
             project_root,
             by_relative_path,
             definitions_by_symbol,
+            repeated_definitions,
             implementations_by_symbol,
             implemented_by_symbol,
             references_by_symbol,
@@ -256,6 +276,47 @@ impl ScipIndex {
         self.definitions_by_symbol.get(symbol).cloned()
     }
 
+    /// Module-level classes and functions named `name` (`…/name#`,
+    /// `…/name().`) that the index defines.
+    pub fn module_level_definitions(&self, name: &str) -> Vec<ScipDefinition> {
+        let class = format!("/{name}#");
+        let func = format!("/{name}().");
+        let mut out: Vec<ScipDefinition> = self
+            .definitions_by_symbol
+            .iter()
+            .filter(|(s, _)| s.ends_with(&class) || s.ends_with(&func))
+            .map(|(_, d)| d.clone())
+            .collect();
+        out.sort_by(|a, b| a.symbol.cmp(&b.symbol));
+        out
+    }
+
+    /// Start position (0-based line, character) and symbol of every
+    /// occurrence in `file`'s document, or `None` when the index has no
+    /// document for it.
+    pub fn occurrence_starts(&self, file: &Path) -> Option<Vec<(u32, u32, String)>> {
+        let rel = self.relative_path_for(file)?;
+        let doc = self.by_relative_path.get(&rel)?;
+        Some(
+            doc.occurrences
+                .iter()
+                .filter_map(|o| {
+                    decode_occurrence_range(o)
+                        .map(|r| (r.start_line, r.start_character, o.symbol.clone()))
+                })
+                .collect(),
+        )
+    }
+
+    /// Every definition occurrence of `symbol`: usually one, several when the
+    /// indexer gave distinct same-named declarations one symbol.
+    pub fn definitions_of(&self, symbol: &str) -> Vec<ScipDefinition> {
+        match self.repeated_definitions.get(symbol) {
+            Some(all) => all.clone(),
+            None => self.definition_of(symbol).into_iter().collect(),
+        }
+    }
+
     /// Symbols that implement `symbol` (SCIP `is_implementation` relationships).
     /// Callers split confidence 1/n across the may-call set.
     pub fn implementations_of(&self, symbol: &str) -> Vec<String> {
@@ -295,10 +356,28 @@ impl ScipIndex {
             if symbol.starts_with("local ") {
                 continue;
             }
-            let Some(def) = self.definitions_by_symbol.get(symbol) else {
+            let Some(def) = self
+                .definitions_by_symbol
+                .get(symbol)
+                .cloned()
+                .or_else(|| self.external_trait_method_anchor(symbol))
+            else {
                 continue;
             };
+            let def = &def;
+            // rust-analyzer names symbols by package, not by crate target, so
+            // `helper()` at the root of two integration tests (or two
+            // `src/bin/*.rs`) is one symbol with two definitions. Pair each
+            // use with the definition nearest to it: same file first, then
+            // the longest shared directory prefix.
+            let repeated = symbol
+                .starts_with("rust-analyzer ")
+                .then(|| self.repeated_definitions.get(symbol))
+                .flatten();
             for r in refs {
+                let def = repeated
+                    .and_then(|all| nearest_definition(all, &r.relative_path))
+                    .unwrap_or(def);
                 out.push((r.clone(), def.clone()));
             }
         }
@@ -333,6 +412,25 @@ impl ScipIndex {
         out
     }
 
+    /// A use of a trait method the index does not define (`serde::Serializer`
+    /// via `S: Serializer`) that the workspace implements: anchored at the
+    /// first in-index implementation but keeping the trait method's symbol,
+    /// so the resolver treats it as dispatch and fans out to every impl.
+    fn external_trait_method_anchor(&self, symbol: &str) -> Option<ScipDefinition> {
+        if !matches!(
+            rust_method_shape(symbol),
+            Some(RustMethod::TraitDecl { .. })
+        ) {
+            return None;
+        }
+        let first = self.implementations_by_symbol.get(symbol)?.first()?;
+        let at = self.definitions_by_symbol.get(first)?;
+        Some(ScipDefinition {
+            symbol: symbol.to_string(),
+            ..at.clone()
+        })
+    }
+
     fn relative_path_for(&self, file: &Path) -> Option<String> {
         if let Ok(rel) = file.strip_prefix(&self.project_root) {
             return Some(normalize_rel_path(&rel.to_string_lossy()));
@@ -347,6 +445,189 @@ impl ScipIndex {
             .get(&normalize_rel_path(&file.to_string_lossy()))
             .map(|d| d.relative_path.clone())
     }
+}
+
+/// Of several definitions of one symbol, the one in `site_path`'s file, else
+/// the one sharing the most leading path components with it.
+fn nearest_definition<'a>(
+    defs: &'a [ScipDefinition],
+    site_path: &str,
+) -> Option<&'a ScipDefinition> {
+    if let Some(same) = defs.iter().find(|d| d.relative_path == site_path) {
+        return Some(same);
+    }
+    let shared = |d: &ScipDefinition| {
+        d.relative_path
+            .split('/')
+            .zip(site_path.split('/'))
+            .take_while(|(a, b)| a == b)
+            .count()
+    };
+    defs.iter().max_by_key(|d| shared(d))
+}
+
+/// rust-analyzer's SCIP output records no `is_implementation` relationships,
+/// but its symbols name them: `m/impl#[Circle][Area]area().` is `Area::area`
+/// implemented for `Circle`, and `m/Area#area().` is the trait's own method.
+/// Link each defined trait method to the defined impl methods with the same
+/// trait name and method name, so a call through `dyn Area` or `T: Area`
+/// can fan out to the implementations. Traits are matched by their last path
+/// segment (the impl descriptor carries no more), so two same-named traits
+/// share implementations; callers lower confidence when there are several.
+///
+/// Methods of traits defined outside the index (`serde::Serializer`,
+/// `Iterator`) are linked too when they are referenced: a call through
+/// `S: Serializer` may run the workspace's own `impl Serializer for …`.
+fn link_rust_trait_impls(
+    definitions: &HashMap<String, ScipDefinition>,
+    referenced: &HashMap<String, Vec<ScipDefinition>>,
+    implementations: &mut HashMap<String, Vec<String>>,
+    implemented_by: &mut HashMap<String, Vec<String>>,
+) {
+    let mut impls_by_key: HashMap<(String, String), Vec<&str>> = HashMap::new();
+    let mut trait_methods: Vec<(&str, (String, String))> = Vec::new();
+    for symbol in definitions.keys() {
+        match rust_method_shape(symbol) {
+            Some(RustMethod::TraitImpl { trait_name, method }) => impls_by_key
+                .entry((trait_name, method))
+                .or_default()
+                .push(symbol),
+            Some(RustMethod::TraitDecl { trait_name, method }) => {
+                trait_methods.push((symbol, (trait_name, method)))
+            }
+            None => {}
+        }
+    }
+    for symbol in referenced.keys() {
+        // Standard-library traits (`Clone::clone`, `Default::default`,
+        // `Iterator::next`) are called generically everywhere; fanning those
+        // out to every workspace impl would rebuild the name-matched
+        // `clone` / `is_empty` hotspots. Only third-party traits fan out.
+        let package = symbol.split(' ').nth(2).unwrap_or("");
+        if definitions.contains_key(symbol)
+            || matches!(package, "core" | "alloc" | "std" | "proc_macro" | "test")
+        {
+            continue;
+        }
+        if let Some(RustMethod::TraitDecl { trait_name, method }) = rust_method_shape(symbol) {
+            trait_methods.push((symbol, (trait_name, method)));
+        }
+    }
+    for (trait_method, key) in trait_methods {
+        if implementations.contains_key(trait_method) {
+            continue;
+        }
+        let Some(impls) = impls_by_key.get(&key) else {
+            continue;
+        };
+        let mut impls: Vec<String> = impls.iter().map(|s| s.to_string()).collect();
+        impls.sort();
+        for imp in &impls {
+            implemented_by
+                .entry(imp.clone())
+                .or_default()
+                .push(trait_method.to_string());
+        }
+        implementations.insert(trait_method.to_string(), impls);
+    }
+}
+
+/// Method shapes in rust-analyzer SCIP symbols.
+#[derive(Debug, PartialEq, Eq)]
+pub enum RustMethod {
+    /// `…/Trait#method().`: declared (with or without a default body) in a trait.
+    TraitDecl { trait_name: String, method: String },
+    /// `…/impl#[Type][Trait]method().`: a trait method implemented for a type.
+    TraitImpl { trait_name: String, method: String },
+}
+
+/// Classify a rust-analyzer SCIP symbol as a trait method declaration or a
+/// trait-impl method. Inherent methods (`impl#[Type]m().`), free functions,
+/// and other schemes return `None`.
+pub fn rust_method_shape(symbol: &str) -> Option<RustMethod> {
+    if !symbol.starts_with("rust-analyzer ") {
+        return None;
+    }
+    let descriptors = symbol.splitn(5, ' ').nth(4)?;
+    let body = descriptors.strip_suffix("().")?;
+    // Method name: trailing identifier (or backtick-escaped name).
+    let (owner, method) = if let Some(stripped) = body.strip_suffix('`') {
+        let open = stripped.rfind('`')?;
+        (&body[..open], stripped[open + 1..].to_string())
+    } else {
+        let start = body
+            .rfind(|c: char| !(c.is_alphanumeric() || c == '_'))
+            .map(|i| i + 1)
+            .unwrap_or(0);
+        (&body[..start], body[start..].to_string())
+    };
+    if method.is_empty() {
+        return None;
+    }
+    if let Some(groups) = owner.strip_suffix(']') {
+        // `…impl#[Type][Trait]` (trait impl) or `…impl#[Type]` (inherent).
+        let groups = format!("{groups}]");
+        let parsed = bracket_groups(&groups)?;
+        let (prefix, list) = parsed;
+        if !prefix.ends_with("impl#") || list.len() != 2 {
+            return None;
+        }
+        return Some(RustMethod::TraitImpl {
+            trait_name: bare_type_name(&list[1]),
+            method,
+        });
+    }
+    let owner = owner.strip_suffix('#')?;
+    let name_start = owner
+        .rfind(['/', '#', '.', ']'])
+        .map(|i| i + 1)
+        .unwrap_or(0);
+    let trait_name = owner[name_start..].trim_matches('`');
+    if trait_name.is_empty() || trait_name == "impl" {
+        return None;
+    }
+    Some(RustMethod::TraitDecl {
+        trait_name: bare_type_name(trait_name),
+        method,
+    })
+}
+
+/// Split `prefix[a][b]` into `prefix` and `["a", "b"]`, honouring backtick
+/// escapes inside the brackets (`[`Vec<T, A>`]`).
+fn bracket_groups(s: &str) -> Option<(&str, Vec<String>)> {
+    let chars: Vec<(usize, char)> = s.char_indices().collect();
+    let mut groups = Vec::new();
+    let mut i = chars.len();
+    // Walk groups from the end.
+    while i > 0 && chars[i - 1].1 == ']' {
+        let close = i - 1;
+        let mut j = close;
+        let mut in_tick = false;
+        loop {
+            if j == 0 {
+                return None;
+            }
+            j -= 1;
+            match chars[j].1 {
+                '`' => in_tick = !in_tick,
+                '[' if !in_tick => break,
+                _ => {}
+            }
+        }
+        let inner: String = chars[j + 1..close].iter().map(|(_, c)| *c).collect();
+        groups.push(inner);
+        i = j;
+    }
+    groups.reverse();
+    let prefix_end = chars.get(i).map(|(b, _)| *b).unwrap_or(s.len());
+    Some((&s[..prefix_end], groups))
+}
+
+/// `Area`, `` `From<u32>` `` → `From`, `` `fmt::Display` `` → `Display`.
+fn bare_type_name(raw: &str) -> String {
+    let t = raw.trim_matches('`');
+    let t = t.split('<').next().unwrap_or(t);
+    t.rsplit("::").next().unwrap_or(t).trim().to_string()
 }
 
 fn document_entry(doc: Document) -> DocumentOccurrences {
@@ -627,6 +908,84 @@ mod tests {
     }
 
     #[test]
+    fn rust_method_shapes() {
+        let ra = |d: &str| format!("rust-analyzer cargo demo 0.1.0 {d}");
+        let decl = |t: &str, m: &str| {
+            Some(RustMethod::TraitDecl {
+                trait_name: t.into(),
+                method: m.into(),
+            })
+        };
+        let imp = |t: &str, m: &str| {
+            Some(RustMethod::TraitImpl {
+                trait_name: t.into(),
+                method: m.into(),
+            })
+        };
+        assert_eq!(
+            rust_method_shape(&ra("shapes/Area#area().")),
+            decl("Area", "area")
+        );
+        assert_eq!(
+            rust_method_shape(&ra("shapes/impl#[Circle][Area]area().")),
+            imp("Area", "area")
+        );
+        assert_eq!(
+            rust_method_shape(&ra("impl#[`Vec<T, A>`][`From<u32>`]from().")),
+            imp("From", "from")
+        );
+        assert_eq!(rust_method_shape(&ra("shapes/impl#[Circle]new().")), None);
+        assert_eq!(rust_method_shape(&ra("shapes/helper().")), None);
+        assert_eq!(rust_method_shape(&ra("Point#x.")), None);
+        assert_eq!(
+            rust_method_shape("scip-go gomod x v1 `x`/Mux#Use()."),
+            None,
+            "only rust-analyzer symbols"
+        );
+    }
+
+    #[test]
+    fn repeated_rust_definition_pairs_with_the_nearest_one() {
+        let def = |p: &str| ScipDefinition {
+            relative_path: p.into(),
+            line: 0,
+            character: 0,
+            symbol: "rust-analyzer cargo pkg 0.1.0 helper().".into(),
+        };
+        let defs = vec![def("tests/a.rs"), def("tests/b.rs"), def("src/bin/x.rs")];
+        let pick = |site: &str| {
+            nearest_definition(&defs, site)
+                .unwrap()
+                .relative_path
+                .clone()
+        };
+        assert_eq!(pick("tests/b.rs"), "tests/b.rs");
+        assert_eq!(pick("tests/a.rs"), "tests/a.rs");
+        assert_eq!(pick("src/bin/x.rs"), "src/bin/x.rs");
+    }
+
+    #[test]
+    fn rust_trait_methods_link_to_impls() {
+        let bytes = std::fs::read(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../graphengine-parsing/tests/fixtures/rust_scip_calls/index.scip"
+        ))
+        .unwrap();
+        let index = ScipIndex::from_bytes(&bytes).unwrap();
+        let sym = |d: &str| format!("rust-analyzer cargo rust-scip-calls 0.0.0 {d}");
+        assert_eq!(
+            index.implementations_of(&sym("shapes/Area#area().")),
+            vec![
+                sym("shapes/impl#[Circle][Area]area()."),
+                sym("shapes/impl#[Square][Area]area()."),
+            ]
+        );
+        assert!(index
+            .implementations_of(&sym("shapes/impl#[Circle]is_empty()."))
+            .is_empty());
+    }
+
+    #[test]
     fn parses_fixture_and_resolves_definition() {
         let bytes = minimal_index_bytes();
         let index = ScipIndex::from_bytes(&bytes).unwrap();
@@ -635,6 +994,55 @@ mod tests {
         assert_eq!(def.symbol, "scip-typescript npm . `index`.callee().");
         assert_eq!(def.line, 1);
         assert_eq!(def.character, 16);
+    }
+
+    /// Uses of an external trait's method fan out to the workspace's impls,
+    /// except for standard-library traits.
+    #[test]
+    fn external_trait_method_uses_anchor_at_workspace_impls() {
+        let occ = |line: i32, symbol: &str, def: bool| Occurrence {
+            range: vec![line, 4, 10],
+            symbol: symbol.into(),
+            symbol_roles: if def {
+                SymbolRole::Definition.value()
+            } else {
+                0
+            },
+            ..Default::default()
+        };
+        let ser = "rust-analyzer cargo serde 1.0.0 ser/Serializer#serialize_str().";
+        let clone = "rust-analyzer cargo core https://github.com/rust-lang/rust/library/core clone/Clone#clone().";
+        let ws = |d: &str| format!("rust-analyzer cargo app 0.1.0 {d}");
+        let mut doc = Document::new();
+        doc.relative_path = "src/lib.rs".into();
+        doc.occurrences
+            .push(occ(3, &ws("impl#[Json][Serializer]serialize_str()."), true));
+        doc.occurrences
+            .push(occ(9, &ws("impl#[Json][Clone]clone()."), true));
+        doc.occurrences.push(occ(20, ser, false));
+        doc.occurrences.push(occ(21, clone, false));
+        let mut index = Index::new();
+        index.metadata = protobuf::MessageField::some(Metadata {
+            project_root: "/app".into(),
+            ..Default::default()
+        });
+        index.documents.push(doc);
+        let parsed = ScipIndex::from_index(index).unwrap();
+        let pairs = parsed.reference_occurrences();
+        let ser_use = pairs
+            .iter()
+            .find(|(r, _)| r.line == 20)
+            .expect("serde trait use kept");
+        assert_eq!(ser_use.1.symbol, ser);
+        assert_eq!(ser_use.1.line, 3, "anchored at the workspace impl");
+        assert_eq!(
+            parsed.implementations_of(ser),
+            vec![ws("impl#[Json][Serializer]serialize_str().")]
+        );
+        assert!(
+            !pairs.iter().any(|(r, _)| r.line == 21),
+            "std trait uses do not fan out"
+        );
     }
 
     #[test]

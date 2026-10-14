@@ -471,6 +471,7 @@ mod tests {
             to_id: "helper_file".into(),
             kind: EdgeKind::Import,
             confidence: crate::health::graph::Confidence::High,
+            via: None,
         }];
 
         let mut graph = AnalysisGraph::build(nodes, edges);
@@ -550,6 +551,7 @@ mod tests {
             to_id: "lib_file".into(),
             kind: EdgeKind::Import,
             confidence: crate::health::graph::Confidence::High,
+            via: None,
         }];
 
         let mut graph = AnalysisGraph::build(nodes, edges);
@@ -587,6 +589,7 @@ mod tests {
             to_id: "helper_file".into(),
             kind: EdgeKind::Import,
             confidence: crate::health::graph::Confidence::High,
+            via: None,
         }];
 
         let mut graph = AnalysisGraph::build(nodes, edges);
@@ -631,12 +634,14 @@ mod tests {
                 to_id: "shared_utils".into(),
                 kind: EdgeKind::Import,
                 confidence: crate::health::graph::Confidence::High,
+                via: None,
             },
             GraphEdge {
                 from_id: "prod_file".into(),
                 to_id: "shared_utils".into(),
                 kind: EdgeKind::Import,
                 confidence: crate::health::graph::Confidence::High,
+                via: None,
             },
         ];
 

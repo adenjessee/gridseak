@@ -9,11 +9,30 @@ use async_trait::async_trait;
 pub struct DisclosedSemanticResolver {
     inner: Box<dyn SemanticResolver>,
     disclosure: ResolutionDisclosure,
+    /// Report the inner resolver's emitted-edge count (when it still emits).
+    keep_inner_edges: bool,
 }
 
 impl DisclosedSemanticResolver {
     pub fn new(inner: Box<dyn SemanticResolver>, disclosure: ResolutionDisclosure) -> Self {
-        Self { inner, disclosure }
+        Self {
+            inner,
+            disclosure,
+            keep_inner_edges: false,
+        }
+    }
+
+    /// Like [`Self::new`], but `emitted_edges` comes from the inner
+    /// resolver's own disclosure (a fallback tier that still emits edges).
+    pub fn keeping_inner_edges(
+        inner: Box<dyn SemanticResolver>,
+        disclosure: ResolutionDisclosure,
+    ) -> Self {
+        Self {
+            inner,
+            disclosure,
+            keep_inner_edges: true,
+        }
     }
 
     pub fn disclosure(&self) -> &ResolutionDisclosure {
@@ -40,6 +59,18 @@ impl SemanticResolver for DisclosedSemanticResolver {
     }
 
     async fn resolution_disclosure(&self) -> Option<ResolutionDisclosure> {
-        Some(self.disclosure.clone())
+        let mut d = self.disclosure.clone();
+        if self.keep_inner_edges {
+            d.emitted_edges = self
+                .inner
+                .resolution_disclosure()
+                .await
+                .and_then(|inner| inner.emitted_edges);
+        }
+        Some(d)
+    }
+
+    async fn layer2_telemetry_json(&self) -> Option<String> {
+        self.inner.layer2_telemetry_json().await
     }
 }

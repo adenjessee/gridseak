@@ -15,7 +15,7 @@
 //!   `ge_analyze` binary's pre-flight.
 //!
 //! Internal surface used by [`super::analysis_graph::AnalysisGraph::load`]:
-//! - [`load_nodes`], [`load_edges`], [`parse_edge_confidence`],
+//! - [`load_nodes`], [`load_edges`], [`parse_edge_provenance`],
 //!   [`has_column`].
 
 use std::collections::BTreeMap;
@@ -23,7 +23,7 @@ use std::collections::BTreeMap;
 use anyhow::{Context, Result};
 use rusqlite::Connection;
 
-use super::types::{Confidence, GraphEdge, GraphNode, NodeKind, PersistedEdgeKind};
+use super::types::{CallUse, Confidence, GraphEdge, GraphNode, NodeKind, PersistedEdgeKind};
 
 /// Read a metadata value from the `metadata` table (created by the parser).
 /// Returns None if the table doesn't exist or the key is missing.
@@ -67,21 +67,28 @@ pub fn validate_schema(conn: &Connection) -> Result<()> {
     Ok(())
 }
 
-/// Parse the `confidence` field out of the stored `provenance` JSON blob.
+/// Parse `confidence` and `via` out of the stored `provenance` JSON blob.
 /// Returns `Confidence::Unknown` whenever the JSON is empty, malformed,
-/// or missing the `confidence` key.
+/// or missing the `confidence` key. A missing or unrecognised `via`
+/// yields `None`, which every consumer treats as a direct call.
 ///
 /// Parsing shape mirrors the parsing crate's `Provenance` serde form:
-/// `{ "source": "...", "confidence": "High" | "Medium" | "Low", ... }`.
-pub(super) fn parse_edge_confidence(provenance_json: &str) -> Confidence {
-    serde_json::from_str::<serde_json::Value>(provenance_json)
-        .ok()
-        .and_then(|v| {
-            v.get("confidence")
-                .and_then(|c| c.as_str())
-                .map(Confidence::parse)
-        })
-        .unwrap_or(Confidence::Unknown)
+/// `{ "source": "...", "confidence": "High" | "Medium" | "Low",
+///    "via": "call" | "dispatch" | "value", ... }`.
+pub(super) fn parse_edge_provenance(provenance_json: &str) -> (Confidence, Option<CallUse>) {
+    let Ok(v) = serde_json::from_str::<serde_json::Value>(provenance_json) else {
+        return (Confidence::Unknown, None);
+    };
+    let confidence = v
+        .get("confidence")
+        .and_then(|c| c.as_str())
+        .map(Confidence::parse)
+        .unwrap_or(Confidence::Unknown);
+    let via = v
+        .get("via")
+        .and_then(|c| c.as_str())
+        .and_then(CallUse::parse);
+    (confidence, via)
 }
 
 /// True if the given table contains the named column. Used to keep the
@@ -320,15 +327,55 @@ pub(super) fn load_edges(
             continue;
         }
 
-        let confidence = parse_edge_confidence(&provenance_json);
+        let (confidence, via) = parse_edge_provenance(&provenance_json);
+        let via = if kind == super::types::EdgeKind::Call {
+            via
+        } else {
+            None
+        };
 
         edges.push(GraphEdge {
             from_id,
             to_id,
             kind,
             confidence,
+            via,
         });
     }
 
     Ok(edges)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parses_via_and_confidence() {
+        assert_eq!(
+            parse_edge_provenance(r#"{"confidence":"High","via":"dispatch"}"#),
+            (Confidence::High, Some(CallUse::Dispatch))
+        );
+        assert_eq!(
+            parse_edge_provenance(r#"{"confidence":"Low","via":"value"}"#),
+            (Confidence::Low, Some(CallUse::Value))
+        );
+        assert_eq!(
+            parse_edge_provenance(r#"{"confidence":"High","via":"call"}"#),
+            (Confidence::High, Some(CallUse::Call))
+        );
+        // Missing / unknown `via` and malformed JSON all read as direct.
+        assert_eq!(
+            parse_edge_provenance(r#"{"confidence":"Medium"}"#),
+            (Confidence::Medium, None)
+        );
+        assert_eq!(
+            parse_edge_provenance(r#"{"confidence":"High","via":"teleport"}"#),
+            (Confidence::High, None)
+        );
+        assert_eq!(
+            parse_edge_provenance("not json"),
+            (Confidence::Unknown, None)
+        );
+    }
 }
