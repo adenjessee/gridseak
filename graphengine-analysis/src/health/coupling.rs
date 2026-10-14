@@ -229,6 +229,7 @@ mod tests {
                 to_id: t.to_string(),
                 kind: k,
                 confidence: crate::health::graph::Confidence::High,
+                via: None,
             })
             .collect();
         let mut g = AnalysisGraph::build(nodes, edges);

@@ -358,11 +358,16 @@ impl ParsingPipeline {
         // cache-hit and nothing was removed, the graph rows for this
         // language are already in the persistent DB — skip resolution and
         // graph rebuild (still O(minutes) on large repos otherwise).
-        if !plan_disabled
+        // The cached edges are only reusable if they came from the same
+        // resolution tier this scan would use: provisioning a compiler
+        // index after a heuristic scan must re-resolve every file.
+        let fully_cached = !plan_disabled
             && plan.is_fully_cached()
             && plan.removed_paths.is_empty()
-            && extract_targets.is_empty()
-        {
+            && extract_targets.is_empty();
+        let tier_changed = fully_cached
+            && !Self::resolution_tier_unchanged(semantic_resolver, &language, graph_repo).await;
+        if fully_cached && !tier_changed {
             info!(
                 "S2-γ: fully cached language pass for {} ({} files) — skipping resolution and graph rebuild",
                 language,
@@ -590,6 +595,13 @@ impl ParsingPipeline {
                     .insert("resolution_compiler_unindexed_files".into(), json);
             }
         }
+        if !stats.compiler_unresolved_calls.is_empty() {
+            if let Ok(json) = serde_json::to_string(&stats.compiler_unresolved_calls) {
+                graph
+                    .metadata
+                    .insert("resolution_compiler_unresolved_calls".into(), json);
+            }
+        }
 
         // Sprint D.4 completion: also persist LSP session-lifecycle
         // metrics alongside the resolution stats. The CLI's
@@ -776,7 +788,10 @@ impl ParsingPipeline {
             cached: cache_hits,
             reparsed: cache_misses,
             removed: cache_removed,
-            plan_disabled,
+            // A tier change re-resolved every edge without any file
+            // changing; flag it so analysis doesn't reuse its cached
+            // zero-delta report.
+            plan_disabled: plan_disabled || tier_changed,
             changed_paths: plan
                 .changed
                 .iter()
@@ -805,6 +820,44 @@ impl ParsingPipeline {
     /// cache is an optimisation, not a correctness contract — so this
     /// helper degrades to "treat every file as changed" on any
     /// problem and logs a `warn!`.
+    /// Whether the last scan of `language` resolved calls with the same
+    /// tier the current resolver will use. A resolver that reports no
+    /// tier can't change tier, so it keeps the fast path. A missing or
+    /// unreadable prior record counts as changed.
+    async fn resolution_tier_unchanged(
+        semantic_resolver: &dyn SemanticResolver,
+        language: &str,
+        graph_repo: &dyn GraphRepository,
+    ) -> bool {
+        use crate::application::resolution_disclosure::ResolutionDisclosure;
+
+        let Some(current) = semantic_resolver.resolution_disclosure().await else {
+            return true;
+        };
+        let prior = match graph_repo
+            .read_metadata(&ResolutionDisclosure::metadata_key(language))
+            .await
+        {
+            Ok(Some(json)) => serde_json::from_str::<ResolutionDisclosure>(&json).ok(),
+            Ok(None) => None,
+            Err(err) => {
+                warn!("S2-γ: could not read prior resolution disclosure for {language}: {err}");
+                None
+            }
+        };
+        match prior {
+            Some(prior) if prior.tier_used == current.tier_used => true,
+            Some(prior) => {
+                info!(
+                    "S2-γ: {language} resolution tier changed ({:?} -> {:?}); re-resolving cached files",
+                    prior.tier_used, current.tier_used
+                );
+                false
+            }
+            None => false,
+        }
+    }
+
     async fn compute_incremental_plan(
         incremental: bool,
         files: &[PathBuf],
@@ -1188,6 +1241,109 @@ mod orchestrator_tests {
         // 2024-01-02T03:04:05Z is 1_704_164_645 unix seconds.
         let t = SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(1_704_164_645);
         assert_eq!(system_time_to_iso8601(t), "2024-01-02T03:04:05Z");
+    }
+
+    mod resolution_tier {
+        use super::*;
+        use crate::application::resolution_disclosure::{ResolutionDisclosure, SkipReason};
+        use std::collections::HashMap;
+
+        struct StubResolver(Option<ResolutionDisclosure>);
+
+        #[async_trait::async_trait]
+        impl SemanticResolver for StubResolver {
+            async fn resolve(
+                &self,
+                _hints: &crate::application::ports::SyntaxResults,
+            ) -> anyhow::Result<crate::application::ports::ResolvedEdges> {
+                Ok(crate::application::ports::ResolvedEdges::new())
+            }
+            fn supported_language(&self) -> &str {
+                "go"
+            }
+            async fn is_available(&self) -> bool {
+                true
+            }
+            async fn resolution_disclosure(&self) -> Option<ResolutionDisclosure> {
+                self.0.clone()
+            }
+        }
+
+        struct StubRepo(HashMap<String, String>);
+
+        #[async_trait::async_trait]
+        impl GraphRepository for StubRepo {
+            async fn upsert(&self, _graph: &Graph) -> anyhow::Result<()> {
+                Ok(())
+            }
+            async fn get(&self, _id: &str) -> anyhow::Result<Option<Graph>> {
+                Ok(None)
+            }
+            async fn list(&self) -> anyhow::Result<Vec<String>> {
+                Ok(Vec::new())
+            }
+            async fn delete(&self, _id: &str) -> anyhow::Result<()> {
+                Ok(())
+            }
+            async fn clear(&self) -> anyhow::Result<()> {
+                Ok(())
+            }
+            async fn read_metadata(&self, key: &str) -> anyhow::Result<Option<String>> {
+                Ok(self.0.get(key).cloned())
+            }
+        }
+
+        fn repo_with(prior: Option<ResolutionDisclosure>) -> StubRepo {
+            let mut map = HashMap::new();
+            if let Some(d) = prior {
+                map.insert(
+                    ResolutionDisclosure::metadata_key("go"),
+                    serde_json::to_string(&d).unwrap(),
+                );
+            }
+            StubRepo(map)
+        }
+
+        fn heuristic() -> ResolutionDisclosure {
+            ResolutionDisclosure::heuristic_only("go", SkipReason::IndexerNotProvisioned)
+        }
+
+        fn compiler() -> ResolutionDisclosure {
+            ResolutionDisclosure::layer2_active("go", 0)
+        }
+
+        async fn unchanged(
+            current: Option<ResolutionDisclosure>,
+            prior: Option<ResolutionDisclosure>,
+        ) -> bool {
+            ParsingPipeline::resolution_tier_unchanged(
+                &StubResolver(current),
+                "go",
+                &repo_with(prior),
+            )
+            .await
+        }
+
+        #[tokio::test]
+        async fn index_provisioned_after_heuristic_scan_forces_re_resolution() {
+            assert!(!unchanged(Some(compiler()), Some(heuristic())).await);
+        }
+
+        #[tokio::test]
+        async fn same_tier_keeps_fast_path() {
+            assert!(unchanged(Some(compiler()), Some(compiler())).await);
+            assert!(unchanged(Some(heuristic()), Some(heuristic())).await);
+        }
+
+        #[tokio::test]
+        async fn missing_prior_record_forces_re_resolution() {
+            assert!(!unchanged(Some(compiler()), None).await);
+        }
+
+        #[tokio::test]
+        async fn resolver_without_disclosure_keeps_fast_path() {
+            assert!(unchanged(None, Some(heuristic())).await);
+        }
     }
 
     #[test]

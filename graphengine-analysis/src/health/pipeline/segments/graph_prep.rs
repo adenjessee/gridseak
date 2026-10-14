@@ -61,10 +61,11 @@ pub fn run(ctx: &mut AnalysisRunContext<'_>) -> Result<Option<HealthReport>> {
         crate::validation::overrides::apply_module_overrides(ov, &mut ctx.config);
     }
 
-    ctx.graph = AnalysisGraph::load_with_module_config(
+    ctx.graph = AnalysisGraph::load_with_options(
         &ctx.conn,
         ctx.config.modules.analysis_depth,
         ctx.config.modules.strip_build_convention_dirs,
+        ctx.config.metrics_edge_basis,
     )?;
     eprintln!(
         "[ge-analyze] {} nodes, {} edges loaded.",

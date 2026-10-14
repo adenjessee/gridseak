@@ -140,7 +140,7 @@ pub fn list_same_short_name(artifact: &Path, short: &str) -> Result<Vec<SymbolHi
     Ok(out)
 }
 
-fn nodes_in_file(conn: &Connection, file: &str) -> Result<Vec<SymbolHit>> {
+pub(crate) fn nodes_in_file(conn: &Connection, file: &str) -> Result<Vec<SymbolHit>> {
     let mut stmt = conn.prepare(
         "SELECT id, fqn, location FROM nodes
          WHERE kind IN ('Function', 'Method', 'Constructor')",
@@ -178,7 +178,7 @@ fn node_location(conn: &Connection, id: &str) -> Result<(String, u32)> {
     Ok(parse_location(&loc))
 }
 
-fn parse_location(loc: &str) -> (String, u32) {
+pub(crate) fn parse_location(loc: &str) -> (String, u32) {
     let v: serde_json::Value = serde_json::from_str(loc).unwrap_or(serde_json::json!({}));
     let file = v
         .get("file")

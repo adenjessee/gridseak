@@ -208,6 +208,21 @@ pub async fn run_pipeline(mut cfg: RunPipelineConfig) -> Result<RunPipelineOutpu
         }
     }
 
+    // The persistent parse DB must describe exactly the languages this
+    // scan covers. Without this, `--lang go` after a full scan keeps
+    // the earlier TypeScript rows, and every reader of the DB (report,
+    // MCP tools, `gridseak audit`) sees a graph mixing this scan with
+    // rows it never refreshed. Keep every requested language, even
+    // the discovery-only ones, so a companion parser's rows survive.
+    if db_is_persistent {
+        if let Err(err) = prune_languages_outside_scan(&db_path, &cfg.languages, cfg.incremental) {
+            tracing::warn!(
+                "failed to prune languages outside this scan ({err}); \
+                 rows from earlier scans may remain in the parse DB"
+            );
+        }
+    }
+
     for (idx, language) in languages.iter().enumerate() {
         // S1-ε: with a persistent parse DB, NEVER pass `--clear` —
         // that would wipe the incremental cache (and every row from
@@ -270,6 +285,47 @@ fn reset_incremental_scan_stats_for_parse_phase(db_path: &Path) -> Result<(), Ru
         &conn,
     )
     .map_err(|e| RunError::Io(std::io::Error::other(e.to_string())))
+}
+
+/// Drop rows for languages outside `keep` and, on an incremental scan,
+/// report their files as removed so S2 analysis sees the delta rather
+/// than reusing a report that still counts them.
+fn prune_languages_outside_scan(
+    db_path: &Path,
+    keep: &[String],
+    incremental: bool,
+) -> Result<(), RunError> {
+    use graphengine_parsing::infrastructure::storage::{parse_meta_store, SqliteRepository};
+    let to_io = |e: anyhow::Error| RunError::Io(std::io::Error::other(e.to_string()));
+    let repo = SqliteRepository::new(&db_path.to_string_lossy()).map_err(to_io)?;
+    let outcome = repo.prune_languages_except_sync(keep).map_err(to_io)?;
+    drop(repo);
+    if outcome.languages.is_empty() {
+        return Ok(());
+    }
+    tracing::info!(
+        "pruned {} node row(s) across {} file(s) for languages outside this scan: {}",
+        outcome.nodes_deleted,
+        outcome.file_paths.len(),
+        outcome.languages.join(", ")
+    );
+    if incremental && !outcome.file_paths.is_empty() {
+        let conn = rusqlite::Connection::open(db_path)
+            .map_err(|e| RunError::Io(std::io::Error::other(e.to_string())))?;
+        parse_meta_store::merge_incremental_scan_stats(
+            &conn,
+            &parse_meta_store::IncrementalScanStats {
+                cached: 0,
+                reparsed: 0,
+                removed: outcome.file_paths.len(),
+                plan_disabled: false,
+                changed_paths: Vec::new(),
+                removed_paths: outcome.file_paths,
+            },
+        )
+        .map_err(to_io)?;
+    }
+    Ok(())
 }
 
 fn validate_binary(kind: BinaryKind, path: &Path) -> Result<(), RunError> {

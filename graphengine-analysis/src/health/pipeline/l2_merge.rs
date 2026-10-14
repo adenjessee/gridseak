@@ -34,6 +34,13 @@ pub fn try_l2_partial_merge(
     let Some(prior_report) = read_health_score_cache(conn, prior_structure_fp)? else {
         return Ok(None);
     };
+    let basis = config
+        .as_ref()
+        .map(|c| c.metrics_edge_basis)
+        .unwrap_or_default();
+    if !super::super::report_matches_edge_basis(&prior_report, basis) {
+        return Ok(None);
+    }
 
     let mut segments_to_run = trust.segments_to_run.clone();
     segments_to_run.insert(AnalysisSegment::FindingsAssembly);

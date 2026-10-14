@@ -1,0 +1,1206 @@
+{
+ "repo": "httpx",
+ "root": "<repo root>",
+ "date": "2026-10-13",
+ "agent": "Claude Code",
+ "model": "claude-haiku-5-5, claude-sonnet-5-5, claude-opus-5-5",
+ "mode": "read-only tools + language toolchain",
+ "answer_key": "GridSeak compiler-indexed call graph (2364 edges, 100% from the compiler index); targets whose callers share a name with any of the 105 calls the compiler could not resolve (untyped receivers) are not asked",
+ "call_edges": 2364,
+ "tasks": [
+  {
+   "id": "t1",
+   "band": "small",
+   "target": "flush",
+   "file": "httpx/_decoders.py",
+   "line": 317,
+   "question": "In this repository (httpx), list every function and method, including those in test files, that transitively calls `flush` (declared at httpx/_decoders.py:317) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `flush` itself. The list must be complete. In Python, a `def` nested in a function is a named function. `C(...)` calls the `__init__` (or `__new__`) C defines or inherits (neither for an `Enum`, whose `E(value)` looks a member up), `super().m(...)` calls the base class's m, and `obj.m(...)` calls the m that obj's type defines or inherits, not overrides in subclasses; a call of an `@abstractmethod` or of a `Protocol` method is dynamic dispatch. A name defined in several `if`/`else` or `try`/`except` branches calls each definition the call can reach; `@overload` stubs are never called. `@d(...)` calls d; a bare `@d`, reading a `@property`, `with`, iteration and operators are not direct calls.",
+   "max_depth": 3,
+   "answer": [
+    {
+     "file": "httpx/_models.py",
+     "line": 642,
+     "name": "text"
+    },
+    {
+     "file": "httpx/_models.py",
+     "line": 907,
+     "name": "iter_text"
+    },
+    {
+     "file": "httpx/_models.py",
+     "line": 926,
+     "name": "iter_lines"
+    },
+    {
+     "file": "httpx/_models.py",
+     "line": 1007,
+     "name": "aiter_text"
+    },
+    {
+     "file": "httpx/_models.py",
+     "line": 1028,
+     "name": "aiter_lines"
+    },
+    {
+     "file": "tests/models/test_responses.py",
+     "line": 600,
+     "name": "test_iter_text"
+    },
+    {
+     "file": "tests/models/test_responses.py",
+     "line": 612,
+     "name": "test_iter_text_with_chunk_size"
+    },
+    {
+     "file": "tests/models/test_responses.py",
+     "line": 635,
+     "name": "test_aiter_text"
+    },
+    {
+     "file": "tests/models/test_responses.py",
+     "line": 648,
+     "name": "test_aiter_text_with_chunk_size"
+    },
+    {
+     "file": "tests/models/test_responses.py",
+     "line": 662,
+     "name": "test_iter_lines"
+    },
+    {
+     "file": "tests/models/test_responses.py",
+     "line": 672,
+     "name": "test_aiter_lines"
+    },
+    {
+     "file": "tests/test_decoders.py",
+     "line": 244,
+     "name": "test_text_decoder_with_autodetect"
+    },
+    {
+     "file": "tests/test_decoders.py",
+     "line": 296,
+     "name": "test_streaming_text_decoder"
+    },
+    {
+     "file": "tests/test_decoders.py",
+     "line": 303,
+     "name": "test_line_decoder_nl"
+    },
+    {
+     "file": "tests/test_decoders.py",
+     "line": 317,
+     "name": "test_line_decoder_cr"
+    },
+    {
+     "file": "tests/test_decoders.py",
+     "line": 331,
+     "name": "test_line_decoder_crnl"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t2",
+   "band": "medium",
+   "target": "json",
+   "file": "httpx/_models.py",
+   "line": 831,
+   "question": "In this repository (httpx), list every function and method, including those in test files, that transitively calls `json` (declared at httpx/_models.py:831) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `json` itself. The list must be complete. In Python, a `def` nested in a function is a named function. `C(...)` calls the `__init__` (or `__new__`) C defines or inherits (neither for an `Enum`, whose `E(value)` looks a member up), `super().m(...)` calls the base class's m, and `obj.m(...)` calls the m that obj's type defines or inherits, not overrides in subclasses; a call of an `@abstractmethod` or of a `Protocol` method is dynamic dispatch. A name defined in several `if`/`else` or `try`/`except` branches calls each definition the call can reach; `@overload` stubs are never called. `@d(...)` calls d; a bare `@d`, reading a `@property`, `with`, iteration and operators are not direct calls.",
+   "max_depth": 2,
+   "answer": [
+    {
+     "file": "httpx/_main.py",
+     "line": 170,
+     "name": "print_response"
+    },
+    {
+     "file": "httpx/_main.py",
+     "line": 452,
+     "name": "main"
+    },
+    {
+     "file": "tests/client/test_async_client.py",
+     "line": 40,
+     "name": "test_build_request"
+    },
+    {
+     "file": "tests/client/test_async_client.py",
+     "line": 302,
+     "name": "test_mounted_transport"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 163,
+     "name": "test_basic_auth"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 176,
+     "name": "test_basic_auth_with_stream"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 195,
+     "name": "test_basic_auth_in_url"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 207,
+     "name": "test_basic_auth_on_session"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 222,
+     "name": "test_custom_auth"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 237,
+     "name": "test_netrc_auth_credentials_exist"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 256,
+     "name": "test_netrc_auth_credentials_do_not_exist"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 289,
+     "name": "test_auth_disable_per_request"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 323,
+     "name": "test_auth_property"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 357,
+     "name": "test_digest_auth_returns_no_auth_if_no_digest_header_in_response"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 370,
+     "name": "test_digest_auth_returns_no_auth_if_alternate_auth_scheme"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 385,
+     "name": "test_digest_auth_200_response_including_digest_auth_header"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 400,
+     "name": "test_digest_auth_401_response_without_digest_auth_header"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 427,
+     "name": "test_digest_auth"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 460,
+     "name": "test_digest_auth_no_specified_qop"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 636,
+     "name": "test_async_auth_history"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 662,
+     "name": "test_sync_auth_history"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 710,
+     "name": "test_async_auth_reads_response_body"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 726,
+     "name": "test_sync_auth_reads_response_body"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 743,
+     "name": "test_async_auth"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 760,
+     "name": "test_sync_auth"
+    },
+    {
+     "file": "tests/client/test_client.py",
+     "line": 47,
+     "name": "test_build_request"
+    },
+    {
+     "file": "tests/client/test_client.py",
+     "line": 62,
+     "name": "test_build_post_request"
+    },
+    {
+     "file": "tests/client/test_client.py",
+     "line": 344,
+     "name": "test_raw_client_header"
+    },
+    {
+     "file": "tests/client/test_client.py",
+     "line": 377,
+     "name": "test_mounted_transport"
+    },
+    {
+     "file": "tests/client/test_client.py",
+     "line": 392,
+     "name": "test_all_mounted_transport"
+    },
+    {
+     "file": "tests/client/test_cookies.py",
+     "line": 18,
+     "name": "test_set_cookie"
+    },
+    {
+     "file": "tests/client/test_cookies.py",
+     "line": 34,
+     "name": "test_set_per_request_cookie_is_deprecated"
+    },
+    {
+     "file": "tests/client/test_cookies.py",
+     "line": 49,
+     "name": "test_set_cookie_with_cookiejar"
+    },
+    {
+     "file": "tests/client/test_cookies.py",
+     "line": 86,
+     "name": "test_setting_client_cookies_to_cookiejar"
+    },
+    {
+     "file": "tests/client/test_cookies.py",
+     "line": 123,
+     "name": "test_set_cookie_with_cookies_model"
+    },
+    {
+     "file": "tests/client/test_cookies.py",
+     "line": 151,
+     "name": "test_cookie_persistence"
+    },
+    {
+     "file": "tests/client/test_headers.py",
+     "line": 23,
+     "name": "test_client_header"
+    },
+    {
+     "file": "tests/client/test_headers.py",
+     "line": 46,
+     "name": "test_header_merge"
+    },
+    {
+     "file": "tests/client/test_headers.py",
+     "line": 68,
+     "name": "test_header_merge_conflicting_headers"
+    },
+    {
+     "file": "tests/client/test_headers.py",
+     "line": 90,
+     "name": "test_header_update"
+    },
+    {
+     "file": "tests/client/test_headers.py",
+     "line": 123,
+     "name": "test_header_repeated_items"
+    },
+    {
+     "file": "tests/client/test_headers.py",
+     "line": 138,
+     "name": "test_header_repeated_multi_items"
+    },
+    {
+     "file": "tests/client/test_headers.py",
+     "line": 152,
+     "name": "test_remove_default_header"
+    },
+    {
+     "file": "tests/client/test_headers.py",
+     "line": 188,
+     "name": "test_host_with_auth_and_port_in_url"
+    },
+    {
+     "file": "tests/client/test_headers.py",
+     "line": 212,
+     "name": "test_host_with_non_default_port_in_url"
+    },
+    {
+     "file": "tests/client/test_redirects.py",
+     "line": 266,
+     "name": "test_cross_domain_redirect_with_auth_header"
+    },
+    {
+     "file": "tests/client/test_redirects.py",
+     "line": 275,
+     "name": "test_cross_domain_https_redirect_with_auth_header"
+    },
+    {
+     "file": "tests/client/test_redirects.py",
+     "line": 284,
+     "name": "test_cross_domain_redirect_with_auth"
+    },
+    {
+     "file": "tests/client/test_redirects.py",
+     "line": 292,
+     "name": "test_same_domain_redirect"
+    },
+    {
+     "file": "tests/client/test_redirects.py",
+     "line": 301,
+     "name": "test_same_domain_https_redirect_with_auth_header"
+    },
+    {
+     "file": "tests/client/test_redirects.py",
+     "line": 310,
+     "name": "test_body_redirect"
+    },
+    {
+     "file": "tests/client/test_redirects.py",
+     "line": 323,
+     "name": "test_no_body_redirect"
+    },
+    {
+     "file": "tests/models/test_responses.py",
+     "line": 79,
+     "name": "test_response_json"
+    },
+    {
+     "file": "tests/models/test_responses.py",
+     "line": 789,
+     "name": "test_json_with_specified_encoding"
+    },
+    {
+     "file": "tests/models/test_responses.py",
+     "line": 801,
+     "name": "test_json_with_options"
+    },
+    {
+     "file": "tests/models/test_responses.py",
+     "line": 826,
+     "name": "test_json_without_specified_charset"
+    },
+    {
+     "file": "tests/models/test_responses.py",
+     "line": 851,
+     "name": "test_json_with_specified_charset"
+    },
+    {
+     "file": "tests/test_asgi.py",
+     "line": 104,
+     "name": "test_asgi_urlencoded_path"
+    },
+    {
+     "file": "tests/test_asgi.py",
+     "line": 115,
+     "name": "test_asgi_raw_path"
+    },
+    {
+     "file": "tests/test_asgi.py",
+     "line": 126,
+     "name": "test_asgi_raw_path_should_not_include_querystring_portion"
+    },
+    {
+     "file": "tests/test_asgi.py",
+     "line": 150,
+     "name": "test_asgi_headers"
+    },
+    {
+     "file": "tests/test_utils.py",
+     "line": 25,
+     "name": "test_encoded"
+    },
+    {
+     "file": "tests/test_utils.py",
+     "line": 31,
+     "name": "test_bad_utf_like_encoding"
+    },
+    {
+     "file": "tests/test_utils.py",
+     "line": 47,
+     "name": "test_guess_by_bom"
+    }
+   ],
+   "kind": "callers"
+  },
+  {
+   "id": "t3",
+   "band": "medium",
+   "target": "__init__",
+   "file": "httpx/_transports/default.py",
+   "line": 280,
+   "question": "In this repository (httpx), list every function and method, including those in test files, that transitively calls `__init__` (declared at httpx/_transports/default.py:280) through chains of direct calls. Follow only direct calls of named functions and methods: do not follow calls made through an interface, abstract or trait method (dynamic dispatch), and do not follow a function being used as a value (passed as an argument, assigned, or stored). A call inside an anonymous function, closure or lambda counts as a call by the enclosing named function. Exclude `__init__` itself. The list must be complete. In Python, a `def` nested in a function is a named function. `C(...)` calls the `__init__` (or `__new__`) C defines or inherits (neither for an `Enum`, whose `E(value)` looks a member up), `super().m(...)` calls the base class's m, and `obj.m(...)` calls the m that obj's type defines or inherits, not overrides in subclasses; a call of an `@abstractmethod` or of a `Protocol` method is dynamic dispatch. A name defined in several `if`/`else` or `try`/`except` branches calls each definition the call can reach; `@overload` stubs are never called. `@d(...)` calls d; a bare `@d`, reading a `@property`, `with`, iteration and operators are not direct calls.",
+   "max_depth": 3,
+   "answer": [
+    {
+     "file": "httpx/_client.py",
+     "line": 1353,
+     "name": "__init__"
+    },
+    {
+     "file": "httpx/_client.py",
+     "line": 1432,
+     "name": "_init_transport"
+    },
+    {
+     "file": "httpx/_client.py",
+     "line": 1454,
+     "name": "_init_proxy_transport"
+    },
+    {
+     "file": "tests/client/test_async_client.py",
+     "line": 12,
+     "name": "test_get"
+    },
+    {
+     "file": "tests/client/test_async_client.py",
+     "line": 33,
+     "name": "test_get_invalid_url"
+    },
+    {
+     "file": "tests/client/test_async_client.py",
+     "line": 40,
+     "name": "test_build_request"
+    },
+    {
+     "file": "tests/client/test_async_client.py",
+     "line": 55,
+     "name": "test_post"
+    },
+    {
+     "file": "tests/client/test_async_client.py",
+     "line": 63,
+     "name": "test_post_json"
+    },
+    {
+     "file": "tests/client/test_async_client.py",
+     "line": 71,
+     "name": "test_stream_response"
+    },
+    {
+     "file": "tests/client/test_async_client.py",
+     "line": 82,
+     "name": "test_access_content_stream_response"
+    },
+    {
+     "file": "tests/client/test_async_client.py",
+     "line": 93,
+     "name": "test_stream_request"
+    },
+    {
+     "file": "tests/client/test_async_client.py",
+     "line": 104,
+     "name": "test_cannot_stream_sync_request"
+    },
+    {
+     "file": "tests/client/test_async_client.py",
+     "line": 115,
+     "name": "test_raise_for_status"
+    },
+    {
+     "file": "tests/client/test_async_client.py",
+     "line": 131,
+     "name": "test_options"
+    },
+    {
+     "file": "tests/client/test_async_client.py",
+     "line": 139,
+     "name": "test_head"
+    },
+    {
+     "file": "tests/client/test_async_client.py",
+     "line": 147,
+     "name": "test_put"
+    },
+    {
+     "file": "tests/client/test_async_client.py",
+     "line": 154,
+     "name": "test_patch"
+    },
+    {
+     "file": "tests/client/test_async_client.py",
+     "line": 161,
+     "name": "test_delete"
+    },
+    {
+     "file": "tests/client/test_async_client.py",
+     "line": 169,
+     "name": "test_100_continue"
+    },
+    {
+     "file": "tests/client/test_async_client.py",
+     "line": 183,
+     "name": "test_context_managed_transport"
+    },
+    {
+     "file": "tests/client/test_async_client.py",
+     "line": 215,
+     "name": "test_context_managed_transport_and_mount"
+    },
+    {
+     "file": "tests/client/test_async_client.py",
+     "line": 260,
+     "name": "test_client_closed_state_using_implicit_open"
+    },
+    {
+     "file": "tests/client/test_async_client.py",
+     "line": 281,
+     "name": "test_client_closed_state_using_with_block"
+    },
+    {
+     "file": "tests/client/test_async_client.py",
+     "line": 302,
+     "name": "test_mounted_transport"
+    },
+    {
+     "file": "tests/client/test_async_client.py",
+     "line": 317,
+     "name": "test_async_mock_transport"
+    },
+    {
+     "file": "tests/client/test_async_client.py",
+     "line": 330,
+     "name": "test_cancellation_during_stream"
+    },
+    {
+     "file": "tests/client/test_async_client.py",
+     "line": 370,
+     "name": "test_server_extensions"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 163,
+     "name": "test_basic_auth"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 176,
+     "name": "test_basic_auth_with_stream"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 195,
+     "name": "test_basic_auth_in_url"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 207,
+     "name": "test_basic_auth_on_session"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 222,
+     "name": "test_custom_auth"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 289,
+     "name": "test_auth_disable_per_request"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 311,
+     "name": "test_auth_hidden_header"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 323,
+     "name": "test_auth_property"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 339,
+     "name": "test_auth_invalid_type"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 357,
+     "name": "test_digest_auth_returns_no_auth_if_no_digest_header_in_response"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 385,
+     "name": "test_digest_auth_200_response_including_digest_auth_header"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 400,
+     "name": "test_digest_auth_401_response_without_digest_auth_header"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 427,
+     "name": "test_digest_auth"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 460,
+     "name": "test_digest_auth_no_specified_qop"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 492,
+     "name": "test_digest_auth_qop_including_spaces_and_auth_returns_auth"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 505,
+     "name": "test_digest_auth_qop_auth_int_not_implemented"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 516,
+     "name": "test_digest_auth_qop_must_be_auth_or_auth_int"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 527,
+     "name": "test_digest_auth_incorrect_credentials"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 540,
+     "name": "test_digest_auth_reuses_challenge"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 557,
+     "name": "test_digest_auth_resets_nonce_count_after_401"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 604,
+     "name": "test_async_digest_auth_raises_protocol_error_on_malformed_header"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 636,
+     "name": "test_async_auth_history"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 696,
+     "name": "test_digest_auth_unavailable_streaming_body"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 710,
+     "name": "test_async_auth_reads_response_body"
+    },
+    {
+     "file": "tests/client/test_auth.py",
+     "line": 743,
+     "name": "test_async_auth"
+    },
+    {
+     "file": "tests/client/test_event_hooks.py",
+     "line": 67,
+     "name": "test_async_event_hooks"
+    },
+    {
+     "file": "tests/client/test_event_hooks.py",
+     "line": 103,
+     "name": "test_async_event_hooks_raising_exception"
+    },
+    {
+     "file": "tests/client/test_event_hooks.py",
+     "line": 175,
+     "name": "test_async_event_hooks_with_redirect"
+    },
+    {
+     "file": "tests/client/test_proxies.py",
+     "line": 16,
+     "name": "test_socks_proxy"
+    },
+    {
+     "file": "tests/client/test_proxies.py",
+     "line": 104,
+     "name": "test_async_proxy_close"
+    },
+    {
+     "file": "tests/client/test_redirects.py",
+     "line": 155,
+     "name": "test_async_next_request"
+    },
+    {
+     "file": "tests/client/test_redirects.py",
+     "line": 244,
+     "name": "test_async_too_many_redirects"
+    },
+    {
+     "file": "tests/client/test_redirects.py",
+     "line": 442,
+     "name": "test_async_invalid_redirect"
+    },
+    {
+     "file": "tests/test_asgi.py",
+     "line": 94,
+     "name": "test_asgi"
+    },
+    {
+     "file": "tests/test_asgi.py",
+     "line": 104,
+     "name": "test_asgi_urlencoded_path"
+    },
+    {
+     "file": "tests/test_asgi.py",
+     "line": 115,
+     "name": "test_asgi_raw_path"
+    },
+    {
+     "file": "tests/test_asgi.py",
+     "line": 126,
+     "name": "test_asgi_raw_path_should_not_include_querystring_portion"
+    },
+    {
+     "file": "tests/test_asgi.py",
+     "line": 140,
+     "name": "test_asgi_upload"
+    },
+    {
+     "file": "tests/test_asgi.py",
+     "line": 150,
+     "name": "test_asgi_headers"
+    },
+    {
+     "file": "tests/test_asgi.py",
+     "line": 168,
+     "name": "test_asgi_exc"
+    },
+    {
+     "file": "tests/test_asgi.py",
+     "line": 176,
+     "name": "test_asgi_exc_after_response"
+    },
+    {
+     "file": "tests/test_asgi.py",
+     "line": 184,
+     "name": "test_asgi_disconnect_after_response_complete"
+    },
+    {
+     "file": "tests/test_asgi.py",
+     "line": 219,
+     "name": "test_asgi_exc_no_raise"
+    },
+    {
+     "file": "tests/test_timeouts.py",
+     "line": 7,
+     "name": "test_read_timeout"
+    },
+    {
+     "file": "tests/test_timeouts.py",
+     "line": 16,
+     "name": "test_write_timeout"
+    },
+    {
+     "file": "tests/test_timeouts.py",
+     "line": 27,
+     "name": "test_connect_timeout"
+    },
+    {
+     "file": "tests/test_timeouts.py",
+     "line": 37,
+     "name": "test_pool_timeout"
+    },
+    {
+     "file": "tests/test_timeouts.py",
+     "line": 48,
+     "name": "test_async_client_new_request_send_timeout"
+    }
+   ],
+   "kind": "callers"
+  }
+ ],
+ "runs": [
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 68.573388167,
+   "cost_usd": 0.558477,
+   "turns": 13,
+   "tokens": 229213,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 16,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 42.811922917,
+   "cost_usd": 0.4486902,
+   "turns": 9,
+   "tokens": 233310,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 16,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 103.763012583,
+   "cost_usd": 0.7648321999999999,
+   "turns": 19,
+   "tokens": 257105,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 64,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 56.909038292,
+   "cost_usd": 0.4673934,
+   "turns": 5,
+   "tokens": 159274,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 64,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 424.302873625,
+   "cost_usd": 3.0620306,
+   "turns": 28,
+   "tokens": 1506310,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 75,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-haiku-5-5",
+   "rep": 1,
+   "wall_s": 88.164726583,
+   "cost_usd": 0.683759,
+   "turns": 8,
+   "tokens": 266461,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 75,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 50.43160825,
+   "cost_usd": 0.1145846,
+   "turns": 14,
+   "tokens": 116619,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 16,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 10.575991291,
+   "cost_usd": 0.0472466,
+   "turns": 2,
+   "tokens": 36338,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 16,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 48.34695375,
+   "cost_usd": 0.171357,
+   "turns": 11,
+   "tokens": 132506,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 64,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 20.141391333,
+   "cost_usd": 0.0792198,
+   "turns": 2,
+   "tokens": 43187,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 64,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 49.852456042,
+   "cost_usd": 0.158601,
+   "turns": 12,
+   "tokens": 121784,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 75,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-sonnet-5-5",
+   "rep": 1,
+   "wall_s": 24.177834375,
+   "cost_usd": 0.0917448,
+   "turns": 2,
+   "tokens": 45132,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 75,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 36.329887458,
+   "cost_usd": 0.164155,
+   "turns": 10,
+   "tokens": 97699,
+   "score": {
+    "pass": false,
+    "recall": 0.875,
+    "precision": 1.0,
+    "n_answer": 14,
+    "flagged_incomplete": false,
+    "missed": [
+     "tests/models/test_responses.py:612 test_iter_text_with_chunk_size",
+     "tests/models/test_responses.py:648 test_aiter_text_with_chunk_size"
+    ],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t1",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 19.645059334,
+   "cost_usd": 0.1237542,
+   "turns": 4,
+   "tokens": 59208,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 16,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 43.299781833,
+   "cost_usd": 0.24898939999999997,
+   "turns": 8,
+   "tokens": 100681,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 64,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t2",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 39.291142958,
+   "cost_usd": 0.23467699999999997,
+   "turns": 6,
+   "tokens": 152992,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 64,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "plain",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 90.696649125,
+   "cost_usd": 0.32965599999999995,
+   "turns": 11,
+   "tokens": 159027,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 75,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  },
+  {
+   "task": "t3",
+   "arm": "gridseak",
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "wall_s": 51.364091292,
+   "cost_usd": 0.2697696,
+   "turns": 7,
+   "tokens": 159930,
+   "score": {
+    "pass": true,
+    "recall": 1.0,
+    "precision": 1.0,
+    "n_answer": 75,
+    "flagged_incomplete": false,
+    "missed": [],
+    "extra": [],
+    "out_of_scope": [],
+    "error": null
+   }
+  }
+ ]
+}

@@ -385,6 +385,80 @@ pub struct GraphEdge {
     /// `Unknown` indicates the edge row had a missing or malformed
     /// `provenance` column (old DBs or corrupted writes).
     pub confidence: Confidence,
+    /// How a `Call` edge uses its target, from `provenance.via`.
+    /// `None` for non-Call edges, heuristic edges, and edges written
+    /// before the field existed; those are treated as direct calls.
+    pub via: Option<CallUse>,
+}
+
+impl GraphEdge {
+    /// True for a `Call` edge the compiler index tagged as interface /
+    /// trait dispatch (fanned out to every implementation) or as a
+    /// function used as a value (passed, stored, assigned). These are
+    /// real uses but not direct calls, so under
+    /// [`MetricsEdgeBasis::DirectCalls`] they are kept out of the
+    /// adjacency every structural metric reads. See
+    /// [`super::AnalysisGraph::liveness_fan_in`] for the dead-code
+    /// exception.
+    pub fn is_indirect_call(&self) -> bool {
+        self.kind == EdgeKind::Call && matches!(self.via, Some(CallUse::Dispatch | CallUse::Value))
+    }
+}
+
+/// Mirror of `graphengine_parsing::domain::provenance::UseKind`, parsed
+/// from the `via` field of an edge's `provenance` JSON.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum CallUse {
+    /// Invoked directly.
+    Call,
+    /// Reached through an interface / trait / virtual method.
+    Dispatch,
+    /// Referenced as a value (passed, stored, assigned).
+    Value,
+}
+
+impl CallUse {
+    pub fn parse(s: &str) -> Option<Self> {
+        match s {
+            "call" => Some(Self::Call),
+            "dispatch" => Some(Self::Dispatch),
+            "value" => Some(Self::Value),
+            _ => None,
+        }
+    }
+}
+
+/// Which Call edges the structural health metrics count.
+///
+/// Default is [`Self::DirectCalls`]: cycles, tangle, fan-in / hotspots,
+/// blast radius, call depth, coupling, cohesion, instability, layers,
+/// API surface and temporal-coupling structure all read only direct
+/// calls (`via` = `call` or absent). Dispatch fan-out links a call
+/// site to every implementation of a trait method — including a
+/// wrapper that forwards to another implementation — which inflates
+/// hotspots and manufactures cycles that no code path takes.
+///
+/// Dead code is the exception: a function reached only through
+/// dispatch or used as a value still has a caller, so dead-code
+/// detection counts every use regardless of basis.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum MetricsEdgeBasis {
+    #[default]
+    DirectCalls,
+    /// Every Call edge, including dispatch fan-out and value uses
+    /// (the behaviour before `direct_calls_v1`).
+    AllUses,
+}
+
+impl MetricsEdgeBasis {
+    /// Stable wire label stamped on reports.
+    pub fn label(self) -> &'static str {
+        match self {
+            Self::DirectCalls => "direct_calls_v1",
+            Self::AllUses => "all_uses_v1",
+        }
+    }
 }
 
 #[cfg(test)]
@@ -458,5 +532,91 @@ mod edgekind_predicate_tests {
         ] {
             assert!(v.is_structural(), "{v:?} must be structural");
         }
+    }
+}
+
+#[cfg(test)]
+mod metrics_edge_basis_tests {
+    use super::super::AnalysisGraph;
+    use super::*;
+    use std::collections::BTreeMap;
+
+    fn node(id: &str) -> (String, GraphNode) {
+        (
+            id.to_string(),
+            GraphNode {
+                id: id.to_string(),
+                fqn: format!("m::{id}"),
+                name: id.to_string(),
+                ..GraphNode::default()
+            },
+        )
+    }
+
+    fn edge(from: &str, to: &str, kind: EdgeKind, via: Option<CallUse>) -> GraphEdge {
+        GraphEdge {
+            from_id: from.into(),
+            to_id: to.into(),
+            kind,
+            confidence: Confidence::High,
+            via,
+        }
+    }
+
+    fn fixture(basis: MetricsEdgeBasis) -> AnalysisGraph {
+        let nodes: BTreeMap<String, GraphNode> =
+            ["a", "b", "c", "d", "e"].into_iter().map(node).collect();
+        let edges = vec![
+            edge("a", "b", EdgeKind::Call, Some(CallUse::Call)),
+            edge("a", "c", EdgeKind::Call, Some(CallUse::Dispatch)),
+            edge("a", "d", EdgeKind::Call, Some(CallUse::Value)),
+            edge("a", "e", EdgeKind::Call, None),
+            // `via` only means something on Call edges.
+            edge("b", "c", EdgeKind::Uses, Some(CallUse::Dispatch)),
+        ];
+        AnalysisGraph::build_with_basis(nodes, edges, basis)
+    }
+
+    #[test]
+    fn indirect_call_predicate() {
+        assert!(edge("a", "b", EdgeKind::Call, Some(CallUse::Dispatch)).is_indirect_call());
+        assert!(edge("a", "b", EdgeKind::Call, Some(CallUse::Value)).is_indirect_call());
+        assert!(!edge("a", "b", EdgeKind::Call, Some(CallUse::Call)).is_indirect_call());
+        assert!(!edge("a", "b", EdgeKind::Call, None).is_indirect_call());
+        assert!(!edge("a", "b", EdgeKind::Uses, Some(CallUse::Dispatch)).is_indirect_call());
+    }
+
+    #[test]
+    fn direct_calls_basis_keeps_dispatch_and_value_out_of_adjacency() {
+        let g = fixture(MetricsEdgeBasis::DirectCalls);
+        assert_eq!(g.edge_basis(), MetricsEdgeBasis::DirectCalls);
+        assert_eq!(g.fan_out("a"), 2, "direct call + call without via");
+        assert_eq!(g.fan_in("b"), 1);
+        assert_eq!(g.fan_in("e"), 1);
+        assert_eq!(g.fan_in("c"), 1, "only the Uses edge");
+        assert_eq!(g.fan_in("d"), 0);
+        assert_eq!(g.total_structural_edges(), 3);
+        assert_eq!(g.indirect_call_edge_counts(), (1, 1));
+        // Liveness still sees every use.
+        assert_eq!(g.liveness_fan_in("c"), 2);
+        assert_eq!(g.liveness_fan_in("d"), 1);
+        assert_eq!(g.liveness_fan_in_high_only("d"), 1);
+        assert_eq!(g.total_edges(), 5, "edges are kept, only adjacency changes");
+    }
+
+    #[test]
+    fn all_uses_basis_counts_every_call() {
+        let g = fixture(MetricsEdgeBasis::AllUses);
+        assert_eq!(g.fan_out("a"), 4);
+        assert_eq!(g.fan_in("d"), 1);
+        assert_eq!(g.total_structural_edges(), 5);
+        assert_eq!(g.indirect_call_edge_counts(), (0, 0));
+        assert_eq!(g.liveness_fan_in("c"), g.fan_in("c"));
+    }
+
+    #[test]
+    fn default_basis_is_direct_calls() {
+        assert_eq!(MetricsEdgeBasis::default(), MetricsEdgeBasis::DirectCalls);
+        assert_eq!(MetricsEdgeBasis::DirectCalls.label(), "direct_calls_v1");
     }
 }

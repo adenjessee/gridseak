@@ -737,6 +737,7 @@ pub fn run(ctx: &mut AnalysisRunContext<'_>) -> Result<Option<HealthReport>> {
         primary_language: None,
         analysis_provenance: None,
     };
+    crate::health::stamp_metrics_edge_basis(&mut report.integrity_status, &ctx.graph);
     if ctx
         .resolution_quality
         .resolution_disclosure

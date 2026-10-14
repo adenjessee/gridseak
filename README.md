@@ -63,7 +63,7 @@ Next: gridseak setup   (wires the MCP server into your IDE)
 
 | Language | Extensions | Tier 0 (tree-sitter) | Tier 3 (compiler / LSP / SCIP) |
 | --- | --- | --- | --- |
-| **Rust** | `.rs` | Full symbol + import/call graph | **Yes** — `rust-analyzer` |
+| **Rust** | `.rs` | Full symbol + import/call graph | **Yes** — `rust-analyzer scip` (in-process `rust-analyzer` fallback); audited against rustc MIR (99.6% of functions with every caller listed on GridSeak itself) |
 | **TypeScript** | `.ts`, `.tsx`, `.mts`, `.cts` | Full | **Yes** — `scip-typescript`; audited against `tsc` (97.4–98.5% of functions with every caller listed) |
 | **JavaScript** | `.js`, `.jsx`, `.mjs`, `.cjs` | Full | Planned |
 | **Python** | `.py` | Skeleton — symbols + imports; thinner call graph than Rust/TS | **Yes** — `scip-python` (not yet audited) |

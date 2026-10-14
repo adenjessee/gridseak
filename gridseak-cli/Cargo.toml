@@ -61,11 +61,13 @@ graphengine-progress = { workspace = true }
 gridseak-engine-runner = { path = "../gridseak-engine-runner" }
 gridseak-local-store = { path = "../gridseak-local-store" }
 # Same tree-sitter line as graphengine-parsing (locked 0.20). Gate
-# name extraction walks Go/TS/Rust only; do not add other grammars here.
+# name extraction walks Go/TS/Rust/Python; add a grammar here only at the
+# version graphengine-parsing already pins.
 tree-sitter = "0.20"
 tree-sitter-rust = "=0.20.2"
 tree-sitter-go = "0.20"
 tree-sitter-typescript = "0.20"
+tree-sitter-python = "0.20"
 
 [dev-dependencies]
 # Snapshot testing for the renderers. Inline + file-based snapshots

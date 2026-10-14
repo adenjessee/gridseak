@@ -96,6 +96,8 @@ const IGNORED_DIRS: &[&str] = &[
     "vendor",
     "Pods",
     ".gradle",
+    ".claude",
+    ".gridseak",
 ];
 
 // `after_help` is what clap prints below the standard `Usage:` / `Options:`

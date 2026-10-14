@@ -1,4 +1,5 @@
-//! Narrow tree-sitter name extractor for the gate (Go / TypeScript / Rust).
+//! Narrow tree-sitter name extractor for the gate (Go / TypeScript / Rust /
+//! Python).
 //!
 //! Walks the same grammar crates `graphengine-parsing` pins. Output is
 //! function/method **short names + 1-based start lines**. Parse failure
@@ -32,6 +33,7 @@ pub fn language_for_file(file: &str) -> Option<Language> {
         "go" => Some(tree_sitter_go::language()),
         "rs" => Some(tree_sitter_rust::language()),
         "ts" | "tsx" | "js" | "jsx" | "mts" | "cts" => Some(tree_sitter_typescript::language_tsx()),
+        "py" | "pyi" => Some(tree_sitter_python::language()),
         _ => None,
     }
 }
@@ -60,7 +62,9 @@ fn walk(node: Node<'_>, src: &[u8], out: &mut Vec<ExtractedName>) {
         | "function_item"
         | "method_definition"
         | "generator_function_declaration"
-        | "function_signature" => push_named(node, src, out),
+        | "function_signature"
+        // Python `def` / `async def`, including methods and decorated defs.
+        | "function_definition" => push_named(node, src, out),
         "variable_declarator" | "public_field_definition" => {
             if let Some(val) = node.child_by_field_name("value") {
                 if is_fn_like(val.kind()) {
@@ -112,7 +116,11 @@ pub fn heuristic_names(src: &str) -> Vec<ExtractedName> {
     for (i, line) in src.lines().enumerate() {
         let n = (i as u32) + 1;
         let t = line.trim();
-        if let Some(name) = go_func(t).or_else(|| rust_fn(t)).or_else(|| ts_func(t)) {
+        if let Some(name) = go_func(t)
+            .or_else(|| rust_fn(t))
+            .or_else(|| ts_func(t))
+            .or_else(|| py_def(t))
+        {
             out.push(ExtractedName {
                 name,
                 start_line: n,
@@ -132,6 +140,11 @@ fn go_func(line: &str) -> Option<String> {
         rest
     };
     ident_at(rest)
+}
+
+fn py_def(line: &str) -> Option<String> {
+    let rest = line.strip_prefix("async ").unwrap_or(line);
+    ident_at(rest.strip_prefix("def ")?.trim_start())
 }
 
 fn rust_fn(line: &str) -> Option<String> {
@@ -225,6 +238,28 @@ mod tests {
                 "TS miss: export const parse = is not a named function in the TSX grammar; names={names:?}. Gate keeps scan-range fallback."
             );
         }
+    }
+
+    #[test]
+    fn python_defs_methods_and_decorated() {
+        let src = "import x\n\ndef top(a):\n    pass\n\nclass App:\n    @property\n    def name(self):\n        return 1\n\n    async def dispatch(self, req):\n        def inner():\n            pass\n        return inner\n";
+        let (names, source) = extract_names("app.py", src);
+        assert_eq!(source, "tree-sitter");
+        let got: Vec<(&str, u32)> = names
+            .iter()
+            .map(|n| (n.name.as_str(), n.start_line))
+            .collect();
+        assert_eq!(
+            got,
+            vec![("top", 3), ("name", 8), ("dispatch", 11), ("inner", 12)]
+        );
+    }
+
+    #[test]
+    fn python_heuristic_def() {
+        let names = heuristic_names("def a(x):\n    async def b():\n        pass\n");
+        let got: Vec<&str> = names.iter().map(|n| n.name.as_str()).collect();
+        assert_eq!(got, vec!["a", "b"]);
     }
 
     #[test]

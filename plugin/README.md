@@ -65,6 +65,32 @@ Markdown with the same steps.
   host maps ask → deny. `setup --verify` fails if Claude
   `PreToolUse` is an empty array.
 - Compaction card: `gridseak gate --card`.
+- Claim check (Claude `Stop`): `gridseak gate --stop`. When the agent's
+  final message claims completeness ("updated all callers", "no other
+  call sites"), the hook diffs the working tree against `HEAD`, finds
+  functions that were removed, renamed or re-signatured, and checks each
+  graph caller: it must be in a changed file, and a caller of a removed
+  name must no longer mention it.
+  - A compiler/LSP-witnessed miss blocks the stop and hands the agent
+    the list of callers.
+  - A tree-sitter-only miss is shown to you without blocking.
+  - Languages: Go, Rust, TypeScript/JavaScript and Python. Module-level
+    entries that are only import lines are not counted as callers for
+    signature changes.
+  - A `git grep -w` fallback also lists references the graph has no
+    edge for (Go `_examples/`, build-tagged files, untyped Python calls):
+    any leftover mention of a removed name, and mentions of a re-signatured
+    name in files the agent didn't touch. These text matches are labeled
+    heuristic and never block on their own. Skipped for names under 4 characters,
+    names another function still defines, and names with more than 50
+    matches.
+  - It never blocks twice in a row (`stop_hook_active`).
+  - No claim, no scan, or any error → `{}`: the hook fails open.
+
+  Limits: the diff is against `HEAD`, so edits made before the session
+  count too. A changed file counts as an updated caller for signature
+  changes; the hook doesn't check the call site itself. Callers come
+  from the last scan, so rescan after big refactors.
 
 The other MCP verbs stay on the full CLI (`gridseak mcp` without `--slim`).
 They are not in the always-on schema.

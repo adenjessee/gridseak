@@ -223,13 +223,18 @@ impl UseCaseFactory {
     // `graphengine-parsing-test-support`.
 }
 
-/// Build the Rust scan's semantic resolver. When the `rust-layer2`
-/// feature is enabled (default post-Gate 1.2), we try to construct
-/// the `ra_ap_ide`-backed `RustLayer2SemanticResolver` against the
-/// workspace root. If that fails (no `Cargo.toml` visible, sysroot
-/// discovery error, etc.) or the feature is disabled, we fall back
-/// to the subprocess-LSP path so the scan still produces heuristic
-/// edges and does not abort.
+/// Build the Rust scan's semantic resolver.
+///
+/// First choice is the compiler tier shared with Go / TypeScript / Python:
+/// a `rust-analyzer scip` index (cached under `.gridseak/scip/scip-rust`
+/// with the v2 fingerprint) swept occurrence by occurrence by
+/// `IndexBackedSemanticResolver`. When no usable index exists, the scan
+/// warns on stderr and falls back to the in-process `ra_ap_ide` resolver
+/// (`rust-layer2`), whose disclosure keeps the index skip reason so the
+/// report carries `compiler_tier_unavailable_v1`. If that also fails (no
+/// `Cargo.toml`, sysroot discovery error, …) the subprocess-LSP path runs.
+///
+/// `GRIDSEAK_RUST_RESOLVER=layer2` skips the SCIP tier (A/B comparisons).
 #[cfg(feature = "rust-layer2")]
 fn build_rust_semantic_resolver(
     config: crate::infrastructure::LanguageConfig,
@@ -242,13 +247,25 @@ fn build_rust_semantic_resolver(
         .and_then(|u| u.to_file_path().ok())
         .unwrap_or_else(|| std::env::current_dir().unwrap_or_default());
 
+    let index_skip = rust_scip_tier(workspace_root);
+    let index_skip = match index_skip {
+        Ok(resolver) => return resolver,
+        Err(skip) => skip,
+    };
+
     match RustLayer2SemanticResolver::new(&ws_path) {
         Ok(resolver) => {
             info!(
                 "Rust Layer-2 adapter initialised against workspace at {}",
                 ws_path.display()
             );
-            Box::new(resolver)
+            match index_skip {
+                Some(reason) => Box::new(DisclosedSemanticResolver::keeping_inner_edges(
+                    Box::new(resolver),
+                    ResolutionDisclosure::layer2_fallback_to_ra_ide("rust", reason),
+                )),
+                None => Box::new(resolver),
+            }
         }
         Err(err) => {
             info!(
@@ -266,11 +283,45 @@ fn build_rust_semantic_resolver(
     }
 }
 
+/// The SCIP tier for Rust. `Err(Some(reason))` when it was attempted and is
+/// unusable (already warned on stderr); `Err(None)` when it was not
+/// attempted (opted out, or built without the `scip` feature).
+#[cfg(all(feature = "rust-layer2", feature = "scip"))]
+fn rust_scip_tier(
+    workspace_root: Option<&url::Url>,
+) -> Result<Box<dyn SemanticResolver>, Option<crate::application::resolution_disclosure::SkipReason>>
+{
+    if std::env::var("GRIDSEAK_RUST_RESOLVER").as_deref() == Ok("layer2") {
+        info!("GRIDSEAK_RUST_RESOLVER=layer2: skipping the Rust SCIP tier");
+        return Err(None);
+    }
+    load_index_backed("rust", workspace_root).map_err(|(reason, detail)| {
+        let detail = detail.unwrap_or_default();
+        let first_line = detail.lines().next().unwrap_or(&detail);
+        eprintln!(
+            "warning: rust: compiler-backed (SCIP) call resolution unavailable; using the in-process rust-analyzer resolver, which resolves call sites one at a time and falls back to name matching ({first_line})"
+        );
+        Some(reason)
+    })
+}
+
+#[cfg(all(feature = "rust-layer2", not(feature = "scip")))]
+fn rust_scip_tier(
+    _workspace_root: Option<&url::Url>,
+) -> Result<Box<dyn SemanticResolver>, Option<crate::application::resolution_disclosure::SkipReason>>
+{
+    Err(None)
+}
+
 #[cfg(not(feature = "rust-layer2"))]
 fn build_rust_semantic_resolver(
     config: crate::infrastructure::LanguageConfig,
     workspace_root: Option<&url::Url>,
 ) -> Box<dyn SemanticResolver> {
+    #[cfg(feature = "scip")]
+    if let Ok(resolver) = load_index_backed("rust", workspace_root) {
+        return resolver;
+    }
     Box::new(LspResolver::with_options(
         config,
         workspace_root.cloned(),
@@ -319,10 +370,39 @@ fn build_index_backed_or_heuristic(
     workspace_root: Option<&url::Url>,
     _config: crate::infrastructure::LanguageConfig,
 ) -> Box<dyn SemanticResolver> {
-    use crate::application::resolution_disclosure::{ResolutionDisclosure, SkipReason};
-    use crate::infrastructure::{
-        DisclosedSemanticResolver, IndexBackedSemanticResolver, ScipSemanticIndex,
-    };
+    use crate::application::resolution_disclosure::ResolutionDisclosure;
+    use crate::infrastructure::DisclosedSemanticResolver;
+
+    match load_index_backed(language, workspace_root) {
+        Ok(resolver) => resolver,
+        Err((reason, detail)) => {
+            if let Some(detail) = detail {
+                warn_compiler_tier_unavailable(language, &detail);
+            }
+            Box::new(DisclosedSemanticResolver::new(
+                Box::new(HeuristicOnlySemanticResolver::new(language)),
+                ResolutionDisclosure::layer2_fallback_to_heuristic(language, reason),
+            ))
+        }
+    }
+}
+
+/// Provision (or reuse) the language's SCIP index and wrap it in the
+/// reference-occurrence resolver. `Err` carries the skip reason and, when
+/// the compiler tier was attempted, a detail line for the stderr warning.
+#[cfg(feature = "scip")]
+fn load_index_backed(
+    language: &str,
+    workspace_root: Option<&url::Url>,
+) -> Result<
+    Box<dyn SemanticResolver>,
+    (
+        crate::application::resolution_disclosure::SkipReason,
+        Option<String>,
+    ),
+> {
+    use crate::application::resolution_disclosure::SkipReason;
+    use crate::infrastructure::{IndexBackedSemanticResolver, ScipSemanticIndex};
     use graphengine_scip_adapter::{provision_index, IndexerError, IndexerLanguage};
     use tracing::warn;
 
@@ -330,15 +410,10 @@ fn build_index_backed_or_heuristic(
         "typescript" | "javascript" => IndexerLanguage::TypeScript,
         "python" => IndexerLanguage::Python,
         "go" => IndexerLanguage::Go,
+        "rust" => IndexerLanguage::Rust,
         other => {
             warn!("no SCIP registry mapping for {other}; heuristic only");
-            return Box::new(DisclosedSemanticResolver::new(
-                Box::new(HeuristicOnlySemanticResolver::new(language)),
-                ResolutionDisclosure::layer2_fallback_to_heuristic(
-                    language,
-                    SkipReason::LanguageNotRouted,
-                ),
-            ));
+            return Err((SkipReason::LanguageNotRouted, None));
         }
     };
 
@@ -356,14 +431,6 @@ fn build_index_backed_or_heuristic(
         }
     };
 
-    let heuristic = |reason: SkipReason, detail: &str| -> Box<dyn SemanticResolver> {
-        warn_compiler_tier_unavailable(language, detail);
-        Box::new(DisclosedSemanticResolver::new(
-            Box::new(HeuristicOnlySemanticResolver::new(language)),
-            ResolutionDisclosure::layer2_fallback_to_heuristic(language, reason),
-        ))
-    };
-
     // `provision_index` returns the cached index only when its fingerprint
     // sidecar matches this workspace, and (re)writes the sidecar only when
     // an indexer actually ran. Never write the sidecar here: doing so for a
@@ -375,7 +442,7 @@ fn build_index_backed_or_heuristic(
                 "{language} SCIP indexer skipped (exit {}): {}",
                 err.exit_code, err.message
             );
-            return heuristic(skip_from_err(&err), &err.message);
+            return Err((skip_from_err(&err), Some(err.message)));
         }
     };
 
@@ -391,7 +458,7 @@ fn build_index_backed_or_heuristic(
                     ws_path.display()
                 );
                 warn!("{language} SCIP index rejected: {detail}");
-                return heuristic(SkipReason::IndexStale, &detail);
+                return Err((SkipReason::IndexStale, Some(detail)));
             }
             let root = index.project_root().to_path_buf();
             info!(
@@ -400,14 +467,16 @@ fn build_index_backed_or_heuristic(
                 coverage.present,
                 coverage.checked
             );
-            Box::new(IndexBackedSemanticResolver::new(index, root, language))
+            Ok(Box::new(IndexBackedSemanticResolver::new(
+                index, root, language,
+            )))
         }
         Err(err) => {
             warn!("Failed to load SCIP index for {language}: {err}");
-            heuristic(
+            Err((
                 SkipReason::IndexerFailed,
-                &format!("failed to load {}: {err}", index_path.display()),
-            )
+                Some(format!("failed to load {}: {err}", index_path.display())),
+            ))
         }
     }
 }

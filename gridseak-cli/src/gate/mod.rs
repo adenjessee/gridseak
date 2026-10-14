@@ -13,6 +13,7 @@ pub mod host_io;
 pub mod ledger;
 pub mod parse_edit;
 pub mod preferred;
+pub mod stop;
 pub mod ts_names;
 
 use std::io::{Read, Write};
@@ -91,6 +92,12 @@ pub struct GateArgs {
     /// Claude-canonical (exit 0 + JSON verdict).
     #[arg(long, default_value_t = false)]
     pub strict_exit: bool,
+
+    /// Claude `Stop` hook: check a completeness claim in the agent's
+    /// final message against the working-tree diff and the scan graph.
+    /// Prints `{}`, a `block` decision, or a `systemMessage`; never fails.
+    #[arg(long, default_value_t = false)]
+    pub stop: bool,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -106,6 +113,19 @@ pub fn run(store: &ProjectStore, args: GateArgs) -> Result<i32> {
             "{}",
             compaction_card(store, &args.project, args.ledger.as_ref())?
         );
+        return Ok(0);
+    }
+
+    if args.stop {
+        let started = std::time::Instant::now();
+        let raw = read_stdin(None, HostFormat::Claude).unwrap_or_default();
+        let mut outcome = stop::run_from_host(store, &raw, args.artifact.clone());
+        if let (Some(decision), false) = (outcome.decision.as_mut(), args.no_ledger) {
+            decision.duration_ms = started.elapsed().as_millis() as u64;
+            let ledger_path = args.ledger.clone().unwrap_or_else(default_ledger_path);
+            let _ = append_ledger(&ledger_path, decision);
+        }
+        print!("{}", outcome.host_stdout);
         return Ok(0);
     }
 
@@ -488,6 +508,7 @@ mod tests {
             ledger: Some(ledger),
             no_ledger: false,
             strict_exit: true,
+            stop: false,
         }
     }
 
@@ -553,6 +574,7 @@ mod tests {
             ledger: Some(dir.path().join("gate.jsonl")),
             no_ledger: false,
             strict_exit: true,
+            stop: false,
         };
         let stdin = r#"{"command":"rm chi.go"}"#;
         let result = evaluate(&store, args, Some(stdin)).unwrap();
@@ -590,6 +612,7 @@ mod tests {
             ledger: None,
             no_ledger: true,
             strict_exit: false,
+            stop: false,
         }
     }
 

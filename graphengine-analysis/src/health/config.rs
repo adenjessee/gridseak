@@ -85,6 +85,11 @@ pub struct AnalysisConfig {
     /// When true, generated/vendor/build-output files are excluded.
     #[serde(default)]
     pub exclude_generated: bool,
+    /// Which Call edges the structural metrics count. Defaults to
+    /// direct calls; `all_uses` restores dispatch fan-out and value
+    /// uses. Dead code counts every use either way.
+    #[serde(default)]
+    pub metrics_edge_basis: super::graph::MetricsEdgeBasis,
 }
 
 impl Default for AnalysisConfig {
@@ -128,6 +133,7 @@ impl AnalysisConfig {
             test_detection: TestDetectionConfig::default(),
             exclude_tests: false,
             exclude_generated: false,
+            metrics_edge_basis: super::graph::MetricsEdgeBasis::default(),
         }
     }
 
@@ -138,6 +144,9 @@ impl AnalysisConfig {
     pub fn apply_toml_overlay(&mut self, overlay: TomlOverlay) {
         if let Some(eco) = overlay.ecosystem {
             self.ecosystem = Some(eco);
+        }
+        if let Some(basis) = overlay.metrics_edge_basis {
+            self.metrics_edge_basis = basis;
         }
         if let Some(m) = overlay.modules {
             if let Some(v) = m.analysis_depth {
@@ -775,6 +784,9 @@ pub struct TomlOverlay {
     pub max_findings_per_type: Option<usize>,
     pub classification: Option<ClassificationOverrides>,
     pub test_detection: Option<TomlTestDetectionOverlay>,
+    /// `metrics_edge_basis = "all_uses"` restores counting dispatch
+    /// fan-out and value uses in structural metrics.
+    pub metrics_edge_basis: Option<super::graph::MetricsEdgeBasis>,
 }
 
 #[derive(Debug, Clone, Deserialize, Default)]
@@ -969,6 +981,16 @@ pub fn load_config_from_toml(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn toml_overlay_sets_metrics_edge_basis() {
+        use super::super::graph::MetricsEdgeBasis;
+        let mut cfg = AnalysisConfig::default();
+        assert_eq!(cfg.metrics_edge_basis, MetricsEdgeBasis::DirectCalls);
+        let overlay: TomlOverlay = toml::from_str(r#"metrics_edge_basis = "all_uses""#).unwrap();
+        cfg.apply_toml_overlay(overlay);
+        assert_eq!(cfg.metrics_edge_basis, MetricsEdgeBasis::AllUses);
+    }
 
     #[test]
     fn default_config_is_valid() {

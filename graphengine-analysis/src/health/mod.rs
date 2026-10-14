@@ -973,5 +973,76 @@ pub(crate) fn build_integrity_status(
         engine_commit: option_env!("GE_COMMIT_SHA").map(|s| s.to_string()),
         schema_caveats,
         invariant_violations,
+        metrics_edge_basis: None,
     }
+}
+
+/// Upper bound on `indirect_only_cycles` entries in a report.
+const MAX_INDIRECT_ONLY_CYCLES_REPORTED: usize = 20;
+
+/// Describe which Call edges the structural metrics counted, stamp the
+/// matching caveat, and list cycles that close only through dispatch /
+/// value uses.
+pub(crate) fn stamp_metrics_edge_basis(status: &mut IntegrityStatus, graph: &graph::AnalysisGraph) {
+    let basis = graph.edge_basis();
+    let (dispatch, value) = graph.indirect_call_edge_counts();
+    let note = match basis {
+        graph::MetricsEdgeBasis::DirectCalls => {
+            if !status
+                .schema_caveats
+                .iter()
+                .any(|c| c == report::CAVEAT_METRICS_EDGE_BASIS_DIRECT_CALLS_V1)
+            {
+                status
+                    .schema_caveats
+                    .push(report::CAVEAT_METRICS_EDGE_BASIS_DIRECT_CALLS_V1.to_string());
+            }
+            "Cycles, hotspots, blast radius, depth, coupling and cohesion count direct calls only; \
+             calls through interface/trait methods (fanned out to every implementation) and \
+             functions used as values are left out. Dead code still treats those uses as callers."
+        }
+        graph::MetricsEdgeBasis::AllUses => {
+            "Structural metrics count every Call edge, including interface/trait dispatch \
+             fan-out and functions used as values."
+        }
+    };
+    let indirect_only_cycles = cycles::detect_indirect_only_cycles(graph)
+        .into_iter()
+        .take(MAX_INDIRECT_ONLY_CYCLES_REPORTED)
+        .map(|c| report::IndirectOnlyCycleInfo {
+            node_names: c
+                .node_ids
+                .iter()
+                .map(|id| {
+                    graph
+                        .nodes
+                        .get(id)
+                        .map(|n| n.display_name())
+                        .unwrap_or_else(|| id.clone())
+                })
+                .collect(),
+            indirect_edges: c.indirect_edge_indices.len(),
+            node_ids: c.node_ids,
+        })
+        .collect();
+    status.metrics_edge_basis = Some(report::MetricsEdgeBasisReport {
+        basis: basis.label().to_string(),
+        dispatch_edges_excluded: dispatch,
+        value_edges_excluded: value,
+        note: note.to_string(),
+        indirect_only_cycles,
+    });
+}
+
+/// True when a cached report was computed on the given metrics edge
+/// basis, so incremental paths never merge numbers from two bases.
+pub(crate) fn report_matches_edge_basis(
+    report: &HealthReport,
+    basis: graph::MetricsEdgeBasis,
+) -> bool {
+    report
+        .integrity_status
+        .metrics_edge_basis
+        .as_ref()
+        .is_some_and(|b| b.basis == basis.label())
 }

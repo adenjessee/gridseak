@@ -238,3 +238,98 @@ async fn no_incremental_forces_full_reparse_on_warm_persistent_db() {
         "no-incremental must reparse every discovered file"
     );
 }
+
+fn count(conn: &rusqlite::Connection, sql: &str) -> i64 {
+    conn.query_row(sql, [], |r| r.get(0)).unwrap()
+}
+
+/// (TS nodes, TS file_cache rows, TS disclosure rows) in the parse DB.
+fn typescript_rows(db: &std::path::Path) -> (i64, i64, i64) {
+    let conn = rusqlite::Connection::open(db).unwrap();
+    (
+        count(
+            &conn,
+            "SELECT COUNT(*) FROM nodes WHERE json_extract(location, '$.file') LIKE '%.ts'",
+        ),
+        count(
+            &conn,
+            "SELECT COUNT(*) FROM file_cache WHERE language = 'typescript'",
+        ),
+        count(
+            &conn,
+            "SELECT COUNT(*) FROM metadata WHERE key = 'resolution_disclosure_typescript'",
+        ),
+    )
+}
+
+/// Regression: a language-restricted rescan of a persistent DB must drop
+/// the rows of every language it left out. Before the fix, scanning
+/// `rust,typescript` and then `rust` kept the TypeScript nodes, edges and
+/// cache rows, so `gridseak audit` counted those stale heuristic edges
+/// and refused to run.
+#[tokio::test]
+async fn language_restricted_rescan_prunes_rows_of_dropped_languages() {
+    ensure_engine_binaries();
+
+    let scratch = tempfile::tempdir().expect("scratch tempdir");
+    let persistent = scratch.path().join("parse.sqlite");
+    let rust_nodes =
+        "SELECT COUNT(*) FROM nodes WHERE json_extract(location, '$.file') LIKE '%.rs'";
+
+    let mut cfg_a = pipeline_config(
+        scratch.path(),
+        Uuid::new_v4(),
+        vec!["rust".into(), "typescript".into()],
+    );
+    cfg_a.persistent_parse_db = Some(persistent.clone());
+    run_pipeline(cfg_a)
+        .await
+        .expect("full polyglot scan succeeds");
+    let (nodes, cache, disclosure) = typescript_rows(&persistent);
+    assert!(
+        nodes > 0 && cache > 0 && disclosure > 0,
+        "fixture must leave TypeScript rows after the full scan; \
+         nodes={nodes} cache={cache} disclosure={disclosure}"
+    );
+    let rust_before = count(
+        &rusqlite::Connection::open(&persistent).unwrap(),
+        rust_nodes,
+    );
+
+    let mut cfg_b = pipeline_config(scratch.path(), Uuid::new_v4(), vec!["rust".into()]);
+    cfg_b.persistent_parse_db = Some(persistent.clone());
+    let output = run_pipeline(cfg_b)
+        .await
+        .expect("rust-only rescan succeeds");
+
+    assert_eq!(
+        typescript_rows(&persistent),
+        (0, 0, 0),
+        "rust-only rescan must drop TypeScript nodes, cache rows and disclosure"
+    );
+    let conn = rusqlite::Connection::open(&persistent).unwrap();
+    assert_eq!(
+        count(&conn, rust_nodes),
+        rust_before,
+        "rust rows are untouched"
+    );
+    assert_eq!(
+        count(
+            &conn,
+            "SELECT COUNT(*) FROM edges WHERE from_id NOT IN (SELECT id FROM nodes)
+             OR to_id NOT IN (SELECT id FROM nodes)",
+        ),
+        0,
+        "no edge may point at a pruned node"
+    );
+    let disclosed: Vec<String> = output
+        .report
+        .resolution_quality
+        .iter()
+        .flat_map(|q| q.resolution_disclosure.iter().map(|d| d.language.clone()))
+        .collect();
+    assert!(
+        !disclosed.iter().any(|l| l == "typescript"),
+        "the report must not disclose a language the scan did not cover; got {disclosed:?}"
+    );
+}

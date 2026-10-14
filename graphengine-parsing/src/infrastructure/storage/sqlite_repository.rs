@@ -34,6 +34,17 @@ pub struct SqliteRepository {
     conn: Arc<Mutex<Connection>>,
 }
 
+/// What [`SqliteRepository::prune_languages_except_sync`] removed.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct LanguagePruneOutcome {
+    /// Languages that had rows in the DB but were not kept, sorted.
+    pub languages: Vec<String>,
+    /// Files whose rows were dropped, sorted.
+    pub file_paths: Vec<String>,
+    /// `nodes` rows deleted. Edges go with them via the cascade.
+    pub nodes_deleted: usize,
+}
+
 impl SqliteRepository {
     /// Creates a new `SqliteRepository` instance, opening a connection
     /// to the specified database file and initializing the schema if needed.
@@ -357,6 +368,19 @@ impl SqliteRepository {
     // repository can avoid the runtime hop.
 
     /// Read every cached `file_cache` row, keyed by `file_path`.
+    /// Read one `metadata` value by key.
+    pub fn read_metadata_sync(&self, key: &str) -> anyhow::Result<Option<String>> {
+        use rusqlite::OptionalExtension;
+        let conn = self.conn.lock().unwrap();
+        Ok(conn
+            .query_row(
+                "SELECT value FROM metadata WHERE key = ?1",
+                params![key],
+                |row| row.get(0),
+            )
+            .optional()?)
+    }
+
     pub fn read_file_cache_sync(
         &self,
     ) -> anyhow::Result<std::collections::BTreeMap<String, super::FileCacheRow>> {
@@ -423,6 +447,87 @@ impl SqliteRepository {
             rusqlite::params![api_name],
         )?;
         Ok(())
+    }
+
+    /// Drop every row owned by a language outside `keep_languages`:
+    /// its files' `nodes` (and incident `edges` via `ON DELETE
+    /// CASCADE`), `file_extraction_coverage`, `file_cache`,
+    /// `apex_class_symbols`, `call_site_bindings`, and its
+    /// `resolution_disclosure_<lang>` metadata row. Language names
+    /// compare case-insensitively.
+    ///
+    /// The persistent parse DB is shared across scans, so a scan
+    /// restricted with `--lang go` would otherwise leave the previous
+    /// scan's TypeScript rows in place. Every consumer of the DB
+    /// (analysis report, MCP tools, `gridseak audit`) would then read
+    /// a graph that mixes this scan with stale rows the scan never
+    /// refreshed. The runner calls this before the first language
+    /// pass so the DB always describes exactly the languages the
+    /// latest scan covered.
+    ///
+    /// A file is attributed to a language through `file_cache` and
+    /// `file_extraction_coverage`, the only tables that record one.
+    pub fn prune_languages_except_sync(
+        &self,
+        keep_languages: &[String],
+    ) -> anyhow::Result<LanguagePruneOutcome> {
+        let keep: std::collections::HashSet<String> = keep_languages
+            .iter()
+            .map(|l| l.to_ascii_lowercase())
+            .collect();
+        let mut conn = self.conn.lock().unwrap();
+        let tx = conn.transaction()?;
+        let mut outcome = LanguagePruneOutcome::default();
+        let mut paths = std::collections::BTreeSet::new();
+        let mut languages = std::collections::BTreeSet::new();
+        {
+            let mut stmt = tx.prepare(
+                "SELECT file_path, language FROM file_cache
+                 UNION SELECT file_path, language FROM file_extraction_coverage",
+            )?;
+            let rows =
+                stmt.query_map([], |r| Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?)))?;
+            for row in rows {
+                let (path, language) = row?;
+                if !keep.contains(&language.to_ascii_lowercase()) {
+                    paths.insert(path);
+                    languages.insert(language);
+                }
+            }
+            let mut stmt =
+                tx.prepare("SELECT key FROM metadata WHERE key LIKE 'resolution_disclosure_%'")?;
+            let keys = stmt
+                .query_map([], |r| r.get::<_, String>(0))?
+                .collect::<Result<Vec<_>, _>>()?;
+            for key in keys {
+                let language = &key["resolution_disclosure_".len()..];
+                if !keep.contains(&language.to_ascii_lowercase()) {
+                    tx.execute("DELETE FROM metadata WHERE key = ?1", params![key])?;
+                    languages.insert(language.to_string());
+                }
+            }
+        }
+        {
+            let mut node_stmt =
+                tx.prepare("DELETE FROM nodes WHERE json_extract(location, '$.file') = ?1")?;
+            let mut coverage_stmt =
+                tx.prepare("DELETE FROM file_extraction_coverage WHERE file_path = ?1")?;
+            let mut cache_stmt = tx.prepare("DELETE FROM file_cache WHERE file_path = ?1")?;
+            let mut binding_stmt = tx.prepare(
+                "DELETE FROM call_site_bindings WHERE caller_file = ?1 OR target_file = ?1",
+            )?;
+            for path in &paths {
+                outcome.nodes_deleted += node_stmt.execute(params![path])?;
+                coverage_stmt.execute(params![path])?;
+                cache_stmt.execute(params![path])?;
+                binding_stmt.execute(params![path])?;
+                Self::prune_apex_class_symbol_for_path(&tx, path)?;
+            }
+        }
+        tx.commit()?;
+        outcome.languages = languages.into_iter().collect();
+        outcome.file_paths = paths.into_iter().collect();
+        Ok(outcome)
     }
 
     pub fn prune_files_from_graph_sync(&self, file_paths: &[String]) -> anyhow::Result<usize> {
@@ -792,6 +897,10 @@ impl GraphRepository for SqliteRepository {
     /// helper for the same reason the other persistence trampolines
     /// do: orchestrator code flows through `&dyn GraphRepository`,
     /// so trait + sync paths must land in identical writes.
+    async fn read_metadata(&self, key: &str) -> anyhow::Result<Option<String>> {
+        SqliteRepository::read_metadata_sync(self, key)
+    }
+
     async fn read_file_cache(
         &self,
     ) -> anyhow::Result<std::collections::BTreeMap<String, super::FileCacheRow>> {
@@ -1155,6 +1264,82 @@ mod tests {
         assert!(g_a.get_edges_from(&n_a.id).is_empty(), "a→b edge cascaded");
         let g_c = repo.get(&n_c.id).await.unwrap().unwrap();
         assert!(g_c.get_edges_to(&n_c.id).is_empty(), "b→c edge cascaded");
+    }
+
+    #[tokio::test]
+    async fn prune_languages_except_drops_rows_of_languages_left_out_of_the_scan() {
+        // A `--lang go` rescan of a DB that also holds TypeScript rows
+        // must leave only Go behind: TS nodes, their edges (including
+        // the Go→TS one), cache rows, and the TS disclosure.
+        let repo = SqliteRepository::new_in_memory().unwrap();
+        let go = Node::function(
+            "main::run".to_string(),
+            Range::with_file(1, 0, 1, 10, "/r/main.go".to_string()),
+        );
+        let go2 = Node::function(
+            "main::helper".to_string(),
+            Range::with_file(5, 0, 5, 10, "/r/main.go".to_string()),
+        );
+        let ts = Node::function(
+            "web::render".to_string(),
+            Range::with_file(1, 0, 1, 10, "/r/web/app.ts".to_string()),
+        );
+        let mut graph = Graph::new();
+        for n in [&go, &go2, &ts] {
+            graph.add_node(n.clone());
+        }
+        graph.add_edge(Edge::call(go.id.clone(), go2.id.clone(), Provenance::lsp()));
+        graph.add_edge(Edge::call(go.id.clone(), ts.id.clone(), Provenance::lsp()));
+        graph
+            .metadata
+            .insert("resolution_disclosure_go".into(), "{}".into());
+        graph
+            .metadata
+            .insert("resolution_disclosure_typescript".into(), "{}".into());
+        repo.upsert(&graph).await.unwrap();
+        let row = |path: &str, language: &str| super::super::FileCacheRow {
+            file_path: path.to_string(),
+            content_hash: "h".into(),
+            language: language.to_string(),
+            payload_json: "{}".into(),
+            cached_at: "t".into(),
+        };
+        repo.upsert_file_cache_sync(&[row("/r/main.go", "go"), row("/r/web/app.ts", "typescript")])
+            .unwrap();
+
+        let outcome = repo
+            .prune_languages_except_sync(&["Go".to_string()])
+            .unwrap();
+        assert_eq!(outcome.languages, vec!["typescript".to_string()]);
+        assert_eq!(outcome.file_paths, vec!["/r/web/app.ts".to_string()]);
+        assert_eq!(outcome.nodes_deleted, 1);
+
+        assert!(repo.get(&ts.id).await.unwrap().is_none(), "TS node pruned");
+        let g = repo.get(&go.id).await.unwrap().unwrap();
+        assert_eq!(
+            g.get_edges_from(&go.id).len(),
+            1,
+            "only Go→Go edge survives"
+        );
+        let cache = repo.read_file_cache_sync().unwrap();
+        assert_eq!(
+            cache.keys().cloned().collect::<Vec<_>>(),
+            vec!["/r/main.go"]
+        );
+        assert!(repo
+            .read_metadata_sync("resolution_disclosure_typescript")
+            .unwrap()
+            .is_none());
+        assert!(repo
+            .read_metadata_sync("resolution_disclosure_go")
+            .unwrap()
+            .is_some());
+
+        // Re-running with the same scope is a no-op.
+        let again = repo
+            .prune_languages_except_sync(&["go".to_string()])
+            .unwrap();
+        assert_eq!(again, LanguagePruneOutcome::default());
     }
 
     #[tokio::test]

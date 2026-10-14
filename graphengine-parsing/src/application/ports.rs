@@ -906,6 +906,12 @@ pub struct ResolutionStatsSummary {
     /// from them at all, so "every edge is compiler-sourced" holds only for
     /// the other files. Workspace-relative, sorted.
     pub compiler_unindexed_files: Vec<String>,
+    /// Calls the compiler index could not resolve, as `(workspace-relative
+    /// file, 1-based line, called name)`: no occurrence on the callee name
+    /// (Python: a receiver typed `Any`, such as an unannotated parameter).
+    /// Any same-named function may be the callee, so a caller set that
+    /// contains that name is not certified complete. Python only.
+    pub compiler_unresolved_calls: Vec<(String, u32, String)>,
 }
 
 impl ResolutionStatsSummary {
@@ -1309,6 +1315,13 @@ pub trait GraphRepository: Send + Sync {
     /// Call edges from the last persisted graph (used to keep unchanged files).
     async fn load_prior_call_edges(&self) -> anyhow::Result<Vec<crate::domain::Edge>> {
         Ok(Vec::new())
+    }
+
+    /// Read one value from the graph's key-value metadata (resolution
+    /// disclosures, telemetry). Default impl returns `None` so backends
+    /// without a metadata table behave as if nothing was recorded.
+    async fn read_metadata(&self, _key: &str) -> anyhow::Result<Option<String>> {
+        Ok(None)
     }
 
     /// Read every cached `file_cache` row for the S1 incremental scan

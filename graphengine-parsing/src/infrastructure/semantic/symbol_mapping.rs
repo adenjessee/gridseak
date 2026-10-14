@@ -59,6 +59,33 @@ impl<'a> SymbolIndex<'a> {
             .min_by_key(|n| range_span(&n.location))
     }
 
+    /// Tightest `Function` node strictly around `node` (the function a nested
+    /// function is declared in), if any.
+    pub fn enclosing_function_of(&self, node: &Node) -> Option<&'a Node> {
+        self.file_symbols_for_location(&node.location)?
+            .iter()
+            .copied()
+            .filter(|n| {
+                n.kind == NodeKind::Function
+                    && n.id != node.id
+                    && contains(&n.location, &node.location)
+            })
+            .min_by_key(|n| range_span(&n.location))
+    }
+
+    /// Whether `outer`'s range contains `location`.
+    pub fn encloses(&self, outer: &Node, location: &Range) -> bool {
+        contains(&outer.location, location)
+            || (path_matches(&outer.location.file, &location.file)
+                && contains(
+                    &outer.location,
+                    &Range {
+                        file: outer.location.file.clone(),
+                        ..location.clone()
+                    },
+                ))
+    }
+
     /// Owner of top-level code at `location`: the tightest enclosing
     /// declaration, else the tightest enclosing module (Go's per-file
     /// module node), never the project or crate.

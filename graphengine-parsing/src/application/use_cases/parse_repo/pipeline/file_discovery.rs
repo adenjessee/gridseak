@@ -44,6 +44,8 @@ const EXCLUDED_DIR_NAMES: &[&str] = &[
     "coverage",
     ".nyc_output",
     "bower_components",
+    ".claude",   // Claude Code state, incl. agent worktrees (full repo copies)
+    ".gridseak", // GridSeak's own cache (SCIP indexes, audit output)
 ];
 
 /// Directory name prefixes that are excluded case-insensitively.
@@ -99,6 +101,21 @@ impl FileDiscovery {
             .into_iter()
             .filter_entry(|entry| {
                 if entry.file_type().is_dir() {
+                    // A nested directory with its own `.git` is a separate
+                    // checkout (git worktree, submodule, cloned repo); its
+                    // files belong to that repository's graph, not this one.
+                    let nested_checkout = entry.depth() > 0 && entry.path().join(".git").exists();
+                    if nested_checkout {
+                        skipped_dirs.push(
+                            entry
+                                .path()
+                                .strip_prefix(root)
+                                .unwrap_or(entry.path())
+                                .display()
+                                .to_string(),
+                        );
+                        return false;
+                    }
                     if let Some(name) = entry.file_name().to_str() {
                         if Self::is_excluded_dir_name(name, &excluded) {
                             skipped_dirs.push(
@@ -204,6 +221,13 @@ mod tests {
             prefixes.contains(&"staticresource"),
             "staticresource prefix must be in CI discovery exclusion list (R19)"
         );
+    }
+
+    #[test]
+    fn agent_worktrees_and_gridseak_cache_are_excluded() {
+        let excluded: HashSet<&str> = EXCLUDED_DIR_NAMES.iter().copied().collect();
+        assert!(FileDiscovery::is_excluded_dir_name(".claude", &excluded));
+        assert!(FileDiscovery::is_excluded_dir_name(".gridseak", &excluded));
     }
 
     #[test]

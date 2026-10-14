@@ -3,6 +3,15 @@
 //! Identifies function nodes with zero incoming non-containment edges,
 //! excluding entry points (test functions, barrel exports, framework handlers, etc.).
 //!
+//! # What counts as a caller
+//!
+//! Every other structural metric reads direct calls only
+//! (`MetricsEdgeBasis::DirectCalls`). Dead code deliberately does not:
+//! a function reached only through interface / trait dispatch, or only
+//! used as a value (callback, stored fn pointer), is live. Liveness is
+//! therefore checked with `AnalysisGraph::liveness_fan_in`, which adds
+//! the dispatch and value Call edges back on top of direct fan-in.
+//!
 //! # Scope contract
 //!
 //! `DeadCodeResult` is split into three disjoint slices so every
@@ -95,9 +104,9 @@ fn detect_dead_code_impl(
 
     for id in &graph.function_node_ids {
         let fi = if high_only {
-            graph.fan_in_high_only(id)
+            graph.liveness_fan_in_high_only(id)
         } else {
-            graph.fan_in(id)
+            graph.liveness_fan_in(id)
         };
 
         if fi > 0 {
@@ -200,6 +209,7 @@ mod tests {
                 to_id: t.to_string(),
                 kind: k,
                 confidence: crate::health::graph::Confidence::High,
+                via: None,
             })
             .collect();
         let mut g = AnalysisGraph::build(node_map, edges);
@@ -279,6 +289,7 @@ mod tests {
                 to_id: t.into(),
                 kind: k,
                 confidence: crate::health::graph::Confidence::High,
+                via: None,
             })
             .collect();
         let mut g = AnalysisGraph::build(m, es);
@@ -493,6 +504,7 @@ mod tests {
             to_id: "getHandler".to_string(),
             kind: EdgeKind::Contains,
             confidence: crate::health::graph::Confidence::High,
+            via: None,
         }];
         let mut g = AnalysisGraph::build(nodes, edges);
         g.compute_module_membership();
@@ -604,12 +616,14 @@ mod tests {
                 to_id: "pub_fn".into(),
                 kind: EdgeKind::Contains,
                 confidence: crate::health::graph::Confidence::High,
+                via: None,
             },
             GraphEdge {
                 from_id: "file".into(),
                 to_id: "priv_fn".into(),
                 kind: EdgeKind::Contains,
                 confidence: crate::health::graph::Confidence::High,
+                via: None,
             },
         ];
         let mut g = AnalysisGraph::build(nodes, edges);
@@ -700,6 +714,7 @@ mod tests {
             to_id: "exported_fn".into(),
             kind: EdgeKind::Contains,
             confidence: crate::health::graph::Confidence::High,
+            via: None,
         }];
         let mut g = AnalysisGraph::build(nodes, edges);
         g.compute_module_membership();
@@ -816,12 +831,14 @@ mod tests {
                 to_id: "trait_fn".into(),
                 kind: EdgeKind::Contains,
                 confidence: crate::health::graph::Confidence::High,
+                via: None,
             },
             GraphEdge {
                 from_id: "file".into(),
                 to_id: "regular_fn".into(),
                 kind: EdgeKind::Contains,
                 confidence: crate::health::graph::Confidence::High,
+                via: None,
             },
         ];
         let mut g = AnalysisGraph::build(nodes, edges);
@@ -925,6 +942,7 @@ mod tests {
             to_id: "row_to_node".into(),
             kind: EdgeKind::Contains,
             confidence: crate::health::graph::Confidence::High,
+            via: None,
         }];
         let mut g2 = AnalysisGraph::build(nodes, edges);
         g2.compute_module_membership();

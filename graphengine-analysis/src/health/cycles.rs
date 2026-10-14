@@ -2,6 +2,14 @@
 //!
 //! Finds all non-trivial SCCs (size > 1) in the structural (non-containment) edge graph.
 //! Each SCC represents a circular dependency.
+//!
+//! Only edges in the metrics edge basis count (direct calls by default;
+//! see `MetricsEdgeBasis`). Cycles that appear only once dispatch
+//! fan-out or function-as-value uses are added back are reported
+//! separately by [`detect_indirect_only_cycles`] as information, not as
+//! risk: e.g. a wrapper that implements a trait and forwards to an inner
+//! implementation of the same trait would otherwise form a cycle with
+//! every call site of that trait method.
 
 use std::collections::HashMap;
 
@@ -26,7 +34,7 @@ pub struct CycleResult {
 }
 
 pub fn detect_cycles(graph: &AnalysisGraph) -> CycleResult {
-    let sccs = tarjan_scc(graph);
+    let sccs = tarjan_scc(graph, &graph.production_structural_edge_indices);
 
     let mut cycles = Vec::new();
     let mut all_cycle_node_ids = std::collections::HashSet::new();
@@ -82,15 +90,78 @@ pub fn detect_cycles(graph: &AnalysisGraph) -> CycleResult {
     }
 }
 
+/// A cycle that exists only when dispatch / value Call edges are counted.
+#[derive(Debug, Clone)]
+pub struct IndirectOnlyCycle {
+    /// Sorted member node ids.
+    pub node_ids: Vec<String>,
+    /// Dispatch / value Call edges inside the cycle.
+    pub indirect_edge_indices: Vec<usize>,
+}
+
+/// SCCs of the production graph with dispatch / value Call edges added
+/// back that are not SCCs of the direct-call graph. Each is a circular
+/// relationship no direct call path closes, typically a forwarding
+/// wrapper. Empty when the graph was built with `MetricsEdgeBasis::AllUses`
+/// (nothing was held out) or when no indirect edge closes a loop.
+pub fn detect_indirect_only_cycles(graph: &AnalysisGraph) -> Vec<IndirectOnlyCycle> {
+    if graph.production_indirect_call_edge_indices.is_empty() {
+        return Vec::new();
+    }
+    let direct: std::collections::HashSet<Vec<String>> =
+        tarjan_scc(graph, &graph.production_structural_edge_indices)
+            .into_iter()
+            .filter(|scc| scc.len() > 1)
+            .map(|mut scc| {
+                scc.sort();
+                scc
+            })
+            .collect();
+
+    let mut combined = graph.production_structural_edge_indices.clone();
+    combined.extend_from_slice(&graph.production_indirect_call_edge_indices);
+
+    let mut out: Vec<IndirectOnlyCycle> = tarjan_scc(graph, &combined)
+        .into_iter()
+        .filter(|scc| scc.len() > 1)
+        .filter_map(|mut scc| {
+            scc.sort();
+            if direct.contains(&scc) {
+                return None;
+            }
+            let members: std::collections::HashSet<&str> = scc.iter().map(|s| s.as_str()).collect();
+            let indirect_edge_indices: Vec<usize> = graph
+                .production_indirect_call_edge_indices
+                .iter()
+                .copied()
+                .filter(|&ei| {
+                    let e = &graph.edges[ei];
+                    members.contains(e.from_id.as_str()) && members.contains(e.to_id.as_str())
+                })
+                .collect();
+            Some(IndirectOnlyCycle {
+                node_ids: scc,
+                indirect_edge_indices,
+            })
+        })
+        .collect();
+    out.sort_by(|a, b| {
+        b.node_ids
+            .len()
+            .cmp(&a.node_ids.len())
+            .then_with(|| a.node_ids.first().cmp(&b.node_ids.first()))
+    });
+    out
+}
+
 // ---------------------------------------------------------------------------
 // Tarjan's SCC (iterative to avoid stack overflow on large cycles)
 // ---------------------------------------------------------------------------
 
-fn tarjan_scc(graph: &AnalysisGraph) -> Vec<Vec<String>> {
-    // Use production edges only — excludes synthetic nodes AND test/example/vendor
-    // nodes so that test→production call edges don't create false cycles.
-    let edge_set = &graph.production_structural_edge_indices;
-
+/// Callers pass production edges only — excluding synthetic nodes AND
+/// test/example/vendor nodes so that test→production call edges don't
+/// create false cycles.
+fn tarjan_scc(graph: &AnalysisGraph, edge_set: &[usize]) -> Vec<Vec<String>> {
     let mut relevant_nodes: Vec<&str> = Vec::new();
     for &ei in edge_set {
         let edge = &graph.edges[ei];
@@ -230,6 +301,7 @@ mod tests {
                 to_id: t.to_string(),
                 kind: k,
                 confidence: crate::health::graph::Confidence::High,
+                via: None,
             })
             .collect();
 

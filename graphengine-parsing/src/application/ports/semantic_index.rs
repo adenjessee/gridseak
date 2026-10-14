@@ -40,6 +40,35 @@ pub trait SemanticIndex {
         Vec::new()
     }
 
+    /// Every definition occurrence of `symbol`. Several when the indexer
+    /// reuses one symbol for distinct same-named declarations (scip-python:
+    /// functions nested in different methods of one class). Default: empty.
+    fn declarations_of(&self, _symbol: &str) -> Vec<IndexTarget> {
+        Vec::new()
+    }
+
+    /// Definition of `symbol`, if the index has one. Default: `None`.
+    fn definition_of(&self, _symbol: &str) -> Option<IndexTarget> {
+        None
+    }
+
+    /// Direct supertypes of the type `symbol` (its base classes), in
+    /// declaration order. Default: empty.
+    fn supertypes_of(&self, _symbol: &str) -> Vec<String> {
+        Vec::new()
+    }
+
+    /// Module-level classes and functions named `name`. Default: empty.
+    fn module_level_definitions(&self, _name: &str) -> Vec<IndexTarget> {
+        Vec::new()
+    }
+
+    /// Start position (0-based line, column) and symbol of every occurrence
+    /// the index records in `file`, or `None` when unknown. Default: `None`.
+    fn occurrence_starts(&self, _file: &Path) -> Option<Vec<(u32, u32, String)>> {
+        None
+    }
+
     /// Reference sites of `symbol` (second caller witness). Default: empty.
     fn references_of(&self, _symbol: &str) -> Vec<IndexTarget> {
         Vec::new()

@@ -411,7 +411,7 @@ fn provision_rust(repo_root: &Path) -> Result<PathBuf, IndexerError> {
         repo_root,
         IndexerLanguage::Rust,
         "rust-analyzer",
-        &["rust-analyzer", "scip"],
+        &["rust-analyzer", "scip", "."],
     )
 }
 
@@ -421,8 +421,17 @@ fn run_npx_indexer(
     package: &str,
     label: &str,
 ) -> Result<PathBuf, IndexerError> {
+    // Run the version the registry pins, so a new upstream release can't
+    // silently change the index (and every answer key built on it).
+    let pinned = registry::entry_for(language)
+        .map(|e| e.pinned_version)
+        .filter(|v| !v.is_empty());
+    let spec = match pinned {
+        Some(v) => format!("{package}@{v}"),
+        None => package.to_string(),
+    };
     let output = Command::new("npx")
-        .args(["--yes", package, "index", "--output", "index.scip"])
+        .args(["--yes", spec.as_str(), "index", "--output", "index.scip"])
         .current_dir(repo_root)
         .output()
         .map_err(|e| IndexerError {

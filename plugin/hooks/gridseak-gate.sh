@@ -16,6 +16,11 @@ else
 fi
 
 fail_json() {
+  # A broken Stop hook must never trap the agent in its turn: fail open.
+  if [ "$MODE" = "stop" ]; then
+    printf '{}\n'
+    exit 0
+  fi
   printf '%s\n' "{\"permission\":\"ask\",\"user_message\":\"$1\",\"failClosed\":true}"
   exit 0
 }
@@ -34,6 +39,8 @@ err_file="$(mktemp -t gridseak-gate.XXXXXX)"
 set +e
 if [ "$MODE" = "card" ] || [ "$MODE" = "--card" ]; then
   printf '%s' "$input" | "$BIN" gate --card >"$out_file" 2>"$err_file"
+elif [ "$MODE" = "stop" ]; then
+  printf '%s' "$input" | "$BIN" gate --stop >"$out_file" 2>"$err_file"
 else
   printf '%s' "$input" | "$BIN" gate --format "$MODE" >"$out_file" 2>"$err_file"
 fi
@@ -43,6 +50,10 @@ if [ "$status" -eq 0 ] && [ -s "$out_file" ]; then
   cat "$out_file"
   rm -f "$out_file" "$err_file"
   exit 0
+fi
+if [ "$MODE" = "stop" ]; then
+  rm -f "$out_file" "$err_file"
+  fail_json ""
 fi
 reason="$(tr '\n' ' ' <"$err_file" | tr -d '"\\')"
 if [ -z "$reason" ]; then

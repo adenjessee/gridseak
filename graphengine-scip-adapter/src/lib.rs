@@ -8,8 +8,8 @@ pub mod index;
 pub mod provisioning;
 
 pub use index::{
-    DecodedRange, DocumentCoverage, ScipDefinition, ScipIndex, ScipIndexError,
-    MIN_WORKSPACE_COVERAGE,
+    rust_method_shape, DecodedRange, DocumentCoverage, RustMethod, ScipDefinition, ScipIndex,
+    ScipIndexError, MIN_WORKSPACE_COVERAGE,
 };
 pub use provisioning::{
     install_indexer, provision_index, IndexerError, IndexerLanguage, INDEXER_TIMEOUT,

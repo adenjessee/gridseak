@@ -37,6 +37,16 @@
         ]
       }
     ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "gridseak gate --stop"
+          }
+        ]
+      }
+    ],
     "SessionStart": [
       {
         "matcher": "compact|startup",

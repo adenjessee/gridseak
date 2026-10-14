@@ -179,6 +179,15 @@ pub const CAVEAT_INCREMENTAL_ANALYSIS_SEGMENTS_MERGED_V1: &str =
 pub const CAVEAT_INCREMENTAL_ANALYSIS_STRUCTURE_CHANGED_V1: &str =
     "incremental_analysis_structure_changed_v1";
 
+/// Structural metrics (cycles, tangle, fan-in / hotspots, blast radius,
+/// depth, coupling, cohesion, instability, layers, API surface) count
+/// direct calls only: Call edges tagged `via = dispatch` (interface /
+/// trait dispatch, fanned out to every implementation) or `via = value`
+/// (function passed or stored) are left out. Dead code still counts
+/// them as callers. Reports missing this caveat counted every Call
+/// edge. Details in `integrity_status.metrics_edge_basis`.
+pub const CAVEAT_METRICS_EDGE_BASIS_DIRECT_CALLS_V1: &str = "metrics_edge_basis_direct_calls_v1";
+
 // ---------------------------------------------------------------------------
 // Top-level report
 // ---------------------------------------------------------------------------
@@ -322,6 +331,40 @@ pub struct IntegrityStatus {
     /// `HealthReport.analysis_errors`.
     #[serde(default)]
     pub invariant_violations: bool,
+
+    /// Which Call edges the structural metrics counted. `None` on
+    /// reports from engines that counted every Call edge.
+    #[serde(skip_serializing_if = "Option::is_none", default)]
+    pub metrics_edge_basis: Option<MetricsEdgeBasisReport>,
+}
+
+/// What the structural metrics in this report count, and what they
+/// left out. See `CAVEAT_METRICS_EDGE_BASIS_DIRECT_CALLS_V1`.
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
+pub struct MetricsEdgeBasisReport {
+    /// `direct_calls_v1` or `all_uses_v1`.
+    pub basis: String,
+    /// Dispatch Call edges left out of structural metrics.
+    pub dispatch_edges_excluded: usize,
+    /// Function-as-value Call edges left out of structural metrics.
+    pub value_edges_excluded: usize,
+    /// Plain-language statement of the counting rule.
+    pub note: String,
+    /// Cycles that close only through dispatch / value uses. Shown for
+    /// information; they are not counted in `metrics.cycles` and carry
+    /// no risk score.
+    #[serde(skip_serializing_if = "Vec::is_empty", default)]
+    pub indirect_only_cycles: Vec<IndirectOnlyCycleInfo>,
+}
+
+/// One cycle that exists only when dispatch / value uses are counted.
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
+pub struct IndirectOnlyCycleInfo {
+    pub node_ids: Vec<String>,
+    /// Display names (`module::name`), same order as `node_ids`.
+    pub node_names: Vec<String>,
+    /// Number of dispatch / value Call edges inside the cycle.
+    pub indirect_edges: usize,
 }
 
 /// S2-γ trust-ladder metadata for agents and UI.
@@ -883,10 +926,15 @@ pub struct LanguageResolutionDisclosure {
 
 impl LanguageResolutionDisclosure {
     /// True when the compiler (SCIP) tier was attempted but the pass fell
-    /// back to heuristic edges because the index was unusable.
+    /// back because the index was unusable: to heuristic edges, or (Rust)
+    /// to the in-process rust-analyzer resolver (`tier_used` still layer2,
+    /// with the index skip reason kept).
     pub fn compiler_tier_unavailable(&self) -> bool {
         self.tier_attempted == ResolutionDisclosureTier::Layer2
-            && self.tier_used == ResolutionDisclosureTier::Heuristic
+            && matches!(
+                self.tier_used,
+                ResolutionDisclosureTier::Heuristic | ResolutionDisclosureTier::Layer2
+            )
             && matches!(
                 self.skip_reason,
                 Some(
@@ -1124,6 +1172,8 @@ mod resolution_disclosure_tests {
         assert!(row(Heuristic, Some(IndexerFailed)).compiler_tier_unavailable());
         assert!(!row(Heuristic, Some(LanguageNotRouted)).compiler_tier_unavailable());
         assert!(!row(Layer2, None).compiler_tier_unavailable());
+        // Rust: SCIP unusable, in-process rust-analyzer resolver ran instead.
+        assert!(row(Layer2, Some(IndexerNotProvisioned)).compiler_tier_unavailable());
         assert!(!row(SubprocessLsp, Some(AdapterInitFailed)).compiler_tier_unavailable());
     }
 
